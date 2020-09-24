@@ -8,6 +8,7 @@
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
     """,
+    'website': 'https://i.imgur.com/42fbqjS.gif',
     'author': "RainOnMe",
     'license': 'LGPL-3',
     # 'website': "https://www.nissho-vn.com/en/",
@@ -23,7 +24,7 @@
         'views/assets.xml',
     ],
     'qweb': ['static/src/xml/*.xml'],
-    "images": ['static/description/banner.gif', 'static/description/theme_screenshot.png'],
+    "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
     'price': 9.99,
     'currency': 'EUR',
     'external_dependencies': {}
