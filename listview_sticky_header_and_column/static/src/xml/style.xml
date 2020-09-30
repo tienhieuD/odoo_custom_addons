@@ -1,24 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <style t-name="listview_sticky_header_and_column.style" type="text/css" class="js_lvs_style">
-        .table-responsive {
-            overflow: unset;
-            overflow-x: unset;
-        }
-        .table-responsive .o_list_view tr.o_data_row {
-            position: relative
-        }
-        .table-responsive .o_list_view thead {
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-        .table-responsive .o_list_view tr.o_data_row:hover td {
-            background-color: #EEE !important;
-        }
-        .table-responsive .o_list_view tr.o_data_row:focus-within td {
-            background-color: #ccc !important;
-        }
         <t t-foreach="arr_offset_lefts" t-as="offset">
             .table-responsive .o_list_view tr.o_data_row td:nth-child(<t t-esc="offset_index+1"/>) {
                 position: sticky;
@@ -28,7 +10,6 @@
             .table-responsive .o_list_view thead tr:nth-child(1) th:nth-child(<t t-esc="offset_index+1"/>) {
                 position: sticky;
                 left: <t t-esc="offset"/>px;
-                background-color:#EEE;
                 z-index: 2
             }
             <t t-if="offset_last">
