@@ -44,6 +44,11 @@
     tr.o_data_row {
       position: relative;
 
+      td {
+        white-space: nowrap;
+        padding: 0.3rem 0.75rem;
+      }
+
       &:hover td {
         background-color: #EEE !important;
       }
