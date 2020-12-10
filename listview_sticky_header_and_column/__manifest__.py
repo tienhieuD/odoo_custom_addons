@@ -16,7 +16,7 @@
     # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Technical Settings',
-    'version': '0.1',
+    'version': '0.2',
     # any module necessary for this one to work correctly
     'depends': ['base', 'web'],
     # always loaded
@@ -25,7 +25,7 @@
     ],
     'qweb': ['static/src/xml/*.xml'],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
-    'price': 9.99,
+    'price': 19.99,
     'currency': 'EUR',
     'external_dependencies': {}
 }
