@@ -8,7 +8,7 @@
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
     """,
-    'website': 'https://i.imgur.com/42fbqjS.gif',
+    'website': 'https://live.staticflickr.com/65535/50701330062_5a6a35cd36_o.gif',
     'author': "RainOnMe",
     'license': 'LGPL-3',
     # 'website': "https://www.nissho-vn.com/en/",
