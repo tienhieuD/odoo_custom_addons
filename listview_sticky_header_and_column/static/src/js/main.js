@@ -41,6 +41,7 @@ odoo.define('nev_widgets.ext_context_freeze_column', function (require) {
             if (!$table.length) {
                 return
             }
+            var wrapper_offset_left = $(".o_content").offset().left;
             var $table_footer = $table.find('tfoot');
             this.arr_offset_lefts.length = 0
             for (var i = 1; i <= this.number_of_keep_columns; i++) {
@@ -48,7 +49,7 @@ odoo.define('nev_widgets.ext_context_freeze_column', function (require) {
                 if (!$td.length) {
                     continue
                 }
-                var offset = $td.offset().left;
+                var offset = $td.offset().left - wrapper_offset_left;
                 this.arr_offset_lefts.push(offset)
             }
             this._addStyle()
