@@ -21,10 +21,19 @@
     'depends': ['base', 'web'],
     # always loaded
     'data': [
-        'views/assets.xml',
+        # 'views/assets.xml',
     ],
     'qweb': ['static/src/xml/*.xml'],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
+    'assets': {
+        'web._assets_primary_variables': [
+            'account/static/src/scss/variables.scss',
+        ],
+        'web.assets_backend': [
+            '/listview_sticky_header_and_column/static/src/scss/main.scss',
+            '/listview_sticky_header_and_column/static/src/js/main.js',
+        ]
+    },
     'price': 21.44,
     'currency': 'EUR',
     'external_dependencies': {}
