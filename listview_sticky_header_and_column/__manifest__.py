@@ -25,7 +25,7 @@
     ],
     'qweb': ['static/src/xml/*.xml'],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
-    'price': 24.44,
+    'price': 21.44,
     'currency': 'EUR',
     'external_dependencies': {}
 }
