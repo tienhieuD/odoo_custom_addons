@@ -2,40 +2,42 @@
 .display-on-hover {
   display: none;
   position: absolute;
-  bottom: -12.5px;
-  right: 0;
+  bottom: 50%;
+  margin-bottom: -10px;
+  right: 4px;
   width: 20px;
   height: 20px;
   overflow: hidden;
   z-index: 10;
   margin-right: 1px;
   text-align: center;
-  background: #eee;
+  background: #fff;
   border: 1px solid #ddd;
+  border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-    display: block
+    display: block;
+  }
+  &:active {
+    transform: scale(0.8);
   }
 }
 
 .o_list_view thead > tr > th {
   &:hover {
     .display-on-hover {
-      display: block
+      display: block;
     }
   }
 }
 
 
 // Common css
-.table-responsive {
-  overflow: unset;
-  overflow-x: unset;
-
-  .o_list_view {
+.o_list_view {
+  .table-responsive {
     thead th {
-      position: sticky;
+      position: sticky !important;
       top: 0;
       background-color: #EEE;
       z-index: 1;
