@@ -133,7 +133,7 @@ odoo.define('nev_widgets.ext_context_freeze_column', function (require) {
                             .o_content .o_list_view .table-responsive table thead tr th:nth-child(${cssNthChildIndex}),
                             .o_content .o_list_view .table-responsive table tfoot tr td:nth-child(${cssNthChildIndex}),
                             .o_content .o_list_view .table-responsive table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
-                                position: sticky;
+                                position: sticky !important;
                                 left: ${offsetLeft}px;
                                 z-index: 1;
                                 border-right: 1px solid #dee2e6;
