@@ -4,7 +4,7 @@
   position: absolute;
   bottom: 50%;
   margin-bottom: -10px;
-  right: 4px;
+  right: 24px;
   width: 20px;
   height: 20px;
   overflow: hidden;
@@ -34,8 +34,9 @@
 
 
 // Common css
-.o_list_view {
+.o_content {
   .table-responsive {
+    overflow: visible;
     thead th {
       position: sticky !important;
       top: 0;
