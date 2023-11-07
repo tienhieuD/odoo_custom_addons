@@ -26,9 +26,6 @@
     # 'qweb': ['static/src/xml/*.xml'],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
     'assets': {
-        'web._assets_primary_variables': [
-            'account/static/src/scss/variables.scss',
-        ],
         'web.assets_backend': [
             'listview_sticky_header_and_column/static/src/scss/main.scss',
             'listview_sticky_header_and_column/static/src/js/main.js',
