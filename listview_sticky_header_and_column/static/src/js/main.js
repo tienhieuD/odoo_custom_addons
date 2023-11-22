@@ -49,19 +49,19 @@ ListRenderer.include({
                         .o_content .o_list_view .table-responsive table tfoot tr td:nth-child(${cssNthChildIndex}),
                         .o_content .o_list_view .table-responsive table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
                             position: sticky !important;
-                            left: ${offsetLeft}px;
-                            z-index: 1;
-                            border-right: 1px solid #dee2e6;
+                            left: ${offsetLeft}px !important;
+                            z-index: 1 !important;
+                            border-right: 1px solid #dee2e6 !important;
                         }
                         .o_content .o_list_view .table-responsive table thead tr th:nth-child(${cssNthChildIndex}) {
-                            top: 0;
-                            z-index: 10;
+                            top: 0 !important;
+                            z-index: 10 !important;
                         }
                         .o_content .o_list_view .table-responsive table tbody tr:nth-of-type(odd).o_data_row td:nth-child(${cssNthChildIndex}) {
-                            background-color: #f9f9f9;
+                            background-color: #f9f9f9 !important;
                         }
                         .o_content .o_list_view .table-responsive table tbody tr:nth-of-type(even).o_data_row td:nth-child(${cssNthChildIndex}) {
-                            background-color: #fff;
+                            background-color: #fff !important;
                         }
                     `)
                 }
