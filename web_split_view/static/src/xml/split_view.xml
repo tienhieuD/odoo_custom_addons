@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="awesome.SplitViewRenderer">
+        <div class="duo_split_view d-flex w-100 h-100">
+            <div class="left-side border-right overflow-auto" style="width:50%">
+                <div id="list-view-container">
+                </div>
+            </div>
+            <div class="split_resizer" title="Resize">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="right-side overflow-auto position-relative" style="width:50%">
+                <div class="js_loading_split_form duo-loading-split-form"></div>
+                <p class="form-placeholder position-absolute">
+                    Select an item from the list to display details.
+                </p>
+                <div id="form-view-container" class="form-view-container">
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="awesome.SplitView.buttons">
+        <div class="o_split_buttons_view" role="toolbar" aria-label="Main actions">
+            <button t-if="widget.is_action_enabled('create')" type="button"
+                    class="btn btn-primary o_split_button_create" title="Create record" accesskey="c">
+                Create
+            </button>
+            <button type="button"
+                    class="btn btn-secondary o_split_button_reload" title="Reload List" accesskey="c">
+                Reload List <i class="fa fa-refresh"/>
+            </button>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="base.open_module_tree" model="ir.actions.act_window">
+        <field name="view_mode">kanban,tree,form,split</field>
+    </record>
+
+    <record id="app_split_view" model="ir.ui.view">
+        <field name="name">app.split.view</field>
+        <field name="model">ir.module.module</field>
+        <field name="arch" type="xml">
+            <split tree_view_ref="base.module_tree" form_view_ref="base.module_form" />
+        </field>
+    </record>
+</odoo>
