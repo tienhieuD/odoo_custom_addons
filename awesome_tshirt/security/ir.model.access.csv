@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-awesome_tshirt.access_awesome_contact,access_awesome_contact,awesome_tshirt.model_awesome_contact,base.group_user,1,1,1,1
