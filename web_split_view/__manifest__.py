@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Web SplitView",
+    'name': "Web Split View",
     'summary': """Dual-view layout, seamlessly dividing the screen into list and detail sections for CRUD operations.""",
     'author': "DUO-TEK Software Vietnam",
     'support ': 'tienhieu1212@gmail.com',

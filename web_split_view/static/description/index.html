@@ -1,0 +1,240 @@
+<link
+  type="text/css"
+  rel="stylesheet"
+  href="https://apps.odoo.com/web/assets/15380454-60c4580/1/web.assets_common.min.css"
+  data-asset-bundle="web.assets_common"
+  data-asset-version="60c4580"
+/>
+<link
+  type="text/css"
+  rel="stylesheet"
+  href="https://apps.odoo.com/web/assets/15380466-e7e0d1a/1/web.assets_frontend.min.css"
+  data-asset-bundle="web.assets_frontend"
+  data-asset-version="e7e0d1a"
+/>
+<script
+  type="text/javascript"
+  async=""
+  src="https://www.gstatic.com/recaptcha/releases/cwQvQhsy4_nYdnSDY4u7O5_B/recaptcha__vi.js"
+  crossorigin="anonymous"
+  integrity="sha384-GgxfAAQdvHOtDvItWqLw1YEPSKdhwpT6e6kTCoqCrb/q+F3agBhCT5a9n4Y+lGE+"
+></script>
+<script id="web.layout.odooscript" type="text/javascript">
+  var odoo = {
+    csrf_token: "146300a7dfe295c2dfadaf84bdbd8941170c916bo1733977194",
+    debug: "",
+  };
+</script>
+<script type="text/javascript">
+  odoo.__session_info__ = {
+    is_admin: false,
+    is_system: false,
+    is_website_user: false,
+    user_id: 237036,
+    is_frontend: true,
+    profile_session: null,
+    profile_collectors: null,
+    profile_params: null,
+    show_effect: "True",
+    server_version: "15.0+e",
+    server_version_info: [15, 0, 0, "final", 0, "e"],
+    translationURL: "/website/translations",
+    cache_hashes: {
+      translations: "ec9ba9f156a80fef4a4a73dd7f5b3aff720d12f7",
+    },
+    lang_url_code: "en_US",
+    geoip_country_code: "VN",
+  };
+  if (!/(^|;\s)tz=/.test(document.cookie)) {
+    const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    document.cookie = `tz=${userTZ}; path=/`;
+  }
+</script>
+<script
+  defer="defer"
+  type="text/javascript"
+  src="https://apps.odoo.com/web/assets/14824531-b5e13c2/1/web.assets_common_minimal.min.js"
+  data-asset-bundle="web.assets_common_minimal"
+  data-asset-version="b5e13c2"
+></script>
+<script
+  defer="defer"
+  type="text/javascript"
+  src="https://apps.odoo.com/web/assets/13753121-9e23d47/1/web.assets_frontend_minimal.min.js"
+  data-asset-bundle="web.assets_frontend_minimal"
+  data-asset-version="9e23d47"
+></script>
+<script
+  defer="defer"
+  type="text/javascript"
+  data-asset-bundle="web.assets_common_lazy"
+  data-asset-version="963a2df"
+  src="https://apps.odoo.com/web/assets/15380417-963a2df/1/web.assets_common_lazy.min.js"
+></script>
+<script
+  defer="defer"
+  type="text/javascript"
+  data-asset-bundle="web.assets_frontend_lazy"
+  data-asset-version="10798f8"
+  src="https://apps.odoo.com/web/assets/15380438-10798f8/1/web.assets_frontend_lazy.min.js"
+></script>
+<link
+  href="https://apps.odoo.com/web/assets/15393974-a10fd4f/1/web_editor.assets_wysiwyg.min.css"
+  rel="stylesheet"
+  type="text/css"
+/>
+<script
+  type="text/javascript"
+  src="https://apps.odoo.com/web/assets/15380424-a10fd4f/1/web_editor.assets_wysiwyg.min.js"
+></script>
+
+<style type="text/css">
+  body {
+    overflow: auto !important;
+  }
+</style>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <h2 class="oe_slogan">Web Split View</h2>
+    <p class="oe_slogan">
+      <b>
+        Web Split View is a dual-view layout, seamlessly dividing the screen
+        into list and detail sections for CRUD operations.
+      </b>
+    </p>
+    <p>
+      The "Web Split View" is an add-on for the Odoo framework designed to
+      enhance the user interface and user experience by introducing a new custom
+      view. The primary purpose of this add-on is to provide a split-screen
+      view, dividing the interface into two distinct sections: a list view and a
+      detail form view.
+    </p>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="home-tab"
+          data-toggle="tab"
+          data-target="#home"
+          type="button"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+        >
+          <b>Key Features</b>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="profile-tab"
+          data-toggle="tab"
+          data-target="#profile"
+          type="button"
+          role="tab"
+          aria-controls="profile"
+          aria-selected="false"
+        >
+          <b>How to Use</b>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="contact-tab"
+          data-toggle="tab"
+          data-target="#contact"
+          type="button"
+          role="tab"
+          aria-controls="contact"
+          aria-selected="false"
+        >
+          <b>Usage for Developers</b>
+        </button>
+      </li>
+    </ul>
+    <div class="tab-content mt-3" id="myTabContent">
+      <div
+        class="tab-pane fade show active"
+        id="home"
+        role="tabpanel"
+        aria-labelledby="home-tab"
+      >
+        <p>
+          Web Split View add-on brings a modern and intuitive interface to Odoo,
+          facilitating a more efficient and enjoyable user interaction with data
+          through the innovative split-screen design.
+        </p>
+        <ol>
+          <li>
+            <b>Split-Screen Interface:</b>
+            <p>
+              The add-on introduces a split-screen interface, allowing users to
+              simultaneously view a list of items and the detailed information
+              of a selected item.
+            </p>
+          </li>
+
+          <li><b>List View:</b></li>
+          <p>
+            The list view presents a comprehensive list of items, enabling users
+            to quickly scan and identify the items they are interested in.
+          </p>
+          <li><b>Detail Form View:</b></li>
+          <p>
+            The detail form view displays in-depth information about a selected
+            item. It provides a closer look at the details, attributes, and
+            related information associated with the chosen item.
+          </p>
+          <li><b>Interactive Selection:</b></li>
+          <p>
+            Users have the ability to interactively select items from the list
+            view, triggering the display of corresponding details in the
+            adjacent form view.
+          </p>
+          <li><b>Create, Edit, Delete Functionality:</b></li>
+          <p>
+            The detail form view supports essential CRUD (Create, Read, Update,
+            Delete) operations. Users can create new items, edit existing ones,
+            and delete items directly from the detail form view.
+          </p>
+          <li><b>Enhanced User Productivity:</b></li>
+          <p>
+            The Web Split View aims to enhance user productivity by streamlining
+            the workflow. Users can efficiently navigate between the list view
+            and detail form view to manage and interact with data.
+          </p>
+          <li><b>Customizable and Flexible:</b></li>
+          <p>
+            The add-on is designed with customization in mind, providing
+            flexibility for developers and administrators to adapt the split
+            view functionality to meet specific business requirements.
+          </p>
+          <li><b>Seamless Integration with Odoo:</b></li>
+          <p>
+            As an Odoo add-on, Web Split View seamlessly integrates into the
+            Odoo framework, leveraging its robust features and maintaining
+            consistency with the overall Odoo user experience.
+          </p>
+        </ol>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="profile"
+        role="tabpanel"
+        aria-labelledby="profile-tab"
+      >
+        ...2
+      </div>
+      <div
+        class="tab-pane fade"
+        id="contact"
+        role="tabpanel"
+        aria-labelledby="contact-tab"
+      >
+        .3..
+      </div>
+    </div>
+  </div>
+</section>
