@@ -94,10 +94,15 @@
       overflow: auto !important;
     }
   </style>
-</div>
- -->
+</div> -->
 
 <section class="oe_container">
+  <style type="text/css">
+    .image-bordered {
+      border: 1px solid #ddd;
+      margin-bottom: 16px;
+    }
+  </style>
   <div class="oe_row oe_spaced">
     <h2 class="oe_slogan">Web Split View</h2>
     <p class="oe_slogan">
@@ -118,7 +123,7 @@
       src="main.png"
       width="100%"
       alt="Web Split View Sale Orders Demo"
-      style="border: 1px solid #ddd; margin-bottom: 16px"
+      class="image-bordered"
     />
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -133,7 +138,7 @@
           aria-controls="home"
           aria-selected="true"
         >
-          <b>Key Features</b>
+          <h3>Key Features</h3>
         </a>
       </li>
       <li class="nav-item" role="presentation">
@@ -147,7 +152,7 @@
           aria-controls="profile"
           aria-selected="false"
         >
-          <b>How to Use</b>
+          <h3>How to Use</h3>
         </a>
       </li>
       <li class="nav-item" role="presentation">
@@ -161,7 +166,7 @@
           aria-controls="contact"
           aria-selected="false"
         >
-          <b>For Developers</b>
+          <h3>For Developers</h3>
         </a>
       </li>
     </ul>
@@ -254,7 +259,108 @@
         role="tabpanel"
         aria-labelledby="profile-tab"
       >
-        Updating...
+        <h4>Prerequisites</h4>
+        <p>To create Split View</p>
+        <ol>
+          <li>
+            <b
+              >You must be admin of your system or has role Administration
+              Settings.</b
+            >
+            <p>
+              Go to <i>Settings/Users & Companies/Users/{user-name}</i> and
+              check out.
+            </p>
+            <img
+              src="pre-admin.png"
+              width="100%"
+              alt="Web Split View Sale Orders Demo"
+              class="image-bordered"
+            />
+          </li>
+          <li>
+            <b>You must activate the developer mode.</b>
+            <p>
+              Go to <i>Settings/General Settings</i> and Turn the Developer Mode
+              on.
+            </p>
+            <img
+              src="pre-debug.png"
+              width="100%"
+              alt="Web Split View Sale Orders Demo"
+              class="image-bordered"
+            />
+          </li>
+        </ol>
+
+        <h4>Setup your Split views</h4>
+        <p>For example, to create new Split View of Sales Order Quotation.</p>
+        <ol>
+          <li>
+            <b
+              >Go to menu <i><u>Sales/Orders/Quotations</u></i
+              >.</b
+            >
+          </li>
+          <li>
+            <b>Click on <i>Debug Menu</i> then <i>Create View: Split</i>.</b>
+            <img
+              src="setup-create.png"
+              width="100%"
+              alt="Web Split View Sale Orders Demo"
+              class="image-bordered"
+            />
+          </li>
+          <li>
+            <b>Config the List View and From View.</b>
+            <p>
+              If you set this inputs empty, it will get the default List and
+              Form View to display.
+            </p>
+
+            <img
+              src="setup-detail-setup.png"
+              width="100%"
+              alt="Web Split View Sale Orders Demo"
+              class="image-bordered"
+            />
+            <p>
+              To make Split View is the default view when you go to this Menu,
+              check <i>Make default view ✅</i>
+            </p>
+            <p>
+              <i>Finnally, click button <u>Create</u> to finish.</i>
+            </p>
+          </li>
+          <li>
+            <b>The result</b>
+            <p>
+              You can resize your List &amp; Form View by hover and move this
+              line.
+            </p>
+
+            <img
+              src="setup-resize.png"
+              width="100%"
+              alt="Web Split View Sale Orders Demo"
+              class="image-bordered"
+            />
+          </li>
+        </ol>
+
+        <h4>Drop your Split views</h4>
+        <ol>
+          <li>
+            Remove your Split View by click on <i>Debug Menu</i> then
+            <i>Remove View: Split</i>.
+          </li>
+          <img
+            src="setup-remove.png"
+            width="100%"
+            alt="Web Split View Sale Orders Demo"
+            class="image-bordered"
+          />
+        </ol>
       </div>
       <div
         class="tab-pane fade"
@@ -262,8 +368,34 @@
         role="tabpanel"
         aria-labelledby="contact-tab"
       >
-        Updating...
-      </div>
+      <p>
+        To define Split View for developer
+        </p>
+      <ol>
+        <li>
+          <b>Create Window Action and define Split View.</b>
+          <p>- Define `ir.actions.act_window` with `view_mode` contain `split`.</p>
+          <p>- Define `ir.ui.view` with attributes `tree_view_ref/form_view_ref` is xmlid of tree/form has been defined before.</p>
+          <p><u>For example:</u></p>
+          <img
+            src="dev-define-action-view.png"
+            width="100%"
+            alt="Web Split View Sale Orders Demo"
+            class="image-bordered"
+          />
+        </li>
+        <li>
+          <b>You can define `form` and `tree` tag directly inside `split` tag.</b>
+          <p><u>For example:</u></p>
+          <img
+            src="dev-define-view-directly.png"
+            width="100%"
+            alt="Web Split View Sale Orders Demo"
+            class="image-bordered"
+          />
+        </li>
+      </ol>
+    </div>
     </div>
   </div>
 </section>

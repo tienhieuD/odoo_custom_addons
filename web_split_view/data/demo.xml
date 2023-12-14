@@ -4,11 +4,40 @@
         <field name="view_mode">kanban,tree,form,split</field>
     </record>
 
-    <record id="app_split_view" model="ir.ui.view">
-        <field name="name">app.split.view</field>
-        <field name="model">ir.module.module</field>
+
+
+    <!-- Define view tree and form inside split tag directly -->
+    <record id="customer_split_view" model="ir.ui.view">
+        <field name="name">customer.split.view</field>
+        <field name="model">res.partner</field>
         <field name="arch" type="xml">
-            <split tree_view_ref="base.module_tree" form_view_ref="base.module_form" />
+            <split>
+                <tree>
+                    <field name="name" />
+                    <field name="phone" />
+                    <field name="city" />
+                    <field name="category_id" />
+                </tree>
+                <form create="1" duplicate="1">
+                    <header>
+                        <field name="active" widget="statusbar" />
+                    </header>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="phone" />
+                        </group>
+                        <group>
+                            <field name="city" />
+                            <field name="category_id" />
+                        </group>
+                    </group>
+                </form>
+            </split>
         </field>
     </record>
+
+
+
+
 </odoo>
