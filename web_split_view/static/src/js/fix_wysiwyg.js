@@ -1,6 +1,5 @@
 /** @odoo-module **/
 
-/*
 
 import Wysiwyg from 'web_editor.wysiwyg'
 
@@ -14,5 +13,3 @@ Wysiwyg.include({
         return this._super(...arguments);
     }
 });
-
-*/

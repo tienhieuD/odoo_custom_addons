@@ -17,12 +17,14 @@
         'views/create_view_split_wizard.xml',
     ],
     'assets': {
+        'website.assets_wysiwyg': [
+            'web_split_view/static/src/js/fix_wysiwyg.js',
+        ],
         'web.assets_qweb': [
             'web_split_view/static/src/xml/**/*',
         ],
         'web.assets_backend': [
             'web_split_view/static/src/scss/split_view.scss',
-            'web_split_view/static/src/js/fix_wysiwyg.js',
             'web_split_view/static/src/js/split_listview.js',
             'web_split_view/static/src/js/split_formview.js',
             'web_split_view/static/src/js/split_view.js',

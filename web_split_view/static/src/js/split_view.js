@@ -281,37 +281,23 @@ odoo.define("awesome.splitView", function (require) {
 
             const modelName = controller.modelName;
             const context = controller.initialState.context;
-            const views = [];
-            let archTree, archForm;
 
             const xml = new DOMParser().parseFromString(this.viewInfo.arch, "text/xml");
 
             const treeRef = xml.documentElement.getAttribute('tree_view_ref');
-            const treeXml = xml.documentElement.getElementsByTagName('tree')[0];
-            if (treeXml) {
-                archTree = treeXml.outerHTML;
-            } else if (treeRef) {
-                const treeId = await this.xmlid(treeRef);
-                views.push([treeId, 'list']);
-            }
-
             const formRef = xml.documentElement.getAttribute('form_view_ref');
+            const treeXml = xml.documentElement.getElementsByTagName('tree')[0];
             const formXml = xml.documentElement.getElementsByTagName('form')[0];
-            if (formXml) {
-                archForm = formXml.outerHTML;
-            } else if (formRef) {
-                const formId = await this.xmlid(formRef);
-                views.push([formId, 'form']);
-            }
+            
+            const [treeId, formId] = await Promise.all([this.xmlid(treeRef), this.xmlid(formRef)]);
+            const views = [[treeId, 'list'], [formId, 'form']];
+            const viewInfo = await controller.loadViews(modelName, context, views);
 
-            if (views.length) {
-                const { form, list } = await controller.loadViews(modelName, context, views);
-                archTree = archTree || (list && list.arch);
-                archForm = archForm || (form && form.arch);
-            }
+            const viewInfoList = treeXml ? {...this.viewInfo, arch: treeXml.outerHTML} : {...viewInfo.list};
+            const viewInfoForm = formXml ? {...this.viewInfo, arch: formXml.outerHTML} : {...viewInfo.form};
 
-            this.ListView = new ListView({ ...this.viewInfo, arch: archTree, }, { ...this.params, withControlPanel: false, withSearchBar: false, withSearchPanel: false, });
-            this.FormView = new FormView({ ...this.viewInfo, arch: archForm, }, { ...this.params, withControlPanel: true, withSearchBar: false, withSearchPanel: false, });
+            this.ListView = new ListView(viewInfoList, { ...this.params, withControlPanel: false, withSearchBar: false, withSearchPanel: false, });
+            this.FormView = new FormView(viewInfoForm, { ...this.params, withControlPanel: true, withSearchBar: false, withSearchPanel: false, });
 
             controller.ListView = this.ListView;
             controller.FormView = this.FormView;
