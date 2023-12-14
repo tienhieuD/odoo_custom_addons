@@ -16,6 +16,7 @@
         'security/ir.model.access.csv',
         'views/create_view_split_wizard.xml',
     ],
+    "images": ['static/description/banner.png'],
     'assets': {
         'website.assets_wysiwyg': [
             'web_split_view/static/src/js/fix_wysiwyg.js',
