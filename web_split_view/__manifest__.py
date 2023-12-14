@@ -8,7 +8,7 @@
     'license': 'LGPL-3',
     'category': 'Technical',
     'version': '15.0.0',
-    'price': 139.45,
+    'price': 139.36,
     'currency': 'EUR',
     'depends': ['base', 'web', 'web_editor'],
     'data': [
