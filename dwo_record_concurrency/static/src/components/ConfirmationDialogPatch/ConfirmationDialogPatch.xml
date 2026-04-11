@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t
+        t-name="web.ConfirmationDialogWithDiscard"
+        t-inherit="web.ConfirmationDialog"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//p[hasclass('text-prewrap')]" position="attributes">
+            <attribute name="class"></attribute>
+            <attribute name="t-att-class">props.bodyPrewrap ? 'text-prewrap' : ''</attribute>
+        </xpath>
+        <xpath expr="//button[@t-on-click='_confirm']" position="after">
+            <button 
+                t-if="props.discard" 
+                t-att-class="'btn btn-outline-primary ' + props.discardClass" 
+                t-on-click="_discard" 
+                t-esc="props.discardLabel"
+            />
+        </xpath>
+    </t>
+</templates>
