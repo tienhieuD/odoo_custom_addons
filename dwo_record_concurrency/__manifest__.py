@@ -21,6 +21,6 @@
     "installable": True,
     "auto_install": False,
     "license": "LGPL-3",
-    'price': 40.00,
+    'price': 59.00,
     'currency': 'EUR',
 } # type: ignore
