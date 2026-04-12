@@ -1,90 +1,131 @@
 <section class="oe_container">
     <div class="oe_row oe_spaced">
-        <h2 class="oe_slogan">
-            Record Concurrency Control Pro
+
+        <!-- HERO -->
+        <h1 class="oe_slogan" style="font-size:40px; font-weight:700;">
+            Stop Data Loss from Concurrent Editing
+        </h1>
+
+        <h2 class="oe_slogan" style="font-size:24px; color:#555;">
+            Record Concurrency Control for Odoo
         </h2>
-        <h5 class="oe_slogan">
-            Prevent Data Conflicts and Enhance Team Collaboration in Real-Time
-        </h5>
-        <p>
-            In multi-user environments, simultaneous editing of the same record can lead to data overwrites, lost work, and frustration. Record Concurrency Control Pro solves this by providing intelligent detection, warnings, and resolution options to ensure data integrity and smooth collaboration.
+
+        <p style="text-align:center; font-size:16px; max-width:800px; margin: 0 auto;">
+            Prevent accidental overwrites when multiple users edit the same record.
+            Detect conflicts in real-time, review differences clearly, and ensure every change is intentional.
         </p>
 
-        <h3>Key Features</h3>
-        <ul>
-            <li><strong>Real-Time Edit Detection:</strong> Instantly notifies users when another person starts editing the same record.</li>
-            <li><strong>Smart Concurrency Warnings:</strong> Displays clear dialogs with options to force save, discard changes, or cancel for review.</li>
-            <li><strong>Visual Conflict Resolution:</strong> Shows a detailed table comparing your local changes with the latest server data, highlighting differences for fields like text, dates, many-to-one, many-to-many, and binary files.</li>
-            <li><strong>Multi-Tab Support:</strong> Seamlessly handles edits across multiple browser tabs, preventing conflicts within the same user session.</li>
-            <li><strong>Bus Integration:</strong> Leverages Odoo's real-time bus system for instant notifications without performance overhead.</li>
-            <li><strong>Automatic Stale Detection:</strong> Marks records as "stale" when updated by others, prompting users to reconcile changes.</li>
-            <li><strong>Flexible Save Options:</strong> Choose to overwrite server data, discard local changes, or review before proceeding.</li>
-            <li><strong>Browser Unload Protection:</strong> Prevents accidental navigation away from unsaved, conflicting changes.</li>
+        <div style="text-align:center; margin-top:20px;">
+            <span style="background:#875A7B; color:#fff; padding:8px 18px; border-radius:4px;">
+                Protect your data integrity with zero configuration
+            </span>
+        </div>
+
+        <br/>
+
+        <!-- DEMO -->
+        <img src="concurrency_warning_dialog.png" width="100%"/>
+
+        <!-- PROBLEM -->
+        <h3 class="oe_slogan">The Problem</h3>
+
+        <p style="text-align:center; font-size:16px; max-width:800px; margin: 0 auto;">
+            In multi-user environments, it is common for two or more users to edit the same record at the same time.
+            Without proper control, the last save overwrites previous changes, leading to data loss,
+            inconsistencies, and costly mistakes.
+        </p>
+
+        <!-- SOLUTION -->
+        <h3 class="oe_slogan">The Solution</h3>
+
+        <p style="text-align:center; font-size:16px; max-width:800px; margin: 0 auto;">
+            This module introduces real-time concurrency detection, intelligent warnings,
+            and visual comparison tools to help users resolve conflicts safely and efficiently.
+        </p>
+
+        <!-- FEATURES -->
+        <h3 class="oe_slogan">Key Features</h3>
+
+        <ul style="font-size:16px;">
+            <li>Real-time detection when another user edits the same record</li>
+            <li>Clear warning dialogs with flexible resolution options</li>
+            <li>Visual comparison between your changes and server data</li>
+            <li>Supports text, dates, relational fields, and binary data</li>
+            <li>Multi-tab awareness to prevent self-conflicts</li>
+            <li>Automatic stale record detection</li>
+            <li>Options to overwrite, discard, or review changes before saving</li>
+            <li>Protection against accidental navigation with unsaved changes</li>
         </ul>
 
-        <h3>How It Works</h3>
-        <ol>
-            <li>A user opens a record for editing.</li>
-            <li>If another user edits and saves the same record, the first user receives a notification.</li>
-            <li>The system marks the record as stale and shows a warning dialog with change details.</li>
-            <li>The user can review differences, force save, discard, or cancel to avoid data loss.</li>
+        <!-- VISUAL -->
+        <img src="difference_table.png" width="100%"/>
+        <p style="text-align:center;"><em>Compare differences before making a decision</em></p>
+
+        <img src="multi_tab_support.png" width="100%"/>
+        <p style="text-align:center;"><em>Prevent conflicts across multiple tabs</em></p>
+
+        <img src="stale_record_notification.png" width="100%"/>
+        <p style="text-align:center;"><em>Instant notification when data becomes outdated</em></p>
+
+        <!-- HOW IT WORKS -->
+        <h3 class="oe_slogan">How It Works</h3>
+
+        <ol style="font-size:16px;">
+            <li>User A opens a record and starts editing</li>
+            <li>User B updates and saves the same record</li>
+            <li>User A is notified immediately about the change</li>
+            <li>The system highlights differences and offers resolution options</li>
+            <li>User A decides to overwrite, discard, or review changes</li>
         </ol>
 
-        <h3>Benefits</h3>
-        <ul>
-            <li><strong>Eliminates Data Overwrites:</strong> Prevents accidental loss of important updates.</li>
-            <li><strong>Boosts Productivity:</strong> Reduces time spent on conflict resolution and rework.</li>
-            <li><strong>Enhances Collaboration:</strong> Allows teams to work simultaneously without fear of data corruption.</li>
-            <li><strong>Improves Data Integrity:</strong> Ensures all changes are intentional and reviewed.</li>
-            <li><strong>User-Friendly:</strong> Intuitive dialogs and clear messaging for non-technical users.</li>
+        <!-- BENEFITS -->
+        <h3 class="oe_slogan">Business Benefits</h3>
+
+        <ul style="font-size:16px;">
+            <li>Prevents accidental data overwrites</li>
+            <li>Improves team collaboration</li>
+            <li>Reduces errors and rework</li>
+            <li>Ensures data consistency across users</li>
+            <li>Enhances confidence when working with critical data</li>
         </ul>
 
-        <h3>Screenshots & Demos</h3>
-        <p>Below are placeholders for images demonstrating the module's features. Replace with actual screenshots or GIFs.</p>
+        <!-- COMPATIBILITY -->
+        <h3 class="oe_slogan">Compatibility</h3>
 
-        <img src="concurrency_warning_dialog.png" alt="Concurrency Warning Dialog" width="100%"/>
-        <p><em>Figure 1: The warning dialog appears when a record is updated by another user, offering resolution options.</em></p>
-
-        <img src="difference_table.png" alt="Visual Difference Table" width="100%"/>
-        <p><em>Figure 2: Detailed table showing differences between local and server data for easy comparison.</em></p>
-
-        <img src="multi_tab_support.png" alt="Multi-Tab Editing" width="100%"/>
-        <p><em>Figure 3: Seamless handling of edits across multiple tabs.</em></p>
-
-        <img src="stale_record_notification.png" alt="Stale Record Notification" width="100%"/>
-        <p><em>Figure 4: Real-time notification when a record becomes stale.</em></p>
-
-        <h3>Compatibility & Requirements</h3>
-        <ul>
+        <ul style="font-size:16px;">
             <li>Compatible with Odoo Community and Enterprise 17.0</li>
-            <li>Requires the 'bus' module for real-time notifications</li>
-            <li>Works with all standard Odoo views and custom modules</li>
-            <li>No additional dependencies beyond standard Odoo setup</li>
+            <li>Requires Odoo bus module for real-time communication</li>
+            <li>Works with standard and custom modules</li>
+            <li>No additional dependencies required</li>
         </ul>
 
-        <h5>Note:</h5>
-        <ul>
-            <li>This module enhances form controllers and may interact with custom themes or extensions.</li>
-            <li>If you encounter issues with Odoo Enterprise, custom themes, or third-party modules, contact our support team for free assistance.</li>
-            <li>Ensure the 'bus' service is enabled for real-time features.</li>
-            <li>Module settings can be configured via the admin panel for advanced users.</li>
-        </ul>
+        <!-- INSTALL -->
+        <h3 class="oe_slogan">Installation</h3>
 
-        <h3>Installation & Setup</h3>
-        <p>Installation is straightforward:</p>
-        <ol>
-            <li>Download and install the module via Odoo Apps or manually.</li>
-            <li>Restart the Odoo server.</li>
-            <li>The module activates automatically on form views.</li>
-            <li>No additional configuration required for basic usage.</li>
+        <ol style="font-size:16px;">
+            <li>Install the module via Odoo Apps</li>
+            <li>Restart the Odoo server</li>
+            <li>The module activates automatically</li>
+            <li>No configuration required for basic usage</li>
         </ol>
 
-        <h3>Support & Customization</h3>
-        <p>For support, customizations, or questions, contact us at [your email] or visit [your website]. We offer free support for installation issues and paid customization services.</p>
+        <!-- SUPPORT -->
+        <h3 class="oe_slogan">Support</h3>
 
-        <h3>Why Choose Record Concurrency Control Pro?</h3>
-        <p>Don't let concurrency issues disrupt your workflow. Invest in a robust solution that protects your data and empowers your team. Join thousands of satisfied users who have transformed their Odoo experience with our module.</p>
+        <p style="text-align:center; font-size:16px;">
+            Free support is provided for installation and compatibility issues.
+            Customization services are available upon request.
+        </p>
 
-        <p><strong>Upgrade your team's efficiency today!</strong></p>
+        <!-- CTA -->
+        <div style="text-align:center; margin-top:30px;">
+            <h2 style="color:#875A7B;">
+                Protect Your Data Before It Is Too Late
+            </h2>
+            <p style="font-size:16px;">
+                A must-have module for any serious Odoo deployment
+            </p>
+        </div>
+
     </div>
 </section>
