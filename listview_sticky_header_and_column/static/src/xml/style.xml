@@ -1,25 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<templates id="template" xml:space="preserve">
-    <style t-name="listview_sticky_header_and_column.style" type="text/css" class="js_lvs_style">
-        <t t-foreach="arr_offset_lefts" t-as="offset">
-            .table-responsive .o_list_view tr.o_data_row td:nth-child(<t t-esc="offset_index+1"/>) {
-                position: sticky;
-                left: <t t-esc="offset"/>px;
-                background-color: rgba(255,255,255);
-            }
-            .table-responsive .o_list_view thead tr:nth-child(1) th:nth-child(<t t-esc="offset_index+1"/>) {
-                position: sticky;
-                left: <t t-esc="offset"/>px;
-                z-index: 2
-            }
-            <t t-if="offset_last">
-                .table-responsive .o_list_view tr.o_data_row td:nth-child(<t t-esc="offset_index+1"/>) {
-                    box-shadow: -1px 0px 0 #ddd inset;
-                }
-                .table-responsive .o_list_view thead tr:nth-child(1) th:nth-child(<t t-esc="offset_index+1"/>) {
-                    box-shadow: -1px 0px 0 #ddd inset;
-                }
-            </t>
-        </t>
-    </style>
+<templates xml:space="preserve">
+   <t t-name="listview_sticky_header_and_column.web.ListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="extension" owl="1">
+       <xpath expr="//th[@data-tooltip-delay='1000']" position="inside">
+           <span t-on-click="_onPinThisColumnClick" class="display-on-hover js_pin_this_column">
+                <i class="fa fa-thumb-tack"></i>
+           </span>
+       </xpath>
+   </t>
 </templates>

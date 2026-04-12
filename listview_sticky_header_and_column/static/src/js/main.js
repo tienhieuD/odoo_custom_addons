@@ -1,111 +1,195 @@
-odoo.define('nev_widgets.ext_context_freeze_column', function (require) {
-    "use strict";
+/** @odoo-module **/
+import { patch } from "@web/core/utils/patch";
+import { ListRenderer } from "@web/views/list/list_renderer";
+import {
+    onWillDestroy,
+    onMounted,
+} from "@odoo/owl";
 
-    var FormController = require('web.FormController');
-    var ActionManager = require('web.ActionManager');
-    var pyUtils = require('web.py_utils');
-    var WebClient = require('web.WebClient');
-    var ListRenderer = require('web.ListRenderer');
-    var session = require('web.session');
-    var core = require('web.core');
-    let localStorage = require('web.local_storage');
-    var qweb = core.qweb;
 
-    WebClient.include({
-        custom_events: _.extend({}, WebClient.prototype.custom_events, {
-            set_freeze: 'setFreeze',
-        }),
-        init: function () {
-            this._super.apply(this, arguments);
-            this.number_of_keep_columns = 0;
-            this.arr_offset_lefts = [];
-            core.bus.on("DOM_updated", this, this.setFreezePosition.bind(this));
-        },
-        on_hashchange: function () {
-            var self = this;
-            return this._super.apply(this, arguments).then(function () {
-                self.number_of_keep_columns = self._getFreezePositionFromLocalStorage() || 0;
-            });
-        },
-        setFreeze: function (event) {
-            this.number_of_keep_columns = event.data.number_of_keep_columns;
-            this.setFreezePosition();
-            this._saveFreezePositionToLocalStorage();
-        },
-        setFreezePosition: function () {
-            this._removeStyle();
-            setTimeout(this._setFreezePosition.bind(this), 1000);
-        },
-        _setFreezePosition: function () {
-            var $table = $('.table-responsive .o_list_view');
-            if (!$table.length) {
-                return
+patch(ListRenderer.prototype, {
+    // Define the patched method here
+    setup() {
+        super.setup(...arguments);
+
+        onWillDestroy(() => {
+            this.lshcRemoveOldStyle();
+        });
+
+        onMounted(() => {
+            this.lshcRemoveOldStyle();
+            const columnIndex = this.lshcGetColumnIndex();
+            if (columnIndex) {
+                this.lshcFreezeColumnListView(columnIndex);
             }
-            var $table_footer = $table.find('tfoot');
-            this.arr_offset_lefts.length = 0
-            for (var i = 1; i <= this.number_of_keep_columns; i++) {
-                var $td = $table_footer.find('td:nth-child(' + i + ')');
-                if (!$td.length) {
-                    continue
+        });
+    },
+
+    /**
+     * Custom config for this module
+     * @param {'key' | 'viewKey'} name name of config
+     * @returns {any}
+     */
+    lshcConfig(name) {
+        return {
+            'key': 'listview_sticky_header_and_column',
+            'viewKey': `listview_sticky_header_and_column__viewId_${this.env.config.viewId}`,
+        }[name];
+    },
+
+    /**
+     * Sleep mixin
+     * @param {number} secs milliseconds to sleep
+     * @returns {Promise}
+     */
+    lshcSleep(secs) {
+        return new Promise(r => setTimeout(r, secs));
+    },
+    
+    /**
+     * remove <style /> freeze if exist
+     */
+    lshcRemoveOldStyle() {
+        const styleName = this.lshcConfig('key');
+        const styles = document.head.querySelectorAll(`style[name="${styleName}"]`);
+        styles.forEach(style => style.remove());
+    },
+
+    /**
+     * On click pin
+     * @param {Event} e click event
+     */
+    async _onPinThisColumnClick(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const columnIndex = $(e.target).closest('th').index();
+        const savedColumnIndex = this.lshcGetColumnIndex();
+
+        if (savedColumnIndex === columnIndex) {
+            this.lshcSaveColumnIndex(-1);
+            this.lshcRemoveOldStyle();
+        } else {
+            this.lshcSaveColumnIndex(columnIndex);
+            await this.lshcFreezeColumnListView(columnIndex);
+        }
+    },
+
+    /**
+     * @param {number} columnIndex 
+     */
+    lshcSaveColumnIndex(columnIndex) {
+        const key = this.lshcConfig('viewKey');
+        localStorage.setItem(key, columnIndex);
+    },
+
+    /**
+     * @returns {number}
+     */
+    lshcGetColumnIndex() {
+        const key = this.lshcConfig('viewKey');
+        const result = localStorage.getItem(key);
+        return Number(result);
+    },
+
+    /**
+     * do freeze list view column of list view on dom
+     * @param {number} columnIndex index of the column to freeze
+     */
+    async lshcFreezeColumnListView(columnIndex) {
+        const el = this.__owl__.bdom.el;
+        const styleName = this.lshcConfig('key');
+
+        // 1. remove old style if exist
+        this.lshcRemoveOldStyle();
+
+        // #region: 2. add pre style for header and table layout before calculate offsetLeft of columns
+        const preStyles = [`
+            /* 1. Container */
+            .o_content .table-responsive {
+                overflow: visible;
+            }
+
+            /* 2. Table */
+            .o_content .table-responsive table {
+                table-layout: auto !important;
+            }
+
+            /* 3. Header */
+            .o_content .table-responsive thead,
+            .o_content .table-responsive thead th {
+                position: sticky !important;
+                top: 0;
+                background-color: #eee;
+                z-index: 2;
+            }
+
+            /* 4. Row */
+            .o_content .table-responsive .o_data_row {
+                position: relative;
+            }
+
+            .o_content .table-responsive .o_data_row td {
+                white-space: nowrap;
+                padding: 0.3rem 0.75rem;
+            }
+
+            /* 5. States */
+            .o_content .table-responsive .o_data_row:hover td {
+                background-color: #eee !important;
+            }
+
+            .o_content .table-responsive .o_data_row:focus-within td {
+                background-color: #ccc !important;
+            }
+        `];
+        const preStyleNode = $(`
+            <style name="${styleName}">
+                ${preStyles.join(' ')}
+            </style>`);
+        $(document.head).append(preStyleNode);
+        // #endregion
+        
+        // 3. sleep to wait for dom update and get correct offsetLeft of columns
+        await this.lshcSleep(300);
+        
+        // #region: 4. calculate offsetLeft of columns
+        const headerTableRow = el.querySelector('table thead tr');
+        const headerTableColumns = Array.from(headerTableRow.querySelectorAll('th'));
+        const offsetLefts = headerTableColumns.map(th => th.offsetLeft).slice(0, columnIndex + 1);
+
+        const styles = [];
+        for (let index in offsetLefts) {
+            const offsetLeft = offsetLefts[index];
+            const cssNthChildIndex = Number(index) + 1;
+            styles.push(`
+                .o_content .table-responsive table thead tr th:nth-child(${cssNthChildIndex}),
+                .o_content .table-responsive table tfoot tr td:nth-child(${cssNthChildIndex}),
+                .o_content .table-responsive table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
+                    position: sticky;
+                    left: ${offsetLeft}px;
+                    z-index: 1;
+                    // border-right: 1px solid #dee2e6;
+                    box-shadow: -1px 0 0 #dee2e6 inset;
                 }
-                var offset = $td.offset().left;
-                this.arr_offset_lefts.push(offset)
-            }
-            this._addStyle()
-        },
-        _addStyle: function () {
-            $(document.head).append(
-                qweb.render('listview_sticky_header_and_column.style', {arr_offset_lefts: this.arr_offset_lefts})
-            );
-        },
-        _removeStyle: function () {
-            $('.js_lvs_style').remove();
-        },
-        _prepareFreezePositionKey: function () {
-            return String(this._current_state.action) + '_'
-                + String(this._current_state.menu_id) + '_'
-                + String(this._current_state.model) + '_'
-                + String(this._current_state.view_type);
-        },
-        _saveFreezePositionToLocalStorage: function () {
-            var key = this._prepareFreezePositionKey()
-            var value = this.number_of_keep_columns;
-            localStorage.setItem(key, value)
-        },
-        _getFreezePositionFromLocalStorage: function () {
-            var key = this._prepareFreezePositionKey()
-            return parseInt(localStorage.getItem(key));
+                .o_content .table-responsive table thead tr th:nth-child(${cssNthChildIndex}) {
+                    top: 0;
+                    z-index: 10;
+                }
+                .o_content .table-responsive table tbody tr:nth-of-type(even).o_data_row td:nth-child(${cssNthChildIndex}) {
+                    background-color: #f9f9f9;
+                }
+                .o_content .table-responsive table tbody tr:nth-of-type(odd).o_data_row td:nth-child(${cssNthChildIndex}) {
+                    background-color: #fff;
+                }
+            `)
         }
 
-    });
+        const newStyleNode = $(`
+            <style name="${styleName}">
+                ${styles.join(' ')}
+            </style>`);
 
-
-    ListRenderer.include({
-        _renderHeaderCell: function (node) {
-            var cell = this._super.apply(this, arguments);
-            var grandpa = this.getParent().getParent();
-            if (_.isEmpty(grandpa && grandpa.actions)) {
-                //&& grandpa.actions[Object.keys(grandpa.actions)[0]].view_id[0]
-                return cell;
-            }
-
-            var self = this;
-
-            $('<span>', {class: 'display-on-hover js_pin_this_column'})
-                .html('<i class="fa fa-thumb-tack"></i>')
-                .on('click', function (e) {
-                    e.stopPropagation();
-                    var current_index = $(e.currentTarget)
-                        .closest('tr')
-                        .find('span')
-                        .index(e.currentTarget);
-                    self.trigger_up('set_freeze', {
-                        number_of_keep_columns: current_index + 2
-                    })
-                })
-                .appendTo(cell);
-            return cell;
-        },
-    });
-
+        $(document.head).append(newStyleNode);
+        // #endregion
+    }
 });

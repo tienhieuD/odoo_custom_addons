@@ -1,5 +1,5 @@
 {
-    'name': "List View Sticky Header & Column",
+    'name': "List View Sticky Header & Freeze Column",
     'summary': """
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
@@ -8,24 +8,22 @@
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
     """,
-    'website': 'https://i.imgur.com/42fbqjS.gif',
-    'author': "RainOnMe",
+    'website': 'https://live.staticflickr.com/65535/50701330062_5a6a35cd36_o.gif',
+    'author': "DUO-TEK Software Vietnam",
     'license': 'LGPL-3',
-    # 'website': "https://www.nissho-vn.com/en/",
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Technical Settings',
-    'version': '0.1',
-    # any module necessary for this one to work correctly
+    'category': 'Tools',
+    'version': '17.0.0.1',
     'depends': ['base', 'web'],
-    # always loaded
-    'data': [
-        'views/assets.xml',
-    ],
-    'qweb': ['static/src/xml/*.xml'],
+    'data': [],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
-    'price': 9.99,
+    'assets': {
+        'web.assets_backend': [
+            'listview_sticky_header_and_column/static/src/scss/main.scss',
+            'listview_sticky_header_and_column/static/src/js/main.js',
+            'listview_sticky_header_and_column/static/src/xml/*.xml',
+        ]
+    },
+    'price': 36.00,
     'currency': 'EUR',
     'external_dependencies': {}
 }

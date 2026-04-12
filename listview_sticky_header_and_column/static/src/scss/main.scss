@@ -1,56 +1,63 @@
 // Pin icon on table header
 .display-on-hover {
-  display: none;
-  position: absolute;
-  bottom: -12.5px;
-  right: 0;
-  width: 20px;
-  height: 20px;
-  overflow: hidden;
-  z-index: 10;
-  margin-right: 1px;
-  text-align: center;
-  background: #eee;
-  border: 1px solid #ddd;
-  cursor: pointer;
+  display: none !important;
+  position: absolute !important;
+  bottom: 50% !important;
+  margin-bottom: -10px !important;
+  right: 24px !important;
+  width: 20px !important;
+  height: 20px !important;
+  overflow: hidden !important;
+  z-index: 10 !important;
+  margin-right: 1px !important;
+  text-align: center !important;
+  background: #fff !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
 
   &:hover {
-    display: block
+    display: block !important;
+  }
+  &:active {
+    transform: scale(0.8) !important;
   }
 }
 
 .o_list_view thead > tr > th {
   &:hover {
     .display-on-hover {
-      display: block
+      display: block !important;
     }
   }
 }
 
 
 // Common css
-.table-responsive {
-  overflow: unset;
-  overflow-x: unset;
+// .o_content .table-responsive {
+//   overflow: visible;
+// }
 
-  .o_list_view {
-    thead th {
-      position: sticky;
-      top: 0;
-      background-color: #EEE;
-      z-index: 1;
-    }
+// .o_content .table-responsive thead th {
+//   position: sticky !important;
+//   top: 0;
+//   background-color: #EEE;
+//   z-index: 1;
+// }
 
-    tr.o_data_row {
-      position: relative;
+// .o_content .table-responsive tr.o_data_row {
+//   position: relative;
+// }
 
-      &:hover td {
-        background-color: #EEE !important;
-      }
+// .o_content .table-responsive tr.o_data_row td {
+//   white-space: nowrap;
+//   padding: 0.3rem 0.75rem;
+// }
 
-      &:focus-within td {
-        background-color: #ccc !important;
-      }
-    }
-  }
-}
+// .o_content .table-responsive tr.o_data_row:hover td {
+//   background-color: #EEE !important;
+// }
+
+// .o_content .table-responsive tr.o_data_row:focus-within td {
+//   background-color: #ccc !important;
+// }
