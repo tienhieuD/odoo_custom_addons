@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Record Concurrency Control Pro",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "summary": "Prevent data conflicts and enhance collaboration with real-time record locking and concurrency warnings.",
     "description": "static/description/index.html",
     "author": "DUO-TEK Software Vietnam",
