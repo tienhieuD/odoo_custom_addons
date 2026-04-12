@@ -4,8 +4,16 @@ import { ListRenderer } from "@web/views/list/list_renderer";
 import {
     onWillDestroy,
     onMounted,
+    onPatched,
 } from "@odoo/owl";
 
+// Constants
+const MODULE_KEY = 'listview_sticky_header_and_column';
+const TOOLTIP_DELAY_ATTR = 'data-tooltip-delay="1000"';
+const PIN_BUTTON_CLASS = 'display-on-hover js_pin_this_column';
+const PIN_ICON_HTML = '<i class="fa fa-thumb-tack"></i>';
+const SLEEP_DELAY = 300;
+const MOUNTED_SLEEP_DELAY = 100;
 
 patch(ListRenderer.prototype, {
     // Define the patched method here
@@ -16,12 +24,18 @@ patch(ListRenderer.prototype, {
             this.lshcRemoveOldStyle();
         });
 
-        onMounted(() => {
+        onMounted(async () => {
             this.lshcRemoveOldStyle();
             const columnIndex = this.lshcGetColumnIndex();
             if (columnIndex) {
-                this.lshcFreezeColumnListView(columnIndex);
+                await this.lshcFreezeColumnListView(columnIndex);
             }
+            await this.lshcSleep(MOUNTED_SLEEP_DELAY);
+            this.lshcAddPinButtons();
+        });
+
+        onPatched(() => {
+            this.lshcAddPinButtons();
         });
     },
 
@@ -32,22 +46,48 @@ patch(ListRenderer.prototype, {
      */
     lshcConfig(name) {
         return {
-            'key': 'listview_sticky_header_and_column',
-            'viewKey': `listview_sticky_header_and_column__viewId_${this.env.config.viewId}`,
+            'key': MODULE_KEY,
+            'viewKey': `${MODULE_KEY}__viewId_${this.env.config.viewId}`,
         }[name];
     },
 
     /**
-     * Sleep mixin
-     * @param {number} secs milliseconds to sleep
+     * Sleep utility
+     * @param {number} ms milliseconds to sleep
      * @returns {Promise}
      */
-    lshcSleep(secs) {
-        return new Promise(r => setTimeout(r, secs));
+    lshcSleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     },
-    
+
     /**
-     * remove <style /> freeze if exist
+     * Get the root element of the list view
+     * @returns {HTMLElement|null}
+     */
+    lshcGetRootElement() {
+        return this.rootRef?.el || this.__owl__.bdom.el;
+    },
+
+    /**
+     * Add pin buttons to table headers
+     */
+    lshcAddPinButtons() {
+        const el = this.lshcGetRootElement();
+        if (!el) return;
+        const thElements = el.querySelectorAll(`th[${TOOLTIP_DELAY_ATTR}]`);
+        thElements.forEach(th => {
+            if (!th.querySelector(`.${PIN_BUTTON_CLASS.split(' ')[1]}`)) {
+                const span = document.createElement('span');
+                span.className = PIN_BUTTON_CLASS;
+                span.innerHTML = PIN_ICON_HTML;
+                span.addEventListener('click', this._onPinThisColumnClick.bind(this));
+                th.appendChild(span);
+            }
+        });
+    },
+
+    /**
+     * Remove old styles
      */
     lshcRemoveOldStyle() {
         const styleName = this.lshcConfig('key');
@@ -56,13 +96,14 @@ patch(ListRenderer.prototype, {
     },
 
     /**
-     * On click pin
+     * Handle pin button click
      * @param {Event} e click event
      */
     async _onPinThisColumnClick(e) {
         e.stopPropagation();
         e.preventDefault();
-        const columnIndex = $(e.target).closest('th').index();
+        const th = e.target.closest('th');
+        const columnIndex = Array.prototype.indexOf.call(th.parentNode.children, th);
         const savedColumnIndex = this.lshcGetColumnIndex();
 
         if (savedColumnIndex === columnIndex) {
@@ -75,7 +116,8 @@ patch(ListRenderer.prototype, {
     },
 
     /**
-     * @param {number} columnIndex 
+     * Save column index to localStorage
+     * @param {number} columnIndex
      */
     lshcSaveColumnIndex(columnIndex) {
         const key = this.lshcConfig('viewKey');
@@ -83,6 +125,7 @@ patch(ListRenderer.prototype, {
     },
 
     /**
+     * Get saved column index from localStorage
      * @returns {number}
      */
     lshcGetColumnIndex() {
@@ -92,29 +135,24 @@ patch(ListRenderer.prototype, {
     },
 
     /**
-     * do freeze list view column of list view on dom
+     * Freeze columns in the list view
      * @param {number} columnIndex index of the column to freeze
      */
     async lshcFreezeColumnListView(columnIndex) {
-        const el = this.__owl__.bdom.el;
+        const el = this.lshcGetRootElement();
         const styleName = this.lshcConfig('key');
 
-        // 1. remove old style if exist
+        // Remove old styles
         this.lshcRemoveOldStyle();
 
-        // #region: 2. add pre style for header and table layout before calculate offsetLeft of columns
-        const preStyles = [`
-            /* 1. Container */
+        // Add preliminary styles
+        const preStyles = `
             .o_content .table-responsive {
                 overflow: visible;
             }
-
-            /* 2. Table */
             .o_content .table-responsive table {
                 table-layout: auto !important;
             }
-
-            /* 3. Header */
             .o_content .table-responsive thead,
             .o_content .table-responsive thead th {
                 position: sticky !important;
@@ -122,53 +160,42 @@ patch(ListRenderer.prototype, {
                 background-color: #eee;
                 z-index: 2;
             }
-
-            /* 4. Row */
             .o_content .table-responsive .o_data_row {
                 position: relative;
             }
-
             .o_content .table-responsive .o_data_row td {
                 white-space: nowrap;
                 padding: 0.3rem 0.75rem;
             }
-
-            /* 5. States */
             .o_content .table-responsive .o_data_row:hover td {
                 background-color: #eee !important;
             }
-
             .o_content .table-responsive .o_data_row:focus-within td {
                 background-color: #ccc !important;
             }
-        `];
-        const preStyleNode = $(`
-            <style name="${styleName}">
-                ${preStyles.join(' ')}
-            </style>`);
-        $(document.head).append(preStyleNode);
-        // #endregion
-        
-        // 3. sleep to wait for dom update and get correct offsetLeft of columns
-        await this.lshcSleep(300);
-        
-        // #region: 4. calculate offsetLeft of columns
+        `;
+        const preStyleNode = document.createElement('style');
+        preStyleNode.setAttribute('name', styleName);
+        preStyleNode.textContent = preStyles;
+        document.head.appendChild(preStyleNode);
+
+        // Wait for DOM update
+        await this.lshcSleep(SLEEP_DELAY);
+
+        // Calculate offsets and create freeze styles
         const headerTableRow = el.querySelector('table thead tr');
         const headerTableColumns = Array.from(headerTableRow.querySelectorAll('th'));
         const offsetLefts = headerTableColumns.map(th => th.offsetLeft).slice(0, columnIndex + 1);
 
-        const styles = [];
-        for (let index in offsetLefts) {
-            const offsetLeft = offsetLefts[index];
-            const cssNthChildIndex = Number(index) + 1;
-            styles.push(`
+        const styles = offsetLefts.map((offsetLeft, index) => {
+            const cssNthChildIndex = index + 1;
+            return `
                 .o_content .table-responsive table thead tr th:nth-child(${cssNthChildIndex}),
                 .o_content .table-responsive table tfoot tr td:nth-child(${cssNthChildIndex}),
                 .o_content .table-responsive table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
                     position: sticky;
                     left: ${offsetLeft}px;
                     z-index: 1;
-                    // border-right: 1px solid #dee2e6;
                     box-shadow: -1px 0 0 #dee2e6 inset;
                 }
                 .o_content .table-responsive table thead tr th:nth-child(${cssNthChildIndex}) {
@@ -181,15 +208,12 @@ patch(ListRenderer.prototype, {
                 .o_content .table-responsive table tbody tr:nth-of-type(odd).o_data_row td:nth-child(${cssNthChildIndex}) {
                     background-color: #fff;
                 }
-            `)
-        }
+            `;
+        }).join('');
 
-        const newStyleNode = $(`
-            <style name="${styleName}">
-                ${styles.join(' ')}
-            </style>`);
-
-        $(document.head).append(newStyleNode);
-        // #endregion
+        const newStyleNode = document.createElement('style');
+        newStyleNode.setAttribute('name', styleName);
+        newStyleNode.textContent = styles;
+        document.head.appendChild(newStyleNode);
     }
 });
