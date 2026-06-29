@@ -1,0 +1,80 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* dwo_document_expiry_tracker
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"POT-Creation-Date: 2026-04-28 00:00+0000\n"
+"PO-Revision-Date: 2026-04-28 00:00+0000\n"
+"Last-Translator: DUO-TEK\n"
+"Language-Team: Vietnamese\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: dwo_document_expiry_tracker
+msgid "Expiry Rules"
+msgstr "Quy tắc hết hạn"
+
+#. module: dwo_document_expiry_tracker
+msgid "Tracked Records"
+msgstr "Bản ghi theo dõi"
+
+#. module: dwo_document_expiry_tracker
+msgid "Notification Queue"
+msgstr "Hàng chờ thông báo"
+
+#. module: dwo_document_expiry_tracker
+msgid "Notification Logs"
+msgstr "Nhật ký thông báo"
+
+#. module: dwo_document_expiry_tracker
+msgid "My Ignored Alerts"
+msgstr "Cảnh báo đã bỏ qua của tôi"
+
+#. module: dwo_document_expiry_tracker
+msgid "Mute Expiry Access Alerts"
+msgstr "Tắt cảnh báo hết hạn khi mở form"
+
+#. module: dwo_document_expiry_tracker
+msgid "Max Access Alerts per Record"
+msgstr "Số cảnh báo tối đa mỗi bản ghi"
+
+#. module: dwo_document_expiry_tracker
+msgid "Access Alert Mode"
+msgstr "Chế độ hiển thị cảnh báo"
+
+#. module: dwo_document_expiry_tracker
+msgid "Detailed"
+msgstr "Chi tiết"
+
+#. module: dwo_document_expiry_tracker
+msgid "Summary"
+msgstr "Tổng hợp"
+
+#. module: dwo_document_expiry_tracker
+msgid "Rule Name"
+msgstr "Tên quy tắc"
+
+#. module: dwo_document_expiry_tracker
+msgid "Target Model"
+msgstr "Model áp dụng"
+
+#. module: dwo_document_expiry_tracker
+msgid "Date Source"
+msgstr "Nguồn ngày"
+
+#. module: dwo_document_expiry_tracker
+msgid "Custom Date Only"
+msgstr "Chỉ dùng ngày tùy chỉnh"
+
+#. module: dwo_document_expiry_tracker
+msgid "Show Alert on Form Access"
+msgstr "Hiện cảnh báo khi mở form"
+
+#. module: dwo_document_expiry_tracker
+msgid "Auto Vacuum Enabled"
+msgstr "Bật dọn dữ liệu tự động"

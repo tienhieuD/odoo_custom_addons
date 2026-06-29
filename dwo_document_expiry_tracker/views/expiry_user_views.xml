@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_simple_modif_expiry_notification" model="ir.ui.view">
+        <field name="name">res.users.form.simple.modif.expiry.notification</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tz']" position="after">
+                <separator string="Expiry Notification Preferences"/>
+                <field name="expiry_notify_muted" placeholder="Enable to mute all expiry notifications"/>
+                <field name="expiry_dismiss_until" readonly="1" placeholder="Auto: dismiss notifications until datetime"/>
+                <div class="text-muted small">
+                    <em>Use popup dismiss buttons (5 minutes to 30 days) when opening records to temporarily stop alerts.</em>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_users_form_expiry_notification" model="ir.ui.view">
+        <field name="name">res.users.form.expiry.notification</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tz']" position="after">
+                <separator string="Expiry Notification Preferences"/>
+                <field name="expiry_notify_muted" placeholder="Enable to mute all expiry notifications"/>
+                <field name="expiry_dismiss_until" readonly="1" placeholder="Auto: dismiss notifications until datetime"/>
+                <div class="text-muted small">
+                    <em>Use popup dismiss buttons (5 minutes to 30 days) when opening records to temporarily stop alerts.</em>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_expiry_rule_admin,dwo.expiry.rule admin,model_dwo_expiry_rule,base.group_system,1,1,1,1
+access_expiry_rule_custom_user,dwo.expiry.rule custom user,model_dwo_expiry_rule,dwo_document_expiry_tracker.group_expiry_custom_user,1,1,1,0
+access_expiry_rule_user_read,dwo.expiry.rule user read,model_dwo_expiry_rule,base.group_user,1,0,0,0
+access_expiry_record_admin,dwo.expiry.record admin,model_dwo_expiry_record,base.group_system,1,1,1,1
+access_expiry_record_user_read,dwo.expiry.record user read,model_dwo_expiry_record,base.group_user,1,0,0,0

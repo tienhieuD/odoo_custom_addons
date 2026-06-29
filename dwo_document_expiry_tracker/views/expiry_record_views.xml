@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_expiry_record_tree" model="ir.ui.view">
+        <field name="name">dwo.expiry.record.tree</field>
+        <field name="model">dwo.expiry.record</field>
+        <field name="arch" type="xml">
+            <tree string="Tracked Expiry Records">
+                <field name="state"/>
+                <field name="record_name"/>
+                <field name="model"/>
+                <field name="rule_id"/>
+                <field name="rule_user_id"/>
+                <field name="expiry_datetime"/>
+                <field name="last_seen_at"/>
+                <button name="action_open_record" type="object" string="Open Record" icon="fa-external-link"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_expiry_record_form" model="ir.ui.view">
+        <field name="name">dwo.expiry.record.form</field>
+        <field name="model">dwo.expiry.record</field>
+        <field name="arch" type="xml">
+            <form string="Tracked Expiry Record">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="state" readonly="1" placeholder="Auto: upcoming or expired"/>
+                            <field name="record_name" readonly="1" placeholder="Auto: source record display name"/>
+                            <field name="model" readonly="1" placeholder="Auto: source model technical name"/>
+                            <field name="res_id" readonly="1" placeholder="Auto: source record ID"/>
+                            <field name="rule_id" readonly="1" placeholder="Auto: matched expiry rule"/>
+                            <field name="rule_user_id" readonly="1" placeholder="Auto: rule owner"/>
+                        </group>
+                        <group>
+                            <field name="expiry_field_id" readonly="1" placeholder="Auto: datetime field used by rule"/>
+                            <field name="expiry_datetime" readonly="1" placeholder="Auto: computed expiry datetime"/>
+                            <field name="last_seen_at" readonly="1" placeholder="Auto: latest scan observation"/>
+                            <field name="last_notified_at" readonly="1" placeholder="Auto: latest notify datetime"/>
+                            <field name="last_notified_state" readonly="1" placeholder="Auto: latest notified state"/>
+                            <field name="company_id" readonly="1" placeholder="Auto: company scope"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_expiry_record_search" model="ir.ui.view">
+        <field name="name">dwo.expiry.record.search</field>
+        <field name="model">dwo.expiry.record</field>
+        <field name="arch" type="xml">
+            <search string="Search Tracked Expiry Records">
+                <field name="record_name"/>
+                <field name="rule_id"/>
+                <field name="rule_user_id"/>
+                <field name="model"/>
+                <filter name="filter_expired" string="Expired" domain="[('state', '=', 'expired')]"/>
+                <filter name="filter_upcoming" string="Upcoming" domain="[('state', '=', 'upcoming')]"/>
+                <filter name="filter_from_my_rule" string="From My Rule" domain="[('rule_user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="group_rule" string="Rule" context="{'group_by': 'rule_id'}"/>
+                    <filter name="group_owner" string="Rule Owner" context="{'group_by': 'rule_user_id'}"/>
+                    <filter name="group_model" string="Model" context="{'group_by': 'model'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_expiry_record_pivot" model="ir.ui.view">
+        <field name="name">dwo.expiry.record.pivot</field>
+        <field name="model">dwo.expiry.record</field>
+        <field name="arch" type="xml">
+            <pivot string="Expiry Dashboard">
+                <field name="rule_id" type="row"/>
+                <field name="state" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_expiry_record_graph" model="ir.ui.view">
+        <field name="name">dwo.expiry.record.graph</field>
+        <field name="model">dwo.expiry.record</field>
+        <field name="arch" type="xml">
+            <graph string="Expiry Records" type="bar">
+                <field name="state"/>
+                <field name="id" type="measure"/>
+                <field name="rule_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_expiry_record" model="ir.actions.act_window">
+        <field name="name">Tracked Expiry Records</field>
+        <field name="res_model">dwo.expiry.record</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_expiry_record_search"/>
+    </record>
+</odoo>

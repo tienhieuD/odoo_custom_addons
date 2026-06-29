@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_expiry_rule_tree" model="ir.ui.view">
+        <field name="name">dwo.expiry.rule.tree</field>
+        <field name="model">dwo.expiry.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Expiry Rules">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="model_id"/>
+                <field name="rule_user_id"/>
+                <field name="date_mode"/>
+                <field name="total_expired_after_minutes"/>
+                <field name="limit_record"/>
+                <field name="last_run_at"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_expiry_rule_form" model="ir.ui.view">
+        <field name="name">dwo.expiry.rule.form</field>
+        <field name="model">dwo.expiry.rule</field>
+        <field name="arch" type="xml">
+            <form string="Expiry Rule">
+                <header>
+                    <button name="action_run_scan" type="object" string="Run Scan" class="oe_highlight"/>
+                    <field name="active" widget="boolean_button" placeholder="Enable/disable this rule quickly."/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_tracked_records" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="tracked_record_count" widget="statinfo" string="Tracked"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title" colspan="2">
+                        <label for="name"/>
+                        <h1><field name="name" colspan="2" placeholder="Example: Contract Expiry - Sales Team"/></h1>
+                    </div>
+
+                    <div class="text-muted small" style="margin-bottom: 12px;">
+                        <em>
+                            Usage guide: choose target object, define domain, and configure notification channels.<br/>
+                            Based on Field mode uses Datetime Field with offsets. On Specific Time mode uses a fixed datetime as notification trigger.
+                        </em>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="sequence" placeholder="Example: 10 (lower runs first)"/>
+                            <field name="company_id" groups="base.group_multi_company" placeholder="Example: My Company"/>
+                            <field name="model_id" placeholder="Example: Contact (res.partner)"/>
+                            <field name="model_name" invisible="1" readonly="1"/>
+                            <field name="description" placeholder="Explain business purpose, owner, and expected behavior."/>
+                        </group>
+                        <group>
+                            <field name="date_mode" placeholder="Choose: Based on Field or On Specific Time"/>
+                            <field name="datetime_field_id" invisible="date_mode != 'field_based'" placeholder="Example: create_date or x_expiry_date"/>
+                            <field name="specific_datetime" invisible="date_mode != 'custom'" placeholder="Example: 2026-12-31 15:30:00"/>
+                            <label for="expired_after_day" invisible="date_mode == 'custom'" class="o_form_label oe_inline" string="Notify After"/>
+                            <div colspan="1" class="align-items-center" invisible="date_mode == 'custom'">
+                                <field name="expired_after_year" nolabel="1" class="oe_inline" placeholder="0" invisible="not advance_time_select"/>
+                                <span class="oe_inline" style="margin: 0 4px;" invisible="not advance_time_select">years</span>
+                                <field name="expired_after_month" nolabel="1" class="oe_inline" placeholder="0" invisible="not advance_time_select"/>
+                                <span class="oe_inline" style="margin: 0 4px;" invisible="not advance_time_select">months</span>
+                                <field name="expired_after_day" nolabel="1" class="oe_inline" placeholder="-3"/>
+                                <span class="oe_inline" style="margin: 0 4px;">days</span>
+                                <field name="expired_after_hour" nolabel="1" class="oe_inline" placeholder="0" invisible="not advance_time_select"/>
+                                <span class="oe_inline" style="margin: 0 4px;" invisible="not advance_time_select">hours</span>
+                                <field name="expired_after_minute" nolabel="1" class="oe_inline" placeholder="0" invisible="not advance_time_select"/>
+                                <span class="oe_inline" style="margin: 0 4px;" invisible="not advance_time_select">minutes</span>
+                                <div class="text-muted small" colspan="2">
+                                    <em>Negative = notify before expiry. Positive = notify after expiry.</em>
+                                </div>
+                            </div>
+                            <field name="advance_time_select" invisible="date_mode == 'custom'" placeholder="Tick to show year/month/hour/minute"/>
+                            <field name="total_expired_after_minutes" readonly="1" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Scope">
+                            <group>
+                                <field name="additional_domain" widget="domain" options="{'model': 'model_name', 'in_dialog': True}" placeholder="Example: [('active', '=', True)]"/>
+                            </group>
+                        </page>
+                        <page string="Notifications">
+                            <group>
+                                <group string="Channels">
+                                    <field name="notify_on_form_view" placeholder="Enable popup alerts on form view open"/>
+                                    <field name="notify_form_view_template" widget="text" invisible="not notify_on_form_view" required="notify_on_form_view" placeholder="Example: [{rule_name}] {record_name} — {state} (at {expiry_datetime})"/>
+                                    <field name="notify_bus" placeholder="Enable in-app system notifications"/>
+                                    <field name="notify_bus_template" widget="text" invisible="not notify_bus" required="notify_bus" placeholder="Example: [{rule_name}] {record_name} expires at {expiry_datetime} ({state})"/>
+                                    <field name="notify_email" placeholder="Enable email notifications"/>
+                                    <field name="notify_email_template" invisible="not notify_email" required="notify_email" placeholder="Example: Expiry Alert Template"/>
+                                    <div class="text-muted small" colspan="2" invisible="not notify_bus and not notify_on_form_view">
+                                        <em>Template placeholders: {rule_name}, {record_name}, {expiry_datetime}, {state}.</em>
+                                    </div>
+                                </group>
+                                <group string="Recipients">
+                                    <field name="notify_to_user_field_ids" widget="many2many_tags" groups="base.group_system" placeholder="Example: user_id, reviewer_id (must link to res.users)"/>
+                                    <field name="advance_notify_user" groups="base.group_system" placeholder="Tick to configure advanced recipients"/>
+                                    <field name="notify_to_user_ids" widget="many2many_tags" groups="base.group_system" invisible="not advance_notify_user" placeholder="Example: Administrator, Expiry Manager"/>
+                                    <field name="notify_to_notify_group_ids" widget="many2many_tags" groups="base.group_system" invisible="not advance_notify_user" placeholder="Example: Internal User"/>
+                                    <field name="use_notify_user_domain" groups="base.group_system" invisible="not advance_notify_user" placeholder="Tick to filter recipients by domain"/>
+                                    <field name="notify_to_user_domain" widget="domain" options="{'model': 'res.users', 'in_dialog': True}" groups="base.group_system" invisible="not advance_notify_user or not use_notify_user_domain" placeholder="Example: [('share', '=', False)]"/>
+                                    <field name="notify_to_formular" groups="base.group_system" invisible="not advance_notify_user" placeholder="Example: ${object.user_id.ids}"/>
+                                    <div class="text-muted small" colspan="2">
+                                        <em>Non-admin users cannot configure recipients. The system always sends to the rule owner.</em>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Performance">
+                            <group>
+                                <field name="limit_record" placeholder="Example: 1000 (0 or negative = no limit)"/>
+                                <field name="limit_notify_user" placeholder="Example: 200 (0 or negative = no limit)"/>
+                                <div class="text-muted small">
+                                    <em>Recommended: keep Max Records per Scan &lt;= 5000 for very large models.</em>
+                                </div>
+                            </group>
+                        </page>
+                        <page string="Other Info">
+                            <group>
+                                <group string="Ownership">
+                                    <field name="rule_user_id" readonly="1" placeholder="Auto: current rule owner"/>
+                                </group>
+                                <group string="Last Execution">
+                                    <field name="last_run_at" readonly="1" placeholder="Auto: latest scan datetime"/>
+                                    <field name="last_run_summary" readonly="1" placeholder="Auto: latest scan summary"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_expiry_rule_search" model="ir.ui.view">
+        <field name="name">dwo.expiry.rule.search</field>
+        <field name="model">dwo.expiry.rule</field>
+        <field name="arch" type="xml">
+            <search string="Search Expiry Rules">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="rule_user_id"/>
+                <filter name="active_rules" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="my_rules" string="My Rules" domain="[('rule_user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_user" string="Owner" context="{'group_by': 'rule_user_id'}"/>
+                    <filter name="group_model" string="Model" context="{'group_by': 'model_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_expiry_rule" model="ir.actions.act_window">
+        <field name="name">Expiry Rules</field>
+        <field name="res_model">dwo.expiry.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_expiry_rule_search"/>
+    </record>
+</odoo>

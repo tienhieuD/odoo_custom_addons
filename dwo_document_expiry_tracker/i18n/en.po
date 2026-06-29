@@ -1,0 +1,56 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* dwo_document_expiry_tracker
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"POT-Creation-Date: 2026-04-28 00:00+0000\n"
+"PO-Revision-Date: 2026-04-28 00:00+0000\n"
+"Last-Translator: DUO-TEK\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: dwo_document_expiry_tracker
+msgid "Expiry Rules"
+msgstr "Expiry Rules"
+
+#. module: dwo_document_expiry_tracker
+msgid "Tracked Records"
+msgstr "Tracked Records"
+
+#. module: dwo_document_expiry_tracker
+msgid "Notification Queue"
+msgstr "Notification Queue"
+
+#. module: dwo_document_expiry_tracker
+msgid "Notification Logs"
+msgstr "Notification Logs"
+
+#. module: dwo_document_expiry_tracker
+msgid "My Ignored Alerts"
+msgstr "My Ignored Alerts"
+
+#. module: dwo_document_expiry_tracker
+msgid "Mute Expiry Access Alerts"
+msgstr "Mute Expiry Access Alerts"
+
+#. module: dwo_document_expiry_tracker
+msgid "Max Access Alerts per Record"
+msgstr "Max Access Alerts per Record"
+
+#. module: dwo_document_expiry_tracker
+msgid "Access Alert Mode"
+msgstr "Access Alert Mode"
+
+#. module: dwo_document_expiry_tracker
+msgid "Detailed"
+msgstr "Detailed"
+
+#. module: dwo_document_expiry_tracker
+msgid "Summary"
+msgstr "Summary"

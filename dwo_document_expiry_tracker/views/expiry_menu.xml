@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_expiry_root" name="Expiry Tracker" sequence="88"/>
+
+    <menuitem
+        id="menu_expiry_rules_admin"
+        name="Expiry Rules"
+        parent="menu_expiry_root"
+        action="action_expiry_rule"
+        groups="base.group_system"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_expiry_rules_custom_user"
+        name="My Expiry Rules"
+        parent="menu_expiry_root"
+        action="action_expiry_rule"
+        groups="dwo_document_expiry_tracker.group_expiry_custom_user"
+        sequence="20"
+    />
+    <menuitem
+        id="menu_expiry_records"
+        name="Tracked Expiry Records"
+        parent="menu_expiry_root"
+        action="action_expiry_record"
+        groups="base.group_user"
+        sequence="30"
+    />
+</odoo>
