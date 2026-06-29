@@ -10,7 +10,7 @@ binaries, and download a ready-to-ship protected module — all from the UI.
 """,
     'category': 'Tools',
     'author': 'DUO-TEK Software Vietnam',
-    'website': 'https://github.com/your-org/jprotect',
+    'website': 'https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam',
     'license': 'OPL-1',
     'depends': ['base'],
     'price': 100.00,
