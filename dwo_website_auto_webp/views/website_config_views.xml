@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_auto_webp" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.auto.webp</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="website.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='website']" position="inside">
+                <block title="Auto WebP Image Conversion" name="auto_webp_settings">
+                    <setting string="Auto WebP Conversion"
+                             help="Automatically convert /web/image responses to WebP for browsers that support it. Reduces image size by 25–35%.">
+                        <field name="auto_webp"/>
+                    </setting>
+                    <setting string="WebP Quality (1–100)"
+                             help="Higher = better quality, larger file. Lower = smaller file, more compression. Default: 85."
+                             invisible="not auto_webp">
+                        <field name="webp_quality" style="width:80px;"/>
+                        <span class="text-muted ms-2">
+                            (1 = smallest · 85 = default · 100 = best quality)
+                        </span>
+                        <button string="Clear WebP Cache"
+                                name="action_clear_webp_cache"
+                                type="object"
+                                class="btn btn-secondary btn-sm ms-3"
+                                confirm="This will remove all cached WebP images for this website. They will be re-converted on the next request. Continue?"
+                                invisible="not auto_webp"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
