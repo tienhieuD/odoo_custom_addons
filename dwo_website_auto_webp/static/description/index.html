@@ -146,9 +146,26 @@
 </p>
 
 <p style="font-size:15px; font-weight:700; color:#875A7B; margin-bottom:4px;">Linux (Ubuntu / Debian)</p>
+<p style="font-size:14px; margin:0 0 8px;">
+    First find which Python your Odoo service actually runs — it may be a venv or the system Python:
+</p>
+<pre style="background:#2b2b2b; color:#f8f8f2; padding:16px; border-radius:4px; font-size:13px; overflow-x:auto; white-space:pre;">systemctl cat odoo | grep ExecStart
+head -n 1 $(which odoo)   # e.g. "#!/usr/bin/python3"</pre>
+<p style="font-size:14px; margin:12px 0 8px;">Then install libwebp and reinstall Pillow using that exact Python:</p>
 <pre style="background:#2b2b2b; color:#f8f8f2; padding:16px; border-radius:4px; font-size:13px; overflow-x:auto; white-space:pre;">sudo apt install -y libwebp-dev
-sudo /opt/odoo/venv/bin/pip install --force-reinstall --no-binary Pillow Pillow
+sudo /path/to/python3 -m pip install --upgrade pip
+sudo /path/to/python3 -m pip install --force-reinstall "Pillow&gt;=10.0.1"
 sudo systemctl restart odoo</pre>
+<p style="font-size:14px; margin:12px 0 0;">
+    If pip refuses with <code>externally-managed-environment</code> (Debian/Ubuntu 12+, no venv),
+    add <code>--break-system-packages</code> to the install command above.
+</p>
+<p style="font-size:14px; margin:8px 0 0;">
+    Avoid <code>--no-binary Pillow</code> unless you specifically need to rebuild the native
+    extension — it forces pip to compile from source, which is much slower and can fail with
+    confusing <code>"metadata for project name unknown"</code> errors on older pip/setuptools.
+    The prebuilt wheel already includes WebP support when libwebp-dev is present at build time.
+</p>
 
 <p style="font-size:15px; font-weight:700; color:#875A7B; margin:16px 0 4px;">Windows</p>
 <p style="font-size:15px; margin:0 0 4px;">Pillow's official Windows wheel already includes WebP — no extra install needed.</p>
