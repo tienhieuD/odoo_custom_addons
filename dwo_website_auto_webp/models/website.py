@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 from .ir_binary import WEBP_CACHE_PREFIX
 
 
@@ -20,7 +21,7 @@ class Website(models.Model):
     def _check_webp_quality(self):
         for rec in self:
             if not (1 <= rec.webp_quality <= 100):
-                raise models.ValidationError('WebP Quality must be between 1 and 100.')
+                raise ValidationError('WebP Quality must be between 1 and 100.')
 
     def write(self, vals):
         # Lưu website ids trước khi write để biết website nào bị thay đổi config
