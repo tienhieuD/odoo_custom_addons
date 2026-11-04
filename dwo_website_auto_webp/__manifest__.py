@@ -27,7 +27,7 @@ Requirements: Pillow with the WebP encoder (libwebp) on the Odoo server. A built
     'data': [
         'views/website_config_views.xml',
     ],
-    'images': ['static/description/icon.png'],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'auto_install': False,
     'price': 36.00,
