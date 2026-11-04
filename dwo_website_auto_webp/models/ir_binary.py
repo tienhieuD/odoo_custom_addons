@@ -5,7 +5,8 @@ import logging
 from PIL import Image, WebPImagePlugin  # noqa: F401 — force WebP encoder registration
 
 from odoo import models
-from odoo.http import Stream, request
+from odoo.http import request
+from odoo.http.stream import Stream  # odoo.http became a package in Odoo 20
 
 _logger = logging.getLogger(__name__)
 

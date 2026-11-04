@@ -1,6 +1,6 @@
 {
     'name': 'Website Auto WebP',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Website',
     'summary': 'Automatically serve all /web/image URLs as WebP for supporting browsers — zero config, built-in cache.',
     'description': """
