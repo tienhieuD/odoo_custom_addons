@@ -4,8 +4,8 @@
     'category': 'Website',
     'summary': 'Automatically serve all /web/image URLs as WebP for supporting browsers — zero config, built-in cache.',
     'description': """
-Auto WebP Image Conversion for Odoo 15
-=======================================
+Auto WebP Image Conversion for Odoo
+===================================
 Automatically converts every /web/image response to WebP format for browsers that support it.
 WebP files are 25–35% smaller than JPEG/PNG with the same visual quality.
 
@@ -16,7 +16,9 @@ Features:
 - Auto-vacuum: cached WebP files removed when source record is deleted
 - Safe fallback: non-WebP browsers receive original images unchanged
 - Supports JPEG, PNG, BMP, TIFF → WebP
-- SVG and already-WebP images are skipped automatically
+- SVG, GIF (may be animated) and already-WebP images are skipped automatically
+
+Requirements: Pillow with the WebP encoder (libwebp) on the Odoo server. A built-in test checks it for you.
     """,
     'author': 'DUO-TEK Software Vietnam',
     'website': 'https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam',
@@ -25,7 +27,7 @@ Features:
     'data': [
         'views/website_config_views.xml',
     ],
-    'images': ['static/description/banner.png', 'static/description/icon.png'],
+    'images': ['static/description/icon.png'],
     'installable': True,
     'auto_install': False,
     'price': 36.00,
