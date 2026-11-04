@@ -148,8 +148,8 @@ class WebpHelper(models.AbstractModel):
         return 'image/webp' in request.httprequest.headers.get('Accept', '')
 
     def _webp_is_convertible(self, mimetype):
-        """Skip SVG (vector) and WebP (already the right format)."""
-        if not mimetype or mimetype in ('image/webp', 'image/svg+xml'):
+        """Skip SVG (vector), WebP (already the right format) and GIF (may be animated: conversion keeps only the first frame)."""
+        if not mimetype or mimetype in ('image/webp', 'image/svg+xml', 'image/gif'):
             return False
         return mimetype.startswith('image/')
 
