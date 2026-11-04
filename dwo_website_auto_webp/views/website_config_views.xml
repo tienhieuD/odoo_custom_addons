@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_auto_webp" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.auto.webp</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Auto WebP" string="Auto WebP"
+                     data-key="dwo_website_auto_webp" groups="website.group_website_designer">
+                    <h2>Auto WebP Image Conversion</h2>
+                    <div class="row mt16 o_settings_container" name="auto_webp_settings">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="auto_webp"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="auto_webp"/>
+                                <div class="text-muted">
+                                    Automatically convert /web/image responses to WebP for browsers that support it. Reduces image size by 25–35%.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('auto_webp', '=', False)]}">
+                            <div class="o_setting_right_pane">
+                                <label for="webp_quality"/>
+                                <div class="text-muted">
+                                    Higher = better quality, larger file. Lower = smaller file, more compression. Default: 85.
+                                </div>
+                                <div class="content-group mt16">
+                                    <field name="webp_quality" style="width:80px;"/>
+                                    <span class="text-muted"> (1 = smallest · 85 = default · 100 = best quality)</span>
+                                    <div class="mt8">
+                                        <button string="Clear WebP Cache"
+                                                name="action_clear_webp_cache"
+                                                type="object"
+                                                class="btn btn-secondary btn-sm"
+                                                confirm="This will remove all cached WebP images for this website. They will be re-converted on the next request. Continue?"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Test Install and Config</h2>
+                    <div class="row mt16 o_settings_container" name="auto_webp_test">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Python WebP Support</span>
+                                <div class="text-muted">
+                                    Run Python in the Odoo server: import Pillow and encode a test image to WebP. Success means Pillow has the WebP encoder.
+                                </div>
+                                <div class="mt8">
+                                    <button string="Test Python Import" name="action_test_python_webp" type="object" class="btn btn-primary btn-sm"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('auto_webp', '=', False)]}">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Website Image Test</span>
+                                <div class="text-muted">
+                                    Load a /web/image URL of this website with Accept: image/webp. Success means the response is a WebP image.
+                                </div>
+                                <div class="mt8">
+                                    <button string="Test WebP Image" name="action_test_webp" type="object" class="btn btn-primary btn-sm"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Installation Guide</h2>
+                    <div class="row mt16 o_settings_container" name="auto_webp_install_guide">
+                        <div class="col-12 o_setting_box px-3">
+                        <p>
+                            This module requires <strong>Pillow with WebP encoder (libwebp)</strong> on the Odoo server.
+                            Always install using the <strong>exact Python that runs Odoo</strong> (venv or system), then restart Odoo.
+                        </p>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" href="#webp_tab_linux" data-toggle="tab" role="tab">Linux</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" href="#webp_tab_docker" data-toggle="tab" role="tab">Docker</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" href="#webp_tab_windows" data-toggle="tab" role="tab">Windows</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" href="#webp_tab_macos_intel" data-toggle="tab" role="tab">macOS (Intel)</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" href="#webp_tab_macos_arm" data-toggle="tab" role="tab">macOS (Apple Silicon)</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" href="#webp_tab_verify" data-toggle="tab" role="tab">Verify</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active pt-3" id="webp_tab_linux" role="tabpanel">
+<p>Find the Python Odoo uses, install libwebp, then reinstall Pillow with that exact Python.</p>
+<pre class="bg-100 p-2 border rounded">systemctl cat odoo | grep ExecStart   # find the Python Odoo uses
+sudo apt install -y libwebp-dev
+sudo /path/to/python3 -m pip install --upgrade pip
+sudo /path/to/python3 -m pip install --force-reinstall "Pillow&gt;=10.0.1"
+sudo systemctl restart odoo</pre>
+<p class="text-muted">
+    If pip reports <code>externally-managed-environment</code>, add <code>--break-system-packages</code>.
+    Avoid <code>--no-binary Pillow</code> on Linux; the prebuilt wheel already includes WebP.
+</p>
+                            </div>
+                            <div class="tab-pane fade pt-3" id="webp_tab_docker" role="tabpanel">
+<p>Add to the Odoo image's Dockerfile, then rebuild the image and restart the container.</p>
+<pre class="bg-100 p-2 border rounded">RUN apt-get update &amp;&amp; apt-get install -y --no-install-recommends libwebp-dev \
+    &amp;&amp; pip3 install --force-reinstall "Pillow&gt;=10.0.1"</pre>
+                            </div>
+                            <div class="tab-pane fade pt-3" id="webp_tab_windows" role="tabpanel">
+<p>The official Pillow wheel for Windows already includes WebP.</p>
+<pre class="bg-100 p-2 border rounded">pip install --upgrade Pillow</pre>
+                            </div>
+                            <div class="tab-pane fade pt-3" id="webp_tab_macos_intel" role="tabpanel">
+
+<pre class="bg-100 p-2 border rounded">brew install webp
+/path/to/venv/bin/pip install --force-reinstall --no-cache-dir --no-binary Pillow Pillow</pre>
+                            </div>
+                            <div class="tab-pane fade pt-3" id="webp_tab_macos_arm" role="tabpanel">
+<p>Homebrew on Apple Silicon lives in <code>/opt/homebrew/</code>. Library paths must be set explicitly, otherwise Pillow is built without WebP.</p>
+<pre class="bg-100 p-2 border rounded">brew install webp
+LDFLAGS="-L/opt/homebrew/lib" CPPFLAGS="-I/opt/homebrew/include" \
+  /path/to/venv/bin/pip install --force-reinstall --no-cache-dir --no-binary Pillow Pillow</pre>
+                            </div>
+                            <div class="tab-pane fade pt-3" id="webp_tab_verify" role="tabpanel">
+<p>Run with the same Python/venv as Odoo, then restart Odoo.</p>
+<pre class="bg-100 p-2 border rounded">python -c "from PIL import Image; import io; img=Image.new('RGB',(1,1)); out=io.BytesIO(); img.save(out,format='WEBP'); print('OK, bytes:', len(out.getvalue()))"
+# Expected: OK, bytes: 44</pre>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
