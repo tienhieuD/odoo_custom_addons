@@ -20,7 +20,7 @@ Follow the section for your environment, then run the **Verify** step at the end
    ```bash
    sudo apt install -y libwebp-dev
    sudo /path/to/python3 -m pip install --upgrade pip
-   sudo /path/to/python3 -m pip install --force-reinstall "Pillow>=10.0.1"
+   sudo /path/to/python3 -m pip install --force-reinstall "Pillow<10"
    sudo systemctl restart odoo
    ```
 3. If pip refuses with `externally-managed-environment` (Debian/Ubuntu 12+, no venv), add `--break-system-packages` to the pip command.
@@ -32,7 +32,7 @@ Note: avoid `--no-binary Pillow` on Linux unless you really need to rebuild the 
 Add to the Odoo image's Dockerfile (or run inside the container and commit):
 ```dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends libwebp-dev \
-    && pip3 install --force-reinstall "Pillow>=10.0.1"
+    && pip3 install --force-reinstall "Pillow<10"
 ```
 Then rebuild the image and restart the container.
 
