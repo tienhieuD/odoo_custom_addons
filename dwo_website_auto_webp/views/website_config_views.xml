@@ -100,7 +100,7 @@
 <pre class="bg-100 p-2 border rounded">systemctl cat odoo | grep ExecStart   # find the Python Odoo uses
 sudo apt install -y libwebp-dev
 sudo /path/to/python3 -m pip install --upgrade pip
-sudo /path/to/python3 -m pip install --force-reinstall "Pillow&gt;=10.0.1"
+sudo /path/to/python3 -m pip install --force-reinstall "Pillow&lt;10"
 sudo systemctl restart odoo</pre>
 <p class="text-muted">
     If pip reports <code>externally-managed-environment</code>, add <code>--break-system-packages</code>.
@@ -110,7 +110,7 @@ sudo systemctl restart odoo</pre>
                             <div class="tab-pane fade pt-3" id="webp_tab_docker" role="tabpanel">
 <p>Add to the Odoo image's Dockerfile, then rebuild the image and restart the container.</p>
 <pre class="bg-100 p-2 border rounded">RUN apt-get update &amp;&amp; apt-get install -y --no-install-recommends libwebp-dev \
-    &amp;&amp; pip3 install --force-reinstall "Pillow&gt;=10.0.1"</pre>
+    &amp;&amp; pip3 install --force-reinstall "Pillow&lt;10"</pre>
                             </div>
                             <div class="tab-pane fade pt-3" id="webp_tab_windows" role="tabpanel">
 <p>The official Pillow wheel for Windows already includes WebP.</p>
