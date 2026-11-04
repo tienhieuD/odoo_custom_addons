@@ -170,12 +170,13 @@ class IrBinary(models.AbstractModel):
     def _webp_is_convertible(self, stream):
         """
         True nếu stream là ảnh có thể convert sang WebP.
-        Loại trừ: SVG (vector, không convert được), WebP (đã đúng format rồi).
+        Loại trừ: SVG (vector, không convert được), WebP (đã đúng format rồi),
+        GIF (có thể là ảnh động — convert sẽ chỉ giữ lại khung hình đầu tiên).
         """
         mimetype = getattr(stream, 'mimetype', None)
         if not mimetype:
             return False
-        if mimetype in ('image/webp', 'image/svg+xml'):
+        if mimetype in ('image/webp', 'image/svg+xml', 'image/gif'):
             return False
         return mimetype.startswith('image/')
 
