@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dwo_webp_test_result_form" model="ir.ui.view">
+        <field name="name">dwo.webp.test.result.form</field>
+        <field name="model">dwo.webp.test.result</field>
+        <field name="arch" type="xml">
+            <form string="Auto WebP">
+                <field name="success" invisible="1"/>
+                <div class="alert alert-success" role="alert" attrs="{'invisible': [('success', '=', False)]}">
+                    <h4><field name="title" readonly="1" nolabel="1"/></h4>
+                    <field name="message" readonly="1" nolabel="1"/>
+                </div>
+                <div class="alert alert-danger" role="alert" attrs="{'invisible': [('success', '=', True)]}">
+                    <h4><field name="title" readonly="1" nolabel="1"/></h4>
+                    <field name="message" readonly="1" nolabel="1"/>
+                </div>
+                <footer>
+                    <button string="Close" special="cancel" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
