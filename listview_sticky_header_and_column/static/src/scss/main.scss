@@ -31,33 +31,3 @@
     }
   }
 }
-
-
-// Common css
-.o_list_view {
-  .table-responsive {
-    thead th {
-      position: sticky !important;
-      top: 0 !important;
-      background-color: #EEE !important;
-      z-index: 1 !important;
-    }
-
-    tr.o_data_row {
-      position: relative !important;
-
-      td {
-        white-space: nowrap !important;
-        padding: 0.3rem 0.75rem !important;
-      }
-
-      &:hover td {
-        background-color: #EEE !important;
-      }
-
-      &:focus-within td {
-        background-color: #ccc !important;
-      }
-    }
-  }
-}
