@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_record_concurrency.ConcurrencyDialog">
+        <Dialog size="'lg'" title.translate="Saving Record with Concurrency Warning!">
+            <p>Another user changed fields you are editing. What do you want to do?</p>
+            <table class="table table-sm table-bordered mt-2">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Field</th>
+                        <th>Your Updates</th>
+                        <th>Latest Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="props.conflicts" t-as="conflict" t-key="conflict.name">
+                        <td t-esc="conflict_index + 1"/>
+                        <td t-esc="conflict.label"/>
+                        <td><span class="badge text-bg-secondary" t-esc="conflict.mine"/></td>
+                        <td><span class="badge text-bg-secondary" t-esc="conflict.server"/></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p t-if="lastWriter" class="fst-italic">Last updated by <strong t-esc="lastWriter"/>.</p>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="() => this.choose('continue')">Force Save</button>
+                <button class="btn btn-secondary" t-on-click="() => this.choose('discard')">Discard My Updates</button>
+                <button class="btn btn-link" t-on-click="() => this.choose('cancel')">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>
