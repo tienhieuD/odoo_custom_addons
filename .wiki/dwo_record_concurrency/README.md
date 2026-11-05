@@ -128,11 +128,11 @@ Tour (3): `dwo_concurrency_conflict` (dialog hai giá trị, Cancel giữ phần
 Bản chuẩn là **19**. 20 và 18 chép từ 19 (xử lý riêng: `ir.access.csv`, `useProps`/`this.`, `_clear_cache_name` ở 20). 17 chép từ 18 rồi `tools/adapt_conc.py 17`. 16 chép từ 17 (viết lại `RecordPatch`/`FormControllerPatch`, `owl="1"`, tour `tour.register`). 15 chép từ 16 (viết lại client legacy; `tools/legacy_py.sh 15`, `legacy_tests.py`). 14 và 13 chép từ 15 bằng `tools/legacy_port.sh <NN>` (+ `legacy_view.py`, `legacy_setup.py`, `legacy_cascade.py` cho 13, `legacy_tour_wait.py`). 12 chép từ 13 (xem phần "12" ở trên).
 `tools/adapt_conc.py` **không idempotent**: nó là bản ghi các sửa đổi đã áp cho bản 17 (từ bản 18) và được viết thêm từng đoạn; đọc nó như tài liệu "cần đổi gì", đừng chạy lại lên module đã port. Các script trong `tools/` ghi sẵn đường dẫn máy của chủ dự án (`/Users/hieu/Documents/Odoo/...`, thư mục scratchpad cho Chrome headless); chỉnh lại khi dùng ở máy khác.
 
-Quy trình nên làm khi sửa một tính năng: sửa ở 19 + chạy test; chép sang 20 và 18 (kiểm tra theo bảng khác biệt); sang 17 rồi 16, rồi nhóm legacy; **chạy test từng bản** (`conc_test.sh`), commit từng bản, cập nhật wiki, chép `wiki/` sang mọi nhánh.
+Quy trình nên làm khi sửa một tính năng: sửa ở 19 + chạy test; chép sang 20 và 18 (kiểm tra theo bảng khác biệt); sang 17 rồi 16, rồi nhóm legacy; **chạy test từng bản** (`conc_test.sh`), commit từng bản, cập nhật wiki, chép `.wiki/` sang mọi nhánh.
 
 ## Đóng gói và listing
 
-- Cấu hình trang mô tả: `wiki/listings/dwo_record_concurrency.json`; sinh bằng skill `odoo-apps-listing` (`gen_assets.py`, `gen_flow.py`, `build_index.py`) rồi chép `static/description/*` y nguyên sang mọi bản, chỉ đổi `version` trong manifest. Chụp ảnh bằng `tools/shoot_listing.py`, bằng chứng từng bước bằng `tools/shoot_evidence.py`.
+- Cấu hình trang mô tả: `.wiki/listings/dwo_record_concurrency.json`; sinh bằng skill `odoo-apps-listing` (`gen_assets.py`, `gen_flow.py`, `build_index.py`) rồi chép `static/description/*` y nguyên sang mọi bản, chỉ đổi `version` trong manifest. Chụp ảnh bằng `tools/shoot_listing.py`, bằng chứng từng bước bằng `tools/shoot_evidence.py`.
 - Chạy `validate_listing.py` trên từng module: phải **0 FAIL**. Changelog trong trang: 1.1 (2026-11-05) và 1.0 (2026-04-12, ngày commit đầu tiên của module).
 - Không để khuyến mãi, emoji, JS hay style ngoài danh sách cho phép trong `index.html`.
 
