@@ -1,42 +1,25 @@
-from odoo import models, tools, _
+from odoo import models
 
 
 class BaseModel(models.AbstractModel):
     _inherit = "base"
 
     def write(self, vals):
-        """
-        @override
-        1. Check the current model is setting for concurrency
-        2. Filter the model fields in vals which is setting for concurrency
-        3. If model is setting for concurrency, and field is setting for concurrency,
-           send bus to mark record isStale = True
+        """After a successful write, tell the clients that watch this record that the fields they may be
+        editing have changed. Nothing is ever refused here: the detection is soft by design.
+
+        The notification carries *names only*, never values: a client re-reads through the ORM, so its own
+        access rights apply.
         """
         res = super().write(vals)
-        if model_concurrency := self._is_setting_for_concurrency():
-            if fields_concurrency := self._is_field_setting_for_concurrency(model_concurrency, vals):
-                self._send_bus_to_mark_record_is_stale(fields_concurrency)
+        pool = self.pool
+        if 'dwo.model.concurrency' in pool and self._name in pool and not self._abstract and not self._transient \
+                and not self.env.context.get('dwo_skip_concurrency'):
+            watched = self.env['dwo.model.concurrency']._get_watched_field_names(self._name)
+            if watched:
+                changed = [name for name in watched if name in vals]
+                if changed:
+                    for rec in self:
+                        self.env['dwo.record.presence'].publish_presence(
+                            model=self._name, res_id=rec.id, state='stale', fields=changed)
         return res
-
-    def _is_setting_for_concurrency(self):
-        return self.env['dwo.model.concurrency'].sudo().search([
-            ('model', '=', self._name)
-        ], limit=1)
-
-    def _is_field_setting_for_concurrency(self, model_concurrency, vals):
-        return model_concurrency.field_ids.filtered(lambda field: field.name in vals)
-
-    def _send_bus_to_mark_record_is_stale(self, fields_concurrency):
-        new_vals_list = self.read(fields_concurrency.mapped('name'))
-        new_vals_by_id = {
-            record_dict['id']: record_dict
-            for record_dict in new_vals_list
-        }
-        for rec in self:
-            new_vals = new_vals_by_id[rec.id]
-            self.env['dwo.record.presence'].publish_presence(
-                model=self._name,
-                res_id=rec.id,
-                state='stale',
-                data=new_vals,
-            )

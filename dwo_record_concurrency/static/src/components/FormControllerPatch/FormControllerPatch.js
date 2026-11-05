@@ -1,398 +1,211 @@
-/** @odoo-module **/
-
-import { registry } from "@web/core/registry";
-import { FormController } from "@web/views/form/form_controller";
+import { onWillDestroy } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
+import { formatDate, formatDateTime } from "@web/core/l10n/dates";
+import { patch } from "@web/core/utils/patch";
 import { useBus, useService } from "@web/core/utils/hooks";
-import { patch } from '@web/core/utils/patch';
-import { userService } from '@web/core/user_service';
-import { markup, onMounted, onWillDestroy, onWillUnmount, remove, type, useEffect } from '@odoo/owl';
-import { useDebounced } from '@web/core/utils/timing';
-import { ConfirmationDialog } from '@web/core/confirmation_dialog/confirmation_dialog';
-import { _t } from '@web/core/l10n/translation';
-import { escape } from '@web/core/utils/strings';
-import { formatDate, formatDateTime } from '@web/core/l10n/dates';
+import { FormController } from "@web/views/form/form_controller";
+import { ConcurrencyDialog } from "../ConcurrencyDialog/ConcurrencyDialog";
+import { DWO_TAB_ID, RECORD_PRESENCE_CHANNEL_KEY } from "../../utils/tab_id";
 
-export const RECORD_PRESENCE_CHANNEL_KEY = 'dwo_record_presence';
+const MODEL = "dwo.model.concurrency";
+// watched fields per model, shared by every form of the page (null while unknown)
+const watchedFieldsByModel = new Map();
 
-patch(
-    FormController.prototype,
-    {
-        setup() {
-            super.setup();
-            this.multiTabService = useService('multi_tab');
-            this.busService = this.env.services.bus_service;
+/**
+ * Soft concurrency control. Nothing here can refuse a save: when the fields the user is saving were changed on
+ * the server after the form was loaded, a dialog lets the user choose Force Save / Discard / Cancel.
+ *
+ * Every way of saving (Save button, pager, leaving the form, tab hidden) goes through `onWillSaveRecord`, which
+ * is therefore the single place where the check is made. The bus only gives early information.
+ */
+patch(FormController.prototype, {
+    setup() {
+        super.setup();
+        this._dwoNotification = useService("notification");
+        this._dwoBus = this.env.services.bus_service;
+        this._dwoChannel = null;
+        this._dwoToken = 0;
+        this._dwoSnapshot = null; // normalized values of the watched fields, taken at load
+        this._dwoWatched = [];
+        this._dwoStale = null; // { fields: Set, userName } told by the bus
+        useBus(this._dwoBus, "notification", (ev) => this._dwoOnNotification(ev.detail));
+        onWillDestroy(() => this._dwoSetChannel(null));
+    },
 
-            this.currentTabId = this.multiTabService.currentTabId;
-            this.channel = null;
-            this.isStale = false;
-            this.lastUpdateUserName = null;
-            this.serverData = null;
+    // ------------------------------------------------------------------ lifecycle
+    onWillLoadRoot(config) {
+        super.onWillLoadRoot(...arguments);
+        const resModel = config?.resModel || this.props.resModel;
+        const resId = config?.resId || this.props.resId;
+        this._dwoStale = null;
+        this._dwoSetChannel(resId ? `${RECORD_PRESENCE_CHANNEL_KEY}:${resModel}:${resId}` : null);
+        this._dwoRefreshSnapshot(resModel, resId);
+    },
 
-            useBus(this.busService, 'notification', this.onPresenceMessage.bind(this));
-        },
+    async onRecordSaved(record) {
+        const res = await super.onRecordSaved(...arguments);
+        this._dwoStale = null;
+        this._dwoRefreshSnapshot(record.resModel, record.resId);
+        return res;
+    },
 
-        /**
-         * Dialog confirm save with options:
-         *   1. Force save my updates (overwrite server data)
-         *   2. Discard all my updates (discard, close the dialog)
-         *   2. Cancel (do nothing, close the dialog)
-         * @param {Object} options - option
-         * @param {Boolean} options.withDiscard - show discard option
-         */
-        async showConcurrencyWarningDialog(options = {}) {
-            const titleText = _t("Saving Record with Concurrency Warning!");
-            const confirmText = _t("Force Save");
-            const discardText = _t("Discard My Updates");
-            const messageHtml = await this.buildConcurrencyWarningMessage();
+    _dwoSetChannel(channel) {
+        if (this._dwoChannel === channel) {
+            return;
+        }
+        if (this._dwoChannel) {
+            this._dwoBus.deleteChannel(this._dwoChannel);
+        }
+        this._dwoChannel = channel;
+        if (channel) {
+            this._dwoBus.addChannel(channel);
+        }
+    },
 
-            return new Promise((resolve) => {
-                const dialogProps = {
-                    title: titleText,
-                    body: messageHtml,
-                    bodyPrewrap: false,
-                    confirmLabel: confirmText,
-                    discardLabel: discardText,
-                    confirm: () => resolve("continue"),
-                    cancel: () => resolve("cancel"),
-                };
-                if (options.withDiscard) {
-                    dialogProps.discard = () => resolve("discard_and_continue");
-                }
-                this.dialogService.add(ConfirmationDialog, dialogProps);
-            });
-        },
+    async _dwoRefreshSnapshot(resModel, resId) {
+        const token = ++this._dwoToken;
+        this._dwoSnapshot = null;
+        if (!resId) {
+            return;
+        }
+        try {
+            if (!watchedFieldsByModel.has(resModel)) {
+                watchedFieldsByModel.set(
+                    resModel,
+                    this.orm.call(MODEL, "get_watched_fields", [resModel])
+                );
+            }
+            const watched = await watchedFieldsByModel.get(resModel);
+            if (token !== this._dwoToken || !watched.length) {
+                return;
+            }
+            const snapshot = await this.orm.call(MODEL, "dwo_snapshot", [resModel, resId]);
+            if (token === this._dwoToken) {
+                this._dwoWatched = watched;
+                this._dwoSnapshot = snapshot;
+            }
+        } catch {
+            watchedFieldsByModel.delete(resModel); // soft: without a snapshot we simply do not check
+        }
+    },
 
-        async buildConcurrencyWarningMessage() {
-            const messageText = _t(
-                "The record has been updated by another user. " +
-                "What do you want to do?"
+    // ------------------------------------------------------------------ bus (early information only)
+    async _dwoOnNotification(notifications) {
+        const root = this.model.root;
+        for (const { type, payload } of notifications) {
+            if (
+                type !== "dwo_record_presence" ||
+                payload.model !== root.resModel ||
+                payload.res_id !== root.resId ||
+                payload.current_tab_id === DWO_TAB_ID
+            ) {
+                continue;
+            }
+            const fields = new Set([...(this._dwoStale?.fields || []), ...payload.fields]);
+            this._dwoStale = { fields, userName: payload.user_name };
+            // getChanges() first commits what the user is typing: until then the record does not know the edit yet
+            const edited = await root.getChanges();
+            const touched = payload.fields.filter((name) => name in edited);
+            if (touched.length) {
+                this._dwoNotification.add(
+                    _t("%(user)s changed fields you are editing. You will be asked before saving.", {
+                        user: payload.user_name,
+                    }),
+                    { type: "warning" }
+                );
+            }
+        }
+    },
+
+    // ------------------------------------------------------------------ the check
+    async onWillSaveRecord(record, changes) {
+        const res = await super.onWillSaveRecord(...arguments);
+        if (res === false || record.isNew || !this._dwoSnapshot) {
+            return res;
+        }
+        const dirty = Object.keys(changes || {}).filter((name) => this._dwoWatched.includes(name));
+        if (!dirty.length) {
+            return res;
+        }
+        let conflicts;
+        try {
+            conflicts = await this.orm.call(MODEL, "dwo_check_conflict", [
+                record.resModel,
+                record.resId,
+                this._dwoSnapshot,
+                dirty,
+            ]);
+        } catch {
+            return res; // soft: if the check itself fails, never get in the way of the save
+        }
+        if (!conflicts.length) {
+            return res;
+        }
+        if (document.visibilityState === "hidden") {
+            return false; // automatic save of a hidden tab: keep the changes, ask nothing, overwrite nothing
+        }
+        for (const conflict of conflicts) {
+            conflict.mine = this._dwoDisplayValue(record, conflict);
+        }
+        const choice = await new Promise((resolve) => {
+            this.dialogService.add(
+                ConcurrencyDialog,
+                { conflicts, onChoice: resolve },
+                { onClose: () => resolve("cancel") }
             );
-            const lastUpdateText = _t(
-                "Last updated by <strong>%s</strong>.",
-                this.lastUpdateUserName
-            )
-            const difference = await this.computeDataDifference();
-            const tableHtml = await this.buildDifferenceTableHtml(difference);
-            return markup(`
-                <p>${messageText}</p>
-                ${tableHtml}
-                <p><i>${lastUpdateText}</i></p>
-            `)
-        },
+        });
+        if (choice === "continue") {
+            return true;
+        }
+        if (choice === "discard") {
+            // not awaited: the save is running inside the model mutex. After dropping the edits, show the
+            // latest data of the server instead of the values the form was opened with.
+            setTimeout(async () => {
+                await this.discard();
+                await this.model.root.load();
+                this._dwoStale = null;
+                this._dwoRefreshSnapshot(record.resModel, record.resId);
+            });
+        }
+        return false;
+    },
 
-        /**
-         * @returns {Promise<{ [key: string]: { local: any, server: any} }>}
-         */
-        async computeDataDifference() {
-            const localChanges = this.model.root._getChanges();
-            const serverData = this.serverData;
-            const diff = {};
-            for (const key in localChanges) {
-                if (key === 'id') {
-                    continue;
-                }
-                diff[key] = {
-                    local: localChanges[key],
-                    server: serverData[key],
-                };
+    _dwoDisplayValue(record, { name, type }) {
+        const value = record.data[name];
+        switch (type) {
+            case "many2one":
+                return value ? value.display_name : "";
+            case "one2many":
+            case "many2many":
+                return _t("%(count)s records", { count: value?.count ?? 0 });
+            case "date":
+                return value ? formatDate(value) : "";
+            case "datetime":
+                return value ? formatDateTime(value) : "";
+            case "boolean":
+                return value ? _t("Yes") : _t("No");
+            case "binary":
+                return _t("Binary content");
+            case "selection": {
+                const selection = record.fields[name].selection || [];
+                return selection.find(([key]) => key === value)?.[1] ?? value ?? "";
             }
-            return diff;
-        },
+            default:
+                return value === false || value === undefined || value === null ? "" : String(value);
+        }
+    },
 
-        async buildDifferenceTableHtml(difference) {
-            const noText = _t("#");
-            const fieldText = _t("Field");
-            const yourUpdatesText = _t("Your Updates");
-            const serverDataText = _t("Latest Data");
-            const previewText = _t("Preview Content");
-            const cannotPreviewText = _t("Preview not Supported");
-            
-            // Store display names of many2many fields to avoid multiple orm call for the same field
-            const storeDisplayNames = {};
-            for (const field in difference) {
-                storeDisplayNames[field] = this.props.fields[field].string;
-                const fieldType = this.props.fields[field].type;
-                if (fieldType === 'many2many' && Array.isArray(difference[field].server)) {
-                    // make an orm call to get the display name of many2many records,
-                    // because server only return the id of records
-                    const record_ids = difference[field].server;
-                    const domain = [['id', 'in', record_ids]];
-                    const name = ''; // empty name to only search with domain
-                    const result = await this.orm.call(this.props.fields[field].relation, "name_search", [], {
-                        name: name,
-                        operator: "ilike",
-                        args: domain,
-                        context: this.props.context,
-                    });
-                    storeDisplayNames[field] = result.map(record => record[1]);
-                }
-            }
-
-            const getFieldString = (field) => this.props.fields[field].string;
-            const getDisplayValue = (field, type) => {
-                const fieldType = this.props.fields[field].type;
-
-                if (fieldType === 'many2many') {
-                    const displayNameList = type === 'server'
-                        ? storeDisplayNames[field]
-                        : this.model.root._changes[field].records.map(
-                            record => record._textValues.display_name
-                        );
-                    const formatedDisplayNameList = displayNameList.map(
-                        displayName => `<span class="badge text-bg-secondary">${
-                            escape(displayName)
-                        }</span>`
-                    );
-                    return formatedDisplayNameList.join(' ');
-
-                } else if (fieldType === 'many2one') {
-                    const displayName = type === 'server'
-                        ? difference[field].server[1]
-                        : this.model.root._changes[field][1];
-                    return `<span class="badge text-bg-secondary">${escape(displayName)}</span>`;
-
-                } else if (fieldType === 'datetime' || fieldType === 'date') {
-                    const toLuxon = (value, fType) => {
-                        const dateFormat = 'yyyy-MM-dd';
-                        const datetimeFormat = 'yyyy-MM-dd HH:mm:ss';
-                        const zone = { zone: "utc" };
-                        if (fType === 'datetime') {
-                            return luxon.DateTime.fromFormat(value, datetimeFormat, zone)
-                        } else if (fType === 'date') {
-                            return luxon.DateTime.fromFormat(value, dateFormat, zone)
-                        }
-                    }
-                    const value = toLuxon(difference[field][type], fieldType);
-                    const formatFunc = fieldType === 'datetime' ? formatDateTime : formatDate;
-                    return formatFunc(value);
-
-                } else if (fieldType === 'binary') {
-                    if (type === 'server') {
-                        const model = this.model.root.resModel;
-                        const id = this.model.root.resId;
-                        const unique = new Date().getTime();
-                        return `
-                        <a target="_blank"
-                            class="badge text-bg-light"
-                            href="/web/content/${model}/${id}/${field}?unique=${unique}">
-                            ${previewText}
-                            <i class="fa fa-external-link"></i>
-                        </a>`;
-                    } else {
-                        return `<span class="badge text-bg-secondary">
-                            ${cannotPreviewText}
-                            <i class="fa fa-ban"></i>
-                        </span>`;
-                    }
-                    
-                } else if (fieldType === 'one2many') {
-                    return `<span class="badge text-bg-secondary">
-                        ${cannotPreviewText}
-                        <i class="fa fa-ban"></i>
-                    </span>`;
-                    
-                }
-                return difference[field][type];
-            }
-
-            const tableHeaders = `
-                <tr>
-                    <th name="no">${noText}</th>
-                    <th name="field">${fieldText}</th>
-                    <th name="your_updates">${yourUpdatesText}</th>
-                    <th name="server_data">${serverDataText}</th>
-                </tr>
-            `;
-            const tableRows = Object.keys(difference).map((key, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${getFieldString(key)}</td>
-                    <td>${getDisplayValue(key, 'local')}</td>
-                    <td>${getDisplayValue(key, 'server')}</td>
-                </tr>
-            `).join('');
-
-            const tableHtml = `
-                <table class="table table-sm table-bordered table-hover position-relative mt-2">
-                    <thead>
-                        ${tableHeaders}
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
-            `
-            return tableHtml;
-        },
-
-        async onPagerUpdate() {
-            const dirty = await this.model.root.isDirty();
-            if (this.isStale && dirty) {
-                const choice = await this.showConcurrencyWarningDialog({
-                    withDiscard: true
-                });
-                if (choice === "continue") {
-                    this._savedFromPager = true;
-                    const res = await super.onPagerUpdate(...arguments);
-                    this._savedFromPager = false;
-                    return res;
-                }
-                if (choice === "discard_and_continue") {
-                    await this.model.root.discard();
-                    return super.onPagerUpdate(...arguments);
-                }
-                // cancel → stay on page
-            }
-
-            return super.onPagerUpdate(...arguments);
-        },
-
-        /**
-         * @override
-         * If record is dirty and stale show dialog to confirm save
-         * else make super call
-         */
-        async beforeLeave() {
-            if (this.model.root.dirty && this.isStale) {
-                const choice = await this.showConcurrencyWarningDialog({
-                    withDiscard: true
-                });
-                if (choice === "continue") {
-                    return super.beforeLeave(...arguments);
-                }
-                if (choice === "discard_and_continue") {
-                    await this.model.root.discard();
-                    return super.beforeLeave(...arguments);
-                }
-                // cancel → stay on page
-                return false;
-            }
-            return super.beforeLeave(...arguments);
-        },
-
-        /**
-         * @override
-         * To prevent the conflict,
-         * If record is stale, and dirty, 
-         * show browser warning and prevent urgent save of base behavior
-         */
-        async beforeUnload(ev) {
-            const dirty = await this.model.root.isDirty();
-            if (this.isStale && dirty) {
-                ev.preventDefault();
-                ev.returnValue = "";
-                return;
-            }
-            return super.beforeUnload(...arguments);
-        },
-
-        /**
-         * @override
-         * If record is stale, show Dialog to confirm save
-         * Return `true` if the record should be saved, `false` to prevent save.
-         * @returns {Promise<boolean>}
-         */
-        async onWillSaveRecord() {
-            const res = super.onWillSaveRecord(...arguments);
-
-            if (this._savedFromPager) {
-                return res;
-            }
-
-            // If record is stale, show dialog
-            if (this.isStale) {
-                const choice = await this.showConcurrencyWarningDialog({
-                    withDiscard: true
-                });
-                if (choice === "continue") {
-                    return true;
-                }
-                if (choice === "discard_and_continue") {
-                    this.discard();
-                    return false;
-                }
-                // cancel → stay on page
-                return false;
-            }
-            return res;
-        },
-
-        /**
-         * @override
-         * Reset `isStale` and `serverData`
-         */
-        async onRecordSaved() {
-            const res = super.onRecordSaved(...arguments);
-            this.isStale = false;
-            this.serverData = null;
-            return res;
-        },
-
-        /**
-         * @override
-         * Set `isStale` to `false` every time the record is loaded.
-         */
-        onWillLoadRoot(nextConfiguration) {
-            super.onWillLoadRoot(...arguments);
-            this.reloadChanel(nextConfiguration);
-            this.isStale = false;
-            this.serverData = null;
-        },
-
-        reloadChanel({ resModel, resId }) {
-            const model = resModel || this.props.resModel;
-            const id = resId || this.props.resId;
-            const channelName = `${RECORD_PRESENCE_CHANNEL_KEY}:${model}:${id}`;
-            if (this.channel === channelName) {
-                return;
-            }
-            if (this.channel) {
-                this.busService.deleteChannel(this.channel);
-            }
-            this.channel = channelName;
-            this.busService.addChannel(channelName);
-        },
-
-        /**
-         * @param {CustomEvent} event - The event containing the presence message.
-         */
-        onPresenceMessage(event) {
-            const notifications = event.detail;
-            for (const notification of notifications) {
-                const { type, payload } = notification;
-                if (type !== 'dwo_record_presence') {
-                    continue;
-                }
-                const {
-                    model,
-                    res_id,
-                    user_id,
-                    user_name,
-                    state,
-                    current_tab_id,
-                    data
-                } = payload;
-
-                // Check if should mark record is stale
-                if (
-                    model === this.model.root.resModel
-                    && res_id === this.model.root.resId
-                    && state === 'stale'
-                    && !(
-                        // Do not mark stale if the current tab is the one that made the save
-                        user_id === this.user.userId
-                        && current_tab_id === this.currentTabId
-                    )
-                ) {
-                    this.isStale = true;
-                    this.lastUpdateUserName = user_name;
-                    this.serverData = {
-                        ...this.serverData,
-                        ...data
-                    };
-                    console.log(`Record ${model} ${res_id} is stale`);
-                }
-            }
-        },
-    }
-)
+    /**
+     * Closing the tab: the unload cannot wait for a server answer, so it relies on what the bus already told us.
+     * Never overwrite silently when we know the record changed under the user.
+     */
+    async beforeUnload(ev) {
+        const root = this.model.root;
+        if (root.dirty && this._dwoStale) {
+            ev.preventDefault();
+            ev.returnValue = "";
+            return;
+        }
+        return super.beforeUnload(...arguments);
+    },
+});
