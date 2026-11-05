@@ -1,5 +1,5 @@
 {
-    'name': "List View Sticky Header & Freeze Column",
+    'name': "Sticky Header & Columns",
     'summary': """
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
@@ -12,7 +12,7 @@
     'author': "DUO-TEK Software Vietnam",
     'license': 'LGPL-3',
     'category': 'Tools',
-    'version': '20.0.0.4',
+    'version': '20.0.0.4.0',
     'depends': ['base', 'web'],
     'data': [],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
