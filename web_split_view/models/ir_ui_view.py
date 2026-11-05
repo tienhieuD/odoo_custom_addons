@@ -7,5 +7,5 @@ class IrUiView(models.Model):
     type = fields.Selection(selection_add=[('split', "Split")])
 
     def _get_view_info(self):
-        # registers the "split" view type (icon of the view switcher) for the web client
-        return {**super()._get_view_info(), 'split': {'icon': 'fa fa-columns'}}
+        # registers the "split" view type (Material Symbols icon of the view switcher: Odoo 20 has no FontAwesome) for the web client
+        return {**super()._get_view_info(), 'split': {'icon': 'view_column'}}
