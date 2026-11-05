@@ -63,3 +63,155 @@ registry.category("web_tour.tours").add("web_split_view_tour", {
         },
     ],
 });
+
+// Automatic mode: no <split> view record, the split view is derived from the action
+registry.category("web_tour.tours").add("web_split_view_auto_tour", {
+    url: "/odoo/action-base.action_partner_form?view_type=split",
+    steps: () => [
+        {
+            content: "the automatic split view shows the partner list on the left",
+            trigger: ".o_split_view .left-side .o_list_view .o_data_row",
+        },
+        {
+            content: "open a record",
+            trigger: ".o_split_view .left-side .o_data_row:first-child .o_data_cell",
+            run: "click",
+        },
+        {
+            content: "the partner form is displayed on the right",
+            trigger: ".o_split_view .right-side .o_form_view",
+        },
+        {
+            content: "the row of the record is highlighted",
+            trigger: ".o_split_view .left-side .o_data_row.split_active_row",
+        },
+    ],
+});
+
+// State kept per split view: pane width (browser) and the record shown on the right (tab session)
+registry.category("web_tour.tours").add("web_split_view_state_tour", {
+    url: "/odoo/action-base.action_partner_form?view_type=split",
+    steps: () => [
+        { trigger: ".o_split_view .left-side .o_data_row", run: () => {} },
+        {
+            content: "resize the panes with the divider",
+            trigger: ".o_split_view .split_resizer",
+            run: () => {
+                const split = document.querySelector(".o_split_view .duo_split_view");
+                const rect = split.getBoundingClientRect();
+                const resizer = document.querySelector(".o_split_view .split_resizer");
+                resizer.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, clientX: rect.left + rect.width * 0.5 }));
+                document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: rect.left + rect.width * 0.3 }));
+                document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+            },
+        },
+        {
+            content: "open the third record",
+            trigger: ".o_split_view .left-side .o_data_row:nth-child(3) .o_data_cell",
+            run: "click",
+        },
+        { trigger: ".o_split_view .right-side .o_form_view .o_field_widget", run: () => {} },
+        {
+            content: "reload the page",
+            trigger: ".o_split_view .left-side .o_data_row.split_active_row",
+            expectUnloadPage: true,
+            run: () => {
+                window.location.reload();
+            },
+        },
+        {
+            content: "the record is still open after the reload",
+            trigger: ".o_split_view .left-side .o_data_row:nth-child(3).split_active_row",
+        },
+        {
+            content: "and the panes keep their width (about 30% for the list)",
+            trigger: ".o_split_view .left-side",
+            run: () => {
+                const width = parseFloat(document.querySelector(".o_split_view .left-side").style.width);
+                if (!(width > 25 && width < 35)) {
+                    throw new Error("left pane width not restored: " + width);
+                }
+            },
+        },
+    ],
+});
+
+// The expand button opens the record in the full form view; the breadcrumb comes back to the split view
+registry.category("web_tour.tours").add("web_split_view_expand_tour", {
+    url: "/odoo/action-base.action_partner_form?view_type=split",
+    steps: () => [
+        { trigger: ".o_split_view .left-side .o_data_row", run: () => {} },
+        {
+            content: "open the second record",
+            trigger: ".o_split_view .left-side .o_data_row:nth-child(2) .o_data_cell",
+            run: "click",
+        },
+        {
+            content: "expand it to the full form view",
+            trigger: ".o_split_view .right-side .o_split_expand",
+            run: "click",
+        },
+        {
+            content: "the full form view is displayed (no split view anymore)",
+            trigger: ".o_form_view:not(:has(.o_split_view)) .o_field_widget[name=name]",
+        },
+        {
+            content: "go back with the breadcrumb: the split view shows the same record",
+            trigger: ".o_control_panel .breadcrumb-item a",
+            run: "click",
+        },
+        {
+            trigger: ".o_split_view .left-side .o_data_row:nth-child(2).split_active_row",
+        },
+    ],
+});
+
+// Going to the full form view and back restores the split view as it was: search facet and open record
+registry.category("web_tour.tours").add("web_split_view_back_tour", {
+    url: "/odoo/action-base.action_partner_form?view_type=split",
+    steps: () => [
+        { trigger: ".o_split_view .left-side .o_data_row", run: () => {} },
+        {
+            content: "search for Azure in the list of the split view",
+            trigger: ".o_split_view .left-side .o_searchview_input",
+            run: "edit Azure",
+        },
+        {
+            trigger: ".o_split_view .left-side .o_searchview_input",
+            run: "press Enter",
+        },
+        {
+            trigger: ".o_split_view .left-side .o_searchview .o_facet_value:contains('Azure')",
+            run: () => {},
+        },
+        {
+            content: "open the first record found",
+            trigger: ".o_split_view .left-side .o_data_row:first-child .o_data_cell",
+            run: "click",
+        },
+        {
+            content: "expand to the full form",
+            trigger: ".o_split_view .right-side .o_split_expand",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view:not(:has(.o_split_view)) .o_field_widget[name=name]",
+            run: () => {},
+        },
+        {
+            content: "back to the split view",
+            trigger: ".o_control_panel .breadcrumb-item a",
+            run: "click",
+        },
+        {
+            content: "the search facet is still there",
+            trigger: ".o_split_view .left-side .o_searchview .o_facet_value:contains('Azure')",
+            run: () => {},
+        },
+        {
+            content: "and the record is still highlighted",
+            trigger: ".o_split_view .left-side .o_data_row.split_active_row",
+            run: () => {},
+        },
+    ],
+});
