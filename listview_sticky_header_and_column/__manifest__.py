@@ -16,14 +16,13 @@
     # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Tools',
-    'version': '13.0.0',
+    'version': '13.0.0.3',
     # any module necessary for this one to work correctly
     'depends': ['base', 'web'],
     # always loaded
     'data': [
         'views/assets.xml',
     ],
-    'qweb': ['static/src/xml/*.xml'],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
     'price': 18.44,
     'currency': 'EUR',
