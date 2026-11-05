@@ -1,4 +1,6 @@
-from odoo import models, api
+from odoo import api, models
+
+CHANNEL_PREFIX = 'dwo_record_presence'
 
 
 class RecordPresence(models.AbstractModel):
@@ -6,12 +8,9 @@ class RecordPresence(models.AbstractModel):
     _description = "Record Presence Publisher"
 
     @api.model
-    def publish_presence(self, model: str, res_id: int, state: str = 'stale', data: dict | None = None):
+    def publish_presence(self, model, res_id, state='stale', fields=None):
+        """Publish a payload-less ping: who changed which fields of which record."""
         user = self.env.user
-        channel = f"dwo_record_presence:{model}:{res_id}"
-        notification_type = 'dwo_record_presence'
-        data = data or {}
-
         message = {
             "model": model,
             "res_id": res_id,
@@ -19,7 +18,7 @@ class RecordPresence(models.AbstractModel):
             "user_name": user.name,
             "current_tab_id": self.env.context.get('current_tab_id'),
             "state": state,
-            "data": data
+            "fields": list(fields or []),
         }
-
-        self.env["bus.bus"]._sendone(channel=channel, notification_type=notification_type, message=message)
+        self.env["bus.bus"]._sendone(
+            f"{CHANNEL_PREFIX}:{model}:{res_id}", 'dwo_record_presence', message)
