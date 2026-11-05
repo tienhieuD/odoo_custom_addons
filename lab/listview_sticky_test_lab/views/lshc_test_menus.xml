@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Developer test bed: a visible top-level app, no debug mode needed. -->
+    <record id="action_lshc_test_wide" model="ir.actions.act_window">
+        <field name="name">Wide list (52 columns, search panel)</field>
+        <field name="res_model">lshc.test.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="lshc_test_record_view_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('lshc_test_record_view_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('lshc_test_record_view_form')})]"/>
+    </record>
+
+    <record id="action_lshc_test_editable" model="ir.actions.act_window">
+        <field name="name">Editable list (40 columns)</field>
+        <field name="res_model">lshc.test.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="lshc_test_record_view_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('lshc_test_record_view_list_editable')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('lshc_test_record_view_form')})]"/>
+    </record>
+
+    <record id="action_lshc_test_grouped" model="ir.actions.act_window">
+        <field name="name">Grouped by category</field>
+        <field name="res_model">lshc.test.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="lshc_test_record_view_search"/>
+        <field name="context">{'search_default_group_category': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('lshc_test_record_view_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('lshc_test_record_view_form')})]"/>
+    </record>
+
+    <menuitem id="menu_lshc_test_root" name="List Sticky Test Lab" sequence="999"
+              web_icon="listview_sticky_header_and_column,static/description/icon.png"/>
+    <menuitem id="menu_lshc_test_wide" name="Wide list (search panel)" parent="menu_lshc_test_root"
+              action="action_lshc_test_wide" sequence="10"/>
+    <menuitem id="menu_lshc_test_editable" name="Editable list" parent="menu_lshc_test_root"
+              action="action_lshc_test_editable" sequence="20"/>
+    <menuitem id="menu_lshc_test_grouped" name="Grouped list" parent="menu_lshc_test_root"
+              action="action_lshc_test_grouped" sequence="30"/>
+</odoo>
