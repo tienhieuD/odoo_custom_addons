@@ -1,0 +1,298 @@
+{
+  "brand": {
+    "primary": "#875A7B",
+    "dark": "#4A2F45",
+    "accent": "#FFC857",
+    "info": "#5B8DB8",
+    "ok": "#0E7C66"
+  },
+  "icon": {
+    "label": "SPLIT",
+    "motif": "document"
+  },
+  "banner": {
+    "pill": "ODOO · WEB ADD-ON",
+    "title_1": "Web Split View",
+    "title_2": "List + Form, Side by Side",
+    "subtitle": "Browse and edit records without leaving the list.",
+    "chips": [
+      "Split mode on every list",
+      "Resizable panes",
+      "Zero configuration"
+    ],
+    "visual": {
+      "type": "icon"
+    }
+  },
+  "flow": {
+    "steps": [
+      {
+        "title": "Open any list",
+        "rows": [
+          "sales, contacts,",
+          "any list + form"
+        ],
+        "icon": "document"
+      },
+      {
+        "title": "Click Split",
+        "rows": [
+          "new button in the",
+          "view switcher"
+        ],
+        "icon": "gear",
+        "highlight": true
+      },
+      {
+        "title": "Pick a record",
+        "rows": [
+          "its form opens",
+          "on the right"
+        ],
+        "icon": "check"
+      },
+      {
+        "title": "Edit and save",
+        "rows": [
+          "the list updates,",
+          "you stay in place"
+        ],
+        "icon": "browser"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Web Split View for Odoo",
+      "tagline": "See the list and the record at the same time.",
+      "subtitle": "A new <strong>Split</strong> button appears in the view switcher of every list that has a form. The list stays on the left, the form of the selected record opens on the right."
+    },
+    {
+      "type": "intro",
+      "flow": true,
+      "flow_alt": "Open a list, click Split, pick a record, edit and save",
+      "html": "Going back and forth between a list and a form costs time and context. With Web Split View you keep the list in front of you while you read, edit, create and delete records in the pane next to it. There is <strong>nothing to configure</strong>: the split view is built from the list, form and search views your action already uses."
+    },
+    {
+      "type": "cards",
+      "title": "What you get",
+      "cols": 3,
+      "accent": "primary",
+      "items": [
+        {
+          "title": "Split on every list",
+          "text": "Every window action that has a list and a form view gets a Split mode in its view switcher. It is added next to the list view and never becomes the default view."
+        },
+        {
+          "title": "Create, edit, delete in place",
+          "text": "New, Save, Discard and Delete work in the right pane. The list refreshes by itself and the record you work on is highlighted."
+        },
+        {
+          "title": "Your list stays a list",
+          "text": "The left pane keeps its own search bar, filters, group by and pager, using the search view of the action."
+        },
+        {
+          "title": "Full form in one click",
+          "text": "An expand button on the right pane opens the record in the normal full form view. The breadcrumb brings you back."
+        },
+        {
+          "title": "Back where you left",
+          "text": "Come back from the full form and the list still has its search, filters and page, and the same record is open and highlighted."
+        },
+        {
+          "title": "Resizable panes",
+          "text": "Drag the divider to give more room to the list or to the form. The width is remembered for each action in your browser."
+        },
+        {
+          "title": "Safe when you switch",
+          "text": "Clicking another record while the current one has unsaved changes asks you to save or discard first, like Odoo does anywhere else."
+        },
+        {
+          "title": "Works with standard lists",
+          "text": "Lists of the standard apps, such as Sales, work too, including lists that use their own list renderer. In split mode a click on a row opens the record instead of editing the row."
+        },
+        {
+          "title": "Your control",
+          "text": "Switch the automatic mode off for the whole database in Settings, or opt a single action out. You can still define your own split view with chosen list and form views."
+        }
+      ]
+    },
+    {
+      "type": "steps",
+      "title": "How to use it",
+      "intro": "Three clicks, nothing to install on your data.",
+      "items": [
+        {
+          "title": "Click Split",
+          "text": "In the view switcher of any list, click the Split button (two columns)."
+        },
+        {
+          "title": "Select a record",
+          "text": "Click a row: its form opens on the right and the row is highlighted."
+        },
+        {
+          "title": "Work next to the list",
+          "text": "Edit and save, create with New, or expand the record to the full form."
+        }
+      ]
+    },
+    {
+      "type": "screenshot",
+      "title": "The list and the form, side by side",
+      "image": "screenshot_1.png",
+      "alt": "Sales orders in split mode with a search active: the list on the left, the selected order and an expand button on the right",
+      "intro": "Sales orders in split mode. The list keeps its search bar and pager, the order opens on the right with its lines, and the expand button in the corner opens the full form."
+    },
+    {
+      "type": "screenshot",
+      "title": "One click away on every list",
+      "image": "screenshot_2.png",
+      "alt": "Sales orders list with the new Split button in the view switcher",
+      "intro": "The Split button sits in the view switcher, right after the list view."
+    },
+    {
+      "type": "screenshot",
+      "title": "Create records without leaving the list",
+      "image": "screenshot_3.png",
+      "alt": "A new record being created in the right pane while the list stays on the left",
+      "intro": "Click New and the form of the new record opens on the right. Save it and the list shows it right away."
+    },
+    {
+      "type": "screenshot",
+      "title": "Come back to the same place",
+      "image": "screenshot_4.png",
+      "alt": "Split view after returning from the full form: the search, the open record and the highlighted row are unchanged",
+      "intro": "Open the record in the full form, use the breadcrumb to go back, and the split view is exactly as you left it."
+    },
+    {
+      "type": "tabs",
+      "title": "Requirements &amp; Installation",
+      "id_prefix": "wsv",
+      "intro": "The module depends only on the standard <code>web</code> module and needs no external Python library. It adds no data and no menu.",
+      "notes": [
+        "The width of the panes is stored in the <strong>browser</strong> (local storage), so it is remembered per browser and not shared between users or devices."
+      ],
+      "tabs": [
+        {
+          "id": "install",
+          "title": "Install",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Install the module"
+            },
+            {
+              "type": "p",
+              "html": "1. Copy the <code>web_split_view</code> folder into an add-ons path of your Odoo server."
+            },
+            {
+              "type": "p",
+              "html": "2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu."
+            },
+            {
+              "type": "p",
+              "html": "3. Search for <em>Web Split View</em> and click <strong>Install</strong>."
+            },
+            {
+              "type": "muted",
+              "html": "Reload your browser page after installing so the new assets are loaded."
+            }
+          ]
+        },
+        {
+          "id": "use",
+          "title": "Use",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Open the split view"
+            },
+            {
+              "type": "p",
+              "html": "Open any list that has a form view, for example Sales Orders or Contacts, and click the <strong>Split</strong> button in the view switcher."
+            },
+            {
+              "type": "p",
+              "html": "Click a row to open it on the right. Use <strong>New</strong> to create a record in the right pane."
+            },
+            {
+              "type": "muted",
+              "html": "In split mode a click on a row always opens the record on the right: lists are not edited inline."
+            }
+          ]
+        },
+        {
+          "id": "settings",
+          "title": "Settings",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Turn it off or customise it"
+            },
+            {
+              "type": "p",
+              "html": "<strong>Settings &gt; Split View</strong> switches the automatic Split mode on or off for the whole database."
+            },
+            {
+              "type": "p",
+              "html": "In developer mode, tick <strong>No split view</strong> on a window action to opt that action out."
+            },
+            {
+              "type": "p",
+              "html": "You can also create your own split view for an action with the list and form views you choose, from the developer mode debug menu."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "changelog",
+      "title": "Changelog",
+      "intro": "Module releases, newest first.",
+      "items": [
+        {
+          "version": "1.0",
+          "date": "2026-11-05",
+          "text": "New automatic Split mode on every list that has a form, built from the views of the action. Resizable panes, New / Save / Discard / Delete in the right pane, an expand button to the full form, state kept when you come back, a Settings page to switch it off and a per-action opt-out. Rewritten on the current web client."
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "q": "Does it change my data or my views?",
+          "a": "No. It only changes how a list and its form are displayed in the browser. It adds no field to your models and does not modify your list or form views."
+        },
+        {
+          "q": "Which views does the split mode use?",
+          "a": "The list, form and search views of the action you are in, so a customised list or form shows up exactly as you set it."
+        },
+        {
+          "q": "What does the list remember when I leave and come back?",
+          "a": "After a visit to the full form, the list keeps its search, filters, group by and page, and the same record is shown and highlighted. After a page reload the same record is reopened. The width of the panes is remembered in your browser for each action."
+        },
+        {
+          "q": "Can I still edit a list inline?",
+          "a": "In the normal list view, yes. In split mode a click on a row opens the record in the right pane instead."
+        },
+        {
+          "q": "Can I switch it off?",
+          "a": "Yes: Settings &gt; Split View turns the automatic mode off for the whole database, and a single action can opt out from developer mode."
+        },
+        {
+          "q": "Can I choose the views of a split view myself?",
+          "a": "Yes. A custom split view can name the list and form views to use, or define them directly inside it."
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "headline": "Stop jumping between list and form.",
+      "text": "Install it, open a list and click Split. That is all it takes.",
+      "footer": "Developed by DUO-TEK Software Vietnam"
+    }
+  ]
+}
