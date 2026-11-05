@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_split_view" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.split.view</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Split View" string="Split View" data-key="web_split_view">
+                    <h2>Split View</h2>
+                    <div class="row mt16 o_settings_container" name="split_view_setting_container">
+                        <div class="col-12 col-lg-6 o_setting_box" id="split_view_auto_setting">
+                            <div class="o_setting_left_pane">
+                                <field name="web_split_view_auto"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="web_split_view_auto"/>
+                                <div class="text-muted">
+                                    Add a Split mode (list and form side by side) to every window action that has a list and a form view. Use the view switcher to try it; an action can opt out with its 'No split view' option.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_window_action_form_split_view" model="ir.ui.view">
+        <field name="name">ir.actions.act_window.form.split.view</field>
+        <field name="model">ir.actions.act_window</field>
+        <field name="inherit_id" ref="base.view_window_action_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//field[@name='view_mode'])[1]" position="after">
+                <field name="no_split_view"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
