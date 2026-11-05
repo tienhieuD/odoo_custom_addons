@@ -5,7 +5,7 @@ Thư mục này được chép vào **mọi nhánh** của repo `odoo_custom_add
 
 | Module | Nội dung |
 |---|---|
-| [web_split_view](web_split_view/README.md) | Chế độ Split (list + form cạnh nhau) tự động cho mọi list, bản 16 đến 20 |
+| [web_split_view](web_split_view/README.md) | Chế độ Split (list + form cạnh nhau) tự động cho mọi list, bản 12 đến 20 (12 đến 15 kiến trúc legacy) |
 | [listview_sticky_header_and_column](listview_sticky_header_and_column/README.md) | Ghim cột và header của list, bản 12 đến 20, kèm module test `lab` |
 
 Các file liên quan nằm ngoài wiki:
