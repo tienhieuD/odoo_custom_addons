@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_action_dwo_concurrency_root"
+        name="Concurrency"
+        parent="base.menu_custom"
+        sequence="9999"
+    />
+    <menuitem id="menu_action_dwo_model_concurrency_views"
+        name="Model Concurrency"
+        action="action_dwo_model_concurrency_views"
+        parent="menu_action_dwo_concurrency_root"
+        sequence="10"
+    />
+</odoo>
