@@ -24,7 +24,8 @@
   }
 }
 
-.o_list_view thead > tr > th {
+.o_list_view thead > tr > th,
+.o_list_renderer thead > tr > th {
   &:hover {
     .display-on-hover {
       display: block !important;
