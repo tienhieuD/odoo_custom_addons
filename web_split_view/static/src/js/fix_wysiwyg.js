@@ -10,6 +10,15 @@ Wysiwyg.include({
                 $el: [document.createElement('div')],
             }
         }
-        return this._super(...arguments);
+        try {
+            return await this._super(...arguments);
+        } catch (error) {
+            // The record shown in the split pane can be replaced (or sent to the full form view) while an html
+            // field is still starting: the editor is then already destroyed, its failure is of no interest.
+            if (this.isDestroyed && this.isDestroyed()) {
+                return;
+            }
+            throw error;
+        }
     }
 });
