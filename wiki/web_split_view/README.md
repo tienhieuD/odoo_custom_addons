@@ -1,6 +1,6 @@
 # web_split_view
 
-Màn hình chia đôi: list bên trái, form của bản ghi đang chọn bên phải. Làm cho Odoo **16, 17, 18, 19, 20** (12 đến 15 vẫn là module legacy cũ, chưa port).
+Màn hình chia đôi: list bên trái, form của bản ghi đang chọn bên phải. Làm cho Odoo **12 đến 20**: 16 đến 20 viết bằng OWL (mô tả chính ở dưới), **12 đến 15 viết bằng kiến trúc legacy** (xem mục "Bản legacy 12 đến 15").
 Bán trên Odoo Apps: giá **39 USD**, license **OPL-1** (đã bỏ file `LICENSE` public domain cũ), tác giả DUO-TEK Software Vietnam.
 Chưa có email `support` trong manifest (chủ dự án không cấp), nên trình kiểm tra của skill luôn báo 1 WARN này: không cần sửa.
 
@@ -86,6 +86,7 @@ Bẫy chung đã gặp:
 ```
 odoo-bin -d <db> -i web_split_view --with-demo --test-tags /web_split_view --stop-after-init
 ```
+(Odoo 12: thêm `web_tour` vào `-i`, vì không tự cài nên không có dịch vụ tour.)
 (`--with-demo` bắt buộc ở 19/20; 16–18 tự nạp demo.) Cần Chrome: biến `ODOO_BROWSER_BIN` (bản 16/17 không đọc biến này, dùng `tools/odoo_wrap.py` để vá đường dẫn Chrome và cổng; cần `pip install websocket-client` trong venv). Chrome headless của Edge không chạy được tour (requestAnimationFrame không bắn): dùng Chrome for Testing headless-shell.
 Tour `state` ở 16 không tải lại trang được (bộ chạy tour cũ) nên chỉ kiểm tra storage.
 
@@ -100,7 +101,36 @@ Tour `state` ở 16 không tải lại trang được (bộ chạy tour cũ) nê
 
 - Chưa test: điện thoại, nút mở popup/wizard trong form bên phải, bản ghi mới đang tạo dở khi tải lại trang (không được lưu).
 - Chế độ tự động bật mặc định cho mọi list có form: nếu một action chạy lạ trong split, dùng `No split view` cho action đó.
-- Bản 12 đến 15: không có chế độ tự động (kiến trúc widget legacy).
+- Bản 12: không có pager (xem mục legacy). Bản 12 và 13: ô tìm kiếm không mở gợi ý khi gõ bằng script nên ảnh chụp và tour dùng menu Filters thay cho gõ tìm kiếm.
+- Bản 12 đến 14: không có wizard và menu debug tạo view split tay (chỉ có chế độ tự động và view `<split>` viết bằng XML); bản 15 giữ wizard và menu debug.
+
+## Bản legacy 12 đến 15
+
+Mã nằm ở `static/src/js/` (`split_view.js`, `split_listview.js`, `split_formview.js`), template `static/src/xml/split_view.xml`; khai báo bằng `odoo.define` (không phải OWL).
+
+- **Cách hoạt động**: `SplitView` là một `BasicView` (kiểu `split`, `withSearchBar: true`): thanh tìm kiếm, bộ lọc, pager của control panel là **của view ngoài**, list và form bên trong là `ListView`/`FormView` legacy tạo bằng `getController(this)` (list không có control panel). Chế độ tự động: khi `<split/>` không có ref hay arch inline, `getController` lấy id view list/form từ `this.params.action.views` (kiểu list tên `tree`), rồi `loadViews`. Phần server giống 16 và 17: `_compute_views` chèn `(False, 'split')`, `_get_default_split_view`, cấu hình, `no_split_view`, khối Settings kiểu cũ `app_settings_block`.
+- **Trạng thái**: khóa độ rộng `web_split_view_width_<action>_<model>_<view>` (localStorage), bản ghi mở `web_split_view_record_<...>` (sessionStorage). Quay lại từ form đầy đủ: action manager legacy giữ nguyên controller (hoặc dựng lại) và module mở lại bản ghi từ sessionStorage, ô tìm kiếm do control panel lưu.
+- **Expand**: `trigger_up('switch_view', {view_type: 'form', res_id, mode: 'readonly'})`; nếu action không có form thì `do_action`. `canBeRemoved` được ghi đè để hỏi lưu/hủy form nhúng trước khi rời.
+- **Highlight dòng**: `SplitListRenderer._renderRow` và `_highlightActiveRow`; **id dòng phải đọc bằng `$(tr).data('id')`** (Odoo 12 không có thuộc tính `data-id`): dùng `node.dataset.id` thì cả danh sách bị tô vì `classList.toggle(name, undefined)` đảo lớp.
+- **Khác biệt**:
+
+| | 12 | 13 | 14 | 15 |
+|---|---|---|---|---|
+| Control panel | legacy; sự kiện `search` | legacy; sự kiện `search` (`_onSearch` ghi đè, chuyển cho list rồi tô lại dòng đang mở) | Owl + `searchModel` (list đăng ký `search` của `searchModel`) | idem 14 |
+| `getController` | phải trả **jQuery deferred** tự tạo bằng `$.Deferred()` (jQuery 1.x không nhận Promise native: `$.when(promise)` trả chính promise và gây `widget.on is not a function`) | async | async | async |
+| `ListModel` | không có `web.ListModel`: dùng `web.BasicModel` | có | có | có |
+| Pager | không có (model ngoài không giữ bản ghi nên `renderPager` bị vô hiệu; list nhúng chỉ hiện trang đầu) | pager ngoài chuyển cho list | idem 13 | idem 13 |
+| Khóa theo action | `controller.actionInfo = {action, viewId}` đặt trong `getController` | idem 12 | `controlPanelProps` | `controlPanelProps` |
+| Assets | template `views/assets.xml` vào `web.assets_backend` (cả tour: **không có `web.assets_tests`**) + `qweb` trong manifest | template + `web.assets_tests` | idem 13 | `assets` trong manifest (`web.assets_qweb`, `web.assets_tests`) |
+| Python | không `ondelete` cho `selection_add`, không `get_views` (dùng `load_views`) | idem 12 (không `ondelete`) | có `ondelete` | idem 14 |
+| Tour | `tour.register` kiểu cổ điển; chạy bằng `browser_js(...run(...))`; **cần cài `web_tour`** (không tự cài ở 12) | cổ điển; `start_tour` | cổ điển | ES module `import tour from "web_tour.tour"` |
+| Khác | CSS ẩn thêm `.o_cp_right`/`.o_search_options` của form nhúng ở 13 | idem | | `fix_wysiwyg.js` (xem dưới) |
+
+Bẫy riêng của legacy:
+- **Bản 15, form có trường html** (sales order...): `Wysiwyg.start` có thể ném `Cannot read properties of undefined (reading '0')` khi form bị thay (mở expand ngay) trong lúc trình soạn thảo đang khởi động. `fix_wysiwyg.js` được nạp ở cả `website.assets_wysiwyg` lẫn `web_editor.assets_wysiwyg` và nuốt lỗi khi widget đã bị hủy.
+- Ở 12 và 13, tour không gõ được tìm kiếm (jQuery UI autocomplete không mở bằng sự kiện script): test dùng menu Filters.
+- Ô tìm kiếm của 13 đọc `originalEvent.inputType`: sự kiện giả của tour phải là `InputEvent` native.
+- 15 giữ trường `'support '` (có dấu cách, chứa email của chủ dự án) trong manifest cũ: khóa sai nên store không đọc được; chưa sửa vì chủ dự án không cấp email support.
 
 ## Quy trình khi cần đổi hoặc thêm version
 
