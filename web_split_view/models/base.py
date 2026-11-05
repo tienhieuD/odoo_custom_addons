@@ -1,3 +1,5 @@
+from lxml import etree
+
 from odoo import api, models
 
 
@@ -11,3 +13,9 @@ class Base(models.AbstractModel):
             return False
         record = self.env.ref(xml_id, raise_if_not_found=False)
         return record.id if record else False
+
+    @api.model
+    def _get_default_split_view(self):
+        """Default split view of any model: ``<split/>``. The client builds it from the list, form and search
+        views of the action it is opened from."""
+        return etree.Element('split')
