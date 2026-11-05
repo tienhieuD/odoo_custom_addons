@@ -18,12 +18,16 @@ function writeOnServer(vals) {
 
 var NAME = ".o_form_view input[name=name], .o_form_view textarea[name=name]";
 
+// the snapshot of the loaded record is fetched in two round trips: wait for it before the "other user" writes.
+// (a promise returned by a step is not waited for, so the wait is a visible marker added after a delay)
 function openAndEdit(value) {
     return [
         {trigger: ".o_form_button_edit", run: "click"},
-        {trigger: NAME},
-        // let the snapshot of the loaded record arrive before the other user writes
-        {trigger: ".o_form_view", run: function () { return new Promise(function (resolve) { setTimeout(resolve, 1500); }); }},
+        {trigger: NAME, run: function () {
+            $('.dwo_wait_done').remove();
+            setTimeout(function () { $('body').append('<div class="dwo_wait_done" style="width:2px;height:2px;overflow:hidden">.</div>'); }, 2000);
+        }},
+        {trigger: ".dwo_wait_done"},
         {trigger: NAME, run: "text " + value},
     ];
 }
