@@ -1,5 +1,5 @@
 """Evidence for dwo_record_concurrency on Odoo 19: two users (admin in the browser, Bob over RPC)."""
-import base64, json, os, subprocess, sys, tempfile, time
+import base64, json, os, secrets, subprocess, sys, tempfile, time
 import requests, websocket
 
 OUT = os.path.dirname(os.path.abspath(__file__))
@@ -9,6 +9,8 @@ CHROME = '/private/tmp/claude-501/-Users-hieu--claude/2c6103e7-e2d6-4a63-9270-12
 DB, PORT, CDP = 'concshot19', 8619, 9619
 W, H = 1366, 800
 LOG = []
+# throw-away user of a throw-away database: the password is generated for each run, never stored
+BOB_PASSWORD = secrets.token_urlsafe(16)
 
 conf = open(f'{ROOT}/myproject/odoo_custom_addons19_conf/odoo.conf').read()
 conf = '\n'.join(l for l in conf.split('\n') if not l.startswith(('dev_mode', 'http_port', 'xmlrpc_port', 'longpolling_port', 'gevent_port')))
@@ -40,8 +42,8 @@ def rpc(s, model, method, args, kwargs=None):
 admin = session('admin', 'admin')
 gid = rpc(admin, 'ir.model.data', 'search_read', [[['module', '=', 'base'], ['name', '=', 'group_partner_manager']], ['res_id']])[0]['res_id']
 gfield = 'group_ids' if rpc(admin, 'res.users', 'fields_get', [['group_ids']]) else 'groups_id'
-rpc(admin, 'res.users', 'create', [[{'name': 'Bob Martin', 'login': 'bob', 'password': 'bob-pass-123', gfield: [[4, gid], [4, rpc(admin, 'ir.model.data', 'search_read', [[['module', '=', 'base'], ['name', '=', 'group_user']], ['res_id']])[0]['res_id']]]}]])
-bob = session('bob', 'bob-pass-123')
+rpc(admin, 'res.users', 'create', [[{'name': 'Bob Martin', 'login': 'bob', 'password': BOB_PASSWORD, gfield: [[4, gid], [4, rpc(admin, 'ir.model.data', 'search_read', [[['module', '=', 'base'], ['name', '=', 'group_user']], ['res_id']])[0]['res_id']]]}]])
+bob = session('bob', BOB_PASSWORD)
 model_id = rpc(admin, 'ir.model', 'search', [[['model', '=', 'res.partner']]])[0]
 fids = rpc(admin, 'ir.model.fields', 'search', [[['model', '=', 'res.partner'], ['name', 'in', ['name', 'phone']]]])
 cfg = rpc(admin, 'dwo.model.concurrency', 'create', [[{'model_id': model_id, 'field_ids': [[6, 0, fids]]}]])[0]
