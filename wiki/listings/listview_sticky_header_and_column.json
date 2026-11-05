@@ -1,0 +1,257 @@
+{
+  "brand": {
+    "primary": "#875A7B",
+    "dark": "#4A2F45",
+    "accent": "#FFC857",
+    "info": "#5B8DB8",
+    "ok": "#0E7C66"
+  },
+  "icon": {
+    "label": "PIN",
+    "motif": "document"
+  },
+  "banner": {
+    "pill": "ODOO · LIST VIEW ADD-ON",
+    "title_1": "Sticky Header",
+    "title_2": "& Freeze Column",
+    "subtitle": "Keep your bearings in long, wide lists.",
+    "chips": [
+      "Pin any column",
+      "Header stays in view",
+      "Remembers your pins"
+    ],
+    "visual": {
+      "type": "icon"
+    }
+  },
+  "flow": {
+    "steps": [
+      {
+        "title": "Open a list",
+        "rows": [
+          "any list view,",
+          "even inside a form"
+        ],
+        "icon": "document"
+      },
+      {
+        "title": "Click the pin",
+        "rows": [
+          "on the column",
+          "header"
+        ],
+        "icon": "gear",
+        "highlight": true
+      },
+      {
+        "title": "Columns freeze",
+        "rows": [
+          "that column and",
+          "all to its left"
+        ],
+        "icon": "check"
+      },
+      {
+        "title": "Scroll freely",
+        "rows": [
+          "header and key",
+          "columns stay put"
+        ],
+        "icon": "browser"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "List View Sticky Header &amp; Freeze Column",
+      "tagline": "Wide lists, long lists &mdash; you never lose the column that matters.",
+      "subtitle": "Hover a column header, click the pin, and that column (with every column to its left) stays in place while you scroll sideways. No settings, no setup."
+    },
+    {
+      "type": "intro",
+      "flow": true,
+      "flow_alt": "Pin a column in four steps",
+      "html": "Large tables are hard to read once you scroll: the first columns disappear and you no longer know which row you are looking at. This module adds a small <strong>pin button</strong> to the column headers of Odoo list views. Pin a column and it stays visible while the rest of the table scrolls, together with the header row."
+    },
+    {
+      "type": "cards",
+      "title": "What you get",
+      "cols": 3,
+      "accent": "primary",
+      "items": [
+        {
+          "title": "Freeze columns",
+          "text": "Click the pin on a column header to freeze it together with every column to its left. Click the pin again to release them."
+        },
+        {
+          "title": "Header stays in view",
+          "text": "While columns are pinned, the header row also stays visible when you scroll down a long list."
+        },
+        {
+          "title": "Remembers your choice",
+          "text": "The pinned column is remembered per list view in your browser and restored the next time you open it."
+        },
+        {
+          "title": "Works inside forms",
+          "text": "Lists embedded in a form (order lines, invoice lines and other x2many fields) can be pinned too. Each list keeps its own pin."
+        },
+        {
+          "title": "Respects Odoo",
+          "text": "Column widths and drag-to-resize keep working, and the pinned columns follow when you resize them. Colours come from your Odoo theme."
+        },
+        {
+          "title": "Zero configuration",
+          "text": "No settings screen, no new menus, no data. Install it and the pin appears on the list headers."
+        }
+      ]
+    },
+    {
+      "type": "steps",
+      "title": "How to use it",
+      "intro": "Three clicks, nothing to configure.",
+      "items": [
+        {
+          "title": "Hover a header",
+          "text": "A small pin button appears on the column header."
+        },
+        {
+          "title": "Click the pin",
+          "text": "The column and all columns to its left are frozen; the header row stays visible too."
+        },
+        {
+          "title": "Click again to unpin",
+          "text": "Everything goes back to normal."
+        }
+      ]
+    },
+    {
+      "type": "screenshot",
+      "title": "Pin a column in any list",
+      "image": "screenshot_1.png",
+      "alt": "Orders list with the pin button on the Customer column header and the first columns frozen while the table is scrolled",
+      "intro": "The pin button shows up when you hover a header. Here the Code and Customer columns stay in place while the other columns scroll, and the header row stays visible."
+    },
+    {
+      "type": "screenshot",
+      "title": "Also inside forms",
+      "image": "screenshot_2.png",
+      "alt": "Order lines list inside a sales order form with the Product column pinned",
+      "intro": "Lists embedded in a form, such as the order lines of an order, can be pinned as well. Each list remembers its own pinned column."
+    },
+    {
+      "type": "tabs",
+      "title": "Requirements &amp; Installation",
+      "id_prefix": "lshc",
+      "intro": "The module depends only on the standard <code>base</code> and <code>web</code> modules and needs no external Python library.",
+      "notes": [
+        "The pinned column is stored in the <strong>browser</strong> (local storage), so it is remembered per browser and per user session on that device. It is not shared between users or devices."
+      ],
+      "tabs": [
+        {
+          "id": "install",
+          "title": "Install",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Install the module"
+            },
+            {
+              "type": "p",
+              "html": "1. Copy the <code>listview_sticky_header_and_column</code> folder into an add-ons path of your Odoo server."
+            },
+            {
+              "type": "p",
+              "html": "2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu."
+            },
+            {
+              "type": "p",
+              "html": "3. Search for <em>List View Sticky Header &amp; Freeze Column</em> and click <strong>Install</strong>."
+            },
+            {
+              "type": "muted",
+              "html": "Reload your browser page after installing so the new assets are loaded."
+            }
+          ]
+        },
+        {
+          "id": "use",
+          "title": "Use",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Pin and unpin a column"
+            },
+            {
+              "type": "p",
+              "html": "Open any list view and hover a column header. Click the pin button to freeze that column and the columns to its left."
+            },
+            {
+              "type": "p",
+              "html": "Click the pin button on the same column again to unfreeze."
+            },
+            {
+              "type": "muted",
+              "html": "Pinning another column moves the frozen area to that column."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "changelog",
+      "title": "Changelog",
+      "intro": "Module releases, newest first.",
+      "items": [
+        {
+          "version": "0.4",
+          "date": "2026-11-05",
+          "text": "Pinned cells and header cells are now opaque on every version (scrolled text could show through them). The pin icon is visible again on the newest Odoo release, and the pin button appears on lists embedded in forms. Rows being edited keep their frozen columns on older versions."
+        },
+        {
+          "version": "0.3",
+          "date": "2026-11-05",
+          "text": "Lists inside a form now keep their own pinned column: pinning one list no longer pins the others, and each list restores its own pin. Fixed an error when a list is closed, and embedded lists keep their horizontal scrollbar."
+        },
+        {
+          "version": "0.2",
+          "date": "2026-11-05",
+          "text": "Pinning no longer widens columns, and drag-to-resize works again. The pinned area follows column resizing and is placed correctly when pinning while scrolled sideways. Header and row colours now follow the Odoo theme, and only the last pinned column shows a divider."
+        },
+        {
+          "version": "0.1",
+          "date": "2026-04-12",
+          "text": "First release: pin button on list headers, frozen columns, sticky header and a remembered pin per list view."
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "q": "Does it change my data or add fields?",
+          "a": "No. It only changes how list views are displayed in the browser. It adds no models, fields, menus or settings."
+        },
+        {
+          "q": "Can I freeze several columns?",
+          "a": "Yes. The pin freezes the chosen column and every column to its left, so pin the right-most column you want to keep in view."
+        },
+        {
+          "q": "Is my choice shared with other users?",
+          "a": "No. It is remembered in your own browser only, per list view."
+        },
+        {
+          "q": "Will it work with my theme?",
+          "a": "Header and row colours are taken from the Odoo theme variables, so it adapts to most themes. If you notice a conflict, please contact support."
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "headline": "Never lose the column that matters again.",
+      "text": "Install it, hover a header and click the pin. That is all it takes.",
+      "footer": "Developed by DUO-TEK Software Vietnam"
+    }
+  ]
+}
