@@ -34,31 +34,30 @@
 
 
 // Common css
-.o_content {
-  .table-responsive {
-    overflow: visible;
-    thead th {
-      position: sticky !important;
-      top: 0;
-      background-color: #EEE;
-      z-index: 1;
-    }
+// .o_content .table-responsive {
+//   overflow: visible;
+// }
 
-    tr.o_data_row {
-      position: relative;
+// .o_content .table-responsive thead th {
+//   position: sticky !important;
+//   top: 0;
+//   background-color: #EEE;
+//   z-index: 1;
+// }
 
-      td {
-        white-space: nowrap;
-        padding: 0.3rem 0.75rem;
-      }
+// .o_content .table-responsive tr.o_data_row {
+//   position: relative;
+// }
 
-      &:hover td {
-        background-color: #EEE !important;
-      }
+// .o_content .table-responsive tr.o_data_row td {
+//   white-space: nowrap;
+//   padding: 0.3rem 0.75rem;
+// }
 
-      &:focus-within td {
-        background-color: #ccc !important;
-      }
-    }
-  }
-}
+// .o_content .table-responsive tr.o_data_row:hover td {
+//   background-color: #EEE !important;
+// }
+
+// .o_content .table-responsive tr.o_data_row:focus-within td {
+//   background-color: #ccc !important;
+// }
