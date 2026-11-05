@@ -1,0 +1,5 @@
+id,name,model_id,group_id/id,operation,domain
+access_lshc_test_record,lshc.test.record,lshc.test.record,base.group_user,ru,
+access_lshc_test_line,lshc.test.line,lshc.test.line,base.group_user,ru,
+access_lshc_test_category,lshc.test.category,lshc.test.category,base.group_user,r,
+access_lshc_test_tag,lshc.test.tag,lshc.test.tag,base.group_user,r,
