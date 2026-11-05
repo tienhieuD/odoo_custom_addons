@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- Split view with the list and form defined directly inside the <split> tag -->
+    <record id="customer_split_view" model="ir.ui.view">
+        <field name="name">customer.split.view</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <split>
+                <list>
+                    <field name="name"/>
+                    <field name="phone"/>
+                    <field name="city"/>
+                    <field name="category_id" widget="many2many_tags"/>
+                </list>
+                <form create="1" duplicate="1">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="phone"/>
+                            </group>
+                            <group>
+                                <field name="city"/>
+                                <field name="category_id" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </split>
+        </field>
+    </record>
+
+    <record id="action_customer_split_demo" model="ir.actions.act_window">
+        <field name="name">Customers (Split view)</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">split</field>
+    </record>
+    <record id="action_customer_split_demo_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">split</field>
+        <field name="view_id" ref="customer_split_view"/>
+        <field name="act_window_id" ref="action_customer_split_demo"/>
+    </record>
+    <menuitem id="menu_customer_split_demo" name="Customers (Split view)"
+              parent="base.menu_custom" action="action_customer_split_demo" sequence="999"/>
+</odoo>
