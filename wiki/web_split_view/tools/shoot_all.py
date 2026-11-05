@@ -4,12 +4,16 @@ import base64, json, os, shutil, subprocess, sys, tempfile, time
 import requests, websocket
 
 V = int(sys.argv[1]); OUT = sys.argv[2]
-SRC = {16: 'odoo-16.0.20261021', 17: 'odoo-17.0.20240624', 18: 'odoo-18.0.20260412', 19: 'odoo-19.0.20260412', 20: 'odoo-20.0.20261104'}[V]
+SRC = {12: 'odoo-12.0.20211011', 13: 'odoo-13.0.20230607', 14: 'odoo-14.0.20231205', 15: 'odoo-15.0.20250115', 16: 'odoo-16.0.20261021', 17: 'odoo-17.0.20240624', 18: 'odoo-18.0.20260412', 19: 'odoo-19.0.20260412', 20: 'odoo-20.0.20261104'}[V]
 ROOT = '/Users/hieu/Documents/Odoo'
 CHROME = '/private/tmp/claude-501/-Users-hieu--claude/2c6103e7-e2d6-4a63-9270-126ab80a6cbe/scratchpad/cft/shell/chrome-headless-shell-mac-arm64/chrome-headless-shell'
 DB, PORT, CDP = 'splitshot%d' % V, 8500 + V, 9500 + V
 W, H = 1366, 800
 os.makedirs(OUT, exist_ok=True)
+
+LEGACY = V <= 15
+SV = '.duo_split_view' if LEGACY else '.o_split_view'   # root of the split view
+SEARCH_SEL = '.o_searchview_input' if LEGACY else '.o_split_view .left-side .o_searchview_input'
 
 def url(path_new, path_old):
     return path_new if V >= 18 else path_old
@@ -40,14 +44,19 @@ chrome = subprocess.Popen([CHROME, '--remote-debugging-port=%d' % CDP, '--user-d
 time.sleep(2)
 ws = websocket.create_connection([t for t in requests.get('http://127.0.0.1:%d/json' % CDP).json() if t['type'] == 'page'][0]['webSocketDebuggerUrl'], timeout=90)
 _id = [0]
+ERRS = []
 def call(method, **params):
     _id[0] += 1
     ws.send(json.dumps({'id': _id[0], 'method': method, 'params': params}))
     while True:
         m = json.loads(ws.recv())
+        if m.get('method') == 'Runtime.exceptionThrown':
+            d = m['params']['exceptionDetails']
+            ERRS.append((d.get('exception') or {}).get('description') or d.get('text'))
         if m.get('id') == _id[0]:
             return m.get('result', m)
 def js(expr):
+    expr = expr.replace('@SV@', SV)
     r = call('Runtime.evaluate', expression=expr, returnByValue=True)
     if 'exceptionDetails' in r:
         raise RuntimeError(str(r['exceptionDetails'])[:300])
@@ -65,11 +74,15 @@ def go(path):
     call('Page.navigate', url='http://127.0.0.1:%d%s' % (PORT, path))
     time.sleep(2)
 def enter():
-    call('Input.dispatchKeyEvent', type='keyDown', key='Enter', code='Enter', windowsVirtualKeyCode=13)
+    if LEGACY and V >= 14:
+        # legacy widgets listen to jQuery events: a native key event does not reach every version
+        js("(() => { const e = $.Event('keydown', {which: 13, keyCode: 13}); $('.o_searchview_input').first().trigger(e); })()")
+        return
+    call('Input.dispatchKeyEvent', type='keyDown', key='Enter', code='Enter', windowsVirtualKeyCode=13, nativeVirtualKeyCode=13, text='\r')
     call('Input.dispatchKeyEvent', type='keyUp', key='Enter', code='Enter', windowsVirtualKeyCode=13)
 
 call('Emulation.setDeviceMetricsOverride', width=W, height=H, deviceScaleFactor=1, mobile=False)
-call('Network.enable')
+call('Runtime.enable'); call('Network.enable')
 call('Network.setCookie', name='session_id', value=sid, domain='127.0.0.1', path='/')
 
 LIST = url('/odoo/action-sale.action_orders', '/web#action=sale.action_orders')
@@ -83,15 +96,17 @@ shot('screenshot_2.png')
 
 def open_record_with_search():
     go(SPLIT)
-    wait_for("document.querySelector('.o_split_view .left-side .o_data_row')")
+    wait_for("document.querySelector('@SV@ .left-side .o_data_row')")
     time.sleep(1.5)
-    js("(() => { const i = document.querySelector('.o_split_view .left-side .o_searchview_input'); i.focus(); })()")
-    call('Input.insertText', text='S0001')
-    enter()
-    time.sleep(2.5)
-    js("document.querySelectorAll('.o_split_view .left-side .o_data_row')[1].querySelector('.o_data_cell').click()")
-    wait_for("document.querySelector('.o_split_view .right-side .o_form_view .o_field_widget')")
-    time.sleep(2.5)
+    if V > 13:   # the suggestions of the Odoo 12/13 search bar do not open with scripted typing: no typed search there
+        js("(() => { const i = document.querySelector('%s'); i.focus(); })()" % SEARCH_SEL)
+        call('Input.insertText', text='S0001')
+        time.sleep(1.5)   # let the suggestions open
+        enter()
+        time.sleep(2.5)
+    js("document.querySelectorAll('@SV@ .left-side .o_data_row')[1].querySelector('.o_data_cell').click()")
+    wait_for("document.querySelector('@SV@ .right-side .o_form_view .o_field_widget')")
+    time.sleep(5 if LEGACY else 2.5)
 
 # 2. split with a search and the expand button
 open_record_with_search()
@@ -100,21 +115,21 @@ shot('screenshot_1.png')
 # 3. New: the right pane becomes an empty form
 js("document.querySelector('.o_split_button_create').click()")
 time.sleep(3)
-wait_for("document.querySelector('.o_split_view .right-side .o_form_view .o_field_widget')")
+wait_for("document.querySelector('@SV@ .right-side .o_form_view .o_field_widget')")
 shot('screenshot_3.png')
 
 # 4. expand, then back with the breadcrumb: same place
 open_record_with_search()
 js("document.querySelector('.o_split_expand').click()")
-wait_for("document.querySelector('.o_form_view') && !document.querySelector('.o_split_view')")
+wait_for("document.querySelector('.o_form_view') && !document.querySelector('@SV@')")
 time.sleep(2)
 js("document.querySelector('.o_control_panel .breadcrumb-item a, .o_control_panel .o_breadcrumb .breadcrumb-item a').click()")
 try:
-    wait_for("document.querySelector('.o_split_view .left-side .o_data_row.split_active_row')", timeout=20)
+    wait_for("document.querySelector('@SV@ .left-side .o_data_row.split_active_row')", timeout=20)
 except TimeoutError:
     pass
 time.sleep(2.5)
-print('STATE', js("JSON.stringify({split: !!document.querySelector('.o_split_view'), active: document.querySelectorAll('.o_split_view .split_active_row').length, facets: Array.from(document.querySelectorAll('.o_split_view .o_facet_value, .o_split_view .o_searchview_facet')).map(e => e.textContent.trim().slice(0, 30))})"))
+print('STATE', js("JSON.stringify({split: !!document.querySelector('@SV@'), active: document.querySelectorAll('@SV@ .split_active_row').length, facets: Array.from(document.querySelectorAll('@SV@ .o_facet_value, @SV@ .o_searchview_facet')).map(e => e.textContent.trim().slice(0, 30))})"))
 shot('screenshot_4.png')
 
 # 5. settings entry
@@ -125,6 +140,7 @@ js("(() => { const t = Array.from(document.querySelectorAll('[data-key]')).find(
 time.sleep(1.5)
 shot('settings.png')
 
+print('JSERRORS', [str(e)[:300] for e in ERRS])
 ws.close(); chrome.terminate(); server.terminate()
 try:
     server.wait(20)
