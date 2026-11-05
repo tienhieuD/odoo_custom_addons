@@ -65,6 +65,8 @@ FORM = r'''async function () {
                 Array.prototype.forEach.call(document.head.querySelectorAll(STYLE), function (s) { owners[s.getAttribute("data-owner")] = 1; });
                 check(Object.keys(owners).length === 1, "form: expected 1 owner style, got " + Object.keys(owners).length);
                 check(getComputedStyle(small.querySelector("thead th:nth-child(2)")).position !== "sticky", "form: pin leaked into the small list");
+                // pinned header cells must be opaque, or the scrolled column titles show through them
+                check(getComputedStyle(medium.querySelector("thead th:nth-child(3)")).backgroundColor !== "rgba(0, 0, 0, 0)", "form: pinned header cell is transparent");
                 check(getComputedStyle(medium.querySelector("thead th:nth-child(3)")).position === "sticky", "form: medium col not sticky");
                 // the medium list is wide: scroll horizontally inside it and check the pinned column stays at the left edge
                 var mscroll = scroller(tableOf(medium));

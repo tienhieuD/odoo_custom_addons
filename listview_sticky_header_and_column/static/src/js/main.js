@@ -12,7 +12,7 @@ const MODULE_KEY = 'listview_sticky_header_and_column';
 // Odoo 20: sortable/label column headers (the 19.0 `data-tooltip-delay` attribute is gone)
 const PIN_TARGET_SELECTOR = 'th[data-name]';
 const PIN_BUTTON_CLASS = 'display-on-hover js_pin_this_column';
-const PIN_ICON_HTML = '<i class="fa fa-thumb-tack"></i>';
+const PIN_ICON_HTML = '<i class="oi oi-fw" data-icon="push_pin"></i>';
 const SLEEP_DELAY = 300;
 const MOUNTED_SLEEP_DELAY = 100;
 let lshcUidCounter = 0;
@@ -181,7 +181,8 @@ patch(ListRenderer.prototype, {
                 position: sticky !important;
                 top: 0;
                 /* Odoo 20: the variable is a (translucent) gradient; keep an opaque layer under it */
-                background: var(--ListRenderer-thead-bg-color), var(--body-bg, #fff);
+                background: var(--ListRenderer-thead-bg-color);
+                background-color: var(--body-bg, #fff);
                 z-index: 2;
             }
             ${scope} .o_data_row {

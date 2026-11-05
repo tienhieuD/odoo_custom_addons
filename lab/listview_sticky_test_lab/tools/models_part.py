@@ -25,8 +25,8 @@ RM = R + [('write_date', 'fields.Datetime()', 'Last update', {})]   # needed by 
 
 RS = {
  'sequence': "g.id * 10",
- 'name': "%s || ' ' || %s || ' #' || g.id" % (PICK(THING, 'n1'), PICK(LAST, 'n2')),
- 'code': "'LAB-' || lpad(g.id::text, 5, '0')",
+ 'name': "%s || ' S' || lpad(g.id::text, 5, '0')" % PICK(['Quotation', 'Sales Order', 'Delivery', 'Invoice', 'Contract'], 'n1'),
+ 'code': "'S' || lpad(g.id::text, 5, '0')",
  'category_id': "1 + mod(%s, 8)" % H('cat'),
  'state': PICK(['draft', 'confirmed', 'progress', 'done', 'cancel'], 'st'),
  'priority': "(mod(%s, 4))::text" % H('pr'),
@@ -78,8 +78,8 @@ RS = {
 }
 LS = {
  'sequence': "g.n * 10",
- 'name': PICK(THING, 'l1') + " || ' line ' || g.n",
- 'product': PICK(['Desk', 'Chair', 'Lamp', 'Cable', 'Monitor', 'Keyboard', 'Router', 'Printer'], 'l2') + " || ' ' || (mod(%s, 900) + 100)" % H('l2n'),
+ 'name': PICK(['Office Desk', 'Ergonomic Chair', 'Desk Lamp', 'Monitor 27 inch', 'Wireless Keyboard', 'Docking Station', 'Network Router', 'Laser Printer', 'Standing Desk', 'Meeting Table', 'Storage Cabinet', 'Webcam HD'], 'l1'),
+ 'product': "'FURN_' || (1000 + mod(%s, 9000))" % H('l2n'),
  'total': "round((g.qty * g.price * (1 - g.discount / 100.0))::numeric, 2)",
  'currency_id': "ref.currency_id",
  'state': PICK(['draft', 'ok', 'late', 'cancel'], 'ls'),
@@ -147,7 +147,7 @@ def sql_cols(specs, mapping, skip=()):
 
 REF_CTE = """WITH ref AS (
             SELECT ARRAY(SELECT id FROM res_users WHERE active ORDER BY id) AS users,
-                   ARRAY(SELECT id FROM res_partner WHERE active ORDER BY id LIMIT 300) AS partners,
+                   ARRAY(SELECT id FROM res_partner WHERE active AND is_company AND id NOT IN (SELECT partner_id FROM res_users UNION SELECT partner_id FROM res_company) ORDER BY id LIMIT 300) AS partners,
                    ARRAY(SELECT id FROM res_country ORDER BY id LIMIT 80) AS countries,
                    (SELECT currency_id FROM res_company ORDER BY id LIMIT 1) AS currency_id
         )"""
