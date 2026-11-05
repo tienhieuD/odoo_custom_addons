@@ -14,11 +14,14 @@ const PIN_BUTTON_CLASS = 'display-on-hover js_pin_this_column';
 const PIN_ICON_HTML = '<i class="fa fa-thumb-tack"></i>';
 const SLEEP_DELAY = 300;
 const MOUNTED_SLEEP_DELAY = 100;
+let lshcUidCounter = 0;
 
 patch(ListRenderer.prototype, {
     // Define the patched method here
     setup() {
         super.setup(...arguments);
+        // Unique per renderer instance: several lists can live in one form view
+        this.lshcUid = ++lshcUidCounter;
 
         onWillDestroy(() => {
             this.lshcRemoveOldStyle();
@@ -45,10 +48,22 @@ patch(ListRenderer.prototype, {
      * @returns {any}
      */
     lshcConfig(name) {
-        return {
-            'key': MODULE_KEY,
-            'viewKey': `${MODULE_KEY}__viewId_${this.env.config.viewId}`,
-        }[name];
+        // Lazy: 'key' is also needed on destroy, when the DOM (and so the field suffix) is gone
+        if (name === 'key') {
+            return MODULE_KEY;
+        }
+        return `${MODULE_KEY}__viewId_${this.env.config.viewId}${this.lshcGetFieldSuffix()}`;
+    },
+
+    /**
+     * For a list embedded in a form (x2many field) return `__field_<name>` so that each list
+     * remembers its own pinned column. Empty for a main list view (keeps the old key).
+     * Must be called after mount (needs the DOM).
+     * @returns {string}
+     */
+    lshcGetFieldSuffix() {
+        const name = this.lshcGetRootElement()?.closest('.o_field_widget[name]')?.getAttribute('name');
+        return name ? `__field_${name}` : '';
     },
 
     /**
@@ -65,7 +80,7 @@ patch(ListRenderer.prototype, {
      * @returns {HTMLElement|null}
      */
     lshcGetRootElement() {
-        return this.rootRef?.el || this.__owl__.bdom.el;
+        return this.rootRef?.el || this.__owl__.bdom?.el || null;
     },
 
     /**
@@ -90,8 +105,10 @@ patch(ListRenderer.prototype, {
      * Remove old styles
      */
     lshcRemoveOldStyle() {
+        this.lshcResizeObserver?.disconnect();
+        this.lshcResizeObserver = null;
         const styleName = this.lshcConfig('key');
-        const styles = document.head.querySelectorAll(`style[name="${styleName}"]`);
+        const styles = document.head.querySelectorAll(`style[name="${styleName}"][data-owner="${this.lshcUid}"]`);
         styles.forEach(style => style.remove());
     },
 
@@ -145,37 +162,32 @@ patch(ListRenderer.prototype, {
         // Remove old styles
         this.lshcRemoveOldStyle();
 
+        // Scope every rule to THIS list only
+        el.dataset.lshcId = this.lshcUid;
+        // List embedded in a form (x2many): it must keep its own scrollbar (overflow auto of
+        // .table-responsive) because the form does not scroll horizontally for it.
+        const isEmbedded = !!el.closest('.o_field_widget[name]');
+        const scope = `.o_content .table-responsive[data-lshc-id="${this.lshcUid}"]`;
+
         // Add preliminary styles
         const preStyles = `
-            .o_content .table-responsive {
+            ${isEmbedded ? '' : `${scope} {
                 overflow: visible;
-            }
-            .o_content .table-responsive table {
-                table-layout: auto !important;
-            }
-            .o_content .table-responsive thead,
-            .o_content .table-responsive thead th {
+            }`}
+            ${scope} thead,
+            ${scope} thead th {
                 position: sticky !important;
                 top: 0;
-                background-color: #eee;
+                background-color: var(--ListRenderer-thead-bg-color);
                 z-index: 2;
             }
-            .o_content .table-responsive .o_data_row {
+            ${scope} .o_data_row {
                 position: relative;
-            }
-            .o_content .table-responsive .o_data_row td {
-                white-space: nowrap;
-                padding: 0.3rem 0.75rem;
-            }
-            .o_content .table-responsive .o_data_row:hover td {
-                background-color: #eee !important;
-            }
-            .o_content .table-responsive .o_data_row:focus-within td {
-                background-color: #ccc !important;
             }
         `;
         const preStyleNode = document.createElement('style');
         preStyleNode.setAttribute('name', styleName);
+        preStyleNode.setAttribute('data-owner', this.lshcUid);
         preStyleNode.textContent = preStyles;
         document.head.appendChild(preStyleNode);
 
@@ -184,36 +196,48 @@ patch(ListRenderer.prototype, {
 
         // Calculate offsets and create freeze styles
         const headerTableRow = el.querySelector('table thead tr');
-        const headerTableColumns = Array.from(headerTableRow.querySelectorAll('th'));
-        const offsetLefts = headerTableColumns.map(th => th.offsetLeft).slice(0, columnIndex + 1);
+        const pinnedColumns = Array.from(headerTableRow.querySelectorAll('th')).slice(0, columnIndex + 1);
 
-        const styles = offsetLefts.map((offsetLeft, index) => {
+        // `left` = sum of the widths of the previous pinned columns. Do not use `offsetLeft`:
+        // once a column is sticky it reflects the scroll-shifted position, not the natural one.
+        const buildStyles = () => {
+            let acc = 0;
+            return pinnedColumns.map(th => {
+                const offsetLeft = acc;
+                acc += th.getBoundingClientRect().width;
+                return offsetLeft;
+            });
+        };
+        const buildCss = () => buildStyles().map((offsetLeft, index) => {
             const cssNthChildIndex = index + 1;
             return `
-                .o_content .table-responsive table thead tr th:nth-child(${cssNthChildIndex}),
-                .o_content .table-responsive table tfoot tr td:nth-child(${cssNthChildIndex}),
-                .o_content .table-responsive table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
+                ${scope} table thead tr th:nth-child(${cssNthChildIndex}),
+                ${scope} table tfoot tr td:nth-child(${cssNthChildIndex}),
+                ${scope} table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
                     position: sticky;
                     left: ${offsetLeft}px;
                     z-index: 1;
-                    box-shadow: -1px 0 0 #dee2e6 inset;
+                    /* theme row colors (stripe/hover/focus); border only on the last pinned column */
+                    box-shadow: ${index === pinnedColumns.length - 1 ? '-1px 0 0 #dee2e6 inset,' : ''}
+                        inset 0 0 0 9999px var(--table-bg-state, var(--table-bg-type, var(--table-accent-bg)));
                 }
-                .o_content .table-responsive table thead tr th:nth-child(${cssNthChildIndex}) {
+                ${scope} table thead tr th:nth-child(${cssNthChildIndex}) {
                     top: 0;
                     z-index: 10;
-                }
-                .o_content .table-responsive table tbody tr:nth-of-type(even).o_data_row td:nth-child(${cssNthChildIndex}) {
-                    background-color: #f9f9f9;
-                }
-                .o_content .table-responsive table tbody tr:nth-of-type(odd).o_data_row td:nth-child(${cssNthChildIndex}) {
-                    background-color: #fff;
                 }
             `;
         }).join('');
 
         const newStyleNode = document.createElement('style');
         newStyleNode.setAttribute('name', styleName);
-        newStyleNode.textContent = styles;
+        newStyleNode.setAttribute('data-owner', this.lshcUid);
+        newStyleNode.textContent = buildCss();
         document.head.appendChild(newStyleNode);
+
+        // Recompute `left` whenever a pinned column is resized (e.g. drag & drop)
+        this.lshcResizeObserver = new ResizeObserver(() => {
+            newStyleNode.textContent = buildCss();
+        });
+        pinnedColumns.forEach(th => this.lshcResizeObserver.observe(th));
     }
 });
