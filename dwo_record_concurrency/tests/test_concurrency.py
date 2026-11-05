@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 from odoo.tests import TransactionCase, tagged, new_test_user
-from odoo.addons.bus.models.bus import BusBus
 
 
 @tagged('post_install', '-at_install')
@@ -22,7 +21,7 @@ class TestConcurrency(TransactionCase):
 
         def _sendone(this, target, notification_type, message):
             sent.append((target, notification_type, message))
-        return sent, patch.object(BusBus, '_sendone', _sendone)
+        return sent, patch.object(type(self.env['bus.bus']), '_sendone', _sendone)
 
     def test_ping_has_names_only(self):
         sent, patcher = self._capture_bus()
