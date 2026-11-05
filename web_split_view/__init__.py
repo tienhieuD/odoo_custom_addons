@@ -10,3 +10,5 @@ def _uninstall_hook(cr, registry):
     for act in env['ir.actions.act_window'].search([('view_mode', 'ilike', 'split')]):
         act.view_mode = ','.join(mode for mode in act.view_mode.split(',') if mode != 'split')
         act.view_id = False
+    # the setting written by Settings > Split View
+    env['ir.config_parameter'].sudo().search([('key', '=', 'web_split_view.auto_split')]).unlink()
