@@ -32,8 +32,20 @@
             (0, 0, {'view_mode': 'form', 'view_id': ref('lshc_test_record_view_form')})]"/>
     </record>
 
+    <record id="action_lshc_test_showcase" model="ir.actions.act_window">
+        <field name="name">Showcase (orders)</field>
+        <field name="res_model">lshc.test.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="lshc_test_record_view_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('lshc_test_record_view_list_showcase')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('lshc_test_record_view_form_showcase')})]"/>
+    </record>
+
     <menuitem id="menu_lshc_test_root" name="List Sticky Test Lab" sequence="999"
               web_icon="listview_sticky_header_and_column,static/description/icon.png"/>
+    <menuitem id="menu_lshc_test_showcase" name="Showcase (orders)" parent="menu_lshc_test_root"
+              action="action_lshc_test_showcase" sequence="5"/>
     <menuitem id="menu_lshc_test_wide" name="Wide list (search panel)" parent="menu_lshc_test_root"
               action="action_lshc_test_wide" sequence="10"/>
     <menuitem id="menu_lshc_test_editable" name="Editable list" parent="menu_lshc_test_root"
