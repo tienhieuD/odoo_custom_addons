@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="web_split_view.SplitView.Buttons">
+        <div class="o_split_buttons_view d-flex gap-1" role="toolbar" aria-label="Main actions">
+            <button type="button" class="btn btn-primary o_split_button_create" title="Create record"
+                    t-on-click="() => this.onCreate()">New</button>
+            <button type="button" class="btn btn-secondary o_split_button_reload" title="Reload list"
+                    t-on-click="() => this.onReload()">
+                <i class="fa fa-refresh" t-att-class="{'fa-spin': this.state.loading}"/>
+                Reload
+            </button>
+        </div>
+    </t>
+
+    <t t-name="web_split_view.SplitView">
+        <div class="o_split_view h-100 d-flex flex-column" t-ref="this.rootRef" t-att-class="this.props.className">
+            <Layout display="this.layoutDisplay" className="'o_split_layout flex-grow-1 overflow-hidden'">
+                <t t-set-slot="control-panel-buttons">
+                    <t t-call="{{ this.props.buttonTemplate }}"/>
+                </t>
+                <div class="duo_split_view d-flex w-100 h-100" t-ref="this.splitRef">
+                    <div class="left-side border-end overflow-auto" t-attf-style="width: {{ this.state.leftWidth }}%">
+                        <View t-props="this.listProps" t-key="this.state.listKey"/>
+                    </div>
+                    <div class="split_resizer" title="Resize" t-on-mousedown="(ev) => this.startResize(ev)">
+                        <span/><span/><span/><span/><span/>
+                    </div>
+                    <div class="right-side overflow-auto position-relative flex-grow-1" t-attf-style="width: {{ 100 - this.state.leftWidth }}%">
+                        <t t-if="this.state.mode === 'empty'">
+                            <p class="form-placeholder text-muted fst-italic text-center position-absolute top-50 start-50 translate-middle"
+                               t-out="this.placeholder"/>
+                        </t>
+                        <t t-else="">
+                            <View t-props="this.formProps" t-key="this.state.formKey"/>
+                        </t>
+                    </div>
+                </div>
+            </Layout>
+        </div>
+    </t>
+
+</templates>
