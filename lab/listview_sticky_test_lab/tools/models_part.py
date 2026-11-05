@@ -11,9 +11,9 @@ PNGS = [png(c) for c in ((135, 90, 123), (14, 124, 102), (91, 141, 184), (224, 1
 def H(salt):
     return "abs(hashtext(g.id::text || '%s'))" % salt
 def PICK(arr, salt):
-    return "(ARRAY[%s])[1 + %s %% %d]" % (', '.join("'%s'" % a for a in arr), H(salt), len(arr))
+    return "(ARRAY[%s])[1 + mod(%s, %d)]" % (', '.join("'%s'" % a for a in arr), H(salt), len(arr))
 def REFPICK(col, salt):
-    return "ref.%s[1 + %s %% GREATEST(array_length(ref.%s, 1), 1)]" % (col, H(salt), col)
+    return "ref.%s[1 + mod(%s, GREATEST(array_length(ref.%s, 1), 1))]" % (col, H(salt), col)
 
 FIRST = ['Anna', 'Minh', 'Linh', 'David', 'Sofia', 'Kenji', 'Lucas', 'Mai', 'Omar', 'Chloe', 'Hugo', 'Yuki']
 LAST = ['Nguyen', 'Tran', 'Smith', 'Garcia', 'Tanaka', 'Martin', 'Silva', 'Kim', 'Rossi', 'Muller']
@@ -27,90 +27,90 @@ RS = {
  'sequence': "g.id * 10",
  'name': "%s || ' ' || %s || ' #' || g.id" % (PICK(THING, 'n1'), PICK(LAST, 'n2')),
  'code': "'LAB-' || lpad(g.id::text, 5, '0')",
- 'category_id': "1 + %s %% 8" % H('cat'),
+ 'category_id': "1 + mod(%s, 8)" % H('cat'),
  'state': PICK(['draft', 'confirmed', 'progress', 'done', 'cancel'], 'st'),
- 'priority': "(%s %% 4)::text" % H('pr'),
+ 'priority': "(mod(%s, 4))::text" % H('pr'),
  'kanban_state': PICK(['normal', 'done', 'blocked'], 'ks'),
  'user_id': REFPICK('users', 'u'),
  'partner_id': REFPICK('partners', 'p'),
  'country_id': REFPICK('countries', 'c'),
  'city': PICK(CITY, 'city'),
  'currency_id': "ref.currency_id",
- 'amount': "round((%s %% 9000000) / 100.0, 2)" % H('am'),
- 'amount_tax': "round((%s %% 900000) / 100.0, 2)" % H('tx'),
- 'amount_total': "round((%s %% 9000000) / 100.0, 2) + round((%s %% 900000) / 100.0, 2)" % (H('am'), H('tx')),
- 'qty': "1 + %s %% 500" % H('q'),
- 'price': "round((%s %% 100000) / 100.0, 3)" % H('pc'),
- 'discount': "round((%s %% 30) / 100.0, 2)" % H('di'),
- 'progress': "(%s %% 101)::float" % H('pg'),
- 'rating_pie': "(%s %% 101)::float" % H('rt'),
- 'duration': "round((%s %% 1200) / 100.0, 2)" % H('du'),
- 'factor': "round((%s %% 2000) / 100.0, 2)" % H('fa'),
- 'active_toggle': "%s %% 5 <> 0" % H('ac'),
- 'favorite': "%s %% 7 = 0" % H('fv'),
- 'is_vip': "%s %% 6 = 0" % H('vp'),
- 'flag_icon': "%s %% 3 = 0" % H('fl'),
- 'date_start': "current_date - (%s %% 90)" % H('d1'),
- 'date_end': "current_date + ((%s %% 120) - 40)" % H('d2'),
- 'datetime_created': "(now() at time zone 'utc')::timestamp - ((%s %% 90) || ' days')::interval - ((%s %% 1440) || ' minutes')::interval" % (H('t1'), H('t1m')),
- 'datetime_due': "(now() at time zone 'utc')::timestamp + (((%s %% 90) - 20) || ' days')::interval + ((%s %% 1440) || ' minutes')::interval" % (H('t2'), H('t2m')),
+ 'amount': "round((mod(%s, 9000000)) / 100.0, 2)" % H('am'),
+ 'amount_tax': "round((mod(%s, 900000)) / 100.0, 2)" % H('tx'),
+ 'amount_total': "round((mod(%s, 9000000)) / 100.0, 2) + round((mod(%s, 900000)) / 100.0, 2)" % (H('am'), H('tx')),
+ 'qty': "1 + mod(%s, 500)" % H('q'),
+ 'price': "round((mod(%s, 100000)) / 100.0, 3)" % H('pc'),
+ 'discount': "round((mod(%s, 30)) / 100.0, 2)" % H('di'),
+ 'progress': "(mod(%s, 101))::float" % H('pg'),
+ 'rating_pie': "(mod(%s, 101))::float" % H('rt'),
+ 'duration': "round((mod(%s, 1200)) / 100.0, 2)" % H('du'),
+ 'factor': "round((mod(%s, 2000)) / 100.0, 2)" % H('fa'),
+ 'active_toggle': "mod(%s, 5) <> 0" % H('ac'),
+ 'favorite': "mod(%s, 7) = 0" % H('fv'),
+ 'is_vip': "mod(%s, 6) = 0" % H('vp'),
+ 'flag_icon': "mod(%s, 3) = 0" % H('fl'),
+ 'date_start': "current_date - (mod(%s, 90))" % H('d1'),
+ 'date_end': "current_date + ((mod(%s, 120)) - 40)" % H('d2'),
+ 'datetime_created': "(now() at time zone 'utc')::timestamp - ((mod(%s, 90)) || ' days')::interval - ((mod(%s, 1440)) || ' minutes')::interval" % (H('t1'), H('t1m')),
+ 'datetime_due': "(now() at time zone 'utc')::timestamp + (((mod(%s, 90)) - 20) || ' days')::interval + ((mod(%s, 1440)) || ' minutes')::interval" % (H('t2'), H('t2m')),
  'email': "lower(%s || '.' || %s) || g.id || '@example.com'" % (PICK(FIRST, 'e1'), PICK(LAST, 'e2')),
- 'phone': "'+84 9' || lpad((%s %% 100000000)::text, 8, '0')" % H('ph'),
+ 'phone': "'+84 9' || lpad((mod(%s, 100000000))::text, 8, '0')" % H('ph'),
  'website': "'https://example.com/lab/' || g.id",
  'website_copy': "'https://example.com/share/' || md5(g.id::text)",
  'color_hex': "'#' || substr(md5(g.id::text), 1, 6)",
- 'color_index': "%s %% 12" % H('ci'),
+ 'color_index': "mod(%s, 12)" % H('ci'),
  'kind': PICK(['a', 'b', 'c', 'd'], 'kd'),
- 'description': "%s || ' for ' || %s || ' - batch ' || (%s %% 90)" % (PICK(THING, 'ds1'), PICK(CITY, 'ds2'), H('ds3')),
- 'ref_char': "'REF/' || to_char(current_date, 'YYYY') || '/' || lpad((%s %% 9999)::text, 4, '0')" % H('rf'),
+ 'description': "%s || ' for ' || %s || ' - batch ' || (mod(%s, 90))" % (PICK(THING, 'ds1'), PICK(CITY, 'ds2'), H('ds3')),
+ 'ref_char': "'REF/' || to_char(current_date, 'YYYY') || '/' || lpad((mod(%s, 9999))::text, 4, '0')" % H('rf'),
  'serial': "upper(substr(md5('s' || g.id::text), 1, 10))",
- 'weight': "round((%s %% 100000) / 100.0, 2)" % H('wt'),
- 'volume': "round((%s %% 5000) / 100.0, 2)" % H('vo'),
- 'height': "10 + %s %% 190" % H('hg'),
- 'width': "10 + %s %% 90" % H('wd'),
- 'stock': "%s %% 2000" % H('sk'),
- 'score_a': "round((%s %% 1000) / 10.0, 1)" % H('sa'),
- 'score_b': "round((%s %% 1000) / 10.0, 1)" % H('sb'),
- 'score_c': "%s %% 100" % H('sc'),
+ 'weight': "round((mod(%s, 100000)) / 100.0, 2)" % H('wt'),
+ 'volume': "round((mod(%s, 5000)) / 100.0, 2)" % H('vo'),
+ 'height': "10 + mod(%s, 190)" % H('hg'),
+ 'width': "10 + mod(%s, 90)" % H('wd'),
+ 'stock': "mod(%s, 2000)" % H('sk'),
+ 'score_a': "round((mod(%s, 1000)) / 10.0, 1)" % H('sa'),
+ 'score_b': "round((mod(%s, 1000)) / 10.0, 1)" % H('sb'),
+ 'score_c': "mod(%s, 100)" % H('sc'),
  'notes': PICK(NOTE, 'no') + " || '. ' || " + PICK(NOTE, 'no2'),
  'write_date': "(now() at time zone 'utc')::date::timestamp",
- 'image': "CASE %s %% 4 %s END" % (H('im'), ' '.join("WHEN %d THEN decode('%s', 'base64')" % (k, p) for k, p in enumerate(PNGS))),
+ 'image': "CASE mod(%s, 4) %s END" % (H('im'), ' '.join("WHEN %d THEN decode('%s', 'base64')" % (k, p) for k, p in enumerate(PNGS))),
 }
 LS = {
  'sequence': "g.n * 10",
  'name': PICK(THING, 'l1') + " || ' line ' || g.n",
- 'product': PICK(['Desk', 'Chair', 'Lamp', 'Cable', 'Monitor', 'Keyboard', 'Router', 'Printer'], 'l2') + " || ' ' || (%s %% 900 + 100)" % H('l2n'),
+ 'product': PICK(['Desk', 'Chair', 'Lamp', 'Cable', 'Monitor', 'Keyboard', 'Router', 'Printer'], 'l2') + " || ' ' || (mod(%s, 900) + 100)" % H('l2n'),
  'total': "round((g.qty * g.price * (1 - g.discount / 100.0))::numeric, 2)",
  'currency_id': "ref.currency_id",
  'state': PICK(['draft', 'ok', 'late', 'cancel'], 'ls'),
  'partner_id': REFPICK('partners', 'lpa'),
  'user_id': REFPICK('users', 'lu'),
- 'date': "current_date + ((%s %% 100) - 30)" % H('lda'),
- 'deadline': "(now() at time zone 'utc')::timestamp + (((%s %% 60) - 20) || ' days')::interval" % H('ldl'),
- 'progress': "(%s %% 101)::float" % H('lpg'),
- 'priority': "(%s %% 4)::text" % H('lpr'),
- 'flag': "%s %% 3 = 0" % H('lfl'),
+ 'date': "current_date + ((mod(%s, 100)) - 30)" % H('lda'),
+ 'deadline': "(now() at time zone 'utc')::timestamp + (((mod(%s, 60)) - 20) || ' days')::interval" % H('ldl'),
+ 'progress': "(mod(%s, 101))::float" % H('lpg'),
+ 'priority': "(mod(%s, 4))::text" % H('lpr'),
+ 'flag': "mod(%s, 3) = 0" % H('lfl'),
  'email': "lower(%s) || g.n || '@example.com'" % PICK(FIRST, 'lem'),
- 'phone': "'+33 6' || lpad((%s %% 100000000)::text, 8, '0')" % H('lph'),
+ 'phone': "'+33 6' || lpad((mod(%s, 100000000))::text, 8, '0')" % H('lph'),
  'url': "'https://example.com/line/' || g.id",
- 'color_index': "%s %% 12" % H('lci'),
+ 'color_index': "mod(%s, 12)" % H('lci'),
  'note': PICK(NOTE, 'lno'),
 }
 for i in range(1, 17):
     n = 'f%02d' % i
     if i % 4 == 0:
-        LS[n] = PICK(['alpha', 'beta', 'gamma', 'delta', 'omega'], 'x' + n) + " || '-' || (%s %% 99)" % H('y' + n)
+        LS[n] = PICK(['alpha', 'beta', 'gamma', 'delta', 'omega'], 'x' + n) + " || '-' || (mod(%s, 99))" % H('y' + n)
     elif i % 4 == 1:
-        LS[n] = "%s %% 10000" % H('x' + n)
+        LS[n] = "mod(%s, 10000)" % H('x' + n)
     elif i % 4 == 2:
-        LS[n] = "round(((%s %% 100000) / 100.0)::numeric, 2)" % H('x' + n)
+        LS[n] = "round(((mod(%s, 100000)) / 100.0)::numeric, 2)" % H('x' + n)
     else:
-        LS[n] = "current_date + ((%s %% 200) - 100)" % H('x' + n)
+        LS[n] = "current_date + ((mod(%s, 200)) - 100)" % H('x' + n)
 # columns computed in the inner query of the line view (so `total` can use them)
 INNER = {
- 'qty': "round(((abs(hashtext(g0.id::text || 'lq')) %% 2000) / 100.0)::numeric, 2)",
- 'price': "round(((abs(hashtext(g0.id::text || 'lp')) %% 50000) / 100.0)::numeric, 2)",
- 'discount': "round(((abs(hashtext(g0.id::text || 'ld')) %% 25))::numeric, 1)",
+ 'qty': "round(((mod(abs(hashtext(g0.id::text || 'lq')), 2000)) / 100.0)::numeric, 2)",
+ 'price': "round(((mod(abs(hashtext(g0.id::text || 'lp')), 50000)) / 100.0)::numeric, 2)",
+ 'discount': "round(((mod(abs(hashtext(g0.id::text || 'ld')), 25)))::numeric, 1)",
 }
 SKIP_FIELD = ('record_id', 'kind')
 
@@ -248,7 +248,7 @@ class LshcTestTag(models.Model):
         return self._fake_sql("""
             SELECT g.id AS id,
                    (ARRAY['urgent', 'vip', 'new', 'follow-up', 'b2b', 'b2c', 'export', 'promo', 'fragile', 'seasonal'])[g.id] AS name,
-                   g.id % 12 AS color
+                   mod(g.id, 12) AS color
             FROM generate_series(1, 10) AS g(id)""")
 
 

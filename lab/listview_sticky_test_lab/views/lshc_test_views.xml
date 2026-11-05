@@ -12,7 +12,7 @@
                 <field name="state" widget="badge"/>
                 <field name="priority" widget="priority"/>
                 <field name="kanban_state" widget="state_selection"/>
-                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="user_id"/>
                 <field name="partner_id"/>
                 <field name="country_id"/>
                 <field name="city"/>
@@ -72,7 +72,7 @@
                 <field name="state" widget="badge"/>
                 <field name="priority" widget="priority"/>
                 <field name="kanban_state" widget="state_selection"/>
-                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="user_id"/>
                 <field name="partner_id"/>
                 <field name="country_id"/>
                 <field name="city"/>
@@ -126,7 +126,7 @@
                             <field name="name"/>
                             <field name="code" widget="CopyClipboardChar"/>
                             <field name="category_id"/>
-                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="user_id"/>
                             <field name="partner_id"/>
                             <field name="country_id"/>
                             <field name="city"/>
@@ -177,7 +177,7 @@
                                     <field name="currency_id" column_invisible="1"/>
                                     <field name="state" widget="badge"/>
                                     <field name="partner_id"/>
-                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="user_id"/>
                                     <field name="date"/>
                                     <field name="deadline"/>
                                     <field name="progress" widget="progressbar"/>
@@ -200,7 +200,7 @@
                                     <field name="currency_id" column_invisible="1"/>
                                     <field name="state" widget="badge"/>
                                     <field name="partner_id"/>
-                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="user_id"/>
                                     <field name="date"/>
                                     <field name="deadline"/>
                                     <field name="progress" widget="progressbar"/>
@@ -255,7 +255,7 @@
                                             <field name="currency_id" column_invisible="1"/>
                                             <field name="state" widget="badge"/>
                                             <field name="partner_id"/>
-                                            <field name="user_id" widget="many2one_avatar_user"/>
+                                            <field name="user_id"/>
                                             <field name="date"/>
                                             <field name="deadline"/>
                                             <field name="progress" widget="progressbar"/>
