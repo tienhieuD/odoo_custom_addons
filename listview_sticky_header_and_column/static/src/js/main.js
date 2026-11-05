@@ -149,7 +149,7 @@ import localStorage from 'web.local_storage';
                     var cells = scope + ' table thead tr th:nth-child(' + n + '), ' +
                         scope + ' table tfoot tr td:nth-child(' + n + '), ' +
                         scope + ' table tbody tr.o_data_row td:nth-child(' + n + ')';
-                    return cells + ' { position: sticky; left: ' + left + 'px; z-index: 1;' +
+                    return cells + ' { position: sticky !important; left: ' + left + 'px; z-index: 1;' +
                             (last ? ' box-shadow: -1px 0 0 #dee2e6 inset;' : '') + ' }\n' +
                         scope + ' table thead tr th:nth-child(' + n + ') { top: 0; z-index: 10; }\n' +
                         scope + ' table tbody tr.o_data_row:nth-of-type(odd) td:nth-child(' + n + ') { ' + tint(oddBg) + ' }\n' +
