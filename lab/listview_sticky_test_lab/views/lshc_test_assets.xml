@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="lshc_test_assets" name="LSHC test tours" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/listview_sticky_test_lab/static/tests/tours/lab_tours.js"/>
+        </xpath>
+    </template>
+</odoo>

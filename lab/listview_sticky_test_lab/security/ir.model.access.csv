@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lshc_test_record,lshc.test.record,model_lshc_test_record,base.group_user,1,1,0,0
+access_lshc_test_line,lshc.test.line,model_lshc_test_line,base.group_user,1,1,0,0
+access_lshc_test_category,lshc.test.category,model_lshc_test_category,base.group_user,1,0,0,0
+access_lshc_test_tag,lshc.test.tag,model_lshc_test_tag,base.group_user,1,0,0,0
