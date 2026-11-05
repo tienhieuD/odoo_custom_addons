@@ -12,7 +12,7 @@
     'author': "DUO-TEK Software Vietnam",
     'license': 'LGPL-3',
     'category': 'Tools',
-    'version': '17.0.0.1',
+    'version': '17.0.0.3',
     'depends': ['base', 'web'],
     'data': [],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
