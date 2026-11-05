@@ -12,7 +12,7 @@
     'author': "DUO-TEK Software Vietnam",
     'license': 'LGPL-3',
     'category': 'Tools',
-    'version': '19.0.0.1',
+    'version': '20.0.0.3',
     'depends': ['base', 'web'],
     'data': [],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
@@ -20,7 +20,6 @@
         'web.assets_backend': [
             'listview_sticky_header_and_column/static/src/scss/main.scss',
             'listview_sticky_header_and_column/static/src/js/main.js',
-            'listview_sticky_header_and_column/static/src/xml/*.xml',
         ]
     },
     'price': 38.00,
