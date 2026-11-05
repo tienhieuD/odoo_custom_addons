@@ -59,7 +59,12 @@ odoo.define("awesome.splitView", function (require) {
         _onSearch: function (ev) {
             ev.stopPropagation();
             this.lastSearchQuery = ev.data;
-            return this.listController && this.listController.reload(_.extend({ offset: 0, groupsOffset: 0 }, ev.data));
+            if (!this.listController) {
+                return;
+            }
+            // the rows are rebuilt by the reload: mark the open record again
+            return this.listController.reload(_.extend({ offset: 0, groupsOffset: 0 }, ev.data))
+                .then(() => this._highlightActiveRow());
         },
         /**
          * @override
@@ -183,7 +188,12 @@ odoo.define("awesome.splitView", function (require) {
 
         _highlightActiveRow: function () {
             const rows = Array.from(this.listController.renderer.el.querySelectorAll('tr.o_data_row'));
-            rows.forEach(node => node.classList.toggle('split_active_row', !!this.activeId && node.dataset.id && this.listController.model.get(node.dataset.id, { raw: true }).res_id === this.activeId));
+            rows.forEach(node => {
+                // Odoo 12 keeps the row id in jQuery data only (no data-id attribute)
+                const id = $(node).data('id') || node.dataset.id;
+                const active = !!this.activeId && !!id && this.listController.model.get(id, { raw: true }).res_id === this.activeId;
+                node.classList.toggle('split_active_row', active);
+            });
         },
 
         /**
