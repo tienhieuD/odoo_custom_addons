@@ -1,0 +1,49 @@
+.o_split_view {
+    .duo_split_view {
+        min-height: 0;
+
+        &.split_resizing {
+            user-select: none;
+            cursor: col-resize;
+        }
+
+        .left-side,
+        .right-side {
+            min-width: 0;
+        }
+
+        // the embedded views live in a narrow pane: let them fill it instead of the whole action
+        .o_view_controller {
+            height: auto;
+        }
+    }
+
+    .split_active_row {
+        background-color: rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .split_resizer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex: 0 0 10px;
+        opacity: 0.5;
+        background-color: #ddd;
+        cursor: col-resize;
+        transition-duration: 0.2s;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        span {
+            display: block;
+            width: 6px;
+            height: 6px;
+            margin-bottom: 8px;
+            border-radius: 100%;
+            background-color: #999;
+        }
+    }
+}
