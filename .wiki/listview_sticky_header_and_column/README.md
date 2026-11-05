@@ -37,13 +37,13 @@ Patch `ListRenderer`: mỗi renderer có `lshcUid`; khi ghim, chèn `<style name
 | 12 đến 15 | 12: khung `.o_list_view` là chính `<table>`, tên cột chỉ lưu bằng jQuery `.data('name')` (không có thuộc tính `data-name`); 15: đã xóa dòng asset `account/static/src/scss/variables.scss` (làm trang lỗi 500 khi chưa cài account); 12: tour test nạp vào `web.assets_backend` (không có `web.assets_tests`) |
 | `view_mode` list | `tree` (16, 17) vs `list` (18+) chỉ ảnh hưởng module lab |
 
-## Module test: `lab/listview_sticky_test_lab` (trong mỗi repo)
+## Module test: `.lab/listview_sticky_test_lab` (trong mỗi repo)
 
 Một app gốc **List Sticky Test Lab** (không cần debug) với dữ liệu giả, để thử ghim/cuộn:
 - Menu: Showcase (đơn hàng, dùng làm ảnh mô tả), Wide list (52 cột, ~30 loại widget, search panel), Editable list (40 cột), Grouped list. Form: list đủ kiểu (full width, trong tab notebook, nửa form, editable, 7 đến 38 cột).
 - **Không có bảng và không có dòng lưu**: model `_auto = False` với `_table_query` (14 đến 19) hoặc `_table_sql` (20), sinh dữ liệu bằng SQL `generate_series` + `hashtext` (ổn định theo id); 12 đến 14 dùng **SQL view** tạo trong `init()` (12 và 13 chưa có `_table_query`, 14 không join được comodel `_table_query`). Chỉ đọc: ghi bị bỏ qua, tạo mới báo lỗi. SQL không được chứa dấu `%` (dùng `mod()`), vì có đường truy vấn không truyền tham số.
-- Mã sinh: `lab/listview_sticky_test_lab/tools/` (`build_lab.py <version> <thư mục addons>` sinh module cho đúng version từ một bộ spec; `gen_lab.py`, `models_part.py`, `lab_tours_*`). Widget không có ở version đó tự bị bỏ.
-- Cần thêm `.../odoo_custom_addonsNN/lab` vào `addons_path` của conf (đã làm cho conf 12 đến 20 và workspace VS Code).
+- Mã sinh: `.lab/listview_sticky_test_lab/tools/` (`build_lab.py <version> <thư mục addons>` sinh module cho đúng version từ một bộ spec; `gen_lab.py`, `models_part.py`, `lab_tours_*`). Widget không có ở version đó tự bị bỏ.
+- Cần thêm `.../odoo_custom_addonsNN/.lab` vào `addons_path` của conf (đã làm cho conf 12 đến 20 và workspace VS Code).
 - Khác biệt khi test: 12 không có search panel (bỏ), 13 không có `enable_counters`, ảnh nhị phân: ≤ 17 lưu base64 dạng text, 18+ lưu bytes; tour 20 cấm hàm `run` rỗng; mọi tour kiểm tra bằng `console.error("LABFAIL ...")` (làm test fail).
 - 3 tour: `lshc_lab_wide_list` (ghim, cuộn ngang/dọc, cột ghim đúng vị trí và không trong suốt, header dính, bỏ ghim, search panel reload vẫn giữ ghim), `lshc_lab_editable_list` (vào chế độ sửa dòng, ô ghim vẫn thẳng hàng), `lshc_lab_form_lists` (ghim ở một list không lan sang list khác, header ghim mờ đục).
 
