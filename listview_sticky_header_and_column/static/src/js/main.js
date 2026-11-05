@@ -16,6 +16,18 @@ const SLEEP_DELAY = 300;
 const MOUNTED_SLEEP_DELAY = 100;
 let lshcUidCounter = 0;
 
+/** First non-transparent background colour going up from `el` (Odoo 16 cells are transparent: sticky cells need an opaque one). */
+function lshcOpaqueBackground(el) {
+    while (el && el.nodeType === 1) {
+        const c = getComputedStyle(el).backgroundColor;
+        if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) {
+            return c;
+        }
+        el = el.parentElement;
+    }
+    return '#fff';
+}
+
 patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", {
     // Define the patched method here
     setup() {
@@ -200,6 +212,7 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
 
         // `left` = sum of the widths of the previous pinned columns. Do not use `offsetLeft`:
         // once a column is sticky it reflects the scroll-shifted position, not the natural one.
+        const baseBg = lshcOpaqueBackground(el);
         const buildStyles = () => {
             let acc = 0;
             return pinnedColumns.map(th => {
@@ -220,6 +233,10 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
                     /* theme row colors (stripe/hover/focus); border only on the last pinned column */
                     box-shadow: ${index === pinnedColumns.length - 1 ? '-1px 0 0 #dee2e6 inset,' : ''}
                         inset 0 0 0 9999px var(--table-bg-state, var(--table-bg-type, var(--table-accent-bg)));
+                }
+                ${scope} table tfoot tr td:nth-child(${cssNthChildIndex}),
+                ${scope} table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
+                    background-color: ${baseBg};
                 }
                 ${scope} table thead tr th:nth-child(${cssNthChildIndex}) {
                     top: 0;
