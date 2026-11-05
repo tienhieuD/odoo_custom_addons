@@ -1,7 +1,7 @@
 # dwo_record_concurrency (Record Concurrency Guard)
 
 Cảnh báo **mềm** khi hai người cùng sửa một bản ghi: người lưu sau thấy bảng so sánh "giá trị của tôi / dữ liệu mới nhất / ai lưu cuối" và tự chọn **Force Save**, **Discard My Updates** hoặc **Cancel**. Làm cho Odoo **12 đến 20** (16 đến 20 là OWL, 12 đến 15 là kiến trúc legacy).
-Bán trên Odoo Apps: **59 EUR**, license **OPL-1**, tác giả DUO-TEK Software Vietnam, tên hiển thị **Record Concurrency Guard** (24 ký tự, store giới hạn 25), **tên kỹ thuật giữ nguyên `dwo_record_concurrency`** (đổi tên kỹ thuật làm gãy các DB đã cài).
+Bán trên Odoo Apps: **39 USD**, license **OPL-1**, tác giả DUO-TEK Software Vietnam, tên hiển thị **Record Concurrency Guard** (24 ký tự, store giới hạn 25), **tên kỹ thuật giữ nguyên `dwo_record_concurrency`** (đổi tên kỹ thuật làm gãy các DB đã cài).
 Chưa có email `support` trong manifest (chủ dự án không cấp), nên trình kiểm tra của skill luôn báo 1 WARN này: không cần sửa.
 Version manifest hiện tại: `<NN>.0.1.1.0` (1.0 là bản cũ chỉ dùng bus).
 

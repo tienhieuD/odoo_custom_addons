@@ -19,6 +19,6 @@
     "installable": True,
     "auto_install": False,
     "license": "OPL-1",
-    'price': 59.00,
-    'currency': 'EUR',
+    'price': 39.00,
+    'currency': 'USD',
 } # type: ignore
