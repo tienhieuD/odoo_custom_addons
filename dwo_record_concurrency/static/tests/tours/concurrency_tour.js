@@ -2,26 +2,30 @@
 
 import tour from "web_tour.tour";
 
-async function writeOnServer(vals) {
-    const call = async (method, args) => {
-        const response = await fetch(`/web/dataset/call_kw/res.partner/${method}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ jsonrpc: "2.0", method: "call", params: { model: "res.partner", method, args, kwargs: {} } }),
-        });
-        return (await response.json()).result;
+// synchronous on purpose: the tours do not wait for a promise returned by a step
+function writeOnServer(vals) {
+    const call = (method, args) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `/web/dataset/call_kw/res.partner/${method}`, false);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify({ jsonrpc: "2.0", method: "call", params: { model: "res.partner", method, args, kwargs: {} } }));
+        return JSON.parse(xhr.responseText).result;
     };
-    const [partner] = await call("search_read", [[["name", "in", ["DWO Conflict Partner", "Edited by another user"]]], ["id"]]);
-    await call("write", [[partner.id], vals]);
+    const [partner] = call("search_read", [[["name", "in", ["DWO Conflict Partner", "Edited by another user"]]], ["id"]]);
+    call("write", [[partner.id], vals]);
 }
 
 const NAME = ".o_form_view .o_field_widget[name=name] textarea, .o_form_view .o_field_widget[name=name] input";
 const noSaveButton = ".o_form_view:not(:has(.o_form_status_indicator_buttons:not(.invisible)))";
 
+// the snapshot of the loaded record is fetched in two round trips: wait for it before the "other user" writes
+// (a promise returned by a step is not waited for, so the wait is a visible marker added after a delay)
 const openAndEdit = (value) => [
-    { trigger: NAME },
-    // let the snapshot of the loaded record arrive before the other user writes
-    { trigger: ".o_form_view", run: () => new Promise((resolve) => setTimeout(resolve, 800)) },
+    { trigger: NAME, run: () => {
+        $(".dwo_wait_done").remove();
+        setTimeout(() => $("body").append('<div class="dwo_wait_done" style="width:2px;height:2px;overflow:hidden">.</div>'), 2000);
+    } },
+    { trigger: ".dwo_wait_done" },
     { trigger: NAME, run: `text ${value}` },
 ];
 
