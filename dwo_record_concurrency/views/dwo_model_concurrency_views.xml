@@ -16,7 +16,7 @@
                     </group>
                     <notebook>
                         <page name="fields" string="Fields">
-                            <field name="field_ids" nolabel="1" domain="field_domain" option="{'no_create': True}"/>
+                            <field name="field_ids" nolabel="1" domain="field_domain" options="{'no_create': True}"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -28,9 +28,9 @@
         <field name="name">view.dwo.model.concurrency.tree</field>
         <field name="model">dwo.model.concurrency</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="model_id" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -48,7 +48,7 @@
         <field name="name">Model Concurrency Configuration</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">dwo.model.concurrency</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="help" type="html">
