@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dwo_model_concurrency_user,dwo_model_concurrency_user,model_dwo_model_concurrency,base.group_user,1,0,0,0
+access_dwo_model_concurrency_admin,dwo_model_concurrency_admin,model_dwo_model_concurrency,base.group_system,1,1,1,1

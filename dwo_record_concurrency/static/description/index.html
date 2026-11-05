@@ -1,0 +1,222 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Record Concurrency Guard for Odoo</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Stop one user from silently overwriting another.</p>
+        <p class="mb-4" style="font-size: 15px;">Choose the models and fields that matter. When someone saves a record while you are editing the same fields, you see what changed and <strong>you decide</strong> what to do.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">In Odoo the last save wins: if two people edit the same record, the second one silently erases the first one's changes. This module adds a safety net <strong>on the form view</strong>. It never blocks a save and never refuses a write on the server: it only shows the conflict and lets the user choose.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="Pick the fields to watch, two users edit, the save compares the values, the user decides" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">You choose what to watch</h4>
+                    <p class="mb-0" style="font-size: 14px;">For each model, pick the fields to protect, from <strong>Settings &gt; Technical &gt; Concurrency</strong>. Models that are not configured are not affected at all.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Checked when you save</h4>
+                    <p class="mb-0" style="font-size: 14px;">At save time the fields you edited are compared with the values they had when you opened the form. This also works if the live notification never reached your browser.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Only real conflicts</h4>
+                    <p class="mb-0" style="font-size: 14px;">If another user changed a field you did not touch, nothing is shown. You are only interrupted for the fields you are actually saving.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Compare and decide</h4>
+                    <p class="mb-0" style="font-size: 14px;">A table shows <em>Your Updates</em> next to the <em>Latest Data</em>, and who saved last. Choose <strong>Force Save</strong>, <strong>Discard My Updates</strong> or <strong>Cancel</strong>.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Live warning</h4>
+                    <p class="mb-0" style="font-size: 14px;">While you edit, a notification tells you that another user has just changed fields you are editing, so you are not surprised at save time.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Every way of saving</h4>
+                    <p class="mb-0" style="font-size: 14px;">The Save button, the pager, leaving the form and the automatic save are all covered. A tab in the background keeps your changes instead of overwriting anything.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Many field types</h4>
+                    <p class="mb-0" style="font-size: 14px;">Text, numbers, dates, selections, many2one and many2many values, and binary fields are compared. Relational values are compared by record, not by order.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Several tabs, several users</h4>
+                    <p class="mb-0" style="font-size: 14px;">The tab that saves is not warned about its own change. Other tabs, and other users, are told that the record changed.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Private by design</h4>
+                    <p class="mb-0" style="font-size: 14px;">The live notification only says who changed which fields. It carries no field value, and a user can only listen to the records he is allowed to read.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded p-4 my-5" style="border: 2px solid #875A7B;">
+        <h2 class="font-weight-bold text-center mt-0 mb-2" style="font-size: 26px; color: #4A2F45;">How it works</h2>
+        <p class="text-center mb-4" style="font-size: 16px;">Set it up once, then it works in the background.</p>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">1. Configure</h4>
+                    <p class="mb-0" style="font-size: 13px;">Open <strong>Settings &gt; Technical &gt; Concurrency &gt; Model Concurrency</strong> (developer mode), create a line for a model and select the fields to watch.</p>
+                </div></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">2. Edit as usual</h4>
+                    <p class="mb-0" style="font-size: 13px;">Users open and edit the form. If someone else saves a watched field, a notification appears.</p>
+                </div></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">3. Save and choose</h4>
+                    <p class="mb-0" style="font-size: 13px;">On save, a conflict on a field you edited opens a dialog. Otherwise the save goes through as usual.</p>
+                </div></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">See the difference before you overwrite</h2>
+    <p class="mb-4" style="font-size: 16px;">Another user saved the same field. The dialog shows both values and who saved last, and the three choices.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_1.png" alt="Dialog listing the field Name with Your Updates and Latest Data, the name of the last user to save, and the buttons Force Save, Discard My Updates and Cancel" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">A warning while you edit</h2>
+    <p class="mb-4" style="font-size: 16px;">A short notification tells you right away that someone changed fields you are editing. Nothing is blocked.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_2.png" alt="Form being edited with a notification saying that another user changed fields you are editing" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Choose the models and fields to protect</h2>
+    <p class="mb-4" style="font-size: 16px;">One line per model, with the fields to watch. Only stored, editable fields can be selected.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_3.png" alt="Configuration form for the Contact model with the Name and Phone fields selected" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">The module depends on the standard <code>base</code>, <code>web</code> and <code>bus</code> modules and needs no external Python library.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">The live notification uses the Odoo bus (websocket). Without it, conflicts are still detected when the user saves.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#rcg_install" role="tab" aria-controls="rcg_install" aria-selected="true">Install</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#rcg_configure" role="tab" aria-controls="rcg_configure" aria-selected="false">Configure</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#rcg_limits" role="tab" aria-controls="rcg_limits" aria-selected="false">Good to know</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="rcg_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
+            <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_record_concurrency</code> folder into an add-ons path of your Odoo server.</p>
+            <p class="mb-2" style="font-size: 14px;">2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu.</p>
+            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Record Concurrency Guard</em> and click <strong>Install</strong>.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Reload your browser page after installing so the new assets are loaded.</p>
+        </div>
+        <div class="tab-pane fade" id="rcg_configure" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Choose what to watch</h4>
+            <p class="mb-2" style="font-size: 14px;">In developer mode open <strong>Settings &gt; Technical &gt; Concurrency &gt; Model Concurrency</strong> and click <strong>New</strong>.</p>
+            <p class="mb-2" style="font-size: 14px;">Select the model, then add the fields to watch. Only stored fields that are not read-only are offered.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Only administrators can change this configuration; every internal user can read it.</p>
+        </div>
+        <div class="tab-pane fade" id="rcg_limits" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">What it does not do</h4>
+            <p class="mb-2" style="font-size: 14px;">The check runs in <strong>form views</strong>. Lists edited inline, kanban cards, imports and external API writes are not interrupted.</p>
+            <p class="mb-2" style="font-size: 14px;">It never blocks: a user can always choose <strong>Force Save</strong>, and the server never rejects a write because of a conflict.</p>
+            <p class="mb-2" style="font-size: 14px;">Closing the browser tab with unsaved changes asks for confirmation when the record is known to have been changed by someone else.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Changelog</h2>
+    <p class="mb-3" style="font-size: 16px;">Module releases, newest first.</p>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.1</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-05</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Conflicts are now detected when you save, field by field, so a change to another field no longer interrupts you. The live notification carries no values and is limited to readable records. Configuration is cached and restricted to administrators.</p></div>
+        </div>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-04-12</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release: live stale-record detection and a comparison dialog before saving.</p></div>
+        </div>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it lock records?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Nobody is prevented from opening or saving a record. A user is only warned and chooses what to do.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What if the other user changed a different field?</h4>
+        <p class="mb-0" style="font-size: 14px;">Nothing is shown. The dialog only appears for the fields you edited and that changed on the server since you opened the form.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it slow Odoo down?</h4>
+        <p class="mb-0" style="font-size: 14px;">Models without a configuration are not touched. The configuration is cached, so saving a record does not add a database query for it.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it change my data or my views?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It adds one small configuration model and changes nothing in your own models or views.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What happens if the live notification does not arrive?</h4>
+        <p class="mb-0" style="font-size: 14px;">The check at save time still works, because it compares the values with the server when you click Save.</p>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Never lose a colleague's changes again.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it, choose the fields to protect and let your team save with confidence.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DUO-TEK Software Vietnam</p>
+    </div>
+
+</div>
+</section>
