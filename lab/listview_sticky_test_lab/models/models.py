@@ -133,14 +133,14 @@ class LshcTestRecord(models.Model):
     def init(self):
         self._create_view(self._table, """WITH ref AS (
             SELECT ARRAY(SELECT id FROM res_users WHERE active ORDER BY id) AS users,
-                   ARRAY(SELECT id FROM res_partner WHERE active ORDER BY id LIMIT 300) AS partners,
+                   ARRAY(SELECT id FROM res_partner WHERE active AND is_company AND id NOT IN (SELECT partner_id FROM res_users UNION SELECT partner_id FROM res_company) ORDER BY id LIMIT 300) AS partners,
                    ARRAY(SELECT id FROM res_country ORDER BY id LIMIT 80) AS countries,
                    (SELECT currency_id FROM res_company ORDER BY id LIMIT 1) AS currency_id
         )
         SELECT g.id AS id,
             g.id * 10 AS sequence,
-            (ARRAY['Order', 'Contract', 'Project', 'Ticket', 'Shipment', 'Invoice', 'Quote', 'Campaign'])[1 + mod(abs(hashtext(g.id::text || 'n1')), 8)] || ' ' || (ARRAY['Nguyen', 'Tran', 'Smith', 'Garcia', 'Tanaka', 'Martin', 'Silva', 'Kim', 'Rossi', 'Muller'])[1 + mod(abs(hashtext(g.id::text || 'n2')), 10)] || ' #' || g.id AS name,
-            'LAB-' || lpad(g.id::text, 5, '0') AS code,
+            (ARRAY['Quotation', 'Sales Order', 'Delivery', 'Invoice', 'Contract'])[1 + mod(abs(hashtext(g.id::text || 'n1')), 5)] || ' S' || lpad(g.id::text, 5, '0') AS name,
+            'S' || lpad(g.id::text, 5, '0') AS code,
             1 + mod(abs(hashtext(g.id::text || 'cat')), 8) AS category_id,
             (ARRAY['draft', 'confirmed', 'progress', 'done', 'cancel'])[1 + mod(abs(hashtext(g.id::text || 'st')), 5)] AS state,
             (mod(abs(hashtext(g.id::text || 'pr')), 4))::text AS priority,
@@ -256,15 +256,15 @@ class LshcTestLine(models.Model):
     def init(self):
         self._create_view(self._table, """WITH ref AS (
             SELECT ARRAY(SELECT id FROM res_users WHERE active ORDER BY id) AS users,
-                   ARRAY(SELECT id FROM res_partner WHERE active ORDER BY id LIMIT 300) AS partners,
+                   ARRAY(SELECT id FROM res_partner WHERE active AND is_company AND id NOT IN (SELECT partner_id FROM res_users UNION SELECT partner_id FROM res_company) ORDER BY id LIMIT 300) AS partners,
                    ARRAY(SELECT id FROM res_country ORDER BY id LIMIT 80) AS countries,
                    (SELECT currency_id FROM res_company ORDER BY id LIMIT 1) AS currency_id
         )
         SELECT g.id AS id, g.record_id AS record_id, g.kind AS kind,
             g.qty AS qty, g.price AS price, g.discount AS discount,
             g.n * 10 AS sequence,
-            (ARRAY['Order', 'Contract', 'Project', 'Ticket', 'Shipment', 'Invoice', 'Quote', 'Campaign'])[1 + mod(abs(hashtext(g.id::text || 'l1')), 8)] || ' line ' || g.n AS name,
-            (ARRAY['Desk', 'Chair', 'Lamp', 'Cable', 'Monitor', 'Keyboard', 'Router', 'Printer'])[1 + mod(abs(hashtext(g.id::text || 'l2')), 8)] || ' ' || (mod(abs(hashtext(g.id::text || 'l2n')), 900) + 100) AS product,
+            (ARRAY['Office Desk', 'Ergonomic Chair', 'Desk Lamp', 'Monitor 27 inch', 'Wireless Keyboard', 'Docking Station', 'Network Router', 'Laser Printer', 'Standing Desk', 'Meeting Table', 'Storage Cabinet', 'Webcam HD'])[1 + mod(abs(hashtext(g.id::text || 'l1')), 12)] AS name,
+            'FURN_' || (1000 + mod(abs(hashtext(g.id::text || 'l2n')), 9000)) AS product,
             round((g.qty * g.price * (1 - g.discount / 100.0))::numeric, 2) AS total,
             ref.currency_id AS currency_id,
             (ARRAY['draft', 'ok', 'late', 'cancel'])[1 + mod(abs(hashtext(g.id::text || 'ls')), 4)] AS state,
