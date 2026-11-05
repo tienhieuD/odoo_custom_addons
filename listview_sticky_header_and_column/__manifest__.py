@@ -1,5 +1,5 @@
 {
-    'name': "Sticky Header & Columns",
+    'name': "List View Sticky Header & Freeze Column",
     'summary': """
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
