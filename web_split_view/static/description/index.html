@@ -1,352 +1,223 @@
-<!-- <div>
-  <link
-    type="text/css"
-    rel="stylesheet"
-    href="https://apps.odoo.com/web/assets/15380454-60c4580/1/web.assets_common.min.css"
-    data-asset-bundle="web.assets_common"
-    data-asset-version="60c4580"
-  />
-  <link
-    type="text/css"
-    rel="stylesheet"
-    href="https://apps.odoo.com/web/assets/15380466-e7e0d1a/1/web.assets_frontend.min.css"
-    data-asset-bundle="web.assets_frontend"
-    data-asset-version="e7e0d1a"
-  />
-  <script
-    type="text/javascript"
-    async=""
-    src="https://www.gstatic.com/recaptcha/releases/cwQvQhsy4_nYdnSDY4u7O5_B/recaptcha__vi.js"
-    crossorigin="anonymous"
-    integrity="sha384-GgxfAAQdvHOtDvItWqLw1YEPSKdhwpT6e6kTCoqCrb/q+F3agBhCT5a9n4Y+lGE+"
-  ></script>
-  <script id="web.layout.odooscript" type="text/javascript">
-    var odoo = {
-      csrf_token: "146300a7dfe295c2dfadaf84bdbd8941170c916bo1733977194",
-      debug: "",
-    };
-  </script>
-  <script type="text/javascript">
-    odoo.__session_info__ = {
-      is_admin: false,
-      is_system: false,
-      is_website_user: false,
-      user_id: 237036,
-      is_frontend: true,
-      profile_session: null,
-      profile_collectors: null,
-      profile_params: null,
-      show_effect: "True",
-      server_version: "15.0+e",
-      server_version_info: [15, 0, 0, "final", 0, "e"],
-      translationURL: "/website/translations",
-      cache_hashes: {
-        translations: "ec9ba9f156a80fef4a4a73dd7f5b3aff720d12f7",
-      },
-      lang_url_code: "en_US",
-      geoip_country_code: "VN",
-    };
-    if (!/(^|;\s)tz=/.test(document.cookie)) {
-      const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      document.cookie = `tz=${userTZ}; path=/`;
-    }
-  </script>
-  <script
-    defer="defer"
-    type="text/javascript"
-    src="https://apps.odoo.com/web/assets/14824531-b5e13c2/1/web.assets_common_minimal.min.js"
-    data-asset-bundle="web.assets_common_minimal"
-    data-asset-version="b5e13c2"
-  ></script>
-  <script
-    defer="defer"
-    type="text/javascript"
-    src="https://apps.odoo.com/web/assets/13753121-9e23d47/1/web.assets_frontend_minimal.min.js"
-    data-asset-bundle="web.assets_frontend_minimal"
-    data-asset-version="9e23d47"
-  ></script>
-  <script
-    defer="defer"
-    type="text/javascript"
-    data-asset-bundle="web.assets_common_lazy"
-    data-asset-version="963a2df"
-    src="https://apps.odoo.com/web/assets/15380417-963a2df/1/web.assets_common_lazy.min.js"
-  ></script>
-  <script
-    defer="defer"
-    type="text/javascript"
-    data-asset-bundle="web.assets_frontend_lazy"
-    data-asset-version="10798f8"
-    src="https://apps.odoo.com/web/assets/15380438-10798f8/1/web.assets_frontend_lazy.min.js"
-  ></script>
-  <link
-    href="https://apps.odoo.com/web/assets/15393974-a10fd4f/1/web_editor.assets_wysiwyg.min.css"
-    rel="stylesheet"
-    type="text/css"
-  />
-  <script
-    type="text/javascript"
-    src="https://apps.odoo.com/web/assets/15380424-a10fd4f/1/web_editor.assets_wysiwyg.min.js"
-  ></script>
-
-  <style type="text/css">
-    body {
-      overflow: auto !important;
-    }
-  </style>
-</div> -->
-
 <section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <h2 class="oe_slogan">Web Split View</h2>
-    <p class="oe_slogan">
-      <b>
-        Web Split View is a dual-view layout, seamlessly dividing the screen
-        into list and detail sections for CRUD operations.
-      </b>
-    </p>
-    <p>
-      The "Web Split View" is an add-on for the Odoo framework designed to
-      enhance the user interface and user experience by introducing a new custom
-      view. The primary purpose of this add-on is to provide a split-screen
-      view, dividing the interface into two distinct sections: a list view and a
-      detail form view.
-    </p>
+<div class="container">
 
-    <img
-      src="main.png"
-      width="100%"
-      alt="Web Split View Sale Orders Demo"
-      class="shadow-sm mb-3"
-    />
-
-   
-    <h3 class="text-primary mb-0" style="font-size: 16px; text-decoration: underline;">Key Features</h3>
-    <div>
-      <div
-        id="home"
-        role="tabpanel"
-        aria-labelledby="home-tab"
-      >
-        <p>
-          Web Split View add-on brings a modern and intuitive interface to Odoo,
-          facilitating a more efficient and enjoyable user interaction with data
-          through the innovative split-screen design.
-        </p>
-        <ol>
-          <li>
-            <b>Split-Screen Interface:</b>
-            <p>
-              The add-on introduces a split-screen interface, allowing users to
-              simultaneously view a list of items and the detailed information
-              of a selected item.
-            </p>
-          </li>
-
-          <li>
-            <b>List View:</b>
-            <p>
-              The list view presents a comprehensive list of items, enabling
-              users to quickly scan and identify the items they are interested
-              in.
-            </p>
-          </li>
-          <li>
-            <b>Detail Form View:</b>
-            <p>
-              The detail form view displays in-depth information about a
-              selected item. It provides a closer look at the details,
-              attributes, and related information associated with the chosen
-              item.
-            </p>
-          </li>
-          <li>
-            <b>Interactive Selection:</b>
-            <p>
-              Users have the ability to interactively select items from the list
-              view, triggering the display of corresponding details in the
-              adjacent form view.
-            </p>
-          </li>
-          <li>
-            <b>Create, Edit, Delete Functionality:</b>
-            <p>
-              The detail form view supports essential CRUD (Create, Read,
-              Update, Delete) operations. Users can create new items, edit
-              existing ones, and delete items directly from the detail form
-              view.
-            </p>
-          </li>
-          <li>
-            <b>Enhanced User Productivity:</b>
-            <p>
-              The Web Split View aims to enhance user productivity by
-              streamlining the workflow. Users can efficiently navigate between
-              the list view and detail form view to manage and interact with
-              data.
-            </p>
-          </li>
-          <li>
-            <b>Customizable and Flexible:</b>
-            <p>
-              The add-on is designed with customization in mind, providing
-              flexibility for developers and administrators to adapt the split
-              view functionality to meet specific business requirements.
-            </p>
-          </li>
-          <li>
-            <b>Seamless Integration with Odoo:</b>
-            <p>
-              As an Odoo add-on, Web Split View seamlessly integrates into the
-              Odoo framework, leveraging its robust features and maintaining
-              consistency with the overall Odoo user experience.
-            </p>
-          </li>
-        </ol>
-      </div>
-      <h3 class="text-primary mb-0" style="font-size: 16px; text-decoration: underline;">How to Use</h3>
-      <div
-        id="profile"
-        role="tabpanel"
-        aria-labelledby="profile-tab"
-      >
-        <h4>Prerequisites</h4>
-        <p>To create Split View</p>
-        <ol>
-          <li>
-            <b
-              >You must be admin of your system or has role Administration
-              Settings.</b
-            >
-            <p>
-              Go to <i>Settings/Users & Companies/Users/{user-name}</i> and
-              check out.
-            </p>
-            <img
-              src="pre-admin.png"
-              width="100%"
-              alt="Web Split View Sale Orders Demo"
-              class="shadow-sm mb-3"
-            />
-          </li>
-          <li>
-            <b>You must activate the developer mode.</b>
-            <p>
-              Go to <i>Settings/General Settings</i> and Turn the Developer Mode
-              on.
-            </p>
-            <img
-              src="pre-debug.png"
-              width="100%"
-              alt="Web Split View Sale Orders Demo"
-              class="shadow-sm mb-3"
-            />
-          </li>
-        </ol>
-
-        <h4>Setup your Split views</h4>
-        <p>For example, to create new Split View of Sales Order Quotation.</p>
-        <ol>
-          <li>
-            <b
-              >Go to menu <i><u>Sales/Orders/Quotations</u></i
-              >.</b
-            >
-          </li>
-          <li>
-            <b>Click on <i>Debug Menu</i> then <i>Create View: Split</i>.</b>
-            <img
-              src="setup-create.png"
-              width="100%"
-              alt="Web Split View Sale Orders Demo"
-              class="shadow-sm mb-3"
-            />
-          </li>
-          <li>
-            <b>Config the List View and From View.</b>
-            <p>
-              If you set this inputs empty, it will get the default List and
-              Form View to display.
-            </p>
-
-            <img
-              src="setup-detail-setup.png"
-              width="100%"
-              alt="Web Split View Sale Orders Demo"
-              class="shadow-sm mb-3"
-            />
-            <p>
-              To make Split View is the default view when you go to this Menu,
-              check <i>Make default view ✅</i>
-            </p>
-            <p>
-              <i>Finnally, click button <u>Create</u> to finish.</i>
-            </p>
-          </li>
-          <li>
-            <b>The result</b>
-            <p>
-              You can resize your List &amp; Form View by hover and move this
-              line.
-            </p>
-
-            <img
-              src="setup-resize.png"
-              width="100%"
-              alt="Web Split View Sale Orders Demo"
-              class="shadow-sm mb-3"
-            />
-          </li>
-        </ol>
-
-        <h4>Drop your Split views</h4>
-        <ol>
-          <li>
-            Remove your Split View by click on <i>Debug Menu</i> then
-            <i>Remove View: Split</i>.
-          </li>
-          <img
-            src="setup-remove.png"
-            width="100%"
-            alt="Web Split View Sale Orders Demo"
-            class="shadow-sm mb-3"
-          />
-        </ol>
-      </div>
-      <h3 class="text-primary mb-0" style="font-size: 16px; text-decoration: underline;">For Developers</h3>
-      <div
-        id="contact"
-        role="tabpanel"
-        aria-labelledby="contact-tab"
-      >
-      <p>
-        To define Split View for developer
-        </p>
-      <ol>
-        <li>
-          <b>Create Window Action and define Split View.</b>
-          <p>- Define `ir.actions.act_window` with `view_mode` contain `split`.</p>
-          <p>- Define `ir.ui.view` with attributes `tree_view_ref/form_view_ref` is xmlid of tree/form has been defined before.</p>
-          <p><u>For example:</u></p>
-          <img
-            src="dev-define-action-view.png"
-            width="100%"
-            alt="Web Split View Sale Orders Demo"
-            class="shadow-sm mb-3"
-          />
-        </li>
-        <li>
-          <b>You can define `form` and `tree` tag directly inside `split` tag.</b>
-          <p><u>For example:</u></p>
-          <img
-            src="dev-define-view-directly.png"
-            width="100%"
-            alt="Web Split View Sale Orders Demo"
-            class="shadow-sm mb-3"
-          />
-        </li>
-      </ol>
-      </div>
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Web Split View for Odoo</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">See the list and the record at the same time.</p>
+        <p class="mb-4" style="font-size: 15px;">A new <strong>Split</strong> button appears in the view switcher of every list that has a form. The list stays on the left, the form of the selected record opens on the right.</p>
     </div>
-  </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Going back and forth between a list and a form costs time and context. With Web Split View you keep the list in front of you while you read, edit, create and delete records in the pane next to it. There is <strong>nothing to configure</strong>: the split view is built from the list, form and search views your action already uses.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="Open a list, click Split, pick a record, edit and save" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Split on every list</h4>
+                    <p class="mb-0" style="font-size: 14px;">Every window action that has a list and a form view gets a Split mode in its view switcher. It is added next to the list view and never becomes the default view.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Create, edit, delete in place</h4>
+                    <p class="mb-0" style="font-size: 14px;">New, Save, Discard and Delete work in the right pane. The list refreshes by itself and the record you work on is highlighted.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Your list stays a list</h4>
+                    <p class="mb-0" style="font-size: 14px;">The left pane keeps its own search bar, filters, group by and pager, using the search view of the action.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Full form in one click</h4>
+                    <p class="mb-0" style="font-size: 14px;">An expand button on the right pane opens the record in the normal full form view. The breadcrumb brings you back.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Back where you left</h4>
+                    <p class="mb-0" style="font-size: 14px;">Come back from the full form and the list still has its search, filters and page, and the same record is open and highlighted.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Resizable panes</h4>
+                    <p class="mb-0" style="font-size: 14px;">Drag the divider to give more room to the list or to the form. The width is remembered for each action in your browser.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Safe when you switch</h4>
+                    <p class="mb-0" style="font-size: 14px;">Clicking another record while the current one has unsaved changes asks you to save or discard first, like Odoo does anywhere else.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Works with standard lists</h4>
+                    <p class="mb-0" style="font-size: 14px;">Lists of the standard apps, such as Sales, work too, including lists that use their own list renderer. In split mode a click on a row opens the record instead of editing the row.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Your control</h4>
+                    <p class="mb-0" style="font-size: 14px;">Switch the automatic mode off for the whole database in Settings, or opt a single action out. You can still define your own split view with chosen list and form views.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded p-4 my-5" style="border: 2px solid #875A7B;">
+        <h2 class="font-weight-bold text-center mt-0 mb-2" style="font-size: 26px; color: #4A2F45;">How to use it</h2>
+        <p class="text-center mb-4" style="font-size: 16px;">Three clicks, nothing to install on your data.</p>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">1. Click Split</h4>
+                    <p class="mb-0" style="font-size: 13px;">In the view switcher of any list, click the Split button (two columns).</p>
+                </div></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">2. Select a record</h4>
+                    <p class="mb-0" style="font-size: 13px;">Click a row: its form opens on the right and the row is highlighted.</p>
+                </div></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">3. Work next to the list</h4>
+                    <p class="mb-0" style="font-size: 13px;">Edit and save, create with New, or expand the record to the full form.</p>
+                </div></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The list and the form, side by side</h2>
+    <p class="mb-4" style="font-size: 16px;">Sales orders in split mode. The list keeps its search bar and pager, the order opens on the right with its lines, and the expand button in the corner opens the full form.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_1.png" alt="Sales orders in split mode with a search active: the list on the left, the selected order and an expand button on the right" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">One click away on every list</h2>
+    <p class="mb-4" style="font-size: 16px;">The Split button sits in the view switcher, right after the list view.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_2.png" alt="Sales orders list with the new Split button in the view switcher" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Create records without leaving the list</h2>
+    <p class="mb-4" style="font-size: 16px;">Click New and the form of the new record opens on the right. Save it and the list shows it right away.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_3.png" alt="A new record being created in the right pane while the list stays on the left" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Come back to the same place</h2>
+    <p class="mb-4" style="font-size: 16px;">Open the record in the full form, use the breadcrumb to go back, and the split view is exactly as you left it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_4.png" alt="Split view after returning from the full form: the search, the open record and the highlighted row are unchanged" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">The module depends only on the standard <code>web</code> module and needs no external Python library. It adds no data and no menu.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">The width of the panes is stored in the <strong>browser</strong> (local storage), so it is remembered per browser and not shared between users or devices.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#wsv_install" role="tab" aria-controls="wsv_install" aria-selected="true">Install</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#wsv_use" role="tab" aria-controls="wsv_use" aria-selected="false">Use</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#wsv_settings" role="tab" aria-controls="wsv_settings" aria-selected="false">Settings</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="wsv_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
+            <p class="mb-2" style="font-size: 14px;">1. Copy the <code>web_split_view</code> folder into an add-ons path of your Odoo server.</p>
+            <p class="mb-2" style="font-size: 14px;">2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu.</p>
+            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Web Split View</em> and click <strong>Install</strong>.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Reload your browser page after installing so the new assets are loaded.</p>
+        </div>
+        <div class="tab-pane fade" id="wsv_use" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Open the split view</h4>
+            <p class="mb-2" style="font-size: 14px;">Open any list that has a form view, for example Sales Orders or Contacts, and click the <strong>Split</strong> button in the view switcher.</p>
+            <p class="mb-2" style="font-size: 14px;">Click a row to open it on the right. Use <strong>New</strong> to create a record in the right pane.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">In split mode a click on a row always opens the record on the right: lists are not edited inline.</p>
+        </div>
+        <div class="tab-pane fade" id="wsv_settings" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Turn it off or customise it</h4>
+            <p class="mb-2" style="font-size: 14px;"><strong>Settings &gt; Split View</strong> switches the automatic Split mode on or off for the whole database.</p>
+            <p class="mb-2" style="font-size: 14px;">In developer mode, tick <strong>No split view</strong> on a window action to opt that action out.</p>
+            <p class="mb-2" style="font-size: 14px;">You can also create your own split view for an action with the list and form views you choose, from the developer mode debug menu.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Changelog</h2>
+    <p class="mb-3" style="font-size: 16px;">Module releases, newest first.</p>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-05</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">New automatic Split mode on every list that has a form, built from the views of the action. Resizable panes, New / Save / Discard / Delete in the right pane, an expand button to the full form, state kept when you come back, a Settings page to switch it off and a per-action opt-out. Rewritten on the current web client.</p></div>
+        </div>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it change my data or my views?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It only changes how a list and its form are displayed in the browser. It adds no field to your models and does not modify your list or form views.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Which views does the split mode use?</h4>
+        <p class="mb-0" style="font-size: 14px;">The list, form and search views of the action you are in, so a customised list or form shows up exactly as you set it.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What does the list remember when I leave and come back?</h4>
+        <p class="mb-0" style="font-size: 14px;">After a visit to the full form, the list keeps its search, filters, group by and page, and the same record is shown and highlighted. After a page reload the same record is reopened. The width of the panes is remembered in your browser for each action.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I still edit a list inline?</h4>
+        <p class="mb-0" style="font-size: 14px;">In the normal list view, yes. In split mode a click on a row opens the record in the right pane instead.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I switch it off?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes: Settings &gt; Split View turns the automatic mode off for the whole database, and a single action can opt out from developer mode.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I choose the views of a split view myself?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. A custom split view can name the list and form views to use, or define them directly inside it.</p>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Stop jumping between list and form.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it, open a list and click Split. That is all it takes.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DUO-TEK Software Vietnam</p>
+    </div>
+
+</div>
 </section>

@@ -38,6 +38,8 @@ odoo.define("awesome.splitView", function (require) {
             this.formController = await this.FormView.getController(this);
             this.renderListView();
             this.addResizeListener();
+            this.$el.on('click', '.o_split_expand', this._onExpand.bind(this));
+            await this._restoreActiveRecord();
             return res;
         },
         /**
@@ -90,7 +92,6 @@ odoo.define("awesome.splitView", function (require) {
                 this.$buttons = $('<div/>');
                 this.$buttons.append(qweb.render("awesome.SplitView.buttons", { widget: this }));
                 this.$buttons.on('click', '.o_split_button_create', this._onCreate.bind(this));
-                this.$buttons.on('click', '.o_split_button_reload', this._onReload.bind(this));
             }
             if (this.$buttons && $node) {
                 this.$buttons.appendTo($node);
@@ -107,20 +108,116 @@ odoo.define("awesome.splitView", function (require) {
             return container && container.innerHTML.trim();
         },
 
+        /**
+         * One key per action (and model / explicit view): each split view remembers its own state.
+         */
+        actionKey() {
+            const action = this.controlPanelProps.action || {};
+            const view = this.controlPanelProps.view || {};
+            return [action.id || 0, this.modelName, view.view_id || ''].join('_');
+        },
+
         saveSize(left, right) {
-            const viewId = this.controlPanelProps.view.view_id;
-            const key = `web_split_view_${viewId}`;
-            localStorage.setItem(key, JSON.stringify([left, right]))
+            localStorage.setItem(`web_split_view_width_${this.actionKey()}`, JSON.stringify([left, right]));
         },
 
         restoreSize() {
-            const viewId = this.controlPanelProps.view.view_id;
-            const key = `web_split_view_${viewId}`;
-            const item = localStorage.getItem(key);
+            const item = localStorage.getItem(`web_split_view_width_${this.actionKey()}`);
             if (!item) {
                 return [50, 50];
             }
             return JSON.parse(item);
+        },
+
+        /**
+         * Record shown on the right: kept for the tab session (survives a page reload).
+         */
+        saveActiveRecord(resId) {
+            const key = `web_split_view_record_${this.actionKey()}`;
+            try {
+                if (resId) {
+                    sessionStorage.setItem(key, String(resId));
+                } else {
+                    sessionStorage.removeItem(key);
+                }
+            } catch (e) {
+                // sessionStorage unavailable
+            }
+        },
+
+        /**
+         * Reopen the record that was displayed before the page was reloaded (if it still exists).
+         */
+        _restoreActiveRecord: async function () {
+            let resId = 0;
+            try {
+                resId = parseInt(sessionStorage.getItem(`web_split_view_record_${this.actionKey()}`), 10) || 0;
+            } catch (e) {
+                // sessionStorage unavailable
+            }
+            if (!resId) {
+                return;
+            }
+            const count = await rpc.query({ model: this.modelName, method: 'search_count', args: [[['id', '=', resId]]] });
+            if (!count) {
+                this.saveActiveRecord(false);
+                return;
+            }
+            await this._showRecord(resId);
+        },
+
+        /**
+         * Display a record in the form on the right and highlight its row in the list.
+         */
+        _showRecord: async function (resId) {
+            if (!this.formInDOM()) {
+                this.renderFormView();
+            }
+            this.activeId = resId;
+            this._highlightActiveRow();
+            await this.formController.update({ currentId: resId, mode: 'readonly' });
+            this.formController.do_show();
+            this.saveActiveRecord(resId);
+            this.$('.o_split_expand').removeClass('d-none');
+        },
+
+        _highlightActiveRow: function () {
+            const rows = Array.from(this.listController.renderer.el.querySelectorAll('tr.o_data_row'));
+            rows.forEach(node => node.classList.toggle('split_active_row', !!this.activeId && node.dataset.id && this.listController.model.get(node.dataset.id, { raw: true }).res_id === this.activeId));
+        },
+
+        /**
+         * The embedded form is the one that may have unsaved changes: ask it (save / discard dialog) before the
+         * action manager leaves the split view.
+         * @override
+         */
+        canBeRemoved: function () {
+            if (this.formInDOM() && this.formController) {
+                return this.formController.canBeRemoved();
+            }
+            return Promise.resolve();
+        },
+
+        /**
+         * Open the record shown on the right in the normal full form view of the action.
+         */
+        _onExpand: async function (ev) {
+            ev.preventDefault();
+            if (!this.activeId) {
+                return;
+            }
+            const actionViews = (this.controlPanelProps.action && this.controlPanelProps.action.views) || [];
+            if (actionViews.some(view => view[1] === 'form')) {
+                this.trigger_up('switch_view', { view_type: 'form', res_id: this.activeId, mode: 'readonly' });
+            } else {
+                this.do_action({
+                    type: 'ir.actions.act_window',
+                    res_model: this.modelName,
+                    res_id: this.activeId,
+                    views: [[false, 'form']],
+                    target: 'current',
+                });
+            }
         },
 
         addResizeListener: function () {
@@ -159,42 +256,17 @@ odoo.define("awesome.splitView", function (require) {
             }
             this.formController.do_show();
             this.formController.update({ currentId: undefined });
-        },
-
-        _onReload: async function (ev) {
-            ev.currentTarget.classList.add('disabled');
-            ev.currentTarget.querySelector('i').classList.add('fa-spin');
-
-            if (this.formInDOM()) {
-                await this.formController.reload();
-            }
-            await this.listController.reload();
-            
-            ev.currentTarget.classList.remove('disabled');
-            ev.currentTarget.querySelector('i').classList.remove('fa-spin');
+            this.activeId = null;
+            this._highlightActiveRow();
+            this.saveActiveRecord(false);
+            this.$('.o_split_expand').addClass('d-none');
         },
 
         _onOpenRecordSplit: async function (ev) {
             ev.stopPropagation();
             this.showLoading();
-
-            if (!this.formInDOM()) {
-                this.renderFormView();
-            }
-
             const record = this.listController.model.get(ev.data.id, { raw: true });
-            const params = {
-                currentId: record.res_id,
-                mode: 'readonly',
-            };
-
-            this.activeId = record.res_id;
-
-            const allRowElements = Array.from(this.listController.renderer.el.querySelectorAll('tr'));
-            allRowElements.forEach(node => node.classList.toggle('split_active_row', node.dataset.id === ev.data.id));
-
-            await this.formController.update(params);
-            this.formController.do_show();
+            await this._showRecord(record.res_id);
             this.hideLoading();
         },
 
@@ -210,8 +282,20 @@ odoo.define("awesome.splitView", function (require) {
             callback(this.activeId);
         },
 
-        _onFormSavedRecord: function () {
-            this.listController.reload();
+        _onFormSavedRecord: async function (ev) {
+            const form = ev.data && ev.data.form;
+            const record = form && form.model.get(form.handle, { raw: true });
+            if (record && record.res_id) {
+                this.activeId = record.res_id;
+                this.saveActiveRecord(record.res_id);
+                this.$('.o_split_expand').removeClass('d-none');
+            } else {
+                this.activeId = null;
+                this.saveActiveRecord(false);
+                this.$('.o_split_expand').addClass('d-none');
+            }
+            await this.listController.reload();
+            this._highlightActiveRow();
         },
 
         _onFormDiscardedRecord: function () {
@@ -289,7 +373,16 @@ odoo.define("awesome.splitView", function (require) {
             const treeXml = xml.documentElement.getElementsByTagName('tree')[0];
             const formXml = xml.documentElement.getElementsByTagName('form')[0];
             
-            const [treeId, formId] = await Promise.all([this.xmlid(treeRef), this.xmlid(formRef)]);
+            // automatic mode: no ref and no inline view -> use the list / form view the action itself declares
+            const actionViews = (this.params.action && this.params.action.views) || [];
+            const actionViewId = (types) => {
+                const entry = actionViews.find(view => types.includes(view[1]));
+                return entry ? entry[0] : false;
+            };
+            const [treeId, formId] = await Promise.all([
+                treeRef ? this.xmlid(treeRef) : actionViewId(['list', 'tree']),
+                formRef ? this.xmlid(formRef) : actionViewId(['form']),
+            ]);
             const views = [[treeId, 'list'], [formId, 'form']];
             const viewInfo = await controller.loadViews(modelName, context, views);
 

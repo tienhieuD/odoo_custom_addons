@@ -14,6 +14,9 @@
                 <span></span>
             </div>
             <div class="right-side overflow-auto position-relative" style="width:50%">
+                <button type="button" class="btn btn-light o_split_expand d-none" title="Open in full form view" aria-label="Open in full form view">
+                    <i class="fa fa-expand"/>
+                </button>
                 <div class="js_loading_split_form duo-loading-split-form"></div>
                 <p class="form-placeholder position-absolute">
                     Select an item from the list to display details.
@@ -29,10 +32,6 @@
             <button t-if="widget.is_action_enabled('create')" type="button"
                     class="btn btn-primary o_split_button_create" title="Create record" accesskey="c">
                 Create
-            </button>
-            <button type="button"
-                    class="btn btn-secondary o_split_button_reload" title="Reload List" accesskey="c">
-                Reload List <i class="fa fa-refresh"/>
             </button>
         </div>
     </t>

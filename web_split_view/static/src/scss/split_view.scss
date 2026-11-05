@@ -37,8 +37,40 @@
       border-top: 1px solid #C9CCD2;
     }
   }
-  .split_active_row {
-    background-color: rgba(0, 0, 0, 0.1) !important;
+  // row of the record shown on the right (the cells paint their own background: style the cells)
+  .split_active_row > td,
+  .split_active_row > th {
+    background-color: rgba(113, 75, 103, 0.16) !important;
+  }
+  .split_active_row > td:first-child {
+    box-shadow: inset 3px 0 0 #714b67;
+  }
+  // button that opens the record in the full form view
+  .right-side .o_split_expand {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.6rem;
+    z-index: 30;
+  }
+  // the form pane has no pager (one record) and the split view already has a Create button
+  .right-side {
+    .o_pager,
+    .o_cp_pager,
+    .o_form_button_create {
+      display: none;
+    }
+  }
+  // narrow screens: stack the panes
+  @media (max-width: 767.98px) {
+    flex-direction: column;
+    overflow: auto;
+    .left-side,
+    .right-side {
+      width: 100% !important;
+    }
+    .split_resizer {
+      display: none;
+    }
   }
   .split_resizer {
     &:hover {
