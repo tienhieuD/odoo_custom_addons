@@ -35,8 +35,14 @@
         z-index: 5;
     }
 
-    .split_active_row {
-        background-color: rgba(0, 0, 0, 0.1) !important;
+    // row of the record shown on the right (the cells paint their own background: style the cells)
+    .split_active_row > td,
+    .split_active_row > th {
+        background-color: rgba(113, 75, 103, 0.16) !important;
+    }
+
+    .split_active_row > td:first-child {
+        box-shadow: inset 3px 0 0 #714b67;
     }
 
     .split_resizer {
