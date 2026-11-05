@@ -1,165 +1,183 @@
-function _x_removeOldStyle () {
-    const oldStyleNode = $("#listview_sticky_header_and_column");
-    oldStyleNode.remove();
-}
-
-function _x_sleep (secs) {
-    return new Promise(r => setTimeout(r, secs))
-}
-
-odoo.define('nev_widgets.ext_context_freeze_column', function (require) {
+odoo.define('listview_sticky_header_and_column.ListRenderer', function (require) {
     "use strict";
 
-    var FormController = require('web.FormController');
-    var ActionManager = require('web.ActionManager');
-    var pyUtils = require('web.py_utils');
-    var WebClient = require('web.WebClient');
     var ListRenderer = require('web.ListRenderer');
-    var session = require('web.session');
-    var core = require('web.core');
-    let localStorage = require('web.local_storage');
-    var qweb = core.qweb;
+    var localStorage = require('web.local_storage');
 
-    // WebClient.include({
-    //     custom_events: _.extend({}, WebClient.prototype.custom_events, {
-    //         set_freeze: 'setFreeze',
-    //     }),
-    //     init: function () {
-    //         this._super.apply(this, arguments);
-    //         this.number_of_keep_columns = 0;
-    //         this.arr_offset_lefts = [];
-    //         core.bus.on("DOM_updated", this, this.setFreezePosition.bind(this));
-    //     },
-    //     on_hashchange: function () {
-    //         var self = this;
-    //         return this._super.apply(this, arguments).then(function () {
-    //             self.number_of_keep_columns = self._getFreezePositionFromLocalStorage() || 0;
-    //         });
-    //     },
-    //     setFreeze: function (event) {
-    //         this.number_of_keep_columns = event.data.number_of_keep_columns;
-    //         this.setFreezePosition();
-    //         this._saveFreezePositionToLocalStorage();
-    //     },
-    //     setFreezePosition: function () {
-    //         this._removeStyle();
-    //         setTimeout(this._setFreezePosition.bind(this), 1000);
-    //     },
-    //     _setFreezePosition: function () {
-    //         var $table = $('.table-responsive .o_list_view');
-    //         if (!$table.length) {
-    //             return
-    //         }
-    //         var wrapper_offset_left = $(".o_content").offset().left;
-    //         var $table_footer = $table.find('tfoot');
-    //         this.arr_offset_lefts.length = 0
-    //         for (var i = 1; i <= this.number_of_keep_columns; i++) {
-    //             var $td = $table_footer.find('td:nth-child(' + i + ')');
-    //             if (!$td.length) {
-    //                 continue
-    //             }
-    //             var offset = $td.offset().left - wrapper_offset_left;
-    //             this.arr_offset_lefts.push(offset)
-    //         }
-    //         this._addStyle()
-    //     },
-    //     _addStyle: function () {
-    //         $(document.head).append(
-    //             qweb.render('listview_sticky_header_and_column.style', { arr_offset_lefts: this.arr_offset_lefts })
-    //         );
-    //     },
-    //     _removeStyle: function () {
-    //         $('.js_lvs_style').remove();
-    //     },
-    //     _prepareFreezePositionKey: function () {
-    //         return String(this._current_state.action) + '_'
-    //             + String(this._current_state.menu_id) + '_'
-    //             + String(this._current_state.model) + '_'
-    //             + String(this._current_state.view_type);
-    //     },
-    //     _saveFreezePositionToLocalStorage: function () {
-    //         var key = this._prepareFreezePositionKey()
-    //         var value = this.number_of_keep_columns;
-    //         localStorage.setItem(key, value)
-    //     },
-    //     _getFreezePositionFromLocalStorage: function () {
-    //         var key = this._prepareFreezePositionKey()
-    //         return parseInt(localStorage.getItem(key));
-    //     }
+    var MODULE_KEY = 'listview_sticky_header_and_column';
+    var PIN_CLASS = 'js_pin_this_column';
+    var uidCounter = 0;
 
-    // });
-
+    /** First non-transparent background colour found going up from `el` (white if none). */
+    function opaqueBackground(el) {
+        while (el && el.nodeType === 1) {
+            var c = window.getComputedStyle(el).backgroundColor;
+            if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) {
+                return c;
+            }
+            el = el.parentElement;
+        }
+        return '#fff';
+    }
 
     ListRenderer.include({
-        _renderHeader: function () {
-            _x_removeOldStyle();
-            return this._super.apply(this, arguments);
+        init: function () {
+            this._super.apply(this, arguments);
+            // Unique per renderer: several lists can live in one form view
+            this.lshcUid = ++uidCounter;
+        },
+
+        destroy: function () {
+            this._lshcRemoveOldStyle();
+            this._super.apply(this, arguments);
+        },
+
+        _renderView: function () {
+            var self = this;
+            return this._super.apply(this, arguments).then(function (result) {
+                // the table is rebuilt on every render: remove the stale style and freeze again
+                self._lshcRemoveOldStyle();
+                setTimeout(function () {
+                    if (self.isDestroyed && self.isDestroyed()) {
+                        return;
+                    }
+                    var columnIndex = self._lshcGetColumnIndex();
+                    if (columnIndex) {
+                        self._lshcFreezeColumnListView(columnIndex);
+                    }
+                }, 300);
+                return result;
+            });
         },
 
         _renderHeaderCell: function (node) {
-            var cell = this._super.apply(this, arguments);
-            var grandpa = this.getParent().getParent();
-            // if (_.isEmpty(grandpa && grandpa.actions)) {  // check is if a big listview, not listview in form, not listview in popup
-            //     return cell;
-            // }
-
-            $('<span>', { class: 'display-on-hover js_pin_this_column' })
+            var self = this;
+            var $cell = this._super.apply(this, arguments);
+            $('<span>', {class: 'display-on-hover ' + PIN_CLASS})
                 .html('<i class="fa fa-thumb-tack"></i>')
-                .on('click', async function (e) {
+                .on('click', function (e) {
                     e.stopPropagation();
                     e.preventDefault();
-
-                    _x_removeOldStyle();
-                    await _x_sleep(300);
-
-                    const currentColumnIndex = $(e.currentTarget).closest('th').index();
-                    const header_tr = $(e.currentTarget).closest('tr');
-                    const header_th_list = Array.from(header_tr.find('th'));
-                    const offsetLefts = header_th_list.map(th => th.offsetLeft);
-                    const firstOffsetLeft = Number(offsetLefts[0])
-
-                    const styles = [`
-                        .o_content .o_list_view .table-responsive table thead tr th {
-                            background-color: #eee;
-                        }
-                    `];
-                    for (let index in offsetLefts) {
-                        if (index > currentColumnIndex) {
-                            break;
-                        }
-                        const offsetLeft = offsetLefts[index] - firstOffsetLeft;
-                        const cssNthChildIndex = Number(index) + 1;
-                        styles.push(`
-                            .o_content .o_list_view .table-responsive table thead tr th:nth-child(${cssNthChildIndex}),
-                            .o_content .o_list_view .table-responsive table tfoot tr td:nth-child(${cssNthChildIndex}),
-                            .o_content .o_list_view .table-responsive table tbody tr.o_data_row td:nth-child(${cssNthChildIndex}) {
-                                position: sticky !important;
-                                left: ${offsetLeft}px;
-                                z-index: 1;
-                                border-right: 1px solid #dee2e6;
-                            }
-                            .o_content .o_list_view .table-responsive table thead tr th:nth-child(${cssNthChildIndex}) {
-                                top: 0;
-                                z-index: 10;
-                            }
-                            .o_content .o_list_view .table-responsive table tbody tr:nth-of-type(odd).o_data_row td:nth-child(${cssNthChildIndex}) {
-                                background-color: #f9f9f9;
-                            }
-                            .o_content .o_list_view .table-responsive table tbody tr:nth-of-type(even).o_data_row td:nth-child(${cssNthChildIndex}) {
-                                background-color: #fff;
-                            }
-                        `)
-                    }
-
-                    const newStyleNode = $(`
-                        <style id="listview_sticky_header_and_column">
-                            ${styles.join(' ')}
-                        </style>`);
-
-                    $(document.head).append(newStyleNode);
+                    self._lshcOnPinClick($(e.currentTarget).closest('th'));
                 })
-                .appendTo(cell);
-            return cell;
+                .appendTo($cell);
+            return $cell;
+        },
+
+        // ------------------------------------------------------------------ helpers
+        _lshcGetWrapper: function () {
+            return this.$el.hasClass('table-responsive') ? this.$el : this.$('.table-responsive').first();
+        },
+
+        /** localStorage key: one per model, and per x2many field when the list lives inside a form */
+        _lshcGetKey: function () {
+            var parent = this.getParent();
+            var field = (parent && parent.attrs && parent.name) ? '__field_' + parent.name : '';
+            return MODULE_KEY + '__model_' + (this.state && this.state.model) + field;
+        },
+
+        _lshcGetColumnIndex: function () {
+            return Number(localStorage.getItem(this._lshcGetKey()));
+        },
+
+        _lshcSaveColumnIndex: function (index) {
+            localStorage.setItem(this._lshcGetKey(), index);
+        },
+
+        _lshcRemoveOldStyle: function () {
+            if (this.lshcResizeObserver) {
+                this.lshcResizeObserver.disconnect();
+                this.lshcResizeObserver = null;
+            }
+            $('style[name="' + MODULE_KEY + '"][data-owner="' + this.lshcUid + '"]').remove();
+        },
+
+        _lshcOnPinClick: function ($th) {
+            var columnIndex = $th.index();
+            if (this._lshcGetColumnIndex() === columnIndex) {
+                this._lshcSaveColumnIndex(-1);
+                this._lshcRemoveOldStyle();
+            } else {
+                this._lshcSaveColumnIndex(columnIndex);
+                this._lshcFreezeColumnListView(columnIndex);
+            }
+        },
+
+        /** Freeze the columns 0..columnIndex of this list (sticky header + sticky left columns). */
+        _lshcFreezeColumnListView: function (columnIndex) {
+            var self = this;
+            var $wrapper = this._lshcGetWrapper();
+            if (!$wrapper.length) {
+                return;
+            }
+            this._lshcRemoveOldStyle();
+
+            // Scope every rule to THIS list only
+            $wrapper.attr('data-lshc-id', this.lshcUid);
+            var isEmbedded = !!this.$el.closest('.o_field_widget, .o_field_x2many').length;
+            var scope = '.o_content .table-responsive[data-lshc-id="' + this.lshcUid + '"]';
+
+            var headBg = opaqueBackground($wrapper.find('thead th')[0]);
+            var baseBg = opaqueBackground($wrapper[0]);
+            var $rows = $wrapper.find('tbody tr.o_data_row');
+            var oddBg = $rows.length ? window.getComputedStyle($rows[0]).backgroundColor : 'transparent';
+            var evenBg = $rows.length > 1 ? window.getComputedStyle($rows[1]).backgroundColor : 'transparent';
+            var tint = function (color) {
+                return 'background-color: ' + baseBg + '; background-image: linear-gradient(' + color + ', ' + color + ');';
+            };
+
+            var preStyles = (isEmbedded ? '' : scope + ' { overflow: visible; }') + '\n' +
+                scope + ' thead, ' + scope + ' thead th { position: sticky !important; top: 0; background-color: ' + headBg + '; z-index: 2; }\n' +
+                scope + ' .o_data_row { position: relative; }';
+            this._lshcAppendStyle(preStyles);
+
+            var $headRow = $wrapper.find('table thead tr').first();
+            var pinnedColumns = Array.prototype.slice.call($headRow.find('th'), 0, columnIndex + 1);
+            if (!pinnedColumns.length) {
+                return;
+            }
+
+            // `left` = sum of the widths of the previous pinned columns (never `offsetLeft`: it is scroll-shifted
+            // once the column is sticky)
+            var buildCss = function () {
+                var acc = 0;
+                return pinnedColumns.map(function (th, index) {
+                    var left = acc;
+                    acc += th.getBoundingClientRect().width;
+                    var n = index + 1;
+                    var last = index === pinnedColumns.length - 1;
+                    var cells = scope + ' table thead tr th:nth-child(' + n + '), ' +
+                        scope + ' table tfoot tr td:nth-child(' + n + '), ' +
+                        scope + ' table tbody tr.o_data_row td:nth-child(' + n + ')';
+                    return cells + ' { position: sticky; left: ' + left + 'px; z-index: 1;' +
+                            (last ? ' box-shadow: -1px 0 0 #dee2e6 inset;' : '') + ' }\n' +
+                        scope + ' table thead tr th:nth-child(' + n + ') { top: 0; z-index: 10; }\n' +
+                        scope + ' table tbody tr.o_data_row:nth-of-type(odd) td:nth-child(' + n + ') { ' + tint(oddBg) + ' }\n' +
+                        scope + ' table tbody tr.o_data_row:nth-of-type(even) td:nth-child(' + n + ') { ' + tint(evenBg) + ' }\n' +
+                        scope + ' table tfoot tr td:nth-child(' + n + ') { background-color: ' + baseBg + '; }\n' +
+                        scope + ' table tbody tr.o_data_row:hover td:nth-child(' + n + ') { background-image: linear-gradient(rgba(0, 0, 0, .075), rgba(0, 0, 0, .075)); }';
+                }).join('\n');
+            };
+            var styleNode = this._lshcAppendStyle(buildCss());
+
+            // Recompute `left` whenever a pinned column is resized
+            if (window.ResizeObserver) {
+                this.lshcResizeObserver = new window.ResizeObserver(function () {
+                    styleNode.textContent = buildCss();
+                });
+                pinnedColumns.forEach(function (th) {
+                    self.lshcResizeObserver.observe(th);
+                });
+            }
+        },
+
+        _lshcAppendStyle: function (css) {
+            var node = document.createElement('style');
+            node.setAttribute('name', MODULE_KEY);
+            node.setAttribute('data-owner', this.lshcUid);
+            node.textContent = css;
+            document.head.appendChild(node);
+            return node;
         },
     });
 
