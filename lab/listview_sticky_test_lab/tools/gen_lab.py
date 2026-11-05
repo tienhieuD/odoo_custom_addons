@@ -1,5 +1,5 @@
 """Generate the listview_sticky_test_lab addon (models + views) so the field/column lists stay consistent."""
-import os, sys, textwrap
+import os, re, sys, textwrap
 
 OUT = sys.argv[1]
 os.makedirs(OUT + '/models', exist_ok=True)
@@ -265,10 +265,61 @@ search = '''    <record id="lshc_test_record_view_search" model="ir.ui.view">
     </record>
 '''
 
+SHOWLINES = MEDIUM
+SHOWLINES_W = {'name': '170px', 'product': '120px', 'partner_id': '170px', 'user_id': '150px', 'deadline': '170px', 'state': '110px'}
+SHOWCASE_W = {'code': '90px', 'partner_id': '190px', 'user_id': '150px', 'category_id': '110px', 'state': '125px', 'date_end': '125px'}
+SHOWCASE = ['code', 'partner_id', 'user_id', 'category_id', 'state', 'priority', 'date_start', 'date_end', 'currency_id', 'amount', 'amount_tax', 'amount_total', 'qty', 'progress', 'active_toggle']
+showcase_form = '''    <record id="lshc_test_record_view_form_showcase" model="ir.ui.view">
+        <field name="name">lshc.test.record.form.showcase</field>
+        <field name="model">lshc.test.record</field>
+        <field name="arch" type="xml">
+            <form string="Order">
+                <header>
+                    <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order lines" name="lines">
+%s
+                        </page>
+                        <page string="Other info" name="other">
+                            <group>
+                                <group>
+                                    <field name="category_id"/>
+                                    <field name="city"/>
+                                </group>
+                                <group>
+                                    <field name="currency_id"/>
+                                    <field name="amount_total"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+''' % re.sub(r'<field name="(%s)"' % '|'.join(SHOWLINES_W), lambda m: '<field name="%s" width="%s"' % (m.group(1), SHOWLINES_W[m.group(1)]),
+                 o2m('line_medium_ids', 'medium', SHOWLINES, 28, editable='bottom'))
+
 views = '<?xml version="1.0" encoding="utf-8"?>\n<odoo>\n' + list_view('lshc_test_record_view_list', 'lshc.test.record.list', ALLR) \
     + list_view('lshc_test_record_view_list_editable', 'lshc.test.record.list.editable',
                 [n for n in ALLR if n not in ('image', 'notes', 'follower_ids', 'rating_pie', 'color_hex', 'website_copy', 'datetime_due', 'score_a', 'score_b', 'score_c', 'serial', 'ref_char')],
                 editable='top') \
-    + form + search + '</odoo>\n'
+    + re.sub(r'<field name="(%s)"' % '|'.join(SHOWCASE_W), lambda m: '<field name="%s" width="%s"' % (m.group(1), SHOWCASE_W[m.group(1)]),
+             list_view('lshc_test_record_view_list_showcase', 'lshc.test.record.list.showcase', SHOWCASE).replace(' widget="CopyClipboardChar"', '')) + form + showcase_form + search + '</odoo>\n'
 open(OUT + '/views/lshc_test_views.xml', 'w').write(views)
 print('columns main list:', len(ALLR), 'editable:', len([n for n in ALLR if n not in ('image', 'notes', 'follower_ids', 'rating_pie', 'color_hex', 'website_copy', 'datetime_due', 'score_a', 'score_b', 'score_c', 'serial', 'ref_char')]), 'large line:', len(LARGE))
