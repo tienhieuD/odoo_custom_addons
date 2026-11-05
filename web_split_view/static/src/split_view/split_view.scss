@@ -18,6 +18,23 @@
         }
     }
 
+    // the form pane has no pager (one record) and the split view already has a New button
+    .right-side {
+        .o_pager,
+        .o_cp_pager,
+        .o_form_button_create {
+            display: none;
+        }
+    }
+
+    // button that opens the record in the full form view
+    .right-side .o_split_expand {
+        position: absolute;
+        top: 0.4rem;
+        right: 0.6rem;
+        z-index: 5;
+    }
+
     .split_active_row {
         background-color: rgba(0, 0, 0, 0.1) !important;
     }
@@ -44,6 +61,24 @@
             margin-bottom: 8px;
             border-radius: 100%;
             background-color: #999;
+        }
+    }
+
+    // narrow screens: stack the panes
+    @media (max-width: 767.98px) {
+        .duo_split_view {
+            flex-direction: column;
+            overflow: auto;
+
+            .left-side,
+            .right-side {
+                width: 100% !important;
+                flex: 0 0 auto;
+            }
+
+            .split_resizer {
+                display: none;
+            }
         }
     }
 }

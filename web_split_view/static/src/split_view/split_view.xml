@@ -6,11 +6,6 @@
             <button type="button"
                     class="btn btn-primary o_split_button_create" title="Create record"
                     t-on-click="onCreate">New</button>
-            <button type="button" class="btn btn-secondary o_split_button_reload" title="Reload list"
-                    t-on-click="onReload">
-                <i class="fa fa-refresh" t-att-class="{'fa-spin': state.loading}"/>
-                Reload
-            </button>
         </div>
     </t>
 
@@ -22,23 +17,32 @@
                 </t>
                 <div class="duo_split_view d-flex w-100 h-100" t-ref="split">
                     <div class="left-side border-end overflow-auto" t-attf-style="width: {{ state.leftWidth }}%">
-                        <View t-props="listProps" t-key="state.listKey"/>
+                        <SplitPane viewProps="listProps" splitState="state" onClose="closePane" t-key="state.listKey"/>
                     </div>
                     <div class="split_resizer" title="Resize" t-on-mousedown="startResize">
                         <span/><span/><span/><span/><span/>
                     </div>
                     <div class="right-side overflow-auto position-relative flex-grow-1" t-attf-style="width: {{ 100 - state.leftWidth }}%">
+                        <button t-if="state.mode === 'record'" type="button"
+                                class="btn btn-light o_split_expand" title="Open in full form view"
+                                aria-label="Open in full form view" t-on-click="onExpand">
+                            <i class="fa fa-expand"/>
+                        </button>
                         <t t-if="state.mode === 'empty'">
                             <p class="form-placeholder text-muted fst-italic text-center position-absolute top-50 start-50 translate-middle"
                                t-out="placeholder"/>
                         </t>
                         <t t-else="">
-                            <View t-props="formProps" t-key="state.formKey"/>
+                            <SplitPane viewProps="formProps" splitState="state" onClose="closePane" t-key="state.formKey"/>
                         </t>
                     </div>
                 </div>
             </Layout>
         </div>
+    </t>
+
+    <t t-name="web_split_view.SplitPane">
+        <View t-props="props.viewProps"/>
     </t>
 
 </templates>
