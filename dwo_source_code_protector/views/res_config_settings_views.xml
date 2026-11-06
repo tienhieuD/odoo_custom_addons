@@ -10,7 +10,7 @@
 
                     <!-- Bo qua block/setting cua Odoo (cot hep, nhieu khoang trang), dung div
                          thuong, full chieu rong, khong mau me/nen. -->
-                    <div style="padding:4px 4px 24px 4px;max-width:100%">
+                    <div style="padding:24px 32px 32px 32px;max-width:100%">
 
                         <!-- Muc 1: mo ta ngan + nut -->
                         <div style="font-size:1.3em;font-weight:700;margin-bottom:6px">Source Code Protector</div>
@@ -19,9 +19,9 @@
                             binaries, so you can ship the module without shipping readable source.
                         </p>
                         <div style="margin-bottom:28px">
-                            <button name="action_dwo_protect_open_wizard" type="object" string="Protect a module zip…" class="btn btn-primary" style="margin-right:8px"/>
-                            <button name="action_dwo_protect_open_jobs" type="object" string="View jobs" class="btn btn-secondary"/>
-                            <span style="margin-left:10px">
+                            <button name="action_dwo_protect_open_wizard" type="object" string="Protect a module zip…" class="btn btn-primary" style="margin-right:16px"/>
+                            <button name="action_dwo_protect_open_jobs" type="object" string="View jobs" class="btn btn-secondary" style="margin-right:16px"/>
+                            <span>
                                 (<field name="dwo_protect_job_count" nolabel="1" readonly="1"/> so far)
                             </span>
                         </div>
