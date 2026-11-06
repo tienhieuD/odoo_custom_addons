@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <!-- Che do dong bo (xem models/dwo_protect_job.py): protect + compile chay het trong
+         CUNG MOT request khi nguoi dung bam nut, khong co cron xu ly hang doi/resume nhieu
+         buoc. Chi con 2 cron: don dep file het han, va don cac job bi "mo coi" (ket o
+         running vi request bi server kill giua chung, vi du cham gioi han CPU time). -->
+
+    <record id="ir_cron_protect_job_cleanup" model="ir.cron">
+        <field name="name">Source Code Protector: delete expired job files</field>
+        <field name="model_id" ref="model_dwo_protect_job"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_cleanup_expired()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="priority">8</field>
+        <field name="active" eval="True"/>
+        <field name="numbercall" eval="-1"/>
+    </record>
+
+    <record id="ir_cron_protect_job_stale" model="ir.cron">
+        <field name="name">Source Code Protector: mark stale jobs as failed</field>
+        <field name="model_id" ref="model_dwo_protect_job"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_fail_stale_jobs()</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="priority">8</field>
+        <field name="active" eval="True"/>
+        <field name="numbercall" eval="-1"/>
+    </record>
+
+</odoo>
