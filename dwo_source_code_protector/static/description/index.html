@@ -8,9 +8,35 @@
     </div>
 
     <div class="my-5">
-        <p class="mb-4" style="font-size: 17px;">The moment you hand a customer or reseller an Odoo module, you are handing them its source &mdash; the pricing rules, algorithms and integrations that took real work to build, in plain readable Python they can open, copy, or quietly rewrite around. <strong>Source Code Protector</strong> takes your module's raw source, extracts the business logic (models, wizards, reports, controllers), and compiles it to native <code>.so</code>/<code>.pyd</code> binaries with Cython. The methods you protect run exactly as before &mdash; often faster, since compiled native code typically outperforms interpreted Python &mdash; but can no longer be read, copied or modified as source. What you get back installs and behaves like any other Odoo module, nothing special for your customers to configure.</p>
+        <p class="mb-4" style="font-size: 17px;">The moment you hand a customer or reseller an Odoo module, you are handing them its source &mdash; the pricing rules, algorithms and integrations that took real work to build, in plain readable Python they can open, copy, or quietly rewrite around. <strong>Source Code Protector</strong> takes your module's raw source, extracts the business logic (models, wizards, reports, controllers), and compiles it to native <code>.so</code>/<code>.pyd</code> binaries. The methods you protect run exactly as before &mdash; often faster, since compiled native code typically outperforms interpreted Python &mdash; but can no longer be read, copied or modified as source. What you get back installs, upgrades and behaves exactly like any other Odoo module &mdash; your customers install and upgrade it the normal way, nothing special to configure.</p>
         <div class="text-center mb-4">
             <img src="flow.png" alt="How it works: raw source code is protected and transformed, then compiled to native binary, then ready to ship with no readable source left" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Before &amp; After</h2>
+    <p class="mb-4" style="font-size: 16px;">A simple example: one method, before and after protection.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Before &mdash; your_module/models/pricing.py</h4>
+                    <p class="mb-0" style="font-size: 14px;"><pre class="bg-dark text-white p-3 rounded mb-2" style="font-size: 13px;">def compute_discount(self, amount):
+    if self.customer_tier == 'gold':
+        return amount * 0.85
+    return amount * 0.95</pre><p class="mb-0" style="font-size: 13px;">Anyone who installs the module can open this file and read exactly how the pricing logic works.</p></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">After &mdash; your_module/models/pricing.so</h4>
+                    <p class="mb-0" style="font-size: 14px;"><pre class="bg-dark text-white p-3 rounded mb-2" style="font-size: 13px;">01001011 11010010 00101101 11001010
+10110100 01011011 11100101 00110101
+11000010 10101011 01110100 00010011</pre><p class="mb-0" style="font-size: 13px;">Same method, same behavior &mdash; now a compiled <code>.so</code>/<code>.pyd</code> file with no readable logic inside.</p></p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -36,7 +62,7 @@
             <div class="card h-100" style="border-top: 4px solid #2D3142;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Often Faster Too</h4>
-                    <p class="mb-0" style="font-size: 14px;">Protected methods are compiled to native machine code with Cython, which typically runs faster than interpreted Python for the same logic.</p>
+                    <p class="mb-0" style="font-size: 14px;">Protected methods are compiled to native machine code, which typically runs faster than interpreted Python for the same logic.</p>
                 </div>
             </div>
         </div>
@@ -61,7 +87,7 @@
             <div class="col-md-3 mb-3">
                 <div class="card h-100"><div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2D3142;">3. Compiled to native binary</h4>
-                    <p class="mb-0" style="font-size: 13px;">The transformed code is compiled to a native <code>.so</code>/<code>.pyd</code> extension with Cython. It runs exactly as before; it just can't be read as source anymore.</p>
+                    <p class="mb-0" style="font-size: 13px;">The transformed code is compiled to a native <code>.so</code>/<code>.pyd</code> extension. It runs exactly as before; it just can't be read as source anymore.</p>
                 </div></div>
             </div>
             <div class="col-md-3 mb-3">
@@ -190,6 +216,10 @@ from . import wizards</pre>
         <p class="mb-0" style="font-size: 14px;">Yes &mdash; compiled methods behave exactly the same from Odoo's point of view. Always test the protected module on a staging database before shipping it to customers.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Can my customers still install and upgrade it normally?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes &mdash; the protected module installs and upgrades through Apps exactly like any other Odoo module, no extra steps or configuration. Only the business logic inside is compiled; the manifest, views and module structure are untouched.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Can I run the protected module on a different server?</h4>
         <p class="mb-0" style="font-size: 14px;">The compiled <code>.so</code>/<code>.pyd</code> binaries are platform-locked: they only run on a server with the same Python version, OS and CPU architecture as the one that compiled them.</p>
     </div></div>
@@ -211,7 +241,7 @@ from . import wizards</pre>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Do I need anything installed on the server besides this module?</h4>
-        <p class="mb-0" style="font-size: 14px;">The server needs the <code>jprotect</code> and <code>pyzipper</code> Python packages, and a C compiler with Python headers available for Cython to compile against.</p>
+        <p class="mb-0" style="font-size: 14px;">The server needs a couple of extra Python packages and a C compiler available, so it can compile the protected code. Your administrator can install these once, the same way any other Odoo dependency is installed.</p>
     </div></div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Changelog</h2>
