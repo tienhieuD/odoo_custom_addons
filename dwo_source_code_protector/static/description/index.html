@@ -151,18 +151,6 @@
         </div>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Settings &rarr; Source Code Protector</h2>
-    <p class="mb-4" style="font-size: 16px;">Everything starts from <strong>Settings &rarr; Source Code Protector</strong>: upload a module zip to protect, and read the recommended module structure notes for best coverage.</p>
-    <div class="text-center mb-4">
-        <img src="screenshot_1.png" alt="Settings screen with a short description, a button to protect a module zip, and recommended module structure notes" class="img-fluid rounded shadow"/>
-    </div>
-
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Protected &amp; Ready to Download</h2>
-    <p class="mb-4" style="font-size: 16px;">Once a module is protected, download the ready-to-ship zip directly, with a result table showing exactly what was protected.</p>
-    <div class="text-center mb-4">
-        <img src="screenshot_2.png" alt="Finished protection job with a download button for the protected zip and a per-module result table" class="img-fluid rounded shadow"/>
-    </div>
-
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Recommended Module Structure &amp; Pitfalls</h2>
     <p class="mb-3" style="font-size: 16px;">Protection follows the <strong>real Python import graph</strong> starting from each module's <code>__init__.py</code> &mdash; a file nothing imports is never scanned or protected. A few conventions make sure your business logic is actually covered:</p>
     <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #2D3142;">Test files of the module being protected are always excluded, so your test suite keeps working against readable source.</p>
