@@ -15,7 +15,7 @@ from odoo import fields
 from odoo.tests.common import TransactionCase, tagged
 
 
-def _make_zip(modules: list[dict], password: bytes | None = None) -> bytes:
+def _make_zip(modules, password=None):
     """
     Build an in-memory zip.
 
