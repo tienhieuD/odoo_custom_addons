@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <record id="ir_cron_protect_job_queue" model="ir.cron">
+        <field name="name">Source Code Protector: process queued jobs</field>
+        <field name="model_id" ref="model_dwo_protect_job"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_process_queue()</field>
+        <!-- Lich chay nen: moi lan chi lam DUNG MOT BUOC nho (xem _process_one_step) roi tu
+             kich hoat lai lan ke tiep qua _trigger() cho den khi job xong, nen khoang cach o
+             day chi la "nhip nen" khi KHONG co job nao dang cho, khong anh huong toc do xu ly
+             mot job dang chay. -->
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="priority">5</field>
+        <field name="active" eval="True"/>
+        <!-- Odoo 17 only: ir.cron van con field numbercall (bi bo tu 18 tro di), mac dinh
+             la 1, neu khong dat -1 (vo han) o day, cron se TU DONG active=False sau DUNG
+             MOT LAN chay, lam job bi ket o "queued" vinh vien sau lan cron dau tien. -->
+        <field name="numbercall" eval="-1"/>
+    </record>
+
+    <record id="ir_cron_protect_job_cleanup" model="ir.cron">
+        <field name="name">Source Code Protector: delete expired job files</field>
+        <field name="model_id" ref="model_dwo_protect_job"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_cleanup_expired()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="priority">8</field>
+        <field name="active" eval="True"/>
+        <field name="numbercall" eval="-1"/>
+    </record>
+
+</odoo>
