@@ -4,13 +4,13 @@
     <div class="text-center pt-5 pb-3 border-bottom">
         <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #1A1C27;">Source Code Protector for Odoo</h1>
         <p class="font-weight-bold mb-2" style="font-size: 18px; color: #1A1C27;">Ship your Odoo module without shipping its source.</p>
-        <p class="mb-4" style="font-size: 15px;">Upload a module .zip and get back the same module with its business logic compiled to native binaries &mdash; no readable Python left in the methods you protect.</p>
+        <p class="mb-4" style="font-size: 15px;">Every module you sell or deploy normally hands over fully readable Python &mdash; anyone who installs it can open every file, copy your logic, or rewrite around it. Source Code Protector compiles your business logic to native machine code first, so what you ship still works exactly the same, but can no longer be read as source.</p>
     </div>
 
     <div class="my-5">
-        <p class="mb-4" style="font-size: 17px;">Selling or deploying an Odoo module usually means handing over readable Python source along with it &mdash; anyone who installs it can open every file. <strong>Source Code Protector</strong> extracts your module's business logic (models, wizards, reports, controllers) and compiles it to native <code>.so</code>/<code>.pyd</code> binaries with Cython, so the methods you protect still run exactly as before, but can no longer be read, copied or modified as plain Python. The module you get back installs and behaves like any other Odoo module &mdash; there is nothing special for your customers to configure.</p>
+        <p class="mb-4" style="font-size: 17px;">The moment you hand a customer or reseller an Odoo module, you are handing them its source &mdash; the pricing rules, algorithms and integrations that took real work to build, in plain readable Python they can open, copy, or quietly rewrite around. <strong>Source Code Protector</strong> takes your module's raw source, extracts the business logic (models, wizards, reports, controllers), and compiles it to native <code>.so</code>/<code>.pyd</code> binaries with Cython. The methods you protect run exactly as before &mdash; often faster, since compiled native code typically outperforms interpreted Python &mdash; but can no longer be read, copied or modified as source. What you get back installs and behaves like any other Odoo module, nothing special for your customers to configure.</p>
         <div class="text-center mb-4">
-            <img src="flow.png" alt="How it works: upload a zip, business logic is protected and compiled to native binary, then the protected zip is ready to ship" class="img-fluid rounded shadow-sm"/>
+            <img src="flow.png" alt="How it works: raw source code is protected and transformed, then compiled to native binary, then ready to ship with no readable source left" class="img-fluid rounded shadow-sm"/>
         </div>
     </div>
 
@@ -20,7 +20,7 @@
             <div class="card h-100" style="border-top: 4px solid #2D3142;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Protect What You Sell</h4>
-                    <p class="mb-0" style="font-size: 14px;">Distribute a compiled module instead of plain-text Python, so customers and resellers cannot read or copy your business logic.</p>
+                    <p class="mb-0" style="font-size: 14px;">Distribute a compiled module instead of plain-text Python, so customers and resellers cannot read, copy or rewrite around your business logic.</p>
                 </div>
             </div>
         </div>
@@ -28,15 +28,15 @@
             <div class="card h-100" style="border-top: 4px solid #2D3142;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Keep Your Edge</h4>
-                    <p class="mb-0" style="font-size: 14px;">The pricing rules, algorithms and integrations that make your module valuable stay yours &mdash; not copy-pasted into a competitor's module.</p>
+                    <p class="mb-0" style="font-size: 14px;">The pricing rules, algorithms and integrations that make your module valuable, and the real work behind them, stay yours &mdash; not copy-pasted into a competitor's module.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #2D3142;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">No Extra Tooling</h4>
-                    <p class="mb-0" style="font-size: 14px;">No external build server, CI pipeline or separate compiler setup to maintain &mdash; the Odoo server you already run does the protecting and compiling.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Often Faster Too</h4>
+                    <p class="mb-0" style="font-size: 14px;">Protected methods are compiled to native machine code with Cython, which typically runs faster than interpreted Python for the same logic.</p>
                 </div>
             </div>
         </div>
@@ -102,8 +102,8 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #4F5D75;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Large Zips, No Timeout</h4>
-                    <p class="mb-0" style="font-size: 14px;">Processing happens one module at a time in the background, so a zip with many modules or heavy Cython compilation never times out a single request.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Handles Multi-Module Zips</h4>
+                    <p class="mb-0" style="font-size: 14px;">Upload a zip with several Odoo modules at once; each one is protected and compiled independently, with its own result.</p>
                 </div>
             </div>
         </div>
@@ -202,8 +202,8 @@ from . import wizards</pre>
         <p class="mb-0" style="font-size: 14px;">That entry is Skipped with a clear reason: there is no reliable module name to compile against in that shape. Re-zip with the module's technical folder name at the top, e.g. <code>my_module.zip</code> containing <code>my_module/__manifest__.py</code>.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Does it slow down a large zip or freeze the browser?</h4>
-        <p class="mb-0" style="font-size: 14px;">No. Upload closes the dialog right away; protection and compilation run in the background, one module at a time, and you come back later to download the result.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Can I see past protection jobs?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes &mdash; every upload becomes a job record in Settings &rarr; Source Code Protector, with its status, per-module result, and the protected zip to download again.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">How long are my uploaded and result files kept?</h4>
@@ -221,7 +221,7 @@ from . import wizards</pre>
                 <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #2D3142;">2.0.0</h4>
                 <p class="text-muted mb-0" style="font-size: 13px;">2026-11-06</p>
             </div>
-            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Protection flow unchanged for the user, now processed in the background so large zips never time out; Settings screen redesigned with a short description, direct download from the job list, and recommended module structure notes.</p></div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Settings screen redesigned with a short description, job history with direct download, and recommended module structure notes.</p></div>
         </div>
     </div></div>
 
