@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_dwo_protect" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.dwo.protect</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Source Code Protector" string="Source Code Protector" data-key="dwo_source_code_protector">
+
+                    <!-- Bo qua block/setting cua Odoo (cot hep, nhieu khoang trang), dung div
+                         thuong, full chieu rong, khong mau me/nen. -->
+                    <div style="padding:4px 4px 24px 4px;max-width:100%">
+
+                        <!-- Muc 1: mo ta ngan + nut -->
+                        <div style="font-size:1.3em;font-weight:700;margin-bottom:6px">Source Code Protector</div>
+                        <p style="max-width:900px;line-height:1.5;margin-bottom:14px">
+                            Upload an Odoo module .zip to extract its business logic and compile it to native
+                            binaries, so you can ship the module without shipping readable source.
+                        </p>
+                        <div style="margin-bottom:28px">
+                            <button name="action_dwo_protect_open_wizard" type="object" string="Protect a module zip…" class="btn btn-primary" style="margin-right:8px"/>
+                            <button name="action_dwo_protect_open_jobs" type="object" string="View jobs" class="btn btn-secondary"/>
+                            <span style="margin-left:10px">
+                                (<field name="dwo_protect_job_count" nolabel="1" readonly="1"/> so far)
+                            </span>
+                        </div>
+
+                        <hr style="margin:0 0 20px 0"/>
+
+                        <!-- Muc 2: tham so he thong + recommend, canh nhau, full chieu rong -->
+                        <div style="display:flex;flex-wrap:wrap;gap:40px">
+                            <div style="flex:1 1 420px;min-width:320px">
+                                <div style="font-weight:700;margin-bottom:8px">Background processing limits</div>
+                                <field name="dwo_protect_limits_info" nolabel="1" readonly="1"/>
+                            </div>
+                            <div style="flex:1 1 420px;min-width:320px">
+                                <div style="font-weight:700;margin-bottom:8px">Recommended module structure</div>
+                                <ul style="margin-bottom:4px;padding-left:18px;line-height:1.5">
+                                    <li>Always import every file explicitly, from <code>__init__.py</code> down (standard Odoo convention) — files nothing imports are never scanned.</li>
+                                    <li>Models/wizards/reports: subclass <code>models.Model</code>/<code>TransientModel</code>/<code>AbstractModel</code>/<code>BaseModel</code> <b>directly</b>, not only through a custom base class defined elsewhere.</li>
+                                    <li>Controllers: re-apply <code>@route(...)</code> on every overridden method, even unchanged — standard Odoo practice, and how protection detects a controller.</li>
+                                    <li>Put sensitive logic inside a model/wizard/report/controller <b>method</b>, not in a free-standing module-level function.</li>
+                                    <li>Use a single leading underscore for "internal" methods (<code>_foo</code>), not a double one (<code>__foo</code>) — Python's own name-mangling rules mean double-underscore methods are intentionally left unprotected.</li>
+                                    <li>Avoid Python's <code>match</code>/<code>case</code> statement in methods you want compiled to binary (not yet supported by the compiler used here); an <code>if</code>/<code>elif</code> chain works the same and compiles fine.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
