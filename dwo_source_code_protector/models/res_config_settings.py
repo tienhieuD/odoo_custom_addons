@@ -1,0 +1,62 @@
+from odoo import api, fields, models
+
+
+class ResConfigSettings(models.TransientModel):
+    _inherit = "res.config.settings"
+
+    dwo_protect_limits_info = fields.Html(compute="_compute_dwo_protect_limits_info")
+    dwo_protect_job_count = fields.Integer(compute="_compute_dwo_protect_job_count")
+
+    @api.depends_context("uid")
+    def _compute_dwo_protect_limits_info(self):
+        limits = self.env["dwo.protect.job"].get_runtime_limits()
+        for record in self:
+            if limits["limits_enforced"]:
+                enforced = (
+                    "<span style='color:#1a7e37'>enforced</span> (server running with "
+                    "%d worker process(es))" % limits["workers"]
+                )
+            else:
+                enforced = (
+                    "<span style='color:#b55a00'>NOT strictly enforced</span> "
+                    "(server running with 0 worker processes — single-process mode)"
+                )
+            record.dwo_protect_limits_info = (
+                "<div style='font-size:0.95em;color:#1F2430;line-height:1.5'>"
+                "<p>Large zips (many modules, or Cython compilation) are processed in the "
+                "background by a scheduled action. These are the server's current limits — "
+                "%s. If a job's background step runs longer than a limit below, that step may "
+                "be killed and the job will end up in an <b>Error</b> state.</p>"
+                "<ul style='margin-bottom:0'>"
+                "<li>CPU time per request: <b>%ss</b></li>"
+                "<li>Real time per request: <b>%ss</b></li>"
+                "<li>Real time per scheduled action (cron): <b>%ss</b></li>"
+                "<li>Soft memory limit: <b>%s MB</b></li>"
+                "<li>Hard memory limit: <b>%s MB</b></li>"
+                "</ul></div>"
+            ) % (
+                enforced,
+                limits["limit_time_cpu"],
+                limits["limit_time_real"],
+                limits["limit_time_real_cron"],
+                round((limits["limit_memory_soft"] or 0) / (1024 * 1024)),
+                round((limits["limit_memory_hard"] or 0) / (1024 * 1024)),
+            )
+
+    def _compute_dwo_protect_job_count(self):
+        count = self.env["dwo.protect.job"].search_count([])
+        for record in self:
+            record.dwo_protect_job_count = count
+
+    def action_dwo_protect_open_wizard(self):
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "dwo.protect.source.wizard",
+            "view_mode": "form",
+            "target": "new",
+        }
+
+    def action_dwo_protect_open_jobs(self):
+        return self.env["ir.actions.actions"]._for_xml_id(
+            "dwo_source_code_protector.action_dwo_protect_job"
+        )
