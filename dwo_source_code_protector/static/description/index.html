@@ -1,0 +1,235 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #1A1C27;">Source Code Protector for Odoo</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #1A1C27;">Ship your Odoo module without shipping its source.</p>
+        <p class="mb-4" style="font-size: 15px;">Every module you sell or deploy normally hands over fully readable Python &mdash; anyone who installs it can open every file, copy your logic, or rewrite around it. Source Code Protector compiles your business logic to native machine code first, so what you ship still works exactly the same, but can no longer be read as source.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">The moment you hand a customer or reseller an Odoo module, you are handing them its source &mdash; the pricing rules, algorithms and integrations that took real work to build, in plain readable Python they can open, copy, or quietly rewrite around. <strong>Source Code Protector</strong> takes your module's raw source, extracts the business logic (models, wizards, reports, controllers), and compiles it to native <code>.so</code>/<code>.pyd</code> binaries with Cython. The methods you protect run exactly as before &mdash; often faster, since compiled native code typically outperforms interpreted Python &mdash; but can no longer be read, copied or modified as source. What you get back installs and behaves like any other Odoo module, nothing special for your customers to configure.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: raw source code is protected and transformed, then compiled to native binary, then ready to ship with no readable source left" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #1A1C27;">Why Protect Your Module</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2D3142;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Protect What You Sell</h4>
+                    <p class="mb-0" style="font-size: 14px;">Distribute a compiled module instead of plain-text Python, so customers and resellers cannot read, copy or rewrite around your business logic.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2D3142;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Keep Your Edge</h4>
+                    <p class="mb-0" style="font-size: 14px;">The pricing rules, algorithms and integrations that make your module valuable, and the real work behind them, stay yours &mdash; not copy-pasted into a competitor's module.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2D3142;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Often Faster Too</h4>
+                    <p class="mb-0" style="font-size: 14px;">Protected methods are compiled to native machine code with Cython, which typically runs faster than interpreted Python for the same logic.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded p-4 my-5" style="border: 2px solid #2D3142;">
+        <h2 class="font-weight-bold text-center mt-0 mb-2" style="font-size: 26px; color: #1A1C27;">How It Works</h2>
+        <p class="text-center mb-4" style="font-size: 16px;">Four steps to a shippable, protected module.</p>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2D3142;">1. Upload the zip</h4>
+                    <p class="mb-0" style="font-size: 13px;">Pick a .zip with one or more Odoo modules, each with its own technical folder name at the top (e.g. <code>my_module/__manifest__.py</code>).</p>
+                </div></div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2D3142;">2. Business logic is extracted</h4>
+                    <p class="mb-0" style="font-size: 13px;">Each module's protectable code &mdash; models, wizards, reports, controllers &mdash; is found by following the real Python import graph, and transformed so it can be compiled.</p>
+                </div></div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2D3142;">3. Compiled to native binary</h4>
+                    <p class="mb-0" style="font-size: 13px;">The transformed code is compiled to a native <code>.so</code>/<code>.pyd</code> extension with Cython. It runs exactly as before; it just can't be read as source anymore.</p>
+                </div></div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2D3142;">4. Download &amp; ship</h4>
+                    <p class="mb-0" style="font-size: 13px;">Get back a ready-to-ship zip with the same module structure, now protected. Install it on a staging database to confirm, then ship it to your customers.</p>
+                </div></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #1A1C27;">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Follows the Real Import Graph</h4>
+                    <p class="mb-0" style="font-size: 14px;">Protection follows each module's actual <code>from . import ...</code> chain from <code>__init__.py</code>, not just file names &mdash; so it protects what Odoo actually loads.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Test Files Stay Readable</h4>
+                    <p class="mb-0" style="font-size: 14px;">A protected module's own unit tests are automatically excluded, so your test suite keeps running against plain Python.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Password-Protected Zips</h4>
+                    <p class="mb-0" style="font-size: 14px;">Upload an AES-encrypted zip with its password; the protected output is re-encrypted with the same password.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Handles Multi-Module Zips</h4>
+                    <p class="mb-0" style="font-size: 14px;">Upload a zip with several Odoo modules at once; each one is protected and compiled independently, with its own result.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Job History &amp; Download</h4>
+                    <p class="mb-0" style="font-size: 14px;">Every upload becomes a job you can reopen later: status, per-module result, and a download link for the protected zip.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #4F5D75;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1A1C27;">Recommended Structure Built In</h4>
+                    <p class="mb-0" style="font-size: 14px;">The Settings screen shows the module-structure conventions your code should follow so protection covers as much of it as possible.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Settings &rarr; Source Code Protector</h2>
+    <p class="mb-4" style="font-size: 16px;">Everything starts from <strong>Settings &rarr; Source Code Protector</strong>: upload a module zip to protect, and read the recommended module structure notes for best coverage.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_1.png" alt="Settings screen with a short description, a button to protect a module zip, and recommended module structure notes" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Protected &amp; Ready to Download</h2>
+    <p class="mb-4" style="font-size: 16px;">Once a module is protected, download the ready-to-ship zip directly, with a result table showing exactly what was protected.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_2.png" alt="Finished protection job with a download button for the protected zip and a per-module result table" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Recommended Module Structure &amp; Pitfalls</h2>
+    <p class="mb-3" style="font-size: 16px;">Protection follows the <strong>real Python import graph</strong> starting from each module's <code>__init__.py</code> &mdash; a file nothing imports is never scanned or protected. A few conventions make sure your business logic is actually covered:</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #2D3142;">Test files of the module being protected are always excluded, so your test suite keeps working against readable source.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #2D3142;">These notes are also shown directly in the Settings screen, so your team sees them again right before uploading a module.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_protect_struct_imports" role="tab" aria-controls="dwo_protect_struct_imports" aria-selected="true">Imports</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_protect_struct_classes" role="tab" aria-controls="dwo_protect_struct_classes" aria-selected="false">Models &amp; wizards</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_protect_struct_controllers" role="tab" aria-controls="dwo_protect_struct_controllers" aria-selected="false">Controllers</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_protect_struct_naming" role="tab" aria-controls="dwo_protect_struct_naming" aria-selected="false">Naming</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_protect_struct_syntax" role="tab" aria-controls="dwo_protect_struct_syntax" aria-selected="false">Syntax</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_protect_struct_imports" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2D3142;">Import every file explicitly</h4>
+            <p class="mb-2" style="font-size: 14px;">Standard Odoo convention: every file must be reachable from <code>__init__.py</code> through <code>from . import ...</code>. A file nothing imports is invisible to protection, even if Odoo itself still loads it some other way.</p>
+            <pre class="bg-dark text-white p-3 rounded mb-2" style="font-size: 13px;"># __init__.py
+from . import models
+from . import wizards</pre>
+        </div>
+        <div class="tab-pane fade" id="dwo_protect_struct_classes" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2D3142;">Subclass Odoo base classes directly</h4>
+            <p class="mb-2" style="font-size: 14px;">Models, wizards and reports must subclass <code>models.Model</code> / <code>TransientModel</code> / <code>AbstractModel</code> directly, not only through your own custom base class defined elsewhere &mdash; that indirection is what protection looks for to recognize an Odoo class.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_protect_struct_controllers" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2D3142;">Re-apply @route on every override</h4>
+            <p class="mb-2" style="font-size: 14px;">If you override a controller method, repeat its <code>@route(...)</code> decorator even if the route itself is unchanged &mdash; this is already standard Odoo practice, and it's also how protection recognizes a controller method.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_protect_struct_naming" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2D3142;">Single underscore, not double</h4>
+            <p class="mb-2" style="font-size: 14px;">Use one leading underscore for internal methods (<code>_foo</code>). A double leading underscore (<code>__foo</code>) triggers Python's own name-mangling rules and is intentionally left unprotected.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_protect_struct_syntax" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2D3142;">Avoid match/case in protected methods</h4>
+            <p class="mb-2" style="font-size: 14px;">Python's <code>match</code>/<code>case</code> statement is not yet supported by the compiler used here. An <code>if</code>/<code>elif</code> chain works the same and compiles without issue.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Will the protected module still run normally?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes &mdash; compiled methods behave exactly the same from Odoo's point of view. Always test the protected module on a staging database before shipping it to customers.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Can I run the protected module on a different server?</h4>
+        <p class="mb-0" style="font-size: 14px;">The compiled <code>.so</code>/<code>.pyd</code> binaries are platform-locked: they only run on a server with the same Python version, OS and CPU architecture as the one that compiled them.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">What happens with a module that has nothing to protect?</h4>
+        <p class="mb-0" style="font-size: 14px;">If no protectable business logic is found (e.g. no models with real methods), that module is marked Skipped with a reason, and the rest of the zip is still processed.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">What if my zip has the manifest at its root, with no module folder?</h4>
+        <p class="mb-0" style="font-size: 14px;">That entry is Skipped with a clear reason: there is no reliable module name to compile against in that shape. Re-zip with the module's technical folder name at the top, e.g. <code>my_module.zip</code> containing <code>my_module/__manifest__.py</code>.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Can I see past protection jobs?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes &mdash; every upload becomes a job record in Settings &rarr; Source Code Protector, with its status, per-module result, and the protected zip to download again.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">How long are my uploaded and result files kept?</h4>
+        <p class="mb-0" style="font-size: 14px;">1 day after the job finishes, after which both are deleted automatically to save disk space. The job's history and per-module results remain.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1A1C27;">Do I need anything installed on the server besides this module?</h4>
+        <p class="mb-0" style="font-size: 14px;">The server needs the <code>jprotect</code> and <code>pyzipper</code> Python packages, and a C compiler with Python headers available for Cython to compile against.</p>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">Changelog</h2>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #2D3142;">2.0.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-06</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Settings screen redesigned with a short description, job history with direct download, and recommended module structure notes.</p></div>
+        </div>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #2D3142;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #2D3142;">Protect your business logic before you ship it.</p>
+        <p class="mb-2" style="font-size: 15px;">Upload a module zip and get back a ready-to-ship, protected module. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DUO-TEK Software Vietnam</p>
+    </div>
+
+</div>
+</section>
