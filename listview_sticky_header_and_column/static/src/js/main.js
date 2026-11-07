@@ -225,6 +225,19 @@ patch(ListRenderer.prototype, {
                     top: 0;
                     z-index: 10;
                 }
+                /* A dropdown opened from a field in this row (e.g. a Many2one autocomplete) is
+                   rendered as an absolutely-positioned child of this very cell, with its own
+                   very high z-index (see web's autocomplete.scss) -- but sibling sticky <td>s
+                   of the rows below still paint over it: browsers give position:sticky table
+                   cells their own compositing layer, and layers with equal z-index can end up
+                   ordered by paint/DOM order rather than by the dropdown's own (much higher)
+                   z-index, since the dropdown's stacking context is nested one level deeper.
+                   Raising the EDITED row's pinned cell above every other row's (same selector,
+                   declared later so it wins the tie) lifts the dropdown along with it, without
+                   having to detect "is a dropdown currently open" at all. */
+                ${scope} table tbody tr.o_selected_row td:nth-child(${cssNthChildIndex}) {
+                    z-index: 20;
+                }
             `;
         }).join('');
 
