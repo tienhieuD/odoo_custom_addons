@@ -11,7 +11,7 @@
     'website': 'https://live.staticflickr.com/65535/50701330062_5a6a35cd36_o.gif',
     'author': "DUO-TEK Software Vietnam",
     'license': 'LGPL-3',
-    'category': 'Tools',
+    'category': 'Extra Tools',
     'version': '20.0.0.4.0',
     'depends': ['base', 'web'],
     'data': [],

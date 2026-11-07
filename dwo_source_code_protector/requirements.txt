@@ -1,2 +1,2 @@
-jprotect>=0.2.0
+jprotect>=0.3.0
 pyzipper
