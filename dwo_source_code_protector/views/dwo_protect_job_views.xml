@@ -12,6 +12,7 @@
                 <field name="progress" widget="progressbar"/>
                 <field name="progress_label" string="Step"/>
                 <field name="module_count" string="Modules"/>
+                <field name="python_version" string="Python"/>
                 <field name="zip_size_human" string="Size"/>
                 <field name="is_expired" invisible="1"/>
                 <field name="result_filename" invisible="1"/>
@@ -59,14 +60,19 @@
                         </group>
                         <group string="Zip" class="text-muted">
                             <field name="zip_size_human" string="Upload size"/>
+                            <field name="python_version" string="Python version"/>
                             <field name="create_date" string="Queued at"/>
                             <field name="date_started"/>
                             <field name="date_done"/>
                         </group>
                     </group>
-                    <group string="Result" attrs="{'invisible': [('state', '!=', 'done')]}">
+                    <!-- Khong de trong <group>: group gioi han chieu rong theo luoi 2-cot cua
+                         Odoo, lam bang ket qua (mot HTML table that, tu result_info) bi co lai
+                         rat hep va kho doc. Dung div thuong de no choan het chieu rong sheet. -->
+                    <div attrs="{'invisible': [('state', '!=', 'done')]}" class="mt-3">
+                        <h5 class="text-muted">Result</h5>
                         <field name="result_info" nolabel="1" widget="html"/>
-                    </group>
+                    </div>
                     <group string="Error" attrs="{'invisible': [('state', '!=', 'error')]}">
                         <field name="error_message" nolabel="1"/>
                     </group>
