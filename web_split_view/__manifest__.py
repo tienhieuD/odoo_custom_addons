@@ -10,7 +10,9 @@ records can be browsed, created, edited and deleted without leaving the list. No
 the split view is derived from the action (its list, form and search views).
 
 Features:
-- Resizable list / form panes (the width is remembered per view)
+- Resizable list / form panes (the width is remembered per view, smooth drag even on long lists)
+- Picking Split for an action is remembered (per browser): it opens in Split again next time,
+  until you explicitly switch back to List yourself
 - Create, edit, save, discard and delete from the right pane; the list refreshes automatically
 - The list keeps its own search bar, filters, grouping and pager
 - Sub views by external id (list_view_ref / form_view_ref) or defined inline in the <split> tag
@@ -20,8 +22,8 @@ Features:
     'author': 'DUO-TEK Software Vietnam',
     'website': 'https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam',
     'license': 'OPL-1',
-    'category': 'Technical',
-    'version': '19.0.1.0.0',
+    'category': 'Extra Tools',
+    'version': '19.0.1.1.0',
     'depends': ['web'],
     'data': [
         'security/ir.model.access.csv',

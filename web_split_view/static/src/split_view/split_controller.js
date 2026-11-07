@@ -67,6 +67,7 @@ export class SplitController extends Component {
                 this.buildSubViewProps("list", listRef, listArch),
                 this.buildSubViewProps("form", formRef, formArch),
             ]);
+            this.listProps = this.buildListProps();
             await this.restoreActiveRecord();
         });
 
@@ -150,7 +151,14 @@ export class SplitController extends Component {
         return { ...this.props.display, controlPanel: { layoutActions: false } };
     }
 
-    get listProps() {
+    /**
+     * Built once (not a getter re-evaluated on every render): none of these fields ever change
+     * after mount, so keeping the SAME object reference means the embedded List `View` never
+     * sees "new props" from an unrelated SplitController re-render (e.g. while resizing) and
+     * never re-searches for no reason. Actual list reloads go through `state.listKey` (see
+     * `reloadList`), which remounts the pane; they do not need a new props object to work.
+     */
+    buildListProps() {
         return {
             ...this.listViewProps,
             // no inline editing in the split list, whatever the arch says: a click opens the record on the right
@@ -332,6 +340,8 @@ export class SplitController extends Component {
     startResize(ev) {
         ev.preventDefault();
         this.resizing = true;
+        // the width while dragging is tracked outside reactive `state` on purpose (see onMouseMove)
+        this.dragWidth = this.state.leftWidth;
         document.addEventListener("mousemove", this.onMouseMove);
         document.addEventListener("mouseup", this.onMouseUp);
         this.splitRef.el?.classList.add("split_resizing");
@@ -340,11 +350,26 @@ export class SplitController extends Component {
     onMouseMove(ev) {
         const rect = this.splitRef.el.getBoundingClientRect();
         const percent = ((ev.clientX - rect.left) / rect.width) * 100;
-        this.state.leftWidth = Math.min(100 - MIN_WIDTH, Math.max(MIN_WIDTH, percent));
+        this.dragWidth = Math.min(100 - MIN_WIDTH, Math.max(MIN_WIDTH, percent));
+        // Write the width straight to the DOM instead of through `state.leftWidth`: writing to
+        // reactive state here would re-render SplitController on every mousemove tick, which
+        // rebuilds listProps/formProps (new object each time) and makes the embedded List/Form
+        // `View` components believe their props changed, which makes them re-search/re-read on
+        // every pixel of movement (many search RPCs, visible freeze while dragging). The two
+        // panes only need their CSS width updated during the drag; `state.leftWidth` (and the
+        // one legitimate re-render + localStorage write it causes) is committed once, in
+        // onMouseUp, after the drag is over.
+        const left = this.splitRef.el?.querySelector(":scope > .left-side");
+        const right = this.splitRef.el?.querySelector(":scope > .right-side");
+        if (left && right) {
+            left.style.width = `${this.dragWidth}%`;
+            right.style.width = `${100 - this.dragWidth}%`;
+        }
     }
 
     onMouseUp() {
         this.stopResize();
+        this.state.leftWidth = this.dragWidth;
         try {
             browser.localStorage.setItem(this.storageKey, String(this.state.leftWidth));
         } catch {
