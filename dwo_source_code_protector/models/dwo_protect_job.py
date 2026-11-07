@@ -168,10 +168,9 @@ class DwoProtectJob(models.Model):
 
     @staticmethod
     def _python_version_tag(version_str):
-        """'3.12.3' -> 'py312', dung trong ten file zip ket qua (ngan, khong co dau cham de
-        tranh lan voi phan ten/timestamp khac trong _output_zip_name)."""
-        major, minor = version_str.split(".")[:2]
-        return "py{0}{1}".format(major, minor)
+        """'3.12.16' -> 'py31216' (day du major.minor.micro, khong co dau cham de tranh lan
+        voi phan ten/timestamp khac trong _output_zip_name)."""
+        return "py" + "".join(version_str.split("."))
 
     @staticmethod
     def _human_size(num_bytes):

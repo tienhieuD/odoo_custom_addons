@@ -267,7 +267,7 @@ class TestProtectJob(TransactionCase):
         import sys
 
         job_model = self.env["dwo.protect.job"]
-        current_tag = "py{0}{1}".format(sys.version_info.major, sys.version_info.minor)
+        current_tag = "py" + "".join(str(p) for p in sys.version_info[:3])
         self.assertEqual(
             job_model._output_zip_name("sale_ext.zip"), "sale_ext_compile_{0}.zip".format(current_tag)
         )
@@ -280,13 +280,13 @@ class TestProtectJob(TransactionCase):
             job_model._output_zip_name(
                 "sale_ext.zip", record_id=42, timestamp=ts, python_version="3.11.9"
             ),
-            "sale_ext_compile_py311_20260102030405_42.zip",
+            "sale_ext_compile_py3119_20260102030405_42.zip",
         )
 
     def test_python_version_tag(self):
         job_model = self.env["dwo.protect.job"]
-        self.assertEqual(job_model._python_version_tag("3.12.3"), "py312")
-        self.assertEqual(job_model._python_version_tag("3.9.0"), "py39")
+        self.assertEqual(job_model._python_version_tag("3.12.3"), "py3123")
+        self.assertEqual(job_model._python_version_tag("3.9.0"), "py390")
 
     def test_finalize_output_filename_has_timestamp_and_id(self):
         """A real finished job's result attachment name contains the job's own id, so two
@@ -312,7 +312,7 @@ class TestProtectJob(TransactionCase):
 
         self._run_to_completion(job)
         self.assertEqual(job.state, "done")
-        tag = "py{0}{1}".format(sys.version_info.major, sys.version_info.minor)
+        tag = "py" + "".join(str(p) for p in sys.version_info[:3])
         self.assertIn("_{0}_".format(tag), job.result_attachment_id.sudo().name)
 
     def test_module_step_skipped_after_retry_cap(self):
