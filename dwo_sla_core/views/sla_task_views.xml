@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Danh sách và form chỉ đọc cho task SLA (REQ-INT-004). group_sla_user
+         VÀ group_sla_manager đều có perm_write=0/perm_unlink=0 trên model
+         này (ir.model.access.csv, REQ-SEC-006) nên Odoo tự ẩn mọi control
+         sửa/xóa field; chỉ 2 nút hành động (gọi method, không sửa field
+         trực tiếp) hiện cho group_sla_manager.
+
+         Layout (quyết định với user, 2026-11-06, [ĐỔI 2026-11-07, UX pass]
+         gộp tab Business Time + Wall-clock Time vào Overview): list hiện
+         mọi field, chỉ 8 field "quan trọng" mặc định hiện, còn lại
+         optional="hide". Form chia tab: Overview (chứa hết các field
+         không phải escalation/history, chia 5 nhóm 2 cột: Record/Target/
+         Timeline/Progress (Business Time)/Progress (Wall-clock Time)) /
+         Escalation / History. Điểm tự chọn mặc định: (a) res_model/res_id
+         trên FORM gộp lại thành 1 field "Source Record" duy nhất dùng
+         widget many2one_reference (mở thẳng record gốc, hiện display_name
+         thật thay vì model kỹ thuật + số id thô); list vẫn giữ 2 cột riêng
+         (res_model/res_id) vì cần lọc/group theo model độc lập; (b)
+         business_pause_duration nằm nhóm "Progress (Business Time)"
+         (nhóm theo tiền tố business_, không theo "Progress (Wall-clock
+         Time)"); (c) achieved_rate/breaching_count không đưa vào form,
+         chỉ dùng cho pivot/graph; (d) mọi field thời lượng (Float tính
+         bằng giờ) dùng widget="float_time_unit" (HH:MM + đơn vị "h" ngay
+         sau giá trị, xem static/src/float_time_unit/) thay vì số thập
+         phân thô. -->
+    <record id="view_sla_task_list" model="ir.ui.view">
+        <field name="name">sla.task.list</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <list string="SLA Tasks" default_order="id desc" create="0" edit="0" delete="0">
+                <field name="display_name" string="Record / Definition"/>
+                <field name="sla_id"/>
+                <field name="res_model"/>
+                <field name="res_id" string="Record ID"/>
+                <field name="stage" widget="badge"
+                       decoration-success="stage == 'achieved'"
+                       decoration-danger="stage == 'breached'"
+                       decoration-info="stage == 'in_progress'"
+                       decoration-warning="stage == 'paused'"/>
+                <field name="start_time"/>
+                <field name="planned_end_time"/>
+                <field name="has_breached" widget="boolean_toggle" readonly="1"/>
+                <field name="business_percent_used" string="% Used"/>
+                <!-- Các field còn lại: mặc định ẩn, người dùng tự bật qua nút cột -->
+                <field name="original_breach_time" optional="hide"/>
+                <field name="end_time" optional="hide"/>
+                <field name="target_duration" widget="float_time_unit" optional="hide"/>
+                <field name="schedule_id" optional="hide"/>
+                <field name="business_duration" widget="float_time_unit" optional="hide" sum="Total Business Hours"/>
+                <field name="business_pause_duration" widget="float_time_unit" optional="hide"/>
+                <field name="duration" widget="float_time_unit" optional="hide"/>
+                <field name="pause_duration" widget="float_time_unit" optional="hide"/>
+                <field name="running_since" optional="hide"/>
+                <field name="pause_time" optional="hide"/>
+                <field name="next_due_at" optional="hide"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+                <field name="achieved_rate" optional="hide"/>
+                <field name="breaching_count" optional="hide"/>
+                <field name="is_due_soon" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sla_task_form" model="ir.ui.view">
+        <field name="name">sla.task.form</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <form string="SLA Task" class="nev_field_border_container" create="0" edit="0" delete="0">
+                <header>
+                    <!-- Refs: REQ-INT-005 -->
+                    <button name="action_recalculate" type="object" string="Recalculate"
+                            groups="dwo_sla_core.group_sla_manager"
+                            invisible="stage not in ('in_progress', 'paused')"
+                            help="Recalculate the planned end using the current target time and working calendar."/>
+                    <!-- Refs: REQ-INT-020 -->
+                    <button name="action_reevaluate" type="object" string="Re-evaluate"
+                            groups="dwo_sla_core.group_sla_manager"
+                            help="Check the start, cancel, pause, resume, stop and reset conditions again against the source record."/>
+                    <field name="stage" widget="statusbar"
+                           statusbar_visible="in_progress,paused,achieved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="display_name"/></h1>
+                    </div>
+                    <!-- KPI ngoài tab: widget trực quan (badge trạng thái + bar + mốc
+                         Start/Deadline/End), thay cho progressbar thô. Badge đã truyền
+                         tải has_breached/is_due_soon nên 2 field này không lặp lại ở
+                         đây (vẫn còn is_due_soon dùng cho filter/search, has_breached
+                         ở tab Business Time); xem static/src/sla_progress/. -->
+                    <widget name="sla_progress"/>
+                    <notebook>
+                        <page string="Overview" name="overview">
+                            <group>
+                                <group string="Record">
+                                    <field name="sla_id"/>
+                                    <!-- 1 field duy nhất, nhãn "Source Record": widget
+                                         many2one_reference hiện display_name thật của
+                                         record gốc (clickable, mở thẳng record) thay vì
+                                         res_model + res_id thô; model kỹ thuật vẫn hiện
+                                         kèm, dạng chữ nhỏ mờ, cùng 1 dòng. -->
+                                    <label for="res_id" string="Source Record"/>
+                                    <div class="d-flex align-items-center flex-wrap column-gap-1 o_dwo_source_record">
+                                        <field name="res_id" widget="many2one_reference" nolabel="1"/>
+                                        <span class="text-muted small" invisible="not res_model">(<field name="res_model" nolabel="1" readonly="1" class="text-muted"/>)</span>
+                                    </div>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                </group>
+                                <group string="Target">
+                                    <field name="target_duration" widget="float_time_unit"/>
+                                    <field name="schedule_id"/>
+                                </group>
+                                <group string="Timeline">
+                                    <field name="start_time"/>
+                                    <field name="planned_end_time"/>
+                                    <field name="original_breach_time"/>
+                                    <field name="end_time"/>
+                                </group>
+                                <group string="Progress (Business Time)">
+                                    <field name="running_since"/>
+                                    <field name="business_duration" widget="float_time_unit"/>
+                                    <field name="business_pause_duration" widget="float_time_unit"/>
+                                    <field name="has_breached"/>
+                                </group>
+                                <!-- Cố ý để trống cột bên trái của hàng cuối: không có field
+                                     "wall-clock" nào đi cặp với nó, nhồi thêm field khác vào
+                                     sẽ phá nhóm theo nghĩa field hiện có. -->
+                                <group string="Progress (Wall-clock Time)">
+                                    <field name="pause_time"/>
+                                    <field name="duration" widget="float_time_unit"/>
+                                    <field name="pause_duration" widget="float_time_unit"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Escalation" name="escalation">
+                            <group>
+                                <field name="next_due_at"/>
+                                <field name="done_escalation_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="History" name="history">
+                            <field name="event_ids">
+                                <list default_order="event_dt desc">
+                                    <field name="event_dt"/>
+                                    <field name="event"/>
+                                    <field name="note"/>
+                                    <field name="is_resolved" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sla_task_search" model="ir.ui.view">
+        <field name="name">sla.task.search</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <search string="SLA Tasks">
+                <field name="res_model"/>
+                <field name="sla_id"/>
+                <filter string="In Progress" name="in_progress" domain="[('stage', '=', 'in_progress')]"/>
+                <filter string="Paused" name="paused" domain="[('stage', '=', 'paused')]"/>
+                <filter string="Has Breached" name="breached" domain="[('has_breached', '=', True)]"/>
+                <filter string="Due Soon" name="due_soon" domain="[('is_due_soon', '=', True)]"/>
+                <separator/>
+                <filter string="Achieved" name="achieved" domain="[('stage', '=', 'achieved')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('stage', '=', 'cancelled')]"/>
+                <group>
+                    <filter string="Definition" name="group_definition" context="{'group_by': 'sla_id'}"/>
+                    <filter string="Model" name="group_model" context="{'group_by': 'res_model'}"/>
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sla_task_pivot" model="ir.ui.view">
+        <field name="name">sla.task.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="SLA Tasks">
+                <field name="sla_id" type="row"/>
+                <field name="stage" type="col"/>
+                <field name="business_duration" type="measure"/>
+                <field name="achieved_rate" type="measure" widget="percentage"/>
+                <field name="breaching_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_task_graph" model="ir.ui.view">
+        <field name="name">sla.task.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="SLA Tasks" type="bar">
+                <field name="sla_id"/>
+                <field name="stage"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_sla_task" model="ir.actions.act_window">
+        <field name="name">SLA Tasks</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+        <field name="context">{'search_default_in_progress': 1, 'search_default_paused': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form định nghĩa SLA (REQ-INT-001). group_sla_user chỉ có perm_read
+         trên model này (ir.model.access.csv) nên Odoo tự chuyển form sang
+         chỉ đọc và ẩn nút Lưu cho nhóm đó, không cần logic view riêng
+         (REQ-INT-001 AC2). -->
+    <record id="view_sla_definition_form" model="ir.ui.view">
+        <field name="name">sla.definition.form</field>
+        <field name="model">sla.definition</field>
+        <field name="arch" type="xml">
+            <form string="SLA Definition" class="nev_field_border_container">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="SLA definition name"/></h1>
+                    </div>
+                    <!-- 4 nhóm nhỏ trong 1 group ngoài -> lưới 2x2 gọn gàng,
+                         không khối nào chạy hết chiều rộng trang (và không
+                         để trống ô nào, khác với thử 3 nhóm trước đó). Duration
+                         tách khỏi Calendar vì Calendar có 2 banner dài
+                         (colspan=2 trong chính nhóm của nó) không hợp đứng
+                         cạnh nhóm nhỏ Duration trong cùng 1 ô. -->
+                    <group>
+                        <group string="Scope">
+                            <field name="model_id"
+                                   placeholder="e.g. Helpdesk Ticket, Contact"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="model_name" invisible="1"/>
+                            <!-- Refs: REQ-SEC-003 -->
+                            <field name="company_id"
+                                   placeholder="Leave empty to apply to every company"/>
+                            <field name="sequence" placeholder="e.g. 10"/>
+                        </group>
+                        <!-- Metadata ServiceNow (scope-add): không ảnh hưởng
+                             engine, tách riêng khỏi Scope để người cấu hình
+                             phân biệt rõ "cái gì" (Scope) với "nhãn/phân
+                             loại" (Classification). -->
+                        <group string="Classification">
+                            <field name="type"/>
+                            <field name="target" placeholder="e.g. Response, Resolution"/>
+                            <field name="vendor_id" invisible="type != 'ola'"
+                                   placeholder="e.g. your ISP or telecom vendor"/>
+                            <field name="service_commitment"/>
+                        </group>
+                        <group string="Duration">
+                            <field name="duration" widget="float_time_unit"
+                                   placeholder="e.g. 4"/>
+                        </group>
+                        <!-- Đổi tiêu đề nhóm từ "Schedule" sang "Calendar":
+                             cả 4 field bên trong đều có label bắt đầu bằng
+                             "Calendar"/"Timezone" (Calendar Source/Fixed
+                             Calendar/Calendar Path on Record/Timezone), tên
+                             nhóm "Schedule" trước đó lệch với các label này. -->
+                        <group string="Calendar">
+                            <field name="schedule_source"/>
+                            <field name="schedule_id"
+                                   invisible="schedule_source != 'definition'"
+                                   required="schedule_source == 'definition'"
+                                   placeholder="e.g. Standard 40 hours/week"/>
+                            <!-- Field chooser giống Automation Rules/Mail
+                                 Template (widget="field_selector"), chỉ chọn
+                                 ĐÚNG 1 chuỗi field kết thúc ở 1 field duy
+                                 nhất, khác domain builder bên các tab điều
+                                 kiện vốn cho nhiều mệnh đề. Validate model
+                                 cuối = resource.calendar vẫn ở Python
+                                 (`_check_calendar` trong sla_definition.py),
+                                 widget chỉ hỗ trợ chọn, không thay validate. -->
+                            <field name="schedule_path"
+                                   widget="field_selector"
+                                   options="{'model': 'model_name'}"
+                                   invisible="schedule_source != 'record'"
+                                   required="schedule_source == 'record'"/>
+                            <!-- Refs: scope-add "calendar_tz_override", label
+                                 Python đổi thành "Timezone" (ngắn gọn theo
+                                 yêu cầu user); placeholder nêu rõ hành vi
+                                 khi để trống. -->
+                            <field name="calendar_tz_override"
+                                   placeholder="Leave empty to use the calendar's own timezone"/>
+                            <div class="alert alert-info mb-0" colspan="2"
+                                 invisible="not calendar_tz_override" role="alert">
+                                A clone of the working calendar with the same work-hour
+                                pattern but this timezone will be auto-created (or
+                                reused if one already exists) and used instead of the
+                                calendar's own timezone.
+                            </div>
+                            <!-- Refs: REQ-FUNC-020 -->
+                            <div class="alert alert-warning mb-0" colspan="2"
+                                 invisible="schedule_source != 'record'" role="alert">
+                                Fallback order when the record's calendar cannot be used:
+                                <ul class="mb-0">
+                                    <li>The record's company default working calendar.</li>
+                                    <li>If the company's calendar cannot be used either, the SLA runs 24x7.</li>
+                                </ul>
+                            </div>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Start Condition" name="start_condition">
+                            <group>
+                                <field name="start_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                                <field name="retroactive"/>
+                                <!-- Refs: REQ-FUNC-017 -->
+                                <field name="start_field_id"
+                                       invisible="not retroactive"
+                                       required="retroactive"
+                                       placeholder="e.g. Created on"
+                                       domain="[('model', '=', model_name), ('ttype', '=', 'datetime')]"/>
+                            </group>
+                            <!-- Refs: REQ-FUNC-042, REQ-FUNC-016. Banner đặt
+                                 cuối tab, dùng ul/li vì có 2 lưu ý độc lập. -->
+                            <div class="alert alert-info mt-4 mb-0" role="alert">
+                                <ul class="mb-0">
+                                    <li>
+                                        For non-stored computed fields, or
+                                        conditions that traverse a relation
+                                        (e.g. <code>partner_id.country_id</code>)
+                                        when only the related record changes:
+                                        the system MAY NOT automatically
+                                        re-evaluate. Use the "Re-evaluate"
+                                        action on the task to get a result
+                                        consistent with current data.
+                                    </li>
+                                    <li>
+                                        Avoid three common mistakes: a Start
+                                        Condition that is a subset of the Stop
+                                        Condition (the SLA never attaches); a
+                                        Pause Condition that is a subset of the
+                                        Start Condition (the task attaches
+                                        paused and is cancelled when the pause
+                                        ends); Start and Pause Conditions that
+                                        are mutually exclusive (the task is
+                                        cancelled before it can pause).
+                                    </li>
+                                </ul>
+                            </div>
+                        </page>
+                        <page string="Stop Condition" name="stop_condition">
+                            <group>
+                                <field name="stop_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                            </group>
+                            <!-- Refs: REQ-FUNC-042, REQ-FUNC-016 -->
+                            <div class="alert alert-info mt-4 mb-0" role="alert">
+                                <ul class="mb-0">
+                                    <li>
+                                        For non-stored computed fields, or
+                                        conditions that traverse a relation
+                                        (e.g. <code>partner_id.country_id</code>)
+                                        when only the related record changes:
+                                        the system MAY NOT automatically
+                                        re-evaluate. Use the "Re-evaluate"
+                                        action on the task to get a result
+                                        consistent with current data.
+                                    </li>
+                                    <li>
+                                        When the record matches, the task
+                                        completes (achieved/breached).
+                                        Reminder: Start Condition must be a
+                                        subset of this Stop Condition.
+                                    </li>
+                                </ul>
+                            </div>
+                        </page>
+                        <page string="Pause/Resume Condition" name="pause_resume_condition">
+                            <group>
+                                <field name="pause_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                                <field name="resume_mode"/>
+                                <field name="resume_domain"
+                                       widget="domain" options="{'model': 'model_name'}"
+                                       invisible="resume_mode != 'condition'"/>
+                                <!-- Refs: scope-add "retroactive_pause" -->
+                                <field name="retroactive_pause"/>
+                                <div class="alert alert-warning mb-0" colspan="2"
+                                     invisible="not retroactive_pause_warning" role="alert">
+                                    <field name="retroactive_pause_warning" nolabel="1" readonly="1"/>
+                                </div>
+                            </group>
+                            <!-- Refs: REQ-FUNC-042, REQ-FUNC-016 -->
+                            <div class="alert alert-info mt-4 mb-0" role="alert">
+                                <ul class="mb-0">
+                                    <li>
+                                        For non-stored computed fields, or
+                                        conditions that traverse a relation
+                                        (e.g. <code>partner_id.country_id</code>)
+                                        when only the related record changes:
+                                        the system MAY NOT automatically
+                                        re-evaluate. Use the "Re-evaluate"
+                                        action on the task to get a result
+                                        consistent with current data.
+                                    </li>
+                                    <li>
+                                        Three common mistakes to avoid: Pause
+                                        Condition must be a subset of Start
+                                        Condition; Start Condition and Pause
+                                        Condition MUST be mutually exclusive.
+                                    </li>
+                                </ul>
+                            </div>
+                        </page>
+                        <page string="Cancel Condition" name="cancel_condition">
+                            <group>
+                                <field name="cancel_mode"/>
+                                <field name="cancel_domain"
+                                       widget="domain" options="{'model': 'model_name'}"
+                                       invisible="cancel_mode != 'condition'"/>
+                            </group>
+                            <!-- Refs: REQ-FUNC-042. Chỉ 1 lưu ý nên không cần
+                                 ul/li. -->
+                            <div class="alert alert-info mt-4 mb-0" role="alert">
+                                For non-stored computed fields, or conditions that
+                                traverse a relation (e.g. <code>partner_id.country_id</code>)
+                                when only the related record changes: the system
+                                MAY NOT automatically re-evaluate. Use the
+                                "Re-evaluate" action on the task to get a result
+                                consistent with current data.
+                            </div>
+                        </page>
+                        <page string="Reset Condition" name="reset_condition">
+                            <group>
+                                <field name="reset_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                                <field name="reset_action"/>
+                                <!-- Refs: REQ-FUNC-013 -->
+                                <field name="reset_field_ids" widget="many2many_tags"
+                                       placeholder="e.g. Priority, Stage"
+                                       domain="[('model', '=', model_name)]"/>
+                            </group>
+                            <!-- Refs: REQ-FUNC-042 -->
+                            <div class="alert alert-info mt-4 mb-0" role="alert">
+                                For non-stored computed fields, or conditions that
+                                traverse a relation (e.g. <code>partner_id.country_id</code>)
+                                when only the related record changes: the system
+                                MAY NOT automatically re-evaluate. Use the
+                                "Re-evaluate" action on the task to get a result
+                                consistent with current data.
+                            </div>
+                        </page>
+                        <page string="Escalation" name="escalations">
+                            <!-- List chỉ hiện 2 cột gọn (percent_display,
+                                 display_name, cả 2 computed, xem
+                                 sla_escalation.py); không còn `editable`
+                                 nên "Add a line" và bấm vào dòng đều mở
+                                 form bên dưới dạng dialog để cấu hình đủ
+                                 field, field nào ẩn/hiện/bắt buộc theo đúng
+                                 action_type/email_recipient_type. -->
+                            <field name="escalation_ids">
+                                <list string="Escalation Rules">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="percent_display" string="Percent"/>
+                                    <field name="display_name" string="Action"/>
+                                </list>
+                                <form string="Escalation Rule">
+                                    <group>
+                                        <field name="percent" placeholder="e.g. 75"/>
+                                        <field name="action_type"/>
+                                        <field name="action_id"
+                                               domain="[('model_id', '=', parent.model_id)]"
+                                               invisible="action_type != 'server_action'"
+                                               required="action_type == 'server_action'"
+                                               placeholder="e.g. Notify Manager"/>
+                                        <field name="email_recipient_type"
+                                               invisible="action_type != 'email'"/>
+                                        <field name="email_field_id"
+                                               domain="[('model_id', '=', parent.model_id)]"
+                                               invisible="action_type != 'email' or email_recipient_type == 'fixed'"
+                                               required="action_type == 'email' and email_recipient_type != 'fixed'"
+                                               placeholder="e.g. Assigned to, Customer Email"/>
+                                        <field name="email_fixed_address"
+                                               invisible="action_type != 'email' or email_recipient_type != 'fixed'"
+                                               required="action_type == 'email' and email_recipient_type == 'fixed'"
+                                               placeholder="e.g. support-team@example.com"/>
+                                        <!-- Refs: scope-add "email template", mặc định đã
+                                             trỏ sẵn template dựng trong module (default ở
+                                             Python), hiện cho mọi recipient_type vì đây là
+                                             nội dung email, không phải người nhận. -->
+                                        <field name="email_template_id"
+                                               invisible="action_type != 'email'"
+                                               options="{'no_create': True}"/>
+                                    </group>
+                                </form>
+                            </field>
+                            <!-- Refs: REQ-SEC-004 -->
+                            <div class="alert alert-info mt-4 mb-0" role="alert">
+                                A Server Action runs with the permissions of the
+                                user assigned to background processing (the SLA
+                                `ir.cron`), NOT the permissions of the user
+                                editing the source record.
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sla_definition_list" model="ir.ui.view">
+        <field name="name">sla.definition.list</field>
+        <field name="model">sla.definition</field>
+        <field name="arch" type="xml">
+            <list string="SLA Definitions">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="type" optional="hide"/>
+                <field name="target" optional="hide"/>
+                <field name="duration" widget="float_time_unit"/>
+                <field name="schedule_source"/>
+                <field name="company_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sla_definition_search" model="ir.ui.view">
+        <field name="name">sla.definition.search</field>
+        <field name="model">sla.definition</field>
+        <field name="arch" type="xml">
+            <search string="SLA Definitions">
+                <field name="name"/>
+                <field name="model_id"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Model" name="group_model" context="{'group_by': 'model_id'}"/>
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sla_definition" model="ir.actions.act_window">
+        <field name="name">SLA Definitions</field>
+        <field name="res_model">sla.definition</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_model': 1}</field>
+        <!-- Refs: REQ-FUNC-001 -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first SLA definition
+            </p>
+            <p>
+                Pick a model, declare the conditions and escalation rules
+                to attach an SLA to any model.
+            </p>
+        </field>
+    </record>
+</odoo>

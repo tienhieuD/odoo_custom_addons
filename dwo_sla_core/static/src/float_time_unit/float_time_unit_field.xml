@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="dwo_sla_core.FloatTimeUnitField">
+        <span class="o_field_float_time_unit d-inline-flex align-items-baseline">
+            <span t-if="props.readonly" t-esc="formattedValue"/>
+            <input t-else="" t-att-id="props.id" type="text" t-ref="numpadDecimal"
+                   class="o_input" autocomplete="off"/>
+            <span class="text-muted ms-1" t-esc="props.unit"/>
+        </span>
+    </t>
+
+</templates>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Màn hình cấu hình SLA trong Settings (REQ-INT-010, REQ-INT-012,
+         REQ-REL-002); chỉ group_sla_manager thấy/sửa được (REQ-SEC-001).
+         Theo khuôn mẫu <app>/<block>/<setting> của Odoo 19 (xem
+         odoo/addons/calendar/views/res_config_settings_views.xml). -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.dwo.sla.core</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="SLA" string="SLA" name="dwo_sla_core"
+                     groups="dwo_sla_core.group_sla_manager">
+                    <block title="SLA Operations" name="sla_operations">
+                        <!-- Refs: REQ-INT-010, REQ-FUNC-035 -->
+                        <setting string="Event Log Retention (days)" id="sla_event_retention_setting"
+                                 help="How many days SLA events are kept before being deleted automatically.">
+                            <field name="sla_event_retention_days"/>
+                        </setting>
+                        <!-- Refs: REQ-INT-012 -->
+                        <setting string="Due Soon (hours)" id="sla_due_soon_setting"
+                                 help="Running tasks that are not yet breached and are due within this many hours appear in the &quot;Due Soon&quot; filter.">
+                            <field name="sla_due_soon_hours"/>
+                        </setting>
+                        <!-- Refs: REQ-REL-002 -->
+                        <setting string="Background Batch Size (tasks)" id="sla_batch_size_setting"
+                                 help="Maximum number of tasks the background process handles per run.">
+                            <field name="sla_batch_size"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_sla_config_settings" model="ir.actions.act_window">
+        <field name="name">SLA Configuration</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module': 'dwo_sla_core'}</field>
+    </record>
+</odoo>
+

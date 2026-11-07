@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sla_definition_user,sla.definition.user,model_sla_definition,group_sla_user,1,0,0,0
+access_sla_definition_manager,sla.definition.manager,model_sla_definition,group_sla_manager,1,1,1,1
+access_sla_escalation_user,sla.escalation.user,model_sla_escalation,group_sla_user,1,0,0,0
+access_sla_escalation_manager,sla.escalation.manager,model_sla_escalation,group_sla_manager,1,1,1,1
+access_sla_task_user,sla.task.user,model_sla_task,group_sla_user,1,0,0,0
+access_sla_task_manager,sla.task.manager,model_sla_task,group_sla_manager,1,0,0,0
+access_sla_event_user,sla.event.user,model_sla_event,group_sla_user,1,0,0,0
+access_sla_event_manager,sla.event.manager,model_sla_event,group_sla_manager,1,0,0,0
+access_ir_model_sla_manager,ir.model.sla.manager,base.model_ir_model,group_sla_manager,1,0,0,0
+access_ir_model_fields_sla_manager,ir.model.fields.sla.manager,base.model_ir_model_fields,group_sla_manager,1,0,0,0

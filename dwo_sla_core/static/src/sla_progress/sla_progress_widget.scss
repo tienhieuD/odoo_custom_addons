@@ -1,0 +1,151 @@
+.o_sla_progress_card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 640px;
+    padding: 16px 18px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background: var(--SlaProgress-bg, #fafbfc);
+    border: 1px solid var(--SlaProgress-border, rgba(0, 0, 0, 0.08));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.o_sla_progress_head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.o_sla_progress_badge {
+    font-size: 0.85rem;
+    padding: 0.35em 0.75em;
+}
+
+.o_sla_progress_percent {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.o_sla_progress_over {
+    font-size: 0.75rem;
+    font-weight: 500;
+    vertical-align: middle;
+    opacity: 0.85;
+}
+
+.o_sla_progress_track {
+    position: relative;
+    height: 14px;
+    border-radius: 7px;
+    background: var(--SlaProgress-track, rgba(0, 0, 0, 0.08));
+    overflow: hidden;
+}
+
+.o_sla_progress_fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    height: 100%;
+    border-radius: 7px;
+    transition: width 0.6s ease;
+    background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%);
+}
+
+.o_sla_progress_overflow {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 6px;
+    opacity: 0.9;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.55) 0 4px,
+        rgba(255, 255, 255, 0) 4px 8px
+    );
+    animation: o_sla_progress_pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes o_sla_progress_pulse {
+    0%, 100% { opacity: 0.65; }
+    50% { opacity: 1; }
+}
+
+.o_sla_progress_target_line {
+    position: absolute;
+    right: 0;
+    top: -2px;
+    bottom: -2px;
+    width: 0;
+    border-right: 2px dashed rgba(0, 0, 0, 0.25);
+    z-index: 1;
+}
+
+.o_sla_progress_milestones {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.o_sla_progress_milestone {
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+.o_sla_progress_milestone_label {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--SlaProgress-label, #8a8d93);
+    margin-bottom: 2px;
+}
+
+.o_sla_progress_milestone_value {
+    font-weight: 600;
+}
+
+.o_sla_progress_milestone_relative {
+    font-size: 0.72rem;
+}
+
+.o_sla_progress_foot {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    padding-top: 6px;
+    border-top: 1px solid var(--SlaProgress-border, rgba(0, 0, 0, 0.06));
+}
+
+.o_sla_progress_foot_item {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* "Source Record" row on the sla.task form (res_id/many2one_reference +
+ * res_model, combined on one line): both field wrappers are plain
+ * `o_field_widget` divs that default to block/full-width, which breaks
+ * them onto separate lines inside the flex row above. Force them back to
+ * inline sizing so "<record name> (model.name)" reads as one line. */
+.o_dwo_source_record {
+    .o_field_many2one_reference,
+    .o_field_many2one_reference .o_many2one,
+    .o_field_many2one_reference .o_form_uri {
+        display: inline-block !important;
+        width: auto !important;
+    }
+    .o_field_char {
+        display: inline !important;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .o_sla_progress_card {
+        --SlaProgress-bg: rgba(255, 255, 255, 0.03);
+        --SlaProgress-border: rgba(255, 255, 255, 0.08);
+        --SlaProgress-track: rgba(255, 255, 255, 0.1);
+        --SlaProgress-label: #9ea1a8;
+    }
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo-only: nút SLA trên form project.task, công thức đúng như
+         070_User-Guide.md hướng dẫn khách tự thêm trên model của họ. -->
+    <record id="view_task_form2_sla_button" model="ir.ui.view">
+        <field name="name">project.task.form.sla.button</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <!-- Breached: nút đỏ -->
+                <button name="action_view_sla_tasks" type="object"
+                        class="oe_stat_button text-danger" icon="fa-exclamation-triangle"
+                        groups="dwo_sla_core.group_sla_user"
+                        invisible="sla_task_breach_count == 0">
+                    <field name="sla_task_active_count" widget="statinfo" string="SLA"/>
+                </button>
+                <!-- Không breach: nút trung tính -->
+                <button name="action_view_sla_tasks" type="object"
+                        class="oe_stat_button" icon="fa-clock-o"
+                        groups="dwo_sla_core.group_sla_user"
+                        invisible="sla_task_breach_count &gt; 0 or sla_task_active_count == 0">
+                    <field name="sla_task_active_count" widget="statinfo" string="SLA"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

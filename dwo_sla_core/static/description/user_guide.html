@@ -1,0 +1,322 @@
+<div class="container">
+
+    <div class="text-center pt-5 pb-4 border-bottom mb-5">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 32px; color: #15133A;">DWO SLA Core &mdash; User Guide</h1>
+        <p class="mb-1" style="font-size: 17px; color: #2C2A6B;">How to configure, run and read Service Level Agreements on any Odoo model.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Applies to Odoo Community and Enterprise. Written for SLA Managers and SLA Users.</p>
+    </div>
+
+    <div class="p-4 mb-5" style="border: 1px solid #ddd;" border="1">
+        <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 16px; color: #15133A;">Contents</h4>
+        <table cellpadding="4" cellspacing="0" style="font-size: 14px;">
+            <tr><td style="padding: 2px 16px 2px 0;">1.</td><td><a href="#overview">Overview &amp; Key Concepts</a></td>
+                <td style="padding: 2px 16px 2px 24px;">10.</td><td><a href="#retroactive">Retroactive Start &amp; Retroactive Pause</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">2.</td><td><a href="#before-you-begin">Before You Begin</a></td>
+                <td style="padding: 2px 16px 2px 24px;">11.</td><td><a href="#sla-task">Reading an SLA Task</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">3.</td><td><a href="#lifecycle">The SLA Lifecycle</a></td>
+                <td style="padding: 2px 16px 2px 24px;">12.</td><td><a href="#event-log">Event Log &amp; Audit Trail</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">4.</td><td><a href="#conditions">The Six Conditions</a></td>
+                <td style="padding: 2px 16px 2px 24px;">13.</td><td><a href="#reporting">Reporting</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">5.</td><td><a href="#first-definition">Create Your First SLA Definition</a></td>
+                <td style="padding: 2px 16px 2px 24px;">14.</td><td><a href="#admin">Administration Settings</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">6.</td><td><a href="#duration-calendar">Duration, Calendar &amp; Timezone</a></td>
+                <td style="padding: 2px 16px 2px 24px;">15.</td><td><a href="#troubleshooting">Troubleshooting</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">7.</td><td><a href="#classification">Classification: SLA vs. OLA</a></td>
+                <td style="padding: 2px 16px 2px 24px;">16.</td><td><a href="#glossary">Glossary</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">8.</td><td><a href="#escalation">Escalation Rules</a></td>
+                <td style="padding: 2px 16px 2px 24px;">17.</td><td><a href="#support">Support</a></td></tr>
+            <tr><td style="padding: 2px 16px 2px 0;">9.</td><td><a href="#smart-button">Smart Button on the Source Record</a></td><td></td><td></td></tr>
+        </table>
+    </div>
+
+    <h2 id="overview" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">1. Overview &amp; Key Concepts</h2>
+    <p class="mb-3" style="font-size: 15px;">DWO SLA Core measures and enforces time-bound commitments on <strong>any model</strong> in your Odoo
+    database. You describe what to watch and when with plain Odoo domain conditions; the module takes care of starting
+    the clock, pausing and resuming it, detecting a breach, running escalations and keeping a full history &mdash; with
+    no code. Four terms come up throughout this guide:</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Term</th><th style="color: #15133A;">Meaning</th></tr>
+        <tr><td><strong>SLA Definition</strong></td><td>The configuration record: one model, six conditions, a target
+            duration, a calendar and (optionally) escalation rules. Editing it never changes tasks already running &mdash;
+            every task keeps the configuration it was created with.</td></tr>
+        <tr><td><strong>SLA Task</strong></td><td>One running (or finished) measurement, created automatically the moment
+            a specific record matches an SLA Definition's Start Condition. A single record can have several tasks at once
+            if it matches several definitions (for example a Response SLA and a Resolution SLA).</td></tr>
+        <tr><td><strong>Business time</strong> vs. <strong>wall-clock time</strong></td><td>Business time only counts hours
+            inside the selected working calendar (used for the target duration and for deciding a breach). Wall-clock time
+            counts every hour regardless of the calendar, shown separately for information. With no calendar selected the
+            two are identical (a plain 24/7 clock).</td></tr>
+        <tr><td><strong>Breach</strong></td><td>Set the moment business time reaches the target duration while a task is
+            still running. Once set, it is never cleared &mdash; even if the task is later paused or its deadline recomputed.</td></tr>
+    </table>
+
+    <h2 id="before-you-begin" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">2. Before You Begin</h2>
+    <p class="mb-3" style="font-size: 15px;">Two access groups control who can do what. Ask your administrator to add you
+    to the right one from <strong>Settings &rarr; Users &amp; Companies &rarr; Users</strong>.</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Group</th><th style="color: #15133A;">Can do</th></tr>
+        <tr><td><strong>SLA / User</strong></td><td>Read SLA Definitions, SLA Tasks and the Event Log. Enough to answer
+            &ldquo;why is this record late?&rdquo; without being able to change how any SLA is configured.</td></tr>
+        <tr><td><strong>SLA / Manager</strong></td><td>Everything a User can do, plus create and edit SLA Definitions, run
+            <strong>Recalculate</strong> and <strong>Re-evaluate</strong> on a task, and mark an error event resolved.</td></tr>
+    </table>
+    <p class="mb-3" style="font-size: 15px;">You do not need to know Python. You do need to be comfortable with Odoo's own
+    domain/filter builder (the same widget used everywhere in Odoo to build a filter such as <em>Priority is Urgent</em>) &mdash;
+    every SLA condition in this module is written with exactly that widget.</p>
+
+    <h2 id="lifecycle" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">3. The SLA Lifecycle</h2>
+    <p class="mb-3" style="font-size: 15px;">A background job checks every active task once a minute. Over its life, a
+    task moves through this sequence:</p>
+    <ol style="font-size: 15px;" class="mb-4">
+        <li class="mb-2"><strong>Attach.</strong> A record starts matching the Start Condition &rarr; a task is created and
+            the clock starts, either now or, with Retroactive Start, from a date already on the record.</li>
+        <li class="mb-2"><strong>In Progress.</strong> Business time accumulates. The deadline (Planned End) is computed
+            from the start time, the target duration and the working calendar.</li>
+        <li class="mb-2"><strong>Paused</strong> (optional, repeatable). The record starts matching the Pause Condition &rarr;
+            the clock stops. It resumes either when the Pause Condition stops matching, or when the Resume Condition
+            matches, depending on Resume Mode.</li>
+        <li class="mb-2"><strong>Breached</strong> (if it happens). The moment business time reaches the target duration
+            while still In Progress, the task is flagged breached. It keeps running &mdash; a breach does not stop a task.</li>
+        <li class="mb-2"><strong>Stopped.</strong> The record starts matching the Stop Condition &rarr; the task closes as
+            <strong>Achieved</strong> (stopped before the deadline) or <strong>Breached</strong> (stopped at or after it).</li>
+    </ol>
+    <p class="mb-3" style="font-size: 15px;">Two conditions can end a task outside this normal path:
+    <strong>Cancel</strong> (the task is discarded, not counted as achieved or breached &mdash; typically because the
+    record left the scope of the rule) and <strong>Reset</strong> (a tracked field changed in a way that invalidates the
+    current measurement; the previous task is cancelled or completed, and the record is re-evaluated from scratch).</p>
+
+    <h2 id="conditions" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">4. The Six Conditions</h2>
+    <p class="mb-3" style="font-size: 15px;">Every SLA Definition is built from up to six conditions, each a plain Odoo
+    domain on the target model. Leave a condition empty to mean &ldquo;not used&rdquo;; use <code>[]</code> to mean
+    &ldquo;always true&rdquo;.</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Condition</th><th style="color: #15133A;">Controls</th><th style="color: #15133A;">Example</th></tr>
+        <tr><td><strong>Start</strong></td><td>When a task is created for a record.</td><td><code>[('priority', '=', '3')]</code> &mdash; starts for urgent records only.</td></tr>
+        <tr><td><strong>Stop</strong></td><td>When a running task closes (Achieved/Breached).</td><td><code>[('stage_id.is_closed', '=', True)]</code></td></tr>
+        <tr><td><strong>Pause</strong></td><td>When a running task's clock stops.</td><td><code>[('stage', '=', 'waiting_on_customer')]</code></td></tr>
+        <tr><td><strong>Resume</strong></td><td>When a paused task's clock restarts (only used if Resume Mode is &ldquo;When the resume condition matches&rdquo;).</td><td><code>[('stage', '!=', 'waiting_on_customer')]</code></td></tr>
+        <tr><td><strong>Cancel</strong></td><td>When a running task is discarded instead of completed (only used if Cancel Mode is &ldquo;When the cancel condition matches&rdquo;).</td><td><code>[('active', '=', False)]</code></td></tr>
+        <tr><td><strong>Reset</strong></td><td>Together with the Reset Field list: which field changes should restart the measurement.</td><td>Reset Field = Priority, on a model where priority changing should re-qualify the record.</td></tr>
+    </table>
+    <div class="p-3 mb-4" style="border-left: 4px solid #D6A64B; font-size: 14px;">
+        <strong>Three mistakes to avoid</strong> when writing conditions:
+        <ol class="mb-0 mt-2">
+            <li>A Start Condition that is a <em>subset</em> of the Stop Condition &mdash; the SLA would never attach, because
+                anything matching Start already matches Stop.</li>
+            <li>A Pause Condition that is a subset of the Start Condition &mdash; the task attaches already paused, and is
+                cancelled the moment the pause ends (since by then it no longer matches Start either).</li>
+            <li>Start and Pause Conditions that are mutually exclusive in the wrong way &mdash; the task can be cancelled
+                before it ever gets the chance to pause.</li>
+        </ol>
+    </div>
+    <p class="mb-4" style="font-size: 14px;" class="text-muted">Limit to keep in mind: a condition that reads a
+    non-stored computed field, or one that reaches across a relation (for example <code>partner_id.country_id</code>),
+    is not automatically re-evaluated when only the related record changes. Use the <strong>Re-evaluate</strong> button
+    on the task (or <strong>Re-evaluate</strong> on the error list for a batch) to refresh it on demand.</p>
+    <div class="text-center mb-5">
+        <img src="screenshot_2.png" alt="Start Condition tab showing Odoo's domain builder with rules on Project and Priority fields" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+        <p class="text-muted mt-2" style="font-size: 13px;">A Start Condition built entirely with Odoo's own domain editor &mdash; no code.</p>
+    </div>
+
+    <h2 id="first-definition" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">5. Create Your First SLA Definition</h2>
+    <ol style="font-size: 15px;" class="mb-4">
+        <li class="mb-2">Go to <strong>SLA &rarr; SLA Definitions &rarr; New</strong>.</li>
+        <li class="mb-2">Give it a clear <strong>Name</strong> &mdash; it is shown on every task it creates (for example
+            &ldquo;Ticket Response &mdash; Priority 1&rdquo;).</li>
+        <li class="mb-2">Pick the <strong>Model</strong> to watch. This can be any model installed in your database.</li>
+        <li class="mb-2">Under <strong>Start Condition</strong>, build the domain that defines which records this SLA
+            applies to.</li>
+        <li class="mb-2">Under <strong>Stop Condition</strong>, build the domain that means &ldquo;this record is
+            done&rdquo;. Remember: Start must be a subset of Stop (see the warning above).</li>
+        <li class="mb-2">Set the <strong>Duration</strong> (in hours) and, if you want business hours instead of a 24/7
+            clock, a <strong>Calendar Source</strong> (see section 6).</li>
+        <li class="mb-2">Save. The very next record that matches the Start Condition gets its own SLA Task automatically
+            &mdash; no restart, no manual action.</li>
+    </ol>
+    <p class="mb-4" style="font-size: 14px;">Pause/Resume, Cancel, Reset and Escalation are all optional and can be added
+    later; a definition only needs a Model, a Start Condition, a Stop Condition and a Duration to work.</p>
+
+    <h2 id="duration-calendar" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">6. Duration, Calendar &amp; Timezone</h2>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Calendar Source</th><th style="color: #15133A;">Behaviour</th></tr>
+        <tr><td><strong>No calendar (24x7)</strong></td><td>Plain clock time, every hour counts, including nights, weekends and holidays.</td></tr>
+        <tr><td><strong>Fixed calendar on the definition</strong></td><td>Always uses the Working Calendar you pick on the definition (for example &ldquo;Standard 40 hours/week&rdquo;), regardless of the record.</td></tr>
+        <tr><td><strong>Calendar read from the record</strong></td><td>Follows a calendar found by walking a dot-separated path of Many2one fields from the record (Calendar Path), for example <code>partner_id.resource_calendar_id</code>. If any step is empty or the calendar cannot be used, the company's calendar is used, then plain 24/7 as a last resort.</td></tr>
+    </table>
+    <p class="mb-3" style="font-size: 15px;"><strong>Timezone</strong> (on the Schedule section) lets you reuse one
+    working calendar's hour pattern (say, 08:00&ndash;17:00) under a different timezone for a specific SLA, without
+    touching the original calendar or anything else that uses it. Leave it empty to use the calendar's own timezone.
+    The module automatically creates (and reuses) a hidden copy of the resolved calendar in the chosen timezone the
+    first time it is needed.</p>
+
+    <h2 id="classification" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">7. Classification: SLA vs. OLA</h2>
+    <p class="mb-3" style="font-size: 15px;">These fields never change how the six conditions behave &mdash; they exist
+    purely to organise and report on your definitions.</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Field</th><th style="color: #15133A;">Use</th></tr>
+        <tr><td><strong>Type</strong> (SLA / OLA)</td><td>SLA: a commitment measured directly with an external customer. OLA: an internal commitment supporting a larger SLA, not shown to the customer.</td></tr>
+        <tr><td><strong>Target</strong> (Response / Resolution)</td><td>Optional tag for filtering and grouping reports.</td></tr>
+        <tr><td><strong>Vendor</strong></td><td>The external vendor this OLA is measured against, for reporting, when it backs an Underpinning Contract.</td></tr>
+        <tr><td><strong>Service Commitment</strong></td><td>Tick for a definition that is an officially published commitment on a service contract, as opposed to an internal-only measure.</td></tr>
+    </table>
+
+    <h2 id="escalation" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">8. Escalation Rules</h2>
+    <ol style="font-size: 15px;" class="mb-3">
+        <li class="mb-2">Open the SLA Definition and go to the <strong>Escalation</strong> tab.</li>
+        <li class="mb-2">Click <strong>Add a line</strong>. Set the <strong>Percent</strong> of the target time at which
+            it should run (a whole number &gt; 0; a value above 100 fires after the deadline &mdash; for example 150 fires
+            when the task has used one and a half times its target).</li>
+        <li class="mb-2">Pick the <strong>Action Type</strong>: <strong>Send Email</strong> (the default &mdash; works
+            out of the box) with <strong>Notify</strong> set to Responsible User/Partner on Record, an Email Field on
+            Record, or a Fixed Email Address; or <strong>Run Server Action</strong> (advanced) for full control via any
+            standard Odoo Server Action on the same model as the definition.</li>
+        <li class="mb-2">Stack as many rows as the process needs &mdash; each percentage fires once, independently.</li>
+    </ol>
+    <p class="mb-3" style="font-size: 14px;">If the action fails, the engine logs one <strong>Escalate Failed</strong>
+    event with the error and moves on &mdash; it does not retry (most failures are configuration issues that a retry
+    would not fix on its own; see Troubleshooting). Server Actions always run with the permissions of the background
+    job's own user, never with the permissions of whoever last edited the source record.</p>
+    <div class="text-center mb-5">
+        <img src="screenshot_4.png" alt="Escalation tab with two threshold rules at 75% and 100%, one emailing every assignee and one emailing a fixed on-call address" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+        <p class="text-muted mt-2" style="font-size: 13px;">A two-stage escalation: a 75% warning emailed to every assignee at once, then a 100% breach alert to a fixed on-call address.</p>
+    </div>
+
+    <h2 id="smart-button" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">9. Smart Button on the Source Record</h2>
+    <p class="mb-3" style="font-size: 15px;">The SLA Progress widget lives on the SLA Task screen. To see SLA status
+    without leaving the ticket, task or any other record it is attached to, add a one-line smart button to that
+    model's own form: inherit <code>sla.mixin</code> on the model, then add one <code>oe_stat_button</code> showing
+    <code>sla_task_active_count</code> that turns red (<code>sla_task_breach_count &gt; 0</code>) the moment a task is
+    breached. Agents get a priority signal at a glance, without reading a number. The button only shows for users in
+    the SLA User/Manager groups. The exact code snippet is in the repository User Guide
+    (<code>docs/070_User-Guide.md</code>) shipped with the module.</p>
+
+    <h2 id="retroactive" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">10. Retroactive Start &amp; Retroactive Pause</h2>
+    <p class="mb-3" style="font-size: 15px;">By default, the clock starts the moment a task attaches. Tick
+    <strong>Retroactive Start</strong> and pick a <strong>Start-Marker Field</strong> (any Datetime field on the model,
+    for example &ldquo;Created on&rdquo;) to instead start the clock from a date already on the record &mdash; useful when
+    an SLA rule is added after records already exist, or when the real clock should start earlier than the moment the
+    rule matched (for example, a ticket's actual creation time rather than when it was re-prioritised into scope).
+    A backdated start can make a task breached the instant it attaches.</p>
+    <p class="mb-3" style="font-size: 15px;"><strong>Retroactive Pause</strong> (on by default when Retroactive Start is
+    used) avoids over-penalising a backdated task: it looks at the record's own change history for the backdated window
+    and credits any period where the Pause Condition was already true, instead of counting that whole window as running
+    time. For example:</p>
+    <div class="p-3 mb-3" style="border-left: 4px solid #3E7CB1; font-size: 14px;">
+        A ticket is retroactively started 40 hours in the past. Looking at its tracked field history, it was actually on
+        hold (matching the Pause Condition) for 5 of those 40 hours before the rule even applied. With Retroactive Pause
+        on, those 5 hours are credited: Total Paused Hours (Business) shows <strong>05:00 h</strong> and Business
+        Duration is reduced accordingly, instead of counting the full 40 hours as time spent working the ticket.
+    </div>
+    <p class="mb-4" style="font-size: 14px;">Retroactive Pause only has an effect when the model, and every field used in
+    the Pause Condition, are change-tracked in Odoo (<code>mail.thread</code> with <code>tracking=True</code> fields).
+    When they are not, the configuration screen shows a clear warning explaining that the backdated window will be
+    counted as running time instead &mdash; the SLA still works, it simply cannot reconstruct a history that was never
+    recorded.</p>
+
+    <h2 id="sla-task" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">11. Reading an SLA Task</h2>
+    <p class="mb-3" style="font-size: 15px;">Every task opens on an <strong>SLA Progress</strong> card that answers
+    &ldquo;where does this commitment stand?&rdquo; at a glance:</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Badge</th><th style="color: #15133A;">Meaning</th></tr>
+        <tr><td><strong>On Track</strong></td><td>In Progress, not breached, not due soon.</td></tr>
+        <tr><td><strong>Due Soon</strong></td><td>In Progress, not breached, deadline within the configured &ldquo;Due Soon&rdquo; window (see section 12).</td></tr>
+        <tr><td><strong>Breaching Now</strong></td><td>Past the deadline and still running (In Progress or Paused).</td></tr>
+        <tr><td><strong>Paused</strong></td><td>Clock stopped; resumes per the Resume Mode.</td></tr>
+        <tr><td><strong>Achieved</strong></td><td>Closed on or before the deadline.</td></tr>
+        <tr><td><strong>Completed Late</strong></td><td>Closed after the deadline.</td></tr>
+        <tr><td><strong>Cancelled</strong></td><td>Discarded; not counted as achieved or breached.</td></tr>
+    </table>
+    <p class="mb-3" style="font-size: 15px;">The progress bar is always capped at 100% of the target so it stays
+    readable; once a task runs far past its deadline, the overrun is shown as a multiplier next to the percentage
+    (for example &ldquo;100% (70.0&times; over target)&rdquo;) instead of a four- or five-digit number.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_3.png" alt="SLA Task form with the SLA Progress widget showing a red breaching status, a capped progress bar and Start/Deadline/End milestones" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+    </div>
+    <p class="mb-2" style="font-size: 15px;">Below the card, the <strong>Overview</strong> tab groups every field the
+    task carries:</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 13px;">
+        <tr><th style="color: #15133A;">Group</th><th style="color: #15133A;">Fields</th></tr>
+        <tr><td><strong>Record</strong></td><td>SLA (the definition), Source Record (the watched record, click to open it), Company.</td></tr>
+        <tr><td><strong>Target</strong></td><td>Target Duration, Calendar used.</td></tr>
+        <tr><td><strong>Timeline</strong></td><td>Start, Planned End (recomputed on resume), Original Breach Time (the deadline as first computed, never changed afterwards), End.</td></tr>
+        <tr><td><strong>Progress (Business Time)</strong></td><td>Running Since, Business Duration, Total Paused Hours (Business), Breached.</td></tr>
+        <tr><td><strong>Progress (Wall-clock Time)</strong></td><td>Paused Since, Duration, Total Paused Hours (Clock) &mdash; the same measurements in real elapsed hours, not excluding non-working time.</td></tr>
+    </table>
+    <p class="mb-4" style="font-size: 14px;">SLA Managers see two buttons in the header: <strong>Recalculate</strong>
+    (recompute the Planned End from the current target duration and calendar &mdash; useful after editing those on the
+    definition) and <strong>Re-evaluate</strong> (check all six conditions again against the current state of the
+    record &mdash; useful after a non-stored or relation-crossing condition may be stale, see section 4).</p>
+
+    <h2 id="event-log" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">12. Event Log &amp; Audit Trail</h2>
+    <p class="mb-3" style="font-size: 15px;">The <strong>History</strong> tab of a task, and the standalone
+    <strong>SLA Events</strong> list, record every decision the engine made, with a timestamp and (where relevant) a
+    note explaining why.</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Event</th><th style="color: #15133A;">Logged when</th></tr>
+        <tr><td>Attach</td><td>A task is created.</td></tr>
+        <tr><td>Pause / Resume</td><td>The clock stops or restarts.</td></tr>
+        <tr><td>Complete</td><td>The task closes as Achieved or Breached.</td></tr>
+        <tr><td>Cancel</td><td>The task is discarded.</td></tr>
+        <tr><td>Reset</td><td>A tracked field change invalidated the measurement and it restarted.</td></tr>
+        <tr><td>Breach</td><td>The deadline passes while the task is still running.</td></tr>
+        <tr><td>Escalate / Escalate Failed</td><td>An escalation (email or server action) ran, or failed.</td></tr>
+        <tr><td>Error</td><td>The engine could not process this task (for example a broken condition); never blocks
+            saving the source record. SLA Managers can mark these resolved from <strong>Unresolved Error
+            Events</strong> once fixed.</td></tr>
+    </table>
+
+    <h2 id="reporting" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">13. Reporting</h2>
+    <p class="mb-3" style="font-size: 15px;">SLA Tasks ship with ready-to-use List, Pivot and Graph views. Two measures
+    are purpose-built for SLA reporting:</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Measure</th><th style="color: #15133A;">Meaning</th></tr>
+        <tr><td><strong>Achieved Rate</strong></td><td>1 for a task that ended on time, 0 for one that ended breached, empty while still running. Averaged over a group, it is the share of tasks achieved (0.8 = 80%).</td></tr>
+        <tr><td><strong>Currently Breaching</strong></td><td>1 while a task is running or paused and already past its deadline, otherwise 0. Summed over a group, it is how many SLAs are in breach right now.</td></tr>
+    </table>
+    <div class="text-center mb-5">
+        <img src="screenshot_8.png" alt="Pivot table of SLA Tasks broken down by definition, with Business Duration, Achieved Rate and Currently Breaching columns" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+    </div>
+
+    <h2 id="admin" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">14. Administration Settings</h2>
+    <p class="mb-3" style="font-size: 15px;">SLA Managers can tune three parameters from
+    <strong>Settings &rarr; SLA</strong>:</p>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Setting</th><th style="color: #15133A;">Default</th><th style="color: #15133A;">Effect</th></tr>
+        <tr><td>Event Log Retention (days)</td><td>365</td><td>SLA events older than this are deleted automatically.</td></tr>
+        <tr><td>&ldquo;Due Soon&rdquo; Window (hours)</td><td>4</td><td>Size of the window used by the Due Soon badge and filter.</td></tr>
+        <tr><td>Background Processing Batch Size</td><td>50</td><td>How many tasks the background job processes per run, so a large backlog is worked off over several runs instead of blocking.</td></tr>
+    </table>
+    <p class="mb-4" style="font-size: 14px;">The background job itself needs no setup: it runs once a minute as a
+    standard Odoo scheduled action (<code>ir.cron</code>), visible like any other under <strong>Settings &rarr;
+    Technical &rarr; Scheduled Actions</strong> for an administrator.</p>
+
+    <h2 id="troubleshooting" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">15. Troubleshooting</h2>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><th style="color: #15133A;">Symptom</th><th style="color: #15133A;">Likely cause &amp; fix</th></tr>
+        <tr><td>No task is ever created for an SLA Definition.</td><td>The Start Condition is probably a subset of the Stop Condition &mdash; every record that could start already matches Stop. Widen Start or narrow Stop.</td></tr>
+        <tr><td>A task attaches already paused and is immediately cancelled.</td><td>The Pause Condition is a subset of the Start Condition. Make sure a record can match Start without also matching Pause.</td></tr>
+        <tr><td>A task's fields look stale after editing an unrelated record.</td><td>A condition reads a non-stored computed field or crosses a relation; those are not auto-refreshed. Use <strong>Re-evaluate</strong>.</td></tr>
+        <tr><td>Retroactive Pause shows a warning and credits no time.</td><td>The model (or a field used in the Pause Condition) is not change-tracked in Odoo. The backdated window is counted as running time, same as with Retroactive Pause off.</td></tr>
+        <tr><td>An escalation did not run, or shows Escalate Failed.</td><td>Check the task's Event Log for the error note. For email: confirm the chosen field actually holds a value on that record. For Server Action: confirm its model matches the SLA Definition's model. The engine does not retry automatically &mdash; fix the configuration, then use Re-evaluate or wait for the next threshold.</td></tr>
+        <tr><td>I changed a definition's Duration but existing tasks did not change.</td><td>By design &mdash; a task snapshots its configuration when it attaches. Use <strong>Recalculate</strong> on the task, or wait for it to complete and let the next one pick up the new value.</td></tr>
+    </table>
+
+    <h2 id="glossary" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">16. Glossary</h2>
+    <table border="1" cellpadding="8" cellspacing="0" class="table table-bordered table-sm mb-4" style="font-size: 14px;">
+        <tr><td><strong>Business time</strong></td><td>Elapsed time counted only during the hours of the applicable working calendar.</td></tr>
+        <tr><td><strong>Breach</strong></td><td>The deadline has passed while a task was still active; never cleared once set.</td></tr>
+        <tr><td><strong>Escalation</strong></td><td>An email or Server Action fired automatically once a task reaches a configured percentage of its target.</td></tr>
+        <tr><td><strong>OLA</strong></td><td>Operational Level Agreement &mdash; an internal commitment supporting a customer-facing SLA.</td></tr>
+        <tr><td><strong>Planned End</strong></td><td>The current computed deadline; recomputed on resume or Recalculate.</td></tr>
+        <tr><td><strong>Original Breach Time</strong></td><td>The deadline as first computed when the task attached, kept unchanged afterwards.</td></tr>
+        <tr><td><strong>Retroactive Start</strong></td><td>Starting the clock from a date already on the record, instead of the moment the task attaches.</td></tr>
+        <tr><td><strong>Retroactive Pause</strong></td><td>Crediting a backdated window with any hold time already visible in the record's change history.</td></tr>
+        <tr><td><strong>Wall-clock time</strong></td><td>Elapsed real time, not excluding non-working hours.</td></tr>
+    </table>
+
+    <h2 id="support" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">17. Support</h2>
+    <p class="mb-5" style="font-size: 15px;">Questions about configuring a rule, or something that does not match this
+    guide? Write to <a href="mailto:tienhieu1212@gmail.com">tienhieu1212@gmail.com</a> with your Odoo version, the SLA
+    Definition involved, and what you expected to happen.</p>
+
+</div>
