@@ -20,7 +20,7 @@ Features:
     'author': 'DUO-TEK Software Vietnam',
     'website': 'https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam',
     'license': 'OPL-1',
-    'category': 'Technical',
+    'category': 'Extra Tools',
     'version': '16.0.1.0.0',
     'depends': ['web'],
     'data': [
