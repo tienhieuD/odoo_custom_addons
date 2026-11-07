@@ -8,8 +8,8 @@
     'license': 'OPL-1',
     'category': 'Extra Tools',
     'version': '15.0.1.0.0',
-    'price': 39.00,
-    'currency': 'USD',
+    'price': 35.00,
+    'currency': 'EUR',
     'depends': ['base', 'web', 'web_editor'],
     'data': [
         'data/demo.xml',
