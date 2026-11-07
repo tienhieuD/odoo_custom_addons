@@ -260,19 +260,33 @@ class TestProtectJob(TransactionCase):
         self.assertEqual(job_model._binary_field_to_bytes(None), b"")
 
     def test_output_zip_name(self):
-        """_output_zip_name strips .zip and appends _compile.zip; with a record_id it also
-        appends a time + id suffix so two jobs never produce the same download filename."""
+        """_output_zip_name strips .zip and appends _compile_<py_tag>.zip; with a record_id it
+        also appends a time + id suffix so two jobs never produce the same download filename.
+        With no explicit python_version, it falls back to the CURRENT interpreter's."""
         import datetime
+        import sys
 
         job_model = self.env["dwo.protect.job"]
-        self.assertEqual(job_model._output_zip_name("sale_ext.zip"), "sale_ext_compile.zip")
-        self.assertEqual(job_model._output_zip_name("module"), "module_compile.zip")
+        current_tag = "py{0}{1}".format(sys.version_info.major, sys.version_info.minor)
+        self.assertEqual(
+            job_model._output_zip_name("sale_ext.zip"), "sale_ext_compile_{0}.zip".format(current_tag)
+        )
+        self.assertEqual(
+            job_model._output_zip_name("module"), "module_compile_{0}.zip".format(current_tag)
+        )
 
         ts = datetime.datetime(2026, 1, 2, 3, 4, 5)
         self.assertEqual(
-            job_model._output_zip_name("sale_ext.zip", record_id=42, timestamp=ts),
-            "sale_ext_compile_20260102030405_42.zip",
+            job_model._output_zip_name(
+                "sale_ext.zip", record_id=42, timestamp=ts, python_version="3.11.9"
+            ),
+            "sale_ext_compile_py311_20260102030405_42.zip",
         )
+
+    def test_python_version_tag(self):
+        job_model = self.env["dwo.protect.job"]
+        self.assertEqual(job_model._python_version_tag("3.12.3"), "py312")
+        self.assertEqual(job_model._python_version_tag("3.9.0"), "py39")
 
     def test_finalize_output_filename_has_timestamp_and_id(self):
         """A real finished job's result attachment name contains the job's own id, so two
@@ -282,6 +296,24 @@ class TestProtectJob(TransactionCase):
         self._run_to_completion(job)
         self.assertEqual(job.state, "done")
         self.assertIn("_{0}.zip".format(job.id), job.result_attachment_id.sudo().name)
+
+    def test_job_records_python_version(self):
+        """python_version is set once extraction starts (so it survives even if the process
+        is later killed/restarted mid-job, see _checkpoint) and the output filename carries
+        the matching tag."""
+        import sys
+
+        zip_bytes = _make_zip([{"root": "sale_ext", "manifest": True, "has_models": True}])
+        job = self._new_job(zip_bytes, filename="sale_ext.zip")
+        self.assertFalse(job.python_version)
+        job._process_one_step()  # extract
+        expected = "{0}.{1}.{2}".format(*sys.version_info[:3])
+        self.assertEqual(job.python_version, expected)
+
+        self._run_to_completion(job)
+        self.assertEqual(job.state, "done")
+        tag = "py{0}{1}".format(sys.version_info.major, sys.version_info.minor)
+        self.assertIn("_{0}_".format(tag), job.result_attachment_id.sudo().name)
 
     def test_module_step_skipped_after_retry_cap(self):
         """If a module's protect step has already failed MAX_STEP_ATTEMPTS times (simulating

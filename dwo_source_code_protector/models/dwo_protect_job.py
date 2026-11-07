@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import shutil
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -73,6 +74,13 @@ class DwoProtectJob(models.Model):
         "would retry the same module forever. See MAX_STEP_ATTEMPTS.",
     )
     module_roots_json = fields.Text(readonly=True)  # danh sach duong dan tuong doi, JSON
+    python_version = fields.Char(
+        readonly=True,
+        help="Python interpreter version of THIS server process (sys.version_info), i.e. the "
+        "version the compiled .so/.pyd artifacts in the output zip were built for. Set once "
+        "extraction starts; shown so users compiling for several Python versions (e.g. "
+        "different Odoo major versions) know which run produced which zip.",
+    )
 
     result_attachment_id = fields.Many2one("ir.attachment", readonly=True)
     result_file = fields.Binary(
@@ -151,6 +159,19 @@ class DwoProtectJob(models.Model):
         if isinstance(value, (str, bytes, bytearray, memoryview)):
             return base64.b64decode(value)
         return bytes(value)  # BinaryValue/BinaryBytes (Odoo 20+ record read): already raw
+
+    @staticmethod
+    def _current_python_version():
+        """'3.12.3' -- phien ban interpreter dang chay process nay (nen dang COMPILE cho
+        phien ban nay, khong phai phien ban zip goc duoc viet)."""
+        return ".".join(str(part) for part in sys.version_info[:3])
+
+    @staticmethod
+    def _python_version_tag(version_str):
+        """'3.12.3' -> 'py312', dung trong ten file zip ket qua (ngan, khong co dau cham de
+        tranh lan voi phan ten/timestamp khac trong _output_zip_name)."""
+        major, minor = version_str.split(".")[:2]
+        return "py{0}{1}".format(major, minor)
 
     @staticmethod
     def _human_size(num_bytes):
@@ -334,6 +355,7 @@ class DwoProtectJob(models.Model):
             "date_started": fields.Datetime.now(),
             "progress": 5.0,
             "step_description": _("Extracted the zip, found %d module(s).") % len(rel_roots),
+            "python_version": self._current_python_version(),
         })
         # Mat khau chi can dung mot lan nua luc nen ket qua (buoc finalize) -- da dung roi thi
         # giu nguyen, se xoa han o _step_finalize.
@@ -449,7 +471,9 @@ class DwoProtectJob(models.Model):
         extract_dir = os.path.join(self.work_dir, "src")
         password_bytes = self.password.encode() if self.password else None
         output_zip_bytes = self._zip_dir(extract_dir, password_bytes)
-        output_filename = self._output_zip_name(self.name, record_id=self.id)
+        output_filename = self._output_zip_name(
+            self.name, record_id=self.id, python_version=self.python_version
+        )
 
         attachment = self.env["ir.attachment"].sudo().create({
             "name": output_filename,
@@ -580,17 +604,19 @@ class DwoProtectJob(models.Model):
                     zf.write(file_path, file_path.relative_to(source_path))
         return buf.getvalue()
 
-    def _output_zip_name(self, upload_filename, record_id=None, timestamp=None):
-        """Ten file ket qua gom timestamp + id cua record job (khi co record_id), de 2 ban
+    def _output_zip_name(self, upload_filename, record_id=None, timestamp=None, python_version=None):
+        """Ten file ket qua gom tag phien ban Python da compile (de biet .so/.pyd trong zip
+        danh cho ban Python nao) + timestamp + id cua record job (khi co record_id), de 2 ban
         download tu 2 job khac nhau (hoac tai lai cung 1 job sau khi retry) khong bao gio
         trung ten tren may nguoi dung."""
         stem = upload_filename
         if stem.lower().endswith(".zip"):
             stem = stem[:-4]
+        py_tag = self._python_version_tag(python_version or self._current_python_version())
         if not record_id:
-            return "{0}_compile.zip".format(stem)
+            return "{0}_compile_{1}.zip".format(stem, py_tag)
         ts = (timestamp or fields.Datetime.now()).strftime("%Y%m%d%H%M%S")
-        return "{0}_compile_{1}_{2}.zip".format(stem, ts, record_id)
+        return "{0}_compile_{1}_{2}_{3}.zip".format(stem, py_tag, ts, record_id)
 
     def _format_result(self, rows):
         row_html = []
@@ -603,17 +629,17 @@ class DwoProtectJob(models.Model):
                 detail = r["reason"] or "No protectable methods"
             row_html.append(
                 "<tr>"
-                "<td style='padding:4px 8px;font-family:monospace'>{0}</td>"
-                "<td style='padding:4px 8px'>{1}</td>"
-                "<td style='padding:4px 8px;color:#555;font-size:0.9em'>{2}</td>"
+                "<td style='padding:10px 16px;font-family:monospace;border-bottom:1px solid #eee'>{0}</td>"
+                "<td style='padding:10px 16px;border-bottom:1px solid #eee'>{1}</td>"
+                "<td style='padding:10px 16px;color:#555;border-bottom:1px solid #eee'>{2}</td>"
                 "</tr>".format(r["name"], badge, detail)
             )
         return (
-            "<table style='border-collapse:collapse;width:100%'>"
+            "<table style='border-collapse:collapse;width:100%;table-layout:fixed'>"
             "<thead><tr style='background:#f5f5f5'>"
-            "<th style='padding:6px 8px;text-align:left'>Module</th>"
-            "<th style='padding:6px 8px;text-align:left'>Status</th>"
-            "<th style='padding:6px 8px;text-align:left'>Detail</th>"
+            "<th style='padding:10px 16px;text-align:left;width:25%'>Module</th>"
+            "<th style='padding:10px 16px;text-align:left;width:15%'>Status</th>"
+            "<th style='padding:10px 16px;text-align:left;width:60%'>Detail</th>"
             "</tr></thead><tbody>" + "".join(row_html) + "</tbody></table>"
         )
 
