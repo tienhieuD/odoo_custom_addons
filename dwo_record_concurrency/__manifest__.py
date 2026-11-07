@@ -6,7 +6,7 @@
     "description": "Soft concurrency control for form views. Choose the models and fields to watch; when another user changed a field you are saving, a dialog compares both values and lets you force save, discard or cancel. It never blocks a save. Requires the standard base, web and bus modules, no external library.",
     "author": "DUO-TEK Software Vietnam",
     "website": "https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam",
-    "category": "Productivity",
+    "category": "Extra Tools",
     "depends": ["base", "web", "bus"],
     "data": [
         "security/ir.model.access.csv",

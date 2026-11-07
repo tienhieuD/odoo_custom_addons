@@ -19,7 +19,7 @@ See custom-addons/dwo_sla_core/docs/ for the SRS, TAD, DB Design.
     'website': "https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam",
     'support': "tienhieu1212@gmail.com",
 
-    'category': 'Customizations',
+    'category': 'Services',
     'version': '19.0.1.0.0',
     'installable': True,
     'application': False,
