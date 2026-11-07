@@ -7,8 +7,8 @@
     'license': 'OPL-1',
     'category': 'Extra Tools',
     'version': '13.0.1.0.0',
-    'price': 39.00,
-    'currency': 'USD',
+    'price': 35.00,
+    'currency': 'EUR',
     'depends': ['web'],
     'data': [
         'views/assets.xml',
