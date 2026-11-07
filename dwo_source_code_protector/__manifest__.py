@@ -1,11 +1,11 @@
 {
     'name': 'Source Code Protector',
-    'version': '13.0.2.0.0',
+    'version': '13.0.2.1.0',
     'summary': 'Protect your Odoo module source code: compile business logic to native binaries',
     'description': 'Upload a module .zip and get back the same module with its business logic '
                     'compiled to native binaries. Requires the jprotect and pyzipper Python '
                     'packages, and a C compiler with Python headers on the server for Cython.',
-    'category': 'Tools',
+    'category': 'Extra Tools',
     'author': 'DUO-TEK Software Vietnam',
     'website': 'https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam',
     'license': 'OPL-1',
