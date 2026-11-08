@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import base64
+import hashlib
+import mimetypes
 import re
 
 from lxml import html as lxml_html
@@ -9,6 +12,10 @@ from odoo.exceptions import AccessError, UserError
 
 # Reply and forward prefixes in several languages (Re, Fw, Fwd, Tr, Aw, Sv, Rv)
 PREFIX_RE = re.compile(r"^\s*((re|fwd?|tr|aw|sv|rv)\s*:\s*)+", re.IGNORECASE)
+
+
+# <img src="data:image/png;base64,..."> pasted in the editor
+B64_IMAGE_RE = re.compile(r"(<img\b[^>]*?\bsrc=)([\"'])data:(image/[\w.+-]+);base64,([^\"']+)\2", re.IGNORECASE)
 
 
 class DwoMailComposer(models.AbstractModel):
@@ -45,12 +52,17 @@ class DwoMailComposer(models.AbstractModel):
     @api.model
     def _parse(self, text):
         """'A <a@x.com>, b@x.com' -> [{'email': 'a@x.com', 'name': 'A'}, ...] (no duplicates)."""
-        result, seen = [], set()
+        result, index = [], {}
         for name, email in tools.mail.email_split_tuples(text or ""):
             normalized = tools.email_normalize(email)
-            if normalized and normalized not in seen:
-                seen.add(normalized)
-                result.append({"email": normalized, "name": name or ""})
+            if not normalized:
+                continue
+            if normalized not in index:
+                index[normalized] = {"email": normalized, "name": name or ""}
+                result.append(index[normalized])
+            elif name and not index[normalized]["name"]:
+                # the same address written twice, once with a name: keep the name, at the first place
+                index[normalized]["name"] = name
         return result
 
     @api.model
@@ -129,11 +141,11 @@ class DwoMailComposer(models.AbstractModel):
             message = Message.browse(ref_message_id).exists()
             # only emails can be answered or forwarded: never an internal note or a discussion message
             if message and message.model == thread._name and message.res_id == thread.id \
-                    and (message.message_type == "email" or message.dwo_is_official_email):
+                    and (message.message_type == "email" or message.dwo_is_from_compose):
                 return message
         return Message.search([
             ("model", "=", thread._name), ("res_id", "=", thread.id),
-            "|", ("message_type", "=", "email"), ("dwo_is_official_email", "=", True),
+            "|", ("message_type", "=", "email"), ("dwo_is_from_compose", "=", True),
         ], order="date desc, id desc", limit=1)
 
     @api.model
@@ -159,9 +171,11 @@ class DwoMailComposer(models.AbstractModel):
         from_ = self._parse(ref.email_from)
         if not from_ and ref.author_id.email_normalized:
             from_ = [{"email": ref.author_id.email_normalized, "name": ref.author_id.name}]
-        if ref.dwo_is_official_email:
+        if ref.dwo_is_from_compose:
             return from_, self._parse(ref.outgoing_email_to), self._parse(ref.outgoing_email_cc)
-        return from_, self._parse(ref.incoming_email_to), self._parse(ref.incoming_email_cc)
+        # the To as received keeps the aliases (catchall) that the core removes from incoming_email_to
+        to = self._parse(ref.dwo_incoming_email_to_all) or self._parse(ref.incoming_email_to)
+        return from_, to, self._parse(ref.incoming_email_cc)
 
     @api.model
     def _quote_block(self, ref, label):
@@ -180,6 +194,13 @@ class DwoMailComposer(models.AbstractModel):
             '<div id="divRplyFwdMsg" dir="ltr"><div>---------- %s ----------</div>'
             "<div>%s</div><br/><div>%s</div></div>"
         ) % (label, Markup("<br/>").join(lines), ref.body or "")
+
+    @api.model
+    def _initial_body(self, quote=Markup("")):
+        """What the editor holds when an email is started: three empty lines to write in, then the
+        signature, then the quote of the email answered. A template chosen on this untouched body
+        is written into those lines."""
+        return Markup("<p><br></p>") * 3 + self._signature_html() + quote
 
     @api.model
     def _signature_html(self):
@@ -255,7 +276,7 @@ class DwoMailComposer(models.AbstractModel):
         result = {
             "mode": "new", "ref_message_id": False, "from": default_from["email"],
             "to": [], "cc": [], "bcc": [], "subject": "",
-            "body": str(self._signature_html()), "template_id": False, "attachments": [],
+            "body": str(self._initial_body()), "template_id": False, "attachments": [],
         }
         if not ref:
             return result
@@ -267,27 +288,35 @@ class DwoMailComposer(models.AbstractModel):
             result.update(
                 mode="forward",
                 subject=self._subject_with_prefix(ref.subject or ref.record_name, "FW"),
-                body=str(self._signature_html() + self._quote_block(ref, "Forwarded message")),
+                body=str(self._initial_body(self._quote_block(ref, "Forwarded message"))),
                 attachments=self._copy_attachments_for_forward(ref),
             )
             return result
 
+        # "reply_sender" is the Reply button: only the person who wrote, no Cc. Anything else is
+        # reply-all, which is also what the Send email button starts with.
+        only_sender = mode == "reply_sender"
         result["mode"] = "reply"
         result["subject"] = self._subject_with_prefix(ref.subject or ref.record_name, "RE")
-        result["body"] = str(self._signature_html() + self._quote_block(ref, "Original message"))
+        result["body"] = str(self._initial_body(self._quote_block(ref, "Original message")))
 
-        if ref.dwo_is_official_email:
+        if ref.dwo_is_from_compose:
             # C. we wrote the last email: continue with the same people
             if sender and sender[0]["email"] in allowed_emails:
                 result["from"] = sender[0]["email"]
             result["to"] = to_list
-            result["cc"] = cc_list
-            result["bcc"] = self._parse(ref.outgoing_email_bcc)
+            if not only_sender:
+                result["cc"] = cc_list
+                result["bcc"] = self._parse(ref.outgoing_email_bcc)
             return result
 
         # B. incoming email: reply-all
         excluded = {me} | system
         reply_to = [a for a in sender if a["email"] not in excluded] or [a for a in to_list if a["email"] not in excluded][:1]
+        if not reply_to:
+            # The user wrote to the system himself (the catchall, the alias of the record) and nobody
+            # else is in To: the answer still goes to the address the email came from.
+            reply_to = [a for a in sender if a["email"] not in system][:1]
         to_emails = {a["email"] for a in reply_to}
         for address in to_list + cc_list:
             if address["email"] in allowed_emails:
@@ -301,7 +330,7 @@ class DwoMailComposer(models.AbstractModel):
             if email not in {o["email"] for o in others}:
                 others.append(address)
         result["to"] = reply_to
-        result["cc"] = others
+        result["cc"] = [] if only_sender else others
         return result
 
     @api.model
@@ -396,7 +425,43 @@ class DwoMailComposer(models.AbstractModel):
         return self._own_email(email_id)._dwo_to_dict()
 
     @api.model
-    def _email_values(self, vals):
+    def _externalize_images(self, res_model, res_id, body):
+        """Turn the images pasted in the body (base64) into attachments of the record, linked by
+        ``/web/image/<id>?access_token=...`` like the Odoo editor does. A mail client does not show
+        a base64 image reliably and a big one makes the email heavy. Done on the server, before the
+        draft is stored and before sending, so the stored draft, a direct send and an approved send
+        all get the same body. The same picture is stored once: autosave sends it again and again."""
+        if not body or "base64," not in body:
+            return body
+        Attachment = self.env["ir.attachment"]
+
+        def replace(match):
+            prefix, quote, mimetype, data = match.groups()
+            try:
+                raw = base64.b64decode(data)
+            except ValueError:
+                return match.group(0)
+            checksum = hashlib.sha1(raw).hexdigest()
+            attachment = Attachment.search([
+                ("res_model", "=", res_model), ("res_id", "=", res_id),
+                ("checksum", "=", checksum), ("create_uid", "=", self.env.uid),
+            ], limit=1)
+            if not attachment:
+                extension = mimetypes.guess_extension(mimetype) or ""
+                attachment = Attachment.create({
+                    "name": "image-%s%s" % (checksum[:8], extension),
+                    "raw": raw,
+                    "mimetype": mimetype,
+                    "res_model": res_model,
+                    "res_id": res_id,
+                })
+            return "%s%s/web/image/%d?access_token=%s%s" % (
+                prefix, quote, attachment.id, attachment.generate_access_token()[0], quote)
+
+        return B64_IMAGE_RE.sub(replace, body)
+
+    @api.model
+    def _email_values(self, vals, res_model=False, res_id=False):
         return {
             "mode": vals.get("mode") or "new",
             "ref_message_id": vals.get("ref_message_id") or 0,
@@ -407,7 +472,7 @@ class DwoMailComposer(models.AbstractModel):
             "reply_to": vals.get("reply_to") or False,
             "reply_to_custom": bool(vals.get("reply_to_custom")),
             "subject": vals.get("subject") or False,
-            "body": vals.get("body") or False,
+            "body": self._externalize_images(res_model, res_id, vals.get("body")) or False,
             "template_id": vals.get("template_id") or False,
             "attachment_ids": [(6, 0, self._own_pending_attachments(vals.get("attachment_ids")).ids)],
         }
@@ -416,7 +481,7 @@ class DwoMailComposer(models.AbstractModel):
     def save_email(self, res_model, res_id, email_id, vals):
         """Create or update the stored email. The client sends the id it got from the first save."""
         self._get_thread(res_model, res_id)
-        values = self._email_values(vals)
+        values = self._email_values(vals, res_model, res_id)
         if email_id:
             email = self._own_email(email_id, res_model, res_id)
             if email.state == "sent":
@@ -539,6 +604,13 @@ class DwoMailComposer(models.AbstractModel):
                 else:
                     parent.text = (parent.text or "") + tail
             parent.remove(quote)
+        # the empty lines left to write in are not part of the template
+        for child in list(root):
+            if child.tag in ("p", "div") and not (child.text or "").strip() \
+                    and all(grandchild.tag == "br" for grandchild in child) and not (child.tail or "").strip():
+                root.remove(child)
+            else:
+                break
         return (root.text or "") + "".join(lxml_html.tostring(child, encoding="unicode") for child in root)
 
     @api.model
@@ -607,7 +679,7 @@ class DwoMailComposer(models.AbstractModel):
             raise AccessError(self.env._("You are not allowed to send from %s.", from_email))
         email_from = tools.formataddr((allowed[from_email]["name"] or "", from_email))
 
-        body = vals.get("body") or ""
+        body = self._externalize_images(thread._name, thread.id, vals.get("body") or "")
         requested_ids = [int(a) for a in (vals.get("attachment_ids") or [])]
         attachment_ids = self._own_pending_attachments(requested_ids).ids
         if set(requested_ids) != set(attachment_ids):
@@ -630,7 +702,7 @@ class DwoMailComposer(models.AbstractModel):
             "post": dict(
                 body=Markup(body),
                 subject=subject,
-                message_type="comment",
+                message_type="email_outgoing",
                 subtype_xmlid="mail.mt_comment",
                 email_from=email_from,
                 author_id=self.env.user.partner_id.id,
@@ -638,7 +710,7 @@ class DwoMailComposer(models.AbstractModel):
                 outgoing_email_to=self._format_list(to),
                 outgoing_email_cc=self._format_list(cc) or False,
                 outgoing_email_bcc=self._format_list(bcc) or False,
-                dwo_is_official_email=True,
+                dwo_is_from_compose=True,
                 attachment_ids=attachment_ids,
                 email_add_signature=False,
                 email_layout_xmlid="dwo_mail_compose.mail_layout_official",

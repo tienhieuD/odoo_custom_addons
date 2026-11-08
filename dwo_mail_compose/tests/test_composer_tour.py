@@ -20,7 +20,7 @@ class TestComposerTour(HttpCase):
     def test_send_email_tour(self):
         self._start("dwo_mail_compose_send")
         message = self.env["mail.message"].search(
-            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_official_email", "=", True)])
+            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])
         self.assertEqual(len(message), 1)
         self.assertEqual(message.sudo().outgoing_email_bcc, "hidden.boss@acme.example")
         self.assertIn("new.person@acme.example", message.outgoing_email_to)
@@ -31,7 +31,7 @@ class TestComposerTour(HttpCase):
         """A pasted image is saved as an attachment of the record and linked, never kept as base64."""
         self._start("dwo_mail_compose_image")
         message = self.env["mail.message"].search(
-            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_official_email", "=", True)])
+            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])
         self.assertEqual(len(message), 1)
         self.assertNotIn("data:image", message.body)
         self.assertIn("/web/image/", message.body)
@@ -53,6 +53,7 @@ class TestComposerTour(HttpCase):
         })
 
     def test_template_tour(self):
+        self.env.ref("base.user_admin").signature = "<p>Tour signature</p>"
         self._tour_template()
         self._start("dwo_mail_compose_template")
 
@@ -124,6 +125,8 @@ class TestComposerTour(HttpCase):
         self.assertFalse(self.env["dwo.mail.email"].search([("res_id", "=", self.record.id)]))
 
     def test_reply_tour(self):
+        # something to suggest when the field is clicked again with nothing typed
+        self.env["dwo.mail.address"].create({"email": "someone.else@acme.example", "name": "Someone Else"})
         self.env["mail.message"].create({
             "model": "res.partner", "res_id": self.record.id, "message_type": "email",
             "subject": "Incoming question", "email_from": "Customer <customer@acme.example>",
@@ -134,6 +137,21 @@ class TestComposerTour(HttpCase):
         # a reply is a new email: it was stored when the form opened, not at the first edit
         stored = self.env["dwo.mail.email"].search([("res_id", "=", self.record.id)])
         self.assertEqual((len(stored), stored.state, stored.subject, stored.mode), (1, "draft", "RE: Incoming question", "reply"))
+
+    def test_reply_buttons_tour(self):
+        """Reply, Reply all and Forward sit under From/To/Cc. Reply writes to the sender only."""
+        self.env["mail.message"].create({
+            "model": "res.partner", "res_id": self.record.id, "message_type": "email",
+            "subject": "Incoming question", "email_from": "Customer <customer@acme.example>",
+            # the core keeps no To for an email sent to an alias: the raw To is what is displayed
+            "incoming_email_to": "", "dwo_incoming_email_to_all": "catchall@dwo.example",
+            "incoming_email_cc": "colleague@acme.example",
+            "date": "2026-11-06 09:12:00", "body": "<p>Can you send the quote?</p>",
+        })
+        self._start("dwo_mail_compose_reply_buttons")
+        stored = self.env["dwo.mail.email"].search([("res_id", "=", self.record.id)])
+        self.assertEqual([a["email"] for a in stored.to_json], ["customer@acme.example"])
+        self.assertFalse(stored.cc_json)
 
     # ------------------------------------------------------------
     # approval
@@ -151,7 +169,7 @@ class TestComposerTour(HttpCase):
         self.assertEqual(email.state, "sent")
         self.assertEqual(email.subject, "Needs approval edited", "edits stop once it is sent; before that it stays editable")
         self.assertEqual(len(self.env["mail.message"].search(
-            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_official_email", "=", True)])), 1)
+            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])), 1)
 
     def test_approval_required_tour(self):
         self.env.ref("base.user_admin").company_id.dwo_mail_require_approval = True
@@ -185,6 +203,6 @@ class TestComposerTour(HttpCase):
         self.assertEqual(email.state, "sent")
         self.assertEqual(email.decision_comment, "Looks good")
         message = self.env["mail.message"].search(
-            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_official_email", "=", True)])
+            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])
         self.assertEqual(len(message), 1)
         self.assertEqual(message.author_id, admin.partner_id)

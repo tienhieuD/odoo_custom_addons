@@ -59,7 +59,7 @@ class TestApproval(MailCommon):
 
     def _official_messages(self):
         return self.env["mail.message"].search([
-            ("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_official_email", "=", True)])
+            ("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])
 
     def _capture_bus(self):
         """Capture the screen notifications of the module (the other modules use the bus too)."""

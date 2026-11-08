@@ -12,7 +12,7 @@ Chatter của Odoo có ba kiểu tin nhắn, và người dùng dễ lẫn:
 |---|---|---|---|
 | **Log note** | `mt_note` | Không ai (trừ người được @mention) | Trao đổi nội bộ thuần |
 | **Send message** | `mt_comment` | Mọi follower, kể cả follower là khách ngoài. Mỗi người một email riêng, dùng layout thông báo | Thảo luận chung, **không phải thư từ chính thức** |
-| **Send email** (module này) | `mt_comment` + cờ `dwo_is_official_email` | Chỉ To, Cc, Bcc được chọn, đúng một email thật | **Thư chính thức** |
+| **Send email** (module này) | `message_type = email_outgoing`, subtype `mt_comment`, cờ `dwo_is_from_compose` | Chỉ To, Cc, Bcc được chọn, đúng một email thật | **Thư chính thức** |
 
 Send message vẫn gửi email ra ngoài nếu thread có follower ngoài, nên không thể coi là "nội bộ".
 Với thư chính thức, doanh nghiệp cần: người nhận thấy đúng To/Cc như một email bình thường, trích dẫn thư trước,
@@ -26,7 +26,13 @@ trả lời tất cả (reply-all), nháp, và phân biệt rõ trong lịch s�
 - Thanh công cụ dưới body: **Attach**, **Template** (menu như composer gốc), **Advanced** (thêm các trường phụ, hiện tại là Reply-To). Mỗi nhãn có dấu `*` đỏ nếu bắt buộc và biểu tượng (i) giải thích bằng tooltip, nằm cùng dòng với nhãn.
 - Mặc định reply-all, subject `RE:`, quote thư trước ngay trong body.
 - Nút **Send email** mở menu hai lựa chọn: **Send now** hoặc **Request approval and send** (nhờ người duyệt rồi gửi). Dòng mờ phía trên nút nhắc: email gửi trực tiếp tới người nhận, không thông báo follower.
-- Mỗi message email có nút **Reply by email** và **Forward by email**.
+- Mỗi message email có một hàng nút outline secondary có icon ngay dưới From/To/Cc: **Reply** (chỉ người gửi, không Cc), **Reply all** (người gửi + To + Cc, giống Send email khi thread đã có email) và **Forward**. Hàng nút này tách khỏi menu tuỳ chọn của message (module không thêm mục nào vào menu đó). Chế độ gọi server: `reply_sender`, `reply` (reply-all), `forward`.
+- Ô địa chỉ: bấm lại vào ô đang có focus (sau khi vừa chọn một gợi ý) vẫn mở lại dropdown; bấm vào vùng trống của ô cũng đặt con trỏ vào và mở gợi ý. Chọn một gợi ý (hoặc Enter, dấu phẩy) huỷ yêu cầu gợi ý đang chờ, nên danh sách không tự mở lại.
+- **Body khi bắt đầu soạn**: 3 dòng trống (`<p><br></p>` x3) để viết vào, rồi chữ ký, rồi khối quote nếu là reply/forward (`_initial_body`). Chọn template khi chưa viết gì (nội dung phía trên quote không đổi so với lúc nạp) thì nội dung template **thay vào 3 dòng trống đó**, chữ ký và quote giữ nguyên (chế độ `fill`). Nếu người dùng đã viết thì vẫn hỏi Overwrite/Append như trước (Overwrite thay cả phần trên quote). Template lưu từ form bỏ các dòng trống ở đầu.
+- **Sửa địa chỉ ngay trên chip**: bấm vào chip thì chip thành ô nhập địa chỉ tại chỗ. Enter, Tab hoặc dấu phẩy lưu và thay đúng vị trí đó (chip mới đánh dấu `new`); rời ô cũng lưu nếu địa chỉ hợp lệ, không hợp lệ thì giữ địa chỉ cũ; Enter với địa chỉ sai báo lỗi và giữ ô để sửa; Esc huỷ; xoá hết chữ rồi lưu thì bỏ chip; sửa thành địa chỉ đã có trong cùng ô thì chip bị gộp (không trùng). Chip dài được cắt bằng `...` và tooltip hiện `Tên <email>`.
+- Khung form và khung danh sách email dùng nền `bg-view` (biến màu của sheet FormView), nên theo dark mode.
+- **Ảnh dán từ clipboard**: server đổi mọi `<img src="data:image/...;base64,...">` thành attachment của bản ghi, link `/web/image/<id>?access_token=...` (`_externalize_images`), ngay khi lưu nháp và trước khi gửi. Làm ở server vì một điểm duy nhất phủ cả nháp, gửi trực tiếp và gửi qua duyệt. Cùng một ảnh (theo checksum) chỉ lưu một lần dù autosave gửi lại nhiều lần. Phía JS vẫn tải ảnh lên trước khi gửi khi editor làm được, server là lớp bảo đảm cuối.
+- Dữ liệu demo để chụp ảnh giới thiệu: module lab `.lab/dwo_mail_compose_demo_data` (không đăng).
 - Tiêu đề của form luôn là **Compose email**. Form và danh sách email là **hai khung riêng**, mỗi khung có viền riêng nên thấy rõ hai vùng.
 - **Delete draft** là nút outline secondary nằm cạnh nút Send email, hover thì đỏ. **Mọi thao tác xoá đều hỏi trước** (Delete draft, nút xoá ở mọi dòng của danh sách kể cả email nháp, gỡ tệp đính kèm); gỡ badge người nhận, gỡ template hay ẩn ô Reply-To không phải là xoá nên không hỏi.
 - Form **chiếm chỗ của chatter**: khi đang mở, vùng message (lịch sử, hoạt động, tệp) bị ẩn (`display: none !important`), đóng form là hiện lại bình thường.
@@ -196,7 +202,7 @@ Người thực hiện hành động không tự nhận thông báo về hành �
 | `email_layout_xmlid` | `dwo_mail_compose.mail_layout_official` | Layout tối giản: chỉ body, không header thông báo, không nút truy cập, không footer |
 | `mail_auto_delete` | `False` | Core xoá `mail.mail` của thông báo sau khi gửi. Với thư chính thức, giữ lại để tra cứu trạng thái gửi, lỗi và nội dung đã ra khỏi hệ thống (menu Technical > Email) |
 | `email_add_signature` | `False` | Chữ ký đã nằm trong body ở dạng sửa được |
-| `dwo_is_official_email` | `True` | Cờ phân biệt thư chính thức |
+| `dwo_is_from_compose` | `True` | Cờ phân biệt thư chính thức |
 | `parent_id` | email tham chiếu | Dựng chuỗi thread; Message-Id, References giữ nguyên của core |
 
 **Khách trả lời quay về thread:** module không đụng vào Message-Id, References, Reply-To mặc định của core.
@@ -211,7 +217,7 @@ Kiểm tra trước khi gửi: có ít nhất một To; mọi địa chỉ hợp
 
 | # | Quyết định | Lý do |
 |---|---|---|
-| P1 | Thêm cờ `dwo_is_official_email`, **không** thêm giá trị vào `message_type` | Core đã dùng `email` (thư đến) và `email_outgoing` (mailing); thêm giá trị mới dễ xung đột logic có sẵn |
+| P1 | Thêm cờ `dwo_is_from_compose`, **không** thêm giá trị vào `message_type` | Core đã dùng `email` (thư đến) và `email_outgoing` (mailing); thêm giá trị mới dễ xung đột logic có sẵn |
 | P2 | Gửi bằng `outgoing_email_to/cc/bcc`, không dùng `partner_ids` | Cần **một** email thật với To/Cc nhìn thấy được, như Gmail/Outlook |
 | P3 | Thư chính thức không notify follower | Tách rõ với Send message; tránh follower ngoài nhận thư không định gửi |
 | P4 | Toàn bộ luật nội dung ở backend (`dwo.mail.composer`); JS chỉ hiển thị và sửa | Test được bằng unit test, một nguồn sự thật, dễ nâng cấp |
@@ -299,7 +305,7 @@ models/
   dwo_mail_email.py      email lưu trữ + quy trình duyệt (trạng thái, khoá, hoạt động, thông báo)
   dwo_mail_decision.py   popup Approve / Reject / Reassign
   dwo_mail_address.py    sổ địa chỉ + gợi ý
-  mail_message.py        dwo_is_official_email, outgoing_email_cc, _to_store_defaults
+  mail_message.py        dwo_is_from_compose, outgoing_email_cc, _to_store_defaults
   mail_thread.py         allow-list message_post, đưa Cc xuống mail.mail
   res_company.py / res_config_settings.py   Require approval, số ngày giữ email
 views/                   trang chi tiết email, danh sách, menu Email Approvals, popup, khối Settings

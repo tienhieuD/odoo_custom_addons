@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="dwo_mail_compose.EmailComposer">
-        <div class="o-dwo-emailComposer m-2 d-flex flex-column gap-3">
-          <div class="o-dwo-formBox border border-success rounded p-2 d-flex flex-column gap-2">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="d-flex align-items-center gap-2">
-                    <strong class="text-success" t-out="title"/>
+        <div class="o-dwo-emailComposer d-flex flex-column gap-3">
+          <div class="o-dwo-formBox bg-view border rounded p-2 d-flex flex-column gap-2">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <span class="d-flex align-items-center gap-2" style="min-width:0;">
+                    <strong class="o-dwo-title text-truncate" t-att-title="title" t-out="title"/>
                     <span t-if="state.emailId" class="o-dwo-stateBadge badge rounded-pill" t-att-class="{
                         'text-bg-secondary': state.emailState === 'draft',
                         'text-bg-info': state.emailState === 'pending',
@@ -148,7 +148,7 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
                         <Dropdown menuClass="'o-dwo-sendMenu'">
-                            <button type="button" class="o-dwo-sendBtn btn btn-success" data-tooltip="Choose how to send this email." t-att-disabled="state.sending or state.uploading or state.emailState === 'sent'">
+                            <button type="button" class="o-dwo-sendBtn btn btn-primary" data-tooltip="Choose how to send this email." t-att-disabled="state.sending or state.uploading or state.emailState === 'sent'">
                                 <i t-if="state.sending" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-paper-plane"/> Send email <i class="fa fa-caret-down ms-1"/>
                             </button>
                             <t t-set-slot="content">
@@ -175,7 +175,7 @@
           </div>
 
           <!-- Second area: the emails of the user on this record, with their own border -->
-                <div t-if="!state.loading and state.emails.length" class="o-dwo-emailList border rounded p-2">
+                <div t-if="!state.loading and state.emails.length" class="o-dwo-emailList bg-view border rounded p-2">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="text-muted small fw-bold">Your emails on this record, not sent yet</span>
                         <button type="button" class="o-dwo-newEmail btn btn-link btn-sm p-0" data-tooltip="Start another email. The one you are writing is saved." t-on-click="onNewEmail"><i class="fa fa-plus"/> New email</button>

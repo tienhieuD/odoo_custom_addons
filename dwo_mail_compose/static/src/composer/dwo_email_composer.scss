@@ -55,6 +55,14 @@
         max-height: 11rem;
         overflow-y: auto;
     }
+    // the field takes the room left by the Cc and Bcc buttons and never more: its chips are cut
+    .o-dwo-row > .flex-grow-1 { min-width: 0; }
+    .o-dwo-addressInput { min-width: 0; }
+    .o-dwo-chip {
+        max-width: 100%;
+        min-width: 0;
+        cursor: text;
+    }
     .o-dwo-addressInput:focus-within { border-color: $primary !important; }
     .o-dwo-addressInput.o-dwo-invalid { border-color: $danger !important; }
 }
@@ -84,4 +92,10 @@
     color: $white;
     background-color: $danger;
     border-color: $danger;
+}
+
+// While the body is expanded, the sticky statusbar of the form (z-index 1020 from 768px) must not be
+// above it. The class is set on the body by the composer.
+.o-dwo-composeExpanded .o_form_view .o_form_statusbar {
+    z-index: 0 !important;
 }

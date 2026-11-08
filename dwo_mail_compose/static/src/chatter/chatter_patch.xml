@@ -4,14 +4,14 @@
         <xpath expr="//button[hasclass('o-mail-Chatter-sendMessage')]" position="after">
             <button class="o-mail-Chatter-dwoSendEmail btn text-nowrap me-1"
                     t-att-class="{
-                        'btn-success': state.composerType === 'email',
-                        'btn-outline-success': state.composerType !== 'email',
+                        'btn-primary': state.composerType === 'email',
+                        'btn-outline-primary': state.composerType !== 'email',
                         'active': state.composerType === 'email',
                         'my-2': !props.compactHeight
                     }"
                     t-att-disabled="!state.thread.canPostMessage and props.threadId"
                     t-on-click="() => this.dwoToggleEmail()">
-                Send email<span t-if="dwo.hasDraft and state.composerType !== 'email'" class="o-dwo-draftDot bg-success ms-1" title="You have a draft"/>
+                Send email<span t-if="dwo.hasDraft and state.composerType !== 'email'" class="o-dwo-draftDot bg-primary ms-1" title="You have a draft"/>
             </button>
         </xpath>
         <!-- The email form takes the room of the chatter: while it is open the messages, the

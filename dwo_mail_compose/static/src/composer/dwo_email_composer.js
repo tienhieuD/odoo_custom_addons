@@ -62,6 +62,25 @@ export function splitBody(html) {
 }
 
 /**
+ * The body without the empty lines at its start: the lines a user finds to write in when an email
+ * is started. What remains is the signature (and nothing else when there is none).
+ */
+export function withoutLeadingBlankLines(html) {
+    const doc = new DOMParser().parseFromString(html || "", "text/html");
+    const root = doc.body;
+    const isBlank = (node) =>
+        node.nodeType === Node.TEXT_NODE
+            ? !node.textContent.trim()
+            : ["P", "DIV"].includes(node.tagName) &&
+              !node.textContent.trim() &&
+              ![...node.children].some((child) => child.tagName !== "BR");
+    while (root.firstChild && isBlank(root.firstChild)) {
+        root.removeChild(root.firstChild);
+    }
+    return root.innerHTML;
+}
+
+/**
  * Inline form of the Send email button. All the rules (defaults, quote,
  * subject, reply-all, sending) come from the server model dwo.mail.composer;
  * this component displays, edits and autosaves the draft.
@@ -157,6 +176,19 @@ export class DwoEmailComposer extends Component {
         onWillStart(() => this.load());
         // Esc brings the expanded body back, wherever the focus is
         useExternalListener(window, "keydown", (ev) => this.onKeydown(ev));
+        // The sticky statusbar of a form (z-index 1020) covers the body shown on the whole screen,
+        // whose fixed position lives in the stacking context of the form: while it is expanded the
+        // page tells the statusbar to go down (see the scss)
+        useEffect(
+            (expanded) => {
+                if (!expanded) {
+                    return;
+                }
+                document.body.classList.add("o-dwo-composeExpanded");
+                return () => document.body.classList.remove("o-dwo-composeExpanded");
+            },
+            () => [this.state.expanded]
+        );
         useEffect(
             () => this.captureSnapshot(),
             () => [this.state.editorKey, this.state.loading]
@@ -187,8 +219,9 @@ export class DwoEmailComposer extends Component {
         return this.props.thread.id;
     }
 
+    /** The subject of the email; before there is one, what the form is. */
     get title() {
-        return _t("Compose email");
+        return (this.state.subject || "").trim() || _t("Compose email");
     }
 
     async load() {
@@ -607,7 +640,8 @@ export class DwoEmailComposer extends Component {
             return;
         }
         if (!this.isContentDirty()) {
-            return this.applyTemplate(record, "overwrite");
+            // nothing written yet: the template goes into the empty lines, the signature stays
+            return this.applyTemplate(record, "fill");
         }
         this.dialog.add(DwoTemplateConflictDialog, {
             onOverwrite: () => this.applyTemplate(record, "overwrite"),
@@ -629,6 +663,8 @@ export class DwoEmailComposer extends Component {
      * template are added to the ones already there (a reply-all keeps its people),
      * and choosing another template first takes back what the previous one added.
      * "append" keeps the user's subject and message and puts the template text after it.
+     * "fill" is for a form nothing was written in: the text takes the place of the empty lines
+     * and the signature stays under it. "overwrite" replaces everything above the quote.
      */
     async applyTemplate(record, mode) {
         this.removeTemplateAdditions();
@@ -639,10 +675,10 @@ export class DwoEmailComposer extends Component {
         ]);
         this.state.templateId = record.id;
         this.state.templateName = record.display_name || record.name || "";
-        if (result.subject && (mode === "overwrite" || !this.state.subject.trim())) {
+        if (result.subject && (mode !== "append" || !this.state.subject.trim())) {
             this.state.subject = result.subject;
         }
-        if (mode === "overwrite") {
+        if (mode !== "append") {
             this.snapshot.subject = this.state.subject;
         }
         if (result.from) {
@@ -654,7 +690,13 @@ export class DwoEmailComposer extends Component {
         if (result.body) {
             const html = this.editor?.editable?.isConnected ? this.editor.getContent() : this.bodyHtml;
             const { above, quote } = splitBody(html);
-            const newAbove = mode === "append" ? above + result.body : result.body;
+            let newAbove = result.body;
+            if (mode === "append") {
+                newAbove = above + result.body;
+            } else if (mode === "fill") {
+                // into the empty lines: what follows them (the signature) is kept
+                newAbove = result.body + withoutLeadingBlankLines(above);
+            }
             this.bodyHtml = newAbove + (quote ? "<br/>" + quote : "");
             this.snapshotMode = mode === "append" ? "keep" : "capture";
             this.renderBody();

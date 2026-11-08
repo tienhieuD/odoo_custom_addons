@@ -2,13 +2,23 @@
 <templates xml:space="preserve">
     <t t-inherit="mail.Message" t-inherit-mode="extension">
         <xpath expr="//span[hasclass('o-mail-Message-author')]" position="after">
-            <span t-if="message.isDwoEmail" class="o-dwo-emailBadge badge rounded-pill text-bg-success me-1 align-self-center">Email</span>
+            <span t-if="message.isDwoEmail" class="o-dwo-emailBadge badge rounded-pill text-bg-primary me-1 align-self-center">Email</span>
         </xpath>
         <xpath expr="//div[hasclass('o-mail-Message-header')]" position="after">
             <div t-if="message.isDwoEmail and message.dwoMetaLines.length" class="o-dwo-emailMeta smaller text-muted mb-1 text-break">
                 <div t-foreach="message.dwoMetaLines" t-as="line" t-key="line.label">
                     <b t-out="line.label + ':'"/> <span t-out="line.text"/>
                 </div>
+            </div>
+            <!-- Reply, Reply all and Forward: their own row under From/To/Cc, apart from the
+                 buttons of the "more" menu of the message -->
+            <div t-if="message.isDwoEmail and env.inChatter?.dwoOpenEmail" class="o-dwo-emailActions d-flex flex-wrap gap-1 mb-2">
+                <button type="button" class="o-dwo-replyBtn btn btn-sm btn-outline-secondary" data-tooltip="Reply to the sender only"
+                        t-on-click="() => env.inChatter.dwoOpenEmail({ mode: 'reply_sender', refMessageId: message.id })"><i class="fa fa-reply"/> Reply</button>
+                <button type="button" class="o-dwo-replyAllBtn btn btn-sm btn-outline-secondary" data-tooltip="Reply to the sender and everyone in To and Cc"
+                        t-on-click="() => env.inChatter.dwoOpenEmail({ mode: 'reply', refMessageId: message.id })"><i class="fa fa-reply-all"/> Reply all</button>
+                <button type="button" class="o-dwo-forwardBtn btn btn-sm btn-outline-secondary" data-tooltip="Forward this email to other people"
+                        t-on-click="() => env.inChatter.dwoOpenEmail({ mode: 'forward', refMessageId: message.id })"><i class="fa fa-share"/> Forward</button>
             </div>
         </xpath>
     </t>

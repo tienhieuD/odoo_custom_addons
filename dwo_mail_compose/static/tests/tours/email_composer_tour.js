@@ -3,6 +3,24 @@ import { registry } from "@web/core/registry";
 
 const EDITOR = ".o-dwo-emailComposer .odoo-editor-editable";
 
+/**
+ * Odoo shows the body of an email message (type email or email_outgoing) inside a shadow DOM, to
+ * keep the style of the email apart from the page: :contains() cannot see into it.
+ */
+const emailBodyShows = (text) => ({
+    trigger: ".o-mail-Message:has(.o-dwo-emailBadge)",
+    async run() {
+        for (let i = 0; i < 50; i++) {
+            const hosts = document.querySelectorAll(".o-mail-Message:has(.o-dwo-emailBadge) div.overflow-x-auto");
+            if ([...hosts].some((host) => host.shadowRoot?.textContent.includes(text))) {
+                return;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        throw new Error(`The email message does not show "${text}"`);
+    },
+});
+
 registry.category("web_tour.tours").add("dwo_mail_compose_send", {
     steps: () => [
         { trigger: ".o-mail-Chatter" },
@@ -19,22 +37,24 @@ registry.category("web_tour.tours").add("dwo_mail_compose_send", {
         // Cc and Bcc are behind their buttons until used
         { trigger: ".o-dwo-emailComposer:not(:has(#dwo_cc)):not(:has(#dwo_bcc))" },
         { trigger: "#dwo_to", run: "edit new.person@acme.example," },
-        { trigger: "[data-field='to'] .o-dwo-chip[title='new.person@acme.example']" },
+        { trigger: "[data-field='to'] .o-dwo-chip[data-email='new.person@acme.example']" },
+        // a chip is grey; only the word "new" has the info colour
+        { trigger: "[data-field='to'] .o-dwo-chip[data-email='new.person@acme.example'].text-bg-light .o-dwo-chipNew.text-info" },
         // no limit between the fields: the same address can be typed again in Cc and Bcc
         { trigger: ".o-dwo-ccBtn", run: "click" },
         { trigger: "#dwo_cc", run: "edit new.person@acme.example," },
         { trigger: "#dwo_cc", run: "edit second.person@acme.example," },
-        { trigger: "[data-field='cc'] .o-dwo-chip[title='new.person@acme.example']" },
-        { trigger: "[data-field='cc'] .o-dwo-chip[title='second.person@acme.example']" },
+        { trigger: "[data-field='cc'] .o-dwo-chip[data-email='new.person@acme.example']" },
+        { trigger: "[data-field='cc'] .o-dwo-chip[data-email='second.person@acme.example']" },
         { trigger: ".o-dwo-bccBtn", run: "click" },
         { trigger: "#dwo_bcc", run: "edit hidden.boss@acme.example," },
-        { trigger: "[data-field='bcc'] .o-dwo-chip[title='hidden.boss@acme.example']" },
+        { trigger: "[data-field='bcc'] .o-dwo-chip[data-email='hidden.boss@acme.example']" },
         { trigger: "#dwo_subject", run: "edit Tour subject" },
         { trigger: EDITOR, run: "click" },
         { trigger: EDITOR, run: "editor Hello from the tour" },
         { trigger: ".o-dwo-sendBtn", run: "click" },
         { trigger: ".o-dwo-sendNow", run: "click" },
-        { trigger: ".o-mail-Message:has(.o-dwo-emailBadge):contains('Hello from the tour')" },
+        emailBodyShows("Hello from the tour"),
         { trigger: ".o-mail-Message .o-dwo-emailMeta:contains('new.person@acme.example')" },
         { trigger: ".o-mail-Chatter:not(:has(.o-dwo-emailComposer))" },
     ],
@@ -94,15 +114,48 @@ registry.category("web_tour.tours").add("dwo_mail_compose_reply", {
     steps: () => [
         { trigger: ".o-mail-Chatter" },
         { trigger: ".o-mail-Message:has(.o-dwo-emailBadge)", run: "hover" },
-        { trigger: ".o-mail-Message-actions [title='Reply by email']", run: "click" },
-        { trigger: ".o-dwo-formBox strong.text-success:contains('Compose email')" },
+        { trigger: ".o-dwo-emailActions .o-dwo-replyAllBtn", run: "click" },
+        { trigger: ".o-dwo-formBox .o-dwo-title:contains('RE: Incoming question')" },
         { trigger: "#dwo_subject:value(RE: Incoming question)" },
-        { trigger: ".o-dwo-chip[title='customer@acme.example']" },
+        { trigger: ".o-dwo-chip[data-email='customer@acme.example']" },
         { trigger: `${EDITOR}:contains('Original message')` },
         { trigger: `${EDITOR}:contains('(JST)')` },
         // the quote is rendered as HTML: a real element, and no tag shown as text
         { trigger: `${EDITOR} #divRplyFwdMsg b:contains('From:')` },
         { trigger: `${EDITOR}:not(:contains('<div')):not(:contains('<b>')):not(:contains('<br'))` },
+        // a suggestion picked, then a second click on the same field (it keeps the focus, so no focus
+        // event) must open the suggestions again
+        { trigger: "#dwo_to", run: "edit admin" },
+        { trigger: ".o-dwo-suggestions .dropdown-item", run: "click" },
+        { trigger: ".o-dwo-chip:not([data-email='customer@acme.example'])" },
+        { trigger: "body:not(:has(.o-dwo-suggestions))" },
+        // the field still has the focus: that is the situation of the bug. Wait: a suggestion
+        // request started while typing must not open the list again by itself
+        { trigger: "#dwo_to:focus", run: () => new Promise((resolve) => setTimeout(resolve, 600)) },
+        { trigger: "body:not(:has(.o-dwo-suggestions))" },
+        // only a click event, like the second click of a user: the tour helper would also send a focus event
+        {
+            trigger: "#dwo_to",
+            run: () => document.querySelector("#dwo_to").dispatchEvent(new MouseEvent("click", { bubbles: true })),
+        },
+        { trigger: ".o-dwo-suggestions .dropdown-item" },
+    ],
+});
+
+registry.category("web_tour.tours").add("dwo_mail_compose_reply_buttons", {
+    steps: () => [
+        { trigger: ".o-mail-Chatter" },
+        // Reply, Reply all and Forward are always visible under From/To/Cc, not in the "more" menu
+        { trigger: ".o-mail-Message:has(.o-dwo-emailBadge) .o-dwo-emailMeta + .o-dwo-emailActions .o-dwo-replyBtn" },
+        { trigger: ".o-dwo-emailActions .o-dwo-replyAllBtn" },
+        { trigger: ".o-dwo-emailActions .o-dwo-forwardBtn" },
+        // an email sent to the catchall still shows its To line
+        { trigger: ".o-dwo-emailMeta:contains('To:'):contains('catchall@dwo.example')" },
+        // Reply goes to the sender only: nobody in Cc
+        { trigger: ".o-dwo-emailActions .o-dwo-replyBtn", run: "click" },
+        { trigger: "#dwo_subject:value(RE: Incoming question)" },
+        { trigger: ".o-dwo-chip[data-email='customer@acme.example']" },
+        { trigger: "body:not(:has(#dwo_cc))" },
     ],
 });
 
@@ -114,12 +167,16 @@ registry.category("web_tour.tours").add("dwo_mail_compose_template", {
         { trigger: ".o-dwo-templateBtn", run: "click" },
         { trigger: ".o-dwo-templateMenu .dropdown-item:contains('Tour template')", run: "click" },
         // recipients, subject and body are computed on this record
-        { trigger: ".o-dwo-chip[title='tpl.customer@acme.example']" },
-        { trigger: ".o-dwo-chip[title='cc.tpl@acme.example']" },
-        { trigger: ".o-dwo-chip[title='bcc.tpl@acme.example']" },
+        { trigger: ".o-dwo-chip[data-email='tpl.customer@acme.example']" },
+        { trigger: ".o-dwo-chip[data-email='cc.tpl@acme.example']" },
+        { trigger: ".o-dwo-chip[data-email='bcc.tpl@acme.example']" },
         { trigger: "#dwo_subject:value(Quote for DWO Mail Tour Partner)" },
         { trigger: `${EDITOR}:contains('Dear DWO Mail Tour Partner, here is your quote.')` },
         { trigger: `${EDITOR}:not(:contains('<'))` },
+        // nothing was written: the text took the place of the three empty lines (it is the first
+        // block) and the signature is still under it
+        { trigger: `${EDITOR} > :first-child:contains('Dear DWO Mail Tour Partner')` },
+        { trigger: `${EDITOR}:contains('Tour signature')` },
         // removing a file asks first
         { trigger: ".o-dwo-attachment:contains('terms.txt') .o-dwo-attachmentRemove", run: "click" },
         { trigger: ".modal .modal-footer button:contains('Cancel')", run: "click" },
@@ -129,8 +186,8 @@ registry.category("web_tour.tours").add("dwo_mail_compose_template", {
         { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-attachment))" },
         // removing the template takes back the recipients it added
         { trigger: ".o-dwo-templateBadge .btn-close", run: "click" },
-        { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-chip[title='cc.tpl@acme.example']))" },
-        { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-chip[title='tpl.customer@acme.example']))" },
+        { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-chip[data-email='cc.tpl@acme.example']))" },
+        { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-chip[data-email='tpl.customer@acme.example']))" },
     ],
 });
 
@@ -157,7 +214,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_template_dirty", {
         { trigger: `${EDITOR}:contains('My own words')` },
         { trigger: `${EDITOR}:contains('here is your quote')` },
         { trigger: "#dwo_subject:value(My own subject)" },
-        { trigger: ".o-dwo-chip[title='tpl.customer@acme.example']" },
+        { trigger: ".o-dwo-chip[data-email='tpl.customer@acme.example']" },
         // remove the template, then pick it again: the user's text is now mixed, so it asks again
         { trigger: ".o-dwo-templateBadge .btn-close", run: "click" },
         { trigger: ".o-dwo-templateBtn", run: "click" },
@@ -178,7 +235,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_image", {
         { trigger: ".o-mail-Chatter" },
         { trigger: ".o-mail-Chatter-dwoSendEmail", run: "click" },
         { trigger: "#dwo_to", run: "edit image.person@acme.example," },
-        { trigger: ".o-dwo-chip[title='image.person@acme.example']" },
+        { trigger: ".o-dwo-chip[data-email='image.person@acme.example']" },
         { trigger: "#dwo_subject", run: "edit Image subject" },
         { trigger: EDITOR, run: "click" },
         { trigger: EDITOR, run: "editor Look at this" },
@@ -196,7 +253,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_image", {
         { trigger: `${EDITOR} img.o_b64_image_to_save` },
         { trigger: ".o-dwo-sendBtn", run: "click" },
         { trigger: ".o-dwo-sendNow", run: "click" },
-        { trigger: ".o-mail-Message:has(.o-dwo-emailBadge):contains('Look at this')" },
+        emailBodyShows("Look at this"),
         { trigger: ".o-mail-Message img[src*='/web/image/']" },
     ],
 });
@@ -205,8 +262,23 @@ registry.category("web_tour.tours").add("dwo_mail_compose_ui", {
     steps: () => [
         { trigger: ".o-mail-Chatter" },
         { trigger: ".o-mail-Chatter-dwoSendEmail", run: "click" },
-        // the title is "Compose email", whatever the email is
-        { trigger: ".o-dwo-formBox strong.text-success:contains('Compose email')" },
+        // the title is the subject; "Compose email" until there is one. A long one is cut with an ellipsis
+        { trigger: ".o-dwo-formBox .o-dwo-title:contains('Compose email')" },
+        { trigger: "#dwo_subject", run: "edit A very long subject that goes on and on and on and on and on and on and on and on and on and on and on and on" },
+        {
+            trigger: ".o-dwo-formBox .o-dwo-title:contains('A very long subject')",
+            run: function () {
+                const style = getComputedStyle(document.querySelector(".o-dwo-formBox .o-dwo-title"));
+                if (style.textOverflow !== "ellipsis" || style.whiteSpace !== "nowrap") {
+                    throw new Error(`The title is not cut with an ellipsis: ${style.textOverflow} ${style.whiteSpace}`);
+                }
+                if (style.color === "rgb(25, 135, 84)") {
+                    throw new Error("The title is green");
+                }
+            },
+        },
+        { trigger: "#dwo_subject", run: "clear" },
+        { trigger: ".o-dwo-formBox .o-dwo-title:contains('Compose email')" },
         // the close button is an icon only
         { trigger: ".o-dwo-closeBtn:not(:contains('Close'))" },
         // the required marks are red
@@ -283,10 +355,10 @@ registry.category("web_tour.tours").add("dwo_mail_compose_shown_values", {
     steps: () => [
         { trigger: ".o-mail-Chatter" },
         { trigger: ".o-mail-Message:has(.o-dwo-emailBadge)", run: "hover" },
-        { trigger: ".o-mail-Message-actions [title='Reply by email']", run: "click" },
+        { trigger: ".o-dwo-emailActions .o-dwo-replyAllBtn", run: "click" },
         // the reply-all has Cc people: the Cc line is shown, Bcc stays behind its button
         { trigger: "#dwo_cc" },
-        { trigger: "[data-field='cc'] .o-dwo-chip[title='cc.person@acme.example']" },
+        { trigger: "[data-field='cc'] .o-dwo-chip[data-email='cc.person@acme.example']" },
         { trigger: ".o-dwo-emailComposer:not(:has(#dwo_bcc))" },
         { trigger: ".o-dwo-bccBtn" },
         { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-ccBtn))" },
@@ -299,7 +371,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_request_approval", {
         { trigger: ".o-mail-Chatter" },
         { trigger: ".o-mail-Chatter-dwoSendEmail", run: "click" },
         { trigger: "#dwo_to", run: "edit approval.customer@acme.example," },
-        { trigger: "[data-field='to'] .o-dwo-chip[title='approval.customer@acme.example']" },
+        { trigger: "[data-field='to'] .o-dwo-chip[data-email='approval.customer@acme.example']" },
         { trigger: "#dwo_subject", run: "edit Needs approval" },
         { trigger: EDITOR, run: "click" },
         { trigger: EDITOR, run: "editor Please check this text" },
@@ -495,8 +567,33 @@ registry.category("web_tour.tours").add("dwo_mail_compose_layout", {
                 }
             },
         },
+        // a sticky statusbar like the one of a form with a header (z-index 1020)
+        {
+            trigger: ".o_form_view",
+            run: function () {
+                // in its own wrapper in the body: the form is rendered again and would drop it
+                const form = document.createElement("div");
+                form.className = "o_form_view o-dwo-fakeForm";
+                const bar = document.createElement("div");
+                bar.className = "o_form_statusbar o-dwo-fakeStatusbar";
+                bar.style.cssText = "position: sticky; top: 0; z-index: 1020; height: 20px;";
+                bar.textContent = "Statusbar";
+                form.append(bar);
+                document.body.prepend(form);
+            },
+        },
         // ... and it can use the whole screen, only the body
         { trigger: ".o-dwo-expandBtn", run: "click" },
+        {
+            // ... and then the statusbar goes under it
+            trigger: ".o-dwo-editorBox.o-dwo-expanded",
+            run: function () {
+                const z = getComputedStyle(document.querySelector(".o-dwo-fakeStatusbar")).zIndex;
+                if (z !== "0") {
+                    throw new Error(`The statusbar stays above the expanded body: z-index ${z}`);
+                }
+            },
+        },
         {
             trigger: ".o-dwo-editorBox.o-dwo-expanded",
             run: function () {
@@ -510,6 +607,17 @@ registry.category("web_tour.tours").add("dwo_mail_compose_layout", {
         { trigger: EDITOR, run: "editor Written on the whole screen" },
         { trigger: ".o-dwo-collapseBtn", run: "click" },
         { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-expanded))" },
+        {
+            // back to the form: the statusbar has its own z-index again
+            trigger: ".o-dwo-fakeStatusbar",
+            run: function () {
+                const z = getComputedStyle(document.querySelector(".o-dwo-fakeStatusbar")).zIndex;
+                if (z !== "1020") {
+                    throw new Error(`The statusbar did not get its z-index back: ${z}`);
+                }
+                document.querySelector(".o-dwo-fakeForm").remove();
+            },
+        },
         { trigger: `${EDITOR}:contains('Written on the whole screen')` },
         // Esc brings it back too
         { trigger: ".o-dwo-expandBtn", run: "click" },
@@ -657,7 +765,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_close_saves", {
         { trigger: ".o-dwo-closeBtn", run: "click" },
         { trigger: ".o-mail-Chatter:not(:has(.o-dwo-emailComposer))" },
         { trigger: ".o-mail-Chatter-dwoSendEmail", run: "click" },
-        { trigger: "[data-field='to'] .o-dwo-chip[title='pending.person@acme.example']" },
+        { trigger: "[data-field='to'] .o-dwo-chip[data-email='pending.person@acme.example']" },
         // a second new email: typed, Close at once
         { trigger: ".o-dwo-newEmail", run: "click" },
         { trigger: ".o-dwo-emailRow.active:contains('(No subject)')" },
@@ -690,7 +798,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_approver_search_more",
         { trigger: ".o-mail-Chatter" },
         { trigger: ".o-mail-Chatter-dwoSendEmail", run: "click" },
         { trigger: "#dwo_to", run: "edit search.customer@acme.example," },
-        { trigger: "[data-field='to'] .o-dwo-chip[title='search.customer@acme.example']" },
+        { trigger: "[data-field='to'] .o-dwo-chip[data-email='search.customer@acme.example']" },
         { trigger: ".o-dwo-sendBtn", run: "click" },
         { trigger: ".o-dwo-requestApproval", run: "click" },
         { trigger: "#dwo_approver_input", run: "edit Searchable" },

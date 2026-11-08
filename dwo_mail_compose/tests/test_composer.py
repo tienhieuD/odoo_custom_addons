@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import email
+import email.policy
 from unittest.mock import patch
 
 from odoo import tools
@@ -127,7 +129,7 @@ class TestComposer(MailCommon):
         self.assertNotIn(HIDDEN, mail["message"])
         self.assertNotIn("follower@x.example", mail["message"])
         message = self.env["mail.message"].browse(result["message_id"])
-        self.assertTrue(message.dwo_is_official_email)
+        self.assertTrue(message.dwo_is_from_compose)
         self.assertEqual(message.sudo().outgoing_email_bcc, HIDDEN)
 
     def test_sent_mail_is_kept_not_auto_deleted(self):
@@ -146,7 +148,7 @@ class TestComposer(MailCommon):
         """No limit between the fields: an address typed in To can be typed again in Cc and Bcc."""
         self._send(to=[CUSTOMER], cc=[CUSTOMER, COLLEAGUE], bcc=[CUSTOMER, HIDDEN])
         message = self.env["mail.message"].search(
-            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_official_email", "=", True)])
+            [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])
         self.assertIn(CUSTOMER, message.outgoing_email_to)
         self.assertIn(CUSTOMER, message.sudo().outgoing_email_cc)
         self.assertIn(CUSTOMER, message.sudo().outgoing_email_bcc)
@@ -506,3 +508,121 @@ class TestComposer(MailCommon):
         self.assertEqual(pending.res_model, "mail.compose.message", "the file stays pending for the email")
         with self.assertRaises(UserError):
             self.composer.save_as_template("res.partner", self.record.id, "  ", {"body": "<p>x</p>"})
+
+    # ------------------------------------------------------------
+    # REPLY BUTTONS AND PASTED IMAGES
+    # ------------------------------------------------------------
+
+    def test_reply_to_sender_only_has_no_cc(self):
+        """The Reply button writes to the sender only; Reply all keeps the others in Cc."""
+        self._incoming()
+        only = self.composer.get_defaults("res.partner", self.record.id, False, "reply_sender")
+        self.assertEqual([a["email"] for a in only["to"]], [CUSTOMER])
+        self.assertEqual(only["cc"], [])
+        self.assertEqual(only["mode"], "reply")
+        self.assertEqual(only["subject"], "RE: Quotation S00042")
+        everyone = self.composer.get_defaults("res.partner", self.record.id, False, "reply")
+        self.assertEqual(len(everyone["cc"]), 2)
+
+    PIXEL = (
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+
+    def _body_with_image(self):
+        return '<p>See:</p><img src="data:image/png;base64,%s" style="width: 50%%;"/>' % self.PIXEL
+
+    def test_pasted_image_becomes_an_attachment_link_when_the_draft_is_saved(self):
+        saved = self.composer.save_email("res.partner", self.record.id, False, {"body": self._body_with_image()})
+        body = self.env["dwo.mail.email"].browse(saved["id"]).body
+        self.assertNotIn("base64", body)
+        attachment = self.env["ir.attachment"].search([
+            ("res_model", "=", "res.partner"), ("res_id", "=", self.record.id), ("mimetype", "=", "image/png")])
+        self.assertEqual(len(attachment), 1)
+        self.assertIn("/web/image/%d?access_token=%s" % (attachment.id, attachment.access_token), body)
+        # autosave sends the same picture again: it is not stored twice
+        self.composer.save_email("res.partner", self.record.id, saved["id"], {"body": self._body_with_image()})
+        self.assertEqual(self.env["ir.attachment"].search_count([
+            ("res_model", "=", "res.partner"), ("res_id", "=", self.record.id), ("mimetype", "=", "image/png")]), 1)
+
+    def test_pasted_image_is_never_sent_as_base64(self):
+        self._send(cc=[], bcc=[], body=self._body_with_image())
+        message = self.env["mail.message"].search([
+            ("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])
+        self.assertNotIn("base64", message.body)
+        self.assertIn("/web/image/", message.body)
+
+    # ------------------------------------------------------------
+    # EMAIL SENT TO THE SYSTEM (CATCHALL)
+    # ------------------------------------------------------------
+
+    def test_reply_to_my_own_email_to_the_system_goes_to_the_sender(self):
+        """I wrote to the catchall to answer a thread: the core keeps no To (aliases are removed) and
+        I am the sender. The reply still defaults To to the address it came from."""
+        self._incoming(email_from="Hieu <hieu@dwo.example>", to="", cc="")
+        d = self.composer.get_defaults("res.partner", self.record.id, False, "reply")
+        self.assertEqual([a["email"] for a in d["to"]], ["hieu@dwo.example"])
+        self.assertEqual(d["cc"], [])
+        only = self.composer.get_defaults("res.partner", self.record.id, False, "reply_sender")
+        self.assertEqual([a["email"] for a in only["to"]], ["hieu@dwo.example"])
+
+    def test_the_to_of_an_email_sent_to_the_catchall_is_kept(self):
+        """The core drops the aliases from incoming_email_to: the raw To is kept next to it."""
+        catchall = self.mail_alias_domain.catchall_email
+        raw = (
+            "From: Hieu <hieu@dwo.example>\r\nTo: " + catchall + "\r\nSubject: Re: Quotation\r\n"
+            "Message-Id: <abc@dwo.example>\r\nContent-Type: text/plain\r\n\r\nHello\r\n")
+        msg_dict = self.env["mail.thread"].message_parse(email.message_from_string(raw, policy=email.policy.SMTP))
+        self.assertEqual(msg_dict["to_filtered"], "")
+        self.assertEqual(msg_dict["dwo_incoming_email_to_all"], catchall)
+        message = self.env["mail.message"].create({
+            "model": "res.partner", "res_id": self.record.id, "message_type": "email",
+            "email_from": "hieu@dwo.example", "dwo_incoming_email_to_all": msg_dict["dwo_incoming_email_to_all"],
+            "body": "<p>Hello</p>",
+        })
+        ref = self.composer._message_addresses(message)
+        self.assertEqual([a["email"] for a in ref[1]], [catchall])
+
+    def test_official_email_is_an_outgoing_email_message(self):
+        """Not editable (only comments are) and easy to filter: the type is email_outgoing, and the
+        badge still comes from the flag."""
+        self._send(cc=[], bcc=[])
+        message = self.env["mail.message"].search([
+            ("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])
+        self.assertEqual((message.message_type, message.subtype_id), ("email_outgoing", self.env.ref("mail.mt_comment")))
+
+    def test_received_to_keeps_the_order_and_shows_an_address_once(self):
+        """The core builds To from a set (order lost), and Delivered-To repeats an address."""
+        catchall = self.mail_alias_domain.catchall_email
+        raw = (
+            "From: Lan <%s>\r\nTo: Zed Last <zed@x.example>, Anna First <anna@x.example>, Mid <mid@x.example>, %s\r\n"
+            "Delivered-To: anna@x.example\r\nSubject: Order\r\nMessage-Id: <order@x.example>\r\n"
+            "Content-Type: text/plain\r\n\r\nHello\r\n" % (CUSTOMER, catchall))
+        msg_dict = self.env["mail.thread"].message_parse(email.message_from_string(raw, policy=email.policy.SMTP))
+        parsed = self.composer._parse(msg_dict["dwo_incoming_email_to_all"])
+        self.assertEqual(
+            [(a["email"], a["name"]) for a in parsed],
+            [("zed@x.example", "Zed Last"), ("anna@x.example", "Anna First"),
+             ("mid@x.example", "Mid"), (catchall, "")])
+
+    def test_parse_keeps_the_name_when_an_address_is_repeated(self):
+        parsed = self.composer._parse("a@x.example, Bob <b@x.example>, Anna <a@x.example>")
+        self.assertEqual([(a["email"], a["name"]) for a in parsed], [("a@x.example", "Anna"), ("b@x.example", "Bob")])
+
+    # ------------------------------------------------------------
+    # EMPTY LINES TO WRITE IN
+    # ------------------------------------------------------------
+
+    def test_a_new_email_starts_with_three_empty_lines_then_the_signature(self):
+        self.admin.signature = "<p>Best regards, Hieu</p>"
+        body = self.composer.get_defaults("res.partner", self.record.id)["body"]
+        self.assertTrue(body.startswith("<p><br></p>" * 3), body)
+        self.assertIn("Best regards, Hieu", body[len("<p><br></p>" * 3):])
+
+    def test_the_empty_lines_come_before_the_quote_of_a_reply(self):
+        self._incoming()
+        body = self.composer.get_defaults("res.partner", self.record.id)["body"]
+        self.assertTrue(body.startswith("<p><br></p>" * 3), body)
+        self.assertLess(body.index("<p><br></p>"), body.index("divRplyFwdMsg"))
+
+    def test_a_saved_template_does_not_keep_the_empty_lines(self):
+        body = "<p><br></p><p><br></p><p><br></p><p>Dear customer</p><p><br></p>"
+        self.assertEqual(self.composer._body_without_quote(body), "<p>Dear customer</p><p><br></p>")

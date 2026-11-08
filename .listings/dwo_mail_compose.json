@@ -39,7 +39,7 @@
         {"title": "Inline composer", "text": "The form opens right in the chatter, no popup. Cc and Bcc are small buttons next to To and appear only when you need them."},
         {"title": "Address badges", "text": "Type to get suggestions from users, partners and the addresses you typed before, or enter any valid email. The same address may appear in To, Cc and Bcc."},
         {"title": "Reply-all by default", "text": "Replies start with the right recipients and an <code>RE:</code> subject, and the previous email is quoted in the body, Outlook style."},
-        {"title": "Reply and Forward", "text": "Every email message has <strong>Reply by email</strong> and <strong>Forward by email</strong> buttons. Forward copies the attachments."},
+        {"title": "Reply, Reply all, Forward", "text": "Three buttons sit right under From, To and Cc of every email. Reply goes to the sender only, Reply all keeps everyone, Forward copies the attachments."},
         {"title": "Templates", "text": "Apply a template to fill subject, body, From, To, Cc, Bcc and attachments, with placeholders computed on the open record."},
         {"title": "Drafts that save themselves", "text": "Unfinished emails are saved automatically. Each person can keep several per record and reload one by clicking it in the list under the form."},
         {"title": "Approval before sending", "text": "Ask one or more people to approve. They get an email, an on-screen notice and an activity, and can approve and send, reject or reassign."},

@@ -1,4 +1,4 @@
-import { Component, useRef, useState } from "@odoo/owl";
+import { Component, useEffect, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 const EMAIL_RE = /^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/;
@@ -39,9 +39,97 @@ export class DwoAddressInput extends Component {
     setup() {
         this.orm = useService("orm");
         this.inputRef = useRef("input");
-        this.state = useState({ text: "", suggestions: [], active: -1, invalid: false });
+        this.editRef = useRef("edit");
+        // editing: the chip being edited ({ email, text, invalid }), null when none
+        this.state = useState({ text: "", suggestions: [], active: -1, invalid: false, editing: null });
         this.timer = null;
         this.requestId = 0;
+        // the edit box takes the focus as soon as it is shown
+        useEffect(
+            (email) => {
+                if (email && this.editRef.el) {
+                    this.editRef.el.focus();
+                    this.editRef.el.select();
+                }
+            },
+            () => [this.state.editing?.email]
+        );
+    }
+
+    // --- edit a chip in place ------------------------------------------------
+
+    startEdit(address) {
+        this.commitText({ silent: true });
+        this.state.suggestions = [];
+        this.state.editing = { email: address.email, text: address.email, invalid: false };
+    }
+
+    onEditInput(ev) {
+        this.state.editing.text = ev.target.value;
+        this.state.editing.invalid = false;
+    }
+
+    onEditKeydown(ev) {
+        if (ev.key === "Enter" || ev.key === "Tab" || ev.key === ",") {
+            ev.preventDefault();
+            this.commitEdit();
+        } else if (ev.key === "Escape") {
+            ev.preventDefault();
+            ev.stopPropagation();
+            this.state.editing = null;
+        }
+    }
+
+    onEditBlur() {
+        // a text that is not an address is dropped: the chip keeps its old address
+        if (this.state.editing) {
+            this.commitEdit({ silent: true });
+        }
+    }
+
+    /**
+     * Replace the address of the chip by what was typed, at the same place. An address already
+     * in the field is not added twice (the chip is removed); an empty text removes the chip.
+     */
+    commitEdit({ silent = false } = {}) {
+        const editing = this.state.editing;
+        if (!editing) {
+            return;
+        }
+        const text = editing.text.trim();
+        const old = this.props.value.find((a) => a.email === editing.email);
+        if (!text) {
+            this.state.editing = null;
+            if (old) {
+                this.remove(old);
+            }
+            return;
+        }
+        const [parsed] = parseAddresses(text);
+        if (!parsed || !parsed.valid) {
+            if (silent) {
+                this.state.editing = null;
+            } else {
+                editing.invalid = true;
+            }
+            return;
+        }
+        this.state.editing = null;
+        if (!old || parsed.email === old.email) {
+            return;
+        }
+        const exists = this.props.value.some((a) => a.email === parsed.email);
+        const value = [];
+        for (const address of this.props.value) {
+            if (address === old) {
+                if (!exists) {
+                    value.push({ email: parsed.email, name: parsed.name, isNew: true });
+                }
+            } else {
+                value.push(address);
+            }
+        }
+        this.props.onChange(value);
     }
 
     /** Only the addresses of this field: the same address may also be in To, Cc and Bcc. */
@@ -74,6 +162,22 @@ export class DwoAddressInput extends Component {
 
     onFocus() {
         this.fetchSuggestions();
+    }
+
+    /**
+     * The input keeps the focus after a suggestion is picked, so a second click on it fires no
+     * focus event: open the suggestions on click too. A click anywhere on the field (badges
+     * area, padding) puts the cursor in the input.
+     */
+    onClick() {
+        this.fetchSuggestions();
+    }
+
+    onBoxClick(ev) {
+        if (ev.target === ev.currentTarget) {
+            this.inputRef.el?.focus();
+            this.fetchSuggestions();
+        }
     }
 
     onBlur() {
@@ -116,7 +220,14 @@ export class DwoAddressInput extends Component {
         }
     }
 
+    /** Forget the suggestions asked for but not shown yet: they are about text that is gone. */
+    cancelPendingSuggestions() {
+        clearTimeout(this.timer);
+        this.requestId++;
+    }
+
     pick(suggestion) {
+        this.cancelPendingSuggestions();
         this.add([{ email: suggestion.email, name: suggestion.name }]);
         this.state.text = "";
         this.state.suggestions = [];
@@ -130,6 +241,8 @@ export class DwoAddressInput extends Component {
         }
         const valid = parsed.filter((a) => a.valid);
         const invalid = parsed.filter((a) => !a.valid);
+        this.cancelPendingSuggestions();
+        this.state.suggestions = [];
         this.add(valid.map(({ email, name }) => ({ email, name, isNew: true })));
         if (invalid.length) {
             // keep what could not be read so the user can fix it
