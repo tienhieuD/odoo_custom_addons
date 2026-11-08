@@ -2,12 +2,13 @@ import { Component, onWillUnmount, useEffect, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
+// Each kind has its own colour (a Bootstrap contextual colour): outlined when off, filled when chosen.
 const KINDS = [
-    { id: "discussion", label: _t("Discussions") },
-    { id: "email", label: _t("Emails") },
-    { id: "note", label: _t("Notes") },
-    { id: "tracking", label: _t("Tracking") },
-    { id: "other", label: _t("Other") },
+    { id: "discussion", label: _t("Discussions"), color: "primary" },
+    { id: "email", label: _t("Emails"), color: "info" },
+    { id: "note", label: _t("Notes"), color: "warning" },
+    { id: "tracking", label: _t("Tracking"), color: "success" },
+    { id: "other", label: _t("Other"), color: "danger" },
 ];
 
 /**
@@ -49,7 +50,7 @@ export class DwoMessageFilter extends Component {
 
     get items() {
         const counts = this.state.counts || {};
-        return [{ id: false, label: _t("All"), count: counts.all ?? 0 }].concat(
+        return [{ id: false, label: _t("All"), color: "dark", count: counts.all ?? 0 }].concat(
             KINDS.map((kind) => ({ ...kind, count: counts[kind.id] ?? 0 }))
         );
     }

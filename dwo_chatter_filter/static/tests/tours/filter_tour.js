@@ -35,9 +35,17 @@ const emailHidden = (text) => ({
 registry.category("web_tour.tours").add("dwo_chatter_filter", {
     steps: () => [
         { trigger: ".o-mail-Chatter" },
-        // the badges are right under the actions, with the numbers
-        { trigger: ".o-mail-Chatter-topbar + .o-dwo-messageFilter, .o-mail-Chatter-top + .o-mail-Chatter-content > .o-dwo-messageFilter" },
-        { trigger: `${badge("all")}.text-bg-primary:contains('5')` },
+        // the place: under the planned activities and above the messages
+        { trigger: ".o-mail-ActivityList + .o-dwo-messageFilter + .o-mail-Thread" },
+        // a label, then the badges, each with its own colour (outlined while off)
+        { trigger: ".o-dwo-messageFilter .o-dwo-filterLabel:contains('Filter by:')" },
+        { trigger: `${badge("discussion")}.text-primary.border-primary` },
+        { trigger: `${badge("email")}.text-info.border-info` },
+        { trigger: `${badge("note")}.text-warning.border-warning` },
+        { trigger: `${badge("tracking")}.text-success.border-success` },
+        { trigger: `${badge("other")}.text-danger.border-danger` },
+        // the numbers
+        { trigger: `${badge("all")}.text-bg-dark:contains('5')` },
         { trigger: `${badge("discussion")}:contains('1')` },
         { trigger: `${badge("email")}:contains('1')` },
         { trigger: `${badge("note")}:contains('1')` },
@@ -49,7 +57,8 @@ registry.category("web_tour.tours").add("dwo_chatter_filter", {
         emailShown("Email from the customer"),
         // Emails: only the email
         { trigger: badge("email"), run: "click" },
-        { trigger: `${badge("email")}.text-bg-primary` },
+        // chosen: filled with its colour
+        { trigger: `${badge("email")}.text-bg-info` },
         emailShown("Email from the customer"),
         { trigger: hidden("Talk about the order") },
         { trigger: hidden("Private reminder") },
@@ -72,7 +81,7 @@ registry.category("web_tour.tours").add("dwo_chatter_filter", {
         { trigger: hidden("Automatic message") },
         // All: back to everything
         { trigger: badge("all"), run: "click" },
-        { trigger: `${badge("all")}.text-bg-primary` },
+        { trigger: `${badge("all")}.text-bg-dark` },
         { trigger: showing("Private reminder") },
         { trigger: showing("Automatic message") },
         emailShown("Email from the customer"),

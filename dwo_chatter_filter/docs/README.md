@@ -10,9 +10,15 @@ trộn lẫn. Muốn xem riêng email hay riêng các lần thay đổi trườn
 
 ## 2. Tính năng
 
-Một hàng badge ở đầu vùng nội dung chatter, ngay dưới hàng nút Send message, Log note, Activity:
+Một hàng badge có nhãn **Filter by:**, nằm **dưới danh sách Planned Activities (`o-mail-ActivityList`) và trên danh sách
+message (`o-mail-Thread`)**:
 
 **All · Discussions · Emails · Notes · Tracking · Other**, mỗi badge có số message.
+
+- Chữ nhỏ (`.7rem`). Mỗi loại một màu viền riêng, nền trong suốt khi chưa chọn; **bấm vào thì đổi sang màu đặc** của loại đó:
+  All = dark, Discussions = primary, Emails = info, Notes = warning, Tracking = success, Other = danger.
+- Vị trí đặt bằng xpath **trước `SearchMessageResult`** (không phải trước `Thread`), vì hai phần tử này là cặp `t-if` / `t-else`
+  của core; chèn vào giữa sẽ làm hỏng cặp đó.
 
 - Bấm một badge thì chỉ hiện loại đó. **Chọn một loại tại một thời điểm**; bấm **All** để quay về tất cả.
 - Không lưu lựa chọn: mở lại bản ghi là thấy tất cả (tránh việc ai đó bỏ sót message mà không biết đang lọc).

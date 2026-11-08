@@ -91,6 +91,11 @@ def post_init_hook(env):
     note(1, "<p>Remember to add the customer to the Tuesday delivery route.</p>", admin)
     automatic(0, "<p>Activity done: Call the customer to confirm the first delivery.</p>")
 
+    # a planned activity: the badges come under it
+    aurora.activity_schedule(
+        "mail.mail_activity_data_call", summary="Call the customer about the delivery date",
+        user_id=admin.id, date_deadline=fields.Date.today() + timedelta(days=1))
+
     env["mail.mail"].sudo().search([("state", "=", "outgoing")]).write({"state": "cancel"})
 
 

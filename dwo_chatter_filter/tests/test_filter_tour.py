@@ -17,6 +17,8 @@ class TestMessageFilterTour(HttpCase):
         Message.create(dict(base, body="<p>Private reminder</p>", message_type="comment", subtype_id=mt_note.id))
         Message.create(dict(base, body="<p>Email from the customer</p>", message_type="email", subtype_id=mt_comment.id))
         tracking = Message.create(dict(base, body="", message_type="notification", subtype_id=mt_note.id))
+        # a planned activity: the badges come under it
+        cls.record.activity_schedule("mail.mail_activity_data_todo", summary="Call the customer")
         cls.env["mail.tracking.value"].create({
             "field_id": cls.env["ir.model.fields"]._get("res.partner", "name").id,
             "mail_message_id": tracking.id, "old_value_char": "Old name", "new_value_char": "Name changed"})

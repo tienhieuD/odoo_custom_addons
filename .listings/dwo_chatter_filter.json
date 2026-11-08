@@ -16,7 +16,7 @@
     "title_2": "Find Any Message Fast",
     "subtitle": "One click: discussions, emails, notes, tracking.",
     "chips": [
-      "Badges under the chatter actions",
+      "Coloured badges above the messages",
       "A count on every badge",
       "Load more keeps working"
     ],
@@ -66,7 +66,7 @@
       "type": "header",
       "title": "Message Filter on Chatter for Odoo",
       "tagline": "Stop scrolling through the whole chatter.",
-      "subtitle": "A row of badges under <strong>Send message</strong>, <strong>Log note</strong> and <strong>Activity</strong>: click one to see only discussions, emails, notes or tracking."
+      "subtitle": "A <strong>Filter by:</strong> row of coloured badges above the messages: click one to see only discussions, emails, notes or tracking."
     },
     {
       "type": "intro",
@@ -82,7 +82,7 @@
       "items": [
         {
           "title": "Six badges",
-          "text": "All, Discussions, Emails, Notes, Tracking and Other."
+          "text": "All, Discussions, Emails, Notes, Tracking and Other, each with its own colour."
         },
         {
           "title": "A count on each",
@@ -90,7 +90,7 @@
         },
         {
           "title": "One click",
-          "text": "One kind at a time. Click All to come back."
+          "text": "One kind at a time: the badge fills with its colour. Click All to come back."
         },
         {
           "title": "Done by the server",
@@ -110,8 +110,8 @@
       "type": "screenshot",
       "title": "The whole picture",
       "image": "screenshot_1.png",
-      "alt": "A record with its chatter on the right: the badges All, Discussions, Emails, Notes, Tracking and Other with their counts, above the messages",
-      "intro": "On a wide screen the chatter sits beside the record. The badges are right under the actions, each with its count."
+      "alt": "A record with its chatter on the right: the Filter by label and the badges All, Discussions, Emails, Notes, Tracking and Other, under the planned activities and above the messages",
+      "intro": "On a wide screen the chatter sits beside the record. <strong>Filter by:</strong> comes under the planned activities and above the messages. Each badge has its own colour and its count."
     },
     {
       "type": "screenshot",
@@ -186,7 +186,7 @@
             },
             {
               "type": "p",
-              "html": "Open any record with a chatter. Click a badge to see that kind of message only. Click <strong>All</strong> to see everything again."
+              "html": "Under <strong>Filter by:</strong>, click a badge to see that kind of message only. Click <strong>All</strong> to see everything again."
             },
             {
               "type": "h",
