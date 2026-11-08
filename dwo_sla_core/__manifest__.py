@@ -16,8 +16,8 @@ smart button on the source record.
 See custom-addons/dwo_sla_core/docs/ for the SRS, TAD, DB Design.
 """,
     'author': "DUO-TEK Software Vietnam",
-    'website': "https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam",
-    'support': "tienhieu1212@gmail.com",
+    'website': 'https://duotek.io.vn',
+    'support': 'hello@duotek.io.vn',
 
     'category': 'Services',
     'version': '19.0.1.0.0',

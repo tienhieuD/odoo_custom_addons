@@ -329,5 +329,5 @@ visible like any other under **Settings → Technical → Scheduled Actions** fo
 ## 17. Support
 
 Questions about configuring a rule, or something that does not match this guide? Write to
-[tienhieu1212@gmail.com](mailto:tienhieu1212@gmail.com) with your Odoo version, the SLA Definition involved, and
+[hello@duotek.io.vn](mailto:hello@duotek.io.vn) with your Odoo version, the SLA Definition involved, and
 what you expected to happen.
