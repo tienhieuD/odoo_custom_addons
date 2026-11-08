@@ -13,8 +13,8 @@
   },
   "banner": {
     "pill": "ODOO · SERVICE LEVEL MANAGEMENT",
-    "title_1": "Enterprise SLA",
-    "title_2": "& Escalation Engine",
+    "title_1": "SLA & Escalation",
+    "title_2": "Enterprise Engine",
     "subtitle": "Any record. One enforceable commitment.",
     "chips": [
       "Works on any model, not just tickets",
@@ -66,7 +66,7 @@
   "sections": [
     {
       "type": "header",
-      "title": "Enterprise SLA &amp; Escalation Engine for Odoo",
+      "title": "SLA &amp; Escalation for Odoo",
       "tagline": "Service Level Agreements, Operational Level Agreements and escalation chains &mdash; on any model, not just support tickets.",
       "subtitle": "Define commitments once with point-and-click conditions, and let the engine measure, pause, breach and escalate them automatically, in real working hours, with a full audit trail for every decision."
     },

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "DWO SLA Core",
+    'name': "SLA & Escalation",
     'summary': "Enterprise SLA &amp; escalation engine for any Odoo model, with working-calendar durations and multi-stage alerts",
     'description': """
 Enterprise-grade Service Level Agreement (SLA) and Operational Level

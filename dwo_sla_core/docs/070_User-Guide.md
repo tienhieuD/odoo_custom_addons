@@ -1,4 +1,4 @@
-# DWO SLA Core — User Guide
+# SLA & Escalation — User Guide
 
 How to configure, run and read Service Level Agreements on any Odoo model.
 Applies to Odoo Community and Enterprise. Written for SLA Managers and SLA Users.
@@ -31,7 +31,7 @@ Applies to Odoo Community and Enterprise. Written for SLA Managers and SLA Users
 
 ## 1. Overview & Key Concepts
 
-DWO SLA Core measures and enforces time-bound commitments on **any model** in your Odoo database. You describe what
+SLA & Escalation measures and enforces time-bound commitments on **any model** in your Odoo database. You describe what
 to watch and when with plain Odoo domain conditions; the module takes care of starting the clock, pausing and
 resuming it, detecting a breach, running escalations and keeping a full history — with no code. Four terms come up
 throughout this guide:
