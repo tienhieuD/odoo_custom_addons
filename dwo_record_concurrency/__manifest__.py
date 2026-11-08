@@ -5,7 +5,8 @@
     "summary": "Warn users before they overwrite each other's changes: field-level conflict check at save, with a clear comparison.",
     "description": "Soft concurrency control for form views. Choose the models and fields to watch; when another user changed a field you are saving, a dialog compares both values and lets you force save, discard or cancel. It never blocks a save. Requires the standard base, web and bus modules, no external library.",
     "author": "DUO-TEK Software Vietnam",
-    "website": "https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam",
+    "website": "https://duotek.io.vn",
+    "support": "hello@duotek.io.vn",
     "category": "Extra Tools",
     "depends": ["base", "web", "bus"],
     "data": [
