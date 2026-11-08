@@ -21,7 +21,8 @@ Features:
 Requirements: Pillow with the WebP encoder (libwebp) on the Odoo server. A built-in test checks it for you.
     """,
     'author': 'DUO-TEK Software Vietnam',
-    'website': 'https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam',
+    'website': 'https://duotek.io.vn',
+    'support': 'hello@duotek.io.vn',
     'license': 'OPL-1',
     'depends': ['web', 'website'],
     'data': [

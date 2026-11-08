@@ -8,7 +8,8 @@
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
     """,
-    'website': 'https://live.staticflickr.com/65535/50701330062_5a6a35cd36_o.gif',
+    'website': 'https://duotek.io.vn',
+    'support': 'hello@duotek.io.vn',
     'author': "DUO-TEK Software Vietnam",
     'license': 'LGPL-3',
     # 'website': "https://www.nissho-vn.com/en/",

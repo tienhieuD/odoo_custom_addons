@@ -18,7 +18,8 @@ Features:
 - Explicit <split> views and debug menu entries to add / remove a custom split view on an action
     """,
     'author': 'DUO-TEK Software Vietnam',
-    'website': 'https://apps.odoo.com/apps/modules/browse?author=DUO-TEK%20Software%20Vietnam',
+    'website': 'https://duotek.io.vn',
+    'support': 'hello@duotek.io.vn',
     'license': 'OPL-1',
     'category': 'Extra Tools',
     'version': '16.0.1.0.0',
