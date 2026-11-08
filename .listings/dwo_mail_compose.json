@@ -1,113 +1,281 @@
 {
-  "brand": {"primary": "#875A7B", "dark": "#4A2F45", "accent": "#FFC857", "info": "#5B8DB8", "ok": "#0E7C66"},
-  "icon": {"label": "EMAIL", "motif": "document"},
+  "brand": {
+    "primary": "#875A7B",
+    "dark": "#4A2F45",
+    "accent": "#FFC857",
+    "info": "#5B8DB8",
+    "ok": "#0E7C66"
+  },
+  "icon": {
+    "label": "EMAIL",
+    "motif": "document"
+  },
   "banner": {
     "pill": "ODOO · DISCUSS ADD-ON",
     "title_1": "Advanced Email Composer",
     "title_2": "Official Emails from the Chatter",
     "subtitle": "To, Cc, Bcc, reply-all, templates, drafts and approval.",
-    "chips": ["Send email button", "Reply-all and quotes", "Approval before sending"],
-    "visual": {"type": "icon"}
+    "chips": [
+      "Send email button",
+      "Reply-all and quotes",
+      "Approval before sending"
+    ],
+    "visual": {
+      "type": "icon"
+    }
   },
   "flow": {
     "steps": [
-      {"title": "Open a record", "rows": ["any chatter", "of your database"], "icon": "browser"},
-      {"title": "Send email", "rows": ["inline form, To,", "Cc and Bcc"], "icon": "document", "highlight": true},
-      {"title": "Approve", "rows": ["optional: one", "approver is enough"], "icon": "user"},
-      {"title": "One real email", "rows": ["sent to the chosen", "people only"], "icon": "check"}
+      {
+        "title": "Open a record",
+        "rows": [
+          "any chatter",
+          "of your database"
+        ],
+        "icon": "browser"
+      },
+      {
+        "title": "Send email",
+        "rows": [
+          "inline form, To,",
+          "Cc and Bcc"
+        ],
+        "icon": "document",
+        "highlight": true
+      },
+      {
+        "title": "Approve",
+        "rows": [
+          "optional: one",
+          "approver is enough"
+        ],
+        "icon": "user"
+      },
+      {
+        "title": "One real email",
+        "rows": [
+          "sent to the chosen",
+          "people only"
+        ],
+        "icon": "check"
+      }
     ]
   },
   "sections": [
     {
       "type": "header",
       "title": "Advanced Email Composer for Odoo",
-      "tagline": "Real emails from the chatter, clearly apart from internal discussion.",
-      "subtitle": "A <strong>Send email</strong> button next to Send message opens an inline form with From, To, Cc, Bcc, subject, body, attachments and templates. The email goes to the people you choose and nobody else."
+      "tagline": "Send real emails from the chatter.",
+      "subtitle": "A <strong>Send email</strong> button next to Send message. One genuine email goes to the people you choose, and nobody else gets a notification."
     },
     {
       "type": "intro",
       "flow": true,
       "flow_alt": "Open a record, click Send email, optionally get approval, one real email is sent",
-      "html": "<strong>Send message</strong> in the chatter is a discussion: it can email every follower, one email each, with a notification layout. It is not a business letter. This module adds a separate <strong>Send email</strong> action that sends <strong>one genuine email</strong> to the To, Cc and Bcc you choose, with a clean layout and no notification to followers. It needs the free <em>Mail BCC Support</em> module."
+      "html": "<strong>Send message</strong> is a discussion: it can email every follower, one by one. <strong>Send email</strong> is a letter: one email, to the To, Cc and Bcc you pick. Follow the screenshots to see how it works."
     },
     {
       "type": "cards",
-      "title": "What you get",
+      "title": "In short",
       "cols": 3,
       "accent": "primary",
       "items": [
-        {"title": "Inline composer", "text": "The form opens right in the chatter, no popup. Cc and Bcc are small buttons next to To and appear only when you need them."},
-        {"title": "Address badges", "text": "Type to get suggestions from users, partners and the addresses you typed before, or enter any valid email. The same address may appear in To, Cc and Bcc."},
-        {"title": "Reply-all by default", "text": "Replies start with the right recipients and an <code>RE:</code> subject, and the previous email is quoted in the body, Outlook style."},
-        {"title": "Reply, Reply all, Forward", "text": "Three buttons sit right under From, To and Cc of every email. Reply goes to the sender only, Reply all keeps everyone, Forward copies the attachments."},
-        {"title": "Templates", "text": "Apply a template to fill subject, body, From, To, Cc, Bcc and attachments, with placeholders computed on the open record."},
-        {"title": "Drafts that save themselves", "text": "Unfinished emails are saved automatically. Each person can keep several per record and reload one by clicking it in the list under the form."},
-        {"title": "Approval before sending", "text": "Ask one or more people to approve. They get an email, an on-screen notice and an activity, and can approve and send, reject or reassign."},
-        {"title": "Company-wide control", "text": "Make approval mandatory for the whole company in Settings. The server then refuses direct sending, not only the button."},
-        {"title": "Easy to tell apart", "text": "Official emails show an <strong>Email</strong> badge with From, To and Cc under the title, so they never get mixed up with messages and notes."}
+        {
+          "title": "Inline form",
+          "text": "Opens in the chatter. No popup."
+        },
+        {
+          "title": "Reply all by default",
+          "text": "The right people, and the old email quoted."
+        },
+        {
+          "title": "Templates",
+          "text": "Fill recipients, subject and text in one click."
+        },
+        {
+          "title": "Drafts",
+          "text": "Saved as you type. Several per record."
+        },
+        {
+          "title": "Approval",
+          "text": "Ask someone to approve before it goes out."
+        },
+        {
+          "title": "Clean",
+          "text": "Official emails have their own badge."
+        }
       ]
     },
     {
-      "type": "steps",
-      "title": "How to use it",
-      "intro": "From the chatter of any record.",
-      "items": [
-        {"title": "Click Send email", "text": "The form opens in place of the chatter history. On a thread that already has emails, it starts as a reply to all."},
-        {"title": "Write your email", "text": "Pick the recipients, add Cc or Bcc if needed, apply a template, attach files. The draft is saved as you type."},
-        {"title": "Send now or ask for approval", "text": "The Send email button offers <strong>Send now</strong> or <strong>Request approval and send</strong>."}
-      ]
+      "type": "screenshot",
+      "title": "1. Emails stand out in the thread",
+      "image": "screenshot_1.png",
+      "alt": "A thread with received and sent emails, each with a badge, From, To, Cc and Reply, Reply all, Forward buttons",
+      "intro": "A badge, From, To and Cc, then <strong>Reply</strong>, <strong>Reply all</strong> and <strong>Forward</strong> right under them."
+    },
+    {
+      "type": "screenshot",
+      "title": "2. Start from a template",
+      "image": "screenshot_2.png",
+      "alt": "A new email filled from a template: To, Bcc, subject and body, with the signature below",
+      "intro": "Click Send email, pick a template. Recipients, subject and text are filled for this record. Your signature stays."
+    },
+    {
+      "type": "screenshot",
+      "title": "3. Find people as you type",
+      "image": "screenshot_3.png",
+      "alt": "The Cc field with a suggestion list while typing a name",
+      "intro": "Suggestions from users, contacts and addresses you used before. Cc and Bcc show up only when you need them."
+    },
+    {
+      "type": "screenshot",
+      "title": "4. Reply all in one click",
+      "image": "screenshot_4.png",
+      "alt": "A reply with To and Cc filled, the signature and the quoted original email",
+      "intro": "The right people in To and Cc, an <code>RE:</code> subject, three empty lines to write in, and the previous email quoted."
+    },
+    {
+      "type": "screenshot",
+      "title": "5. Drafts save themselves",
+      "image": "screenshot_5.png",
+      "alt": "A draft with a pasted image in the body and the list of unsent emails below",
+      "intro": "Paste an image and it just works. Unfinished emails are kept in a list under the form."
+    },
+    {
+      "type": "screenshot",
+      "title": "6. Ask for approval",
+      "image": "screenshot_6.png",
+      "alt": "The request approval dialog with an approver and a note",
+      "intro": "Pick one or more approvers, add a note. Anyone of them can approve."
+    },
+    {
+      "type": "screenshot",
+      "title": "7. Wait for the answer",
+      "image": "screenshot_7.png",
+      "alt": "An email waiting for approval, with the names of the approvers",
+      "intro": "The email shows who must approve. You can keep editing; the approver sees the latest text."
+    },
+    {
+      "type": "screenshot",
+      "title": "8. The approver decides",
+      "image": "screenshot_8.png",
+      "alt": "The approver's page with the email, the request and the Approve, Reject and Reassign buttons",
+      "intro": "One click to <strong>Approve and send</strong>, <strong>Reject</strong> or <strong>Reassign</strong>."
+    },
+    {
+      "type": "screenshot",
+      "title": "9. Rejected? Fix it and ask again",
+      "image": "screenshot_9.png",
+      "alt": "A rejected email with the reason given by the approver",
+      "intro": "The reason is shown on the email. Edit it and ask again."
     },
     {
       "type": "tabs",
       "title": "Requirements &amp; Installation",
       "id_prefix": "dmc",
-      "intro": "The module depends on the standard <code>mail</code> module and on <code>dwo_mail_bcc</code> (Mail BCC Support, free). It needs no external Python library.",
+      "intro": "Needs the standard <code>mail</code> module and the free <code>dwo_mail_bcc</code> (installed with it). No external library.",
       "notes": [
-        "Install <strong>Mail BCC Support</strong> first or together with this module.",
-        "The composer is for internal users only; portal and public users cannot use it."
+        "For internal users only. Portal and public users cannot use the composer."
       ],
       "tabs": [
         {
           "id": "install",
           "title": "Install",
           "blocks": [
-            {"type": "h", "text": "Install the modules"},
-            {"type": "p", "html": "1. Copy the <code>dwo_mail_bcc</code> and <code>dwo_mail_compose</code> folders into an add-ons path of your Odoo server."},
-            {"type": "p", "html": "2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu."},
-            {"type": "p", "html": "3. Search for <em>Advanced Email Composer</em> and click <strong>Install</strong>. Mail BCC Support is installed with it."},
-            {"type": "muted", "html": "Reload your browser page after installing so the new assets are loaded."}
+            {
+              "type": "h",
+              "text": "Install the modules"
+            },
+            {
+              "type": "p",
+              "html": "1. Copy the <code>dwo_mail_bcc</code> and <code>dwo_mail_compose</code> folders into an add-ons path of your Odoo server."
+            },
+            {
+              "type": "p",
+              "html": "2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu."
+            },
+            {
+              "type": "p",
+              "html": "3. Search for <em>Advanced Email Composer</em> and click <strong>Install</strong>. Mail BCC Support is installed with it."
+            },
+            {
+              "type": "muted",
+              "html": "Reload your browser page after installing so the new assets are loaded."
+            }
           ]
         },
         {
           "id": "use",
           "title": "Use",
           "blocks": [
-            {"type": "h", "text": "Send an email"},
-            {"type": "p", "html": "Open a record, click <strong>Send email</strong>, fill in the recipients and the message, then use <strong>Send now</strong>. Use <strong>Advanced</strong> to add a Reply-To address."},
-            {"type": "h", "text": "Ask for approval"},
-            {"type": "p", "html": "Choose <strong>Request approval and send</strong>, pick one or more approvers (yourself included) and add an optional note. Approvers find the request in <strong>Discuss &gt; Email Approvals</strong>."},
-            {"type": "muted", "html": "Any one approver is enough to send; any one rejection is enough to stop. The email is sent from your address with your rights."}
+            {
+              "type": "h",
+              "text": "Send an email"
+            },
+            {
+              "type": "p",
+              "html": "Open a record, click <strong>Send email</strong>, fill in the recipients and the message, then use <strong>Send now</strong>. Use <strong>Advanced</strong> to add a Reply-To address."
+            },
+            {
+              "type": "h",
+              "text": "Ask for approval"
+            },
+            {
+              "type": "p",
+              "html": "Choose <strong>Request approval and send</strong>, pick one or more approvers (yourself included) and add an optional note. Approvers find the request in <strong>Discuss &gt; Email Approvals</strong>."
+            },
+            {
+              "type": "muted",
+              "html": "Any one approver is enough to send; any one rejection is enough to stop. The email is sent from your address with your rights."
+            }
           ]
         },
         {
           "id": "settings",
           "title": "Settings",
           "blocks": [
-            {"type": "h", "text": "Email Composer settings"},
-            {"type": "p", "html": "<strong>Settings &gt; General Settings &gt; Email Composer</strong> has two options for each company:"},
-            {"type": "p", "html": "<strong>Require approval</strong>: nobody can send directly, every email goes through approval."},
-            {"type": "p", "html": "<strong>Delete unfinished emails after (days)</strong>: drafts and pending or rejected emails with no activity for this long are removed automatically. Default 180 days."}
+            {
+              "type": "h",
+              "text": "Email Composer settings"
+            },
+            {
+              "type": "p",
+              "html": "<strong>Settings &gt; General Settings &gt; Email Composer</strong> has two options for each company:"
+            },
+            {
+              "type": "p",
+              "html": "<strong>Require approval</strong>: nobody can send directly, every email goes through approval."
+            },
+            {
+              "type": "p",
+              "html": "<strong>Delete unfinished emails after (days)</strong>: drafts and pending or rejected emails with no activity for this long are removed automatically. Default 180 days."
+            }
           ]
         },
         {
           "id": "limits",
           "title": "Limits",
           "blocks": [
-            {"type": "h", "text": "Good to know"},
-            {"type": "p", "html": "An email needs at least one recipient in <strong>To</strong>; an email with only Cc or Bcc cannot be sent."},
-            {"type": "p", "html": "Delivery is not tracked per Cc or Bcc address."},
-            {"type": "p", "html": "Images inside the body are links to your Odoo server, so recipients see them only if the server is reachable from the internet. Use <strong>Attach</strong> to be sure."},
-            {"type": "p", "html": "Sending to several records at once, scheduling and preview are not available yet. The interface is in English."}
+            {
+              "type": "h",
+              "text": "Good to know"
+            },
+            {
+              "type": "p",
+              "html": "An email needs at least one recipient in <strong>To</strong>; an email with only Cc or Bcc cannot be sent."
+            },
+            {
+              "type": "p",
+              "html": "Delivery is not tracked per Cc or Bcc address."
+            },
+            {
+              "type": "p",
+              "html": "Images inside the body are links to your Odoo server, so recipients see them only if the server is reachable from the internet. Use <strong>Attach</strong> to be sure."
+            },
+            {
+              "type": "p",
+              "html": "Sending to several records at once, scheduling and preview are not available yet. The interface is in English."
+            }
           ]
         }
       ]
@@ -117,25 +285,42 @@
       "title": "Changelog",
       "intro": "Module releases, newest first.",
       "items": [
-        {"version": "1.0", "date": "2026-11-08", "text": "First release: Send email in the chatter with To, Cc and Bcc, reply-all and quoted history, Reply and Forward, templates, address book, autosaved drafts and optional approval."}
+        {
+          "version": "1.0",
+          "date": "2026-11-08",
+          "text": "First release."
+        }
       ]
     },
     {
       "type": "faq",
       "title": "Frequently Asked Questions",
       "items": [
-        {"q": "How is Send email different from Send message?", "a": "Send message is a discussion that can email every follower separately. Send email sends one real email to the To, Cc and Bcc you choose, with a minimal layout, and does not notify followers."},
-        {"q": "Will customer replies come back to the record?", "a": "Yes. The standard message identifiers are not changed, so a reply is routed by the mail gateway to the same record."},
-        {"q": "Which From addresses can I use?", "a": "Your own email, the company email and the default sending address of the alias domain."},
-        {"q": "Can I force every email through approval?", "a": "Yes. Turn on Require approval in Settings. Direct sending is then refused by the server."},
-        {"q": "Who can see an email that waits for approval?", "a": "The author, the current approvers, anyone who was an approver, and administrators. Only the author can edit it."},
-        {"q": "Is the sent email kept?", "a": "Yes. The outgoing email is kept under Technical &gt; Emails so you can check its status, errors and content."},
-        {"q": "Does it require the free Mail BCC Support module?", "a": "Yes, it depends on it for the Bcc, and installs it with this module."}
+        {
+          "q": "What is the difference with Send message?",
+          "a": "Send message can email each follower separately. Send email sends one real email to the To, Cc and Bcc you choose, and does not notify followers."
+        },
+        {
+          "q": "Do replies come back to the record?",
+          "a": "Yes. The standard message identifiers are kept, so the mail gateway routes the answer to the same record."
+        },
+        {
+          "q": "Can I force approval?",
+          "a": "Yes. Turn on <em>Require approval</em> in Settings. The server then refuses direct sending too."
+        },
+        {
+          "q": "Which From can I use?",
+          "a": "Your own email, the company email and the default sending address."
+        },
+        {
+          "q": "Does it need Mail BCC Support?",
+          "a": "Yes, it is free and installed with this module."
+        }
       ]
     },
     {
       "type": "cta",
-      "headline": "Send official emails without leaving Odoo.",
+      "headline": "Official emails, without leaving Odoo.",
       "text": "Install it, open a record and click Send email.",
       "footer": "Developed by DUO-TEK Software Vietnam"
     }

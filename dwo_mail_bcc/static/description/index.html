@@ -3,32 +3,32 @@
 
     <div class="text-center pt-5 pb-3 border-bottom">
         <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Mail BCC Support for Odoo</h1>
-        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Blind carbon copy, finally wired from the composer to the mail server.</p>
-        <p class="mb-4" style="font-size: 15px;">Adds a <strong>Bcc</strong> field to the full composer, to mail templates and to outgoing emails. Bcc recipients receive the email; their addresses never appear in any header seen by the other recipients.</p>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">A real Bcc in Odoo mail.</p>
+        <p class="mb-4" style="font-size: 15px;">Add a <strong>Bcc</strong> to the composer, to mail templates and to outgoing emails. Other recipients never see it.</p>
     </div>
 
     <div class="my-5">
-        <p class="mb-4" style="font-size: 17px;">Odoo already knows how to send a Bcc at the lowest level, but nothing connects it to the screens people use: the composer has no Bcc box and an outgoing email has no Bcc field. This module <strong>connects those points</strong> without rewriting the sending layer, so it stays small and easy to upgrade. It depends only on the standard <code>mail</code> module.</p>
+        <p class="mb-4" style="font-size: 17px;">Odoo can send a Bcc, but no screen lets you type one. This module connects the missing parts and keeps the standard sending code untouched.</p>
         <div class="text-center mb-4">
             <img src="flow.png" alt="Write a message, fill in Bcc, send, the Bcc address stays hidden" class="img-fluid rounded shadow-sm"/>
         </div>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">In short</h2>
     <div class="row">
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Bcc in the composer</h4>
-                    <p class="mb-0" style="font-size: 14px;">The full composer (Send message) has a Bcc box, for a single record or for mass mailing. It is not shown for Log note.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">In the composer</h4>
+                    <p class="mb-0" style="font-size: 14px;">A Bcc box in the full composer and in mass mailing.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Bcc on mail templates</h4>
-                    <p class="mb-0" style="font-size: 14px;">A template has its own Bcc field. Placeholders such as <code>{{ object.user_id.email }}</code> work and are computed for each record.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">On templates</h4>
+                    <p class="mb-0" style="font-size: 14px;">A Bcc field with placeholders, computed per record.</p>
                 </div>
             </div>
         </div>
@@ -36,23 +36,23 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Truly blind</h4>
-                    <p class="mb-0" style="font-size: 14px;">Bcc addresses are delivered to, but never written in the visible headers, so To and Cc recipients cannot see them.</p>
+                    <p class="mb-0" style="font-size: 14px;">Delivered, but never written in the visible headers.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Bcc on outgoing emails</h4>
-                    <p class="mb-0" style="font-size: 14px;">The outgoing email (Technical &gt; Emails) shows the Bcc, and the message log keeps it in the Recipients tab for internal users.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Sent once</h4>
+                    <p class="mb-0" style="font-size: 14px;">The Bcc address gets one copy, not one per recipient.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Sent once, not many times</h4>
-                    <p class="mb-0" style="font-size: 14px;">Odoo sends one email per recipient. The Bcc address receives exactly one copy, not one per recipient.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Logged</h4>
+                    <p class="mb-0" style="font-size: 14px;">Kept on the outgoing email and in the message log.</p>
                 </div>
             </div>
         </div>
@@ -60,39 +60,14 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">For developers</h4>
-                    <p class="mb-0" style="font-size: 14px;"><code>message_post(outgoing_email_bcc="a@x.com, b@y.com")</code> is accepted, and the composer exposes the field for other modules to build on.</p>
+                    <p class="mb-0" style="font-size: 14px;"><code>message_post(outgoing_email_bcc=...)</code> is accepted.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="rounded p-4 my-5" style="border: 2px solid #875A7B;">
-        <h2 class="font-weight-bold text-center mt-0 mb-2" style="font-size: 26px; color: #4A2F45;">How to use it</h2>
-        <p class="text-center mb-4" style="font-size: 16px;">Nothing to configure.</p>
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <div class="card h-100"><div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">1. Open the full composer</h4>
-                    <p class="mb-0" style="font-size: 13px;">On a record, click <strong>Send message</strong>, then the expand button to open the full composer.</p>
-                </div></div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card h-100"><div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">2. Fill in Bcc</h4>
-                    <p class="mb-0" style="font-size: 13px;">Type one or more email addresses in the <strong>Bcc</strong> box, separated by commas.</p>
-                </div></div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card h-100"><div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">3. Send</h4>
-                    <p class="mb-0" style="font-size: 13px;">Recipients in To and Cc see a normal email. The Bcc recipients get the same email without being listed.</p>
-                </div></div>
-            </div>
-        </div>
-    </div>
-
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
-    <p class="mb-3" style="font-size: 16px;">The module depends only on the standard <code>mail</code> module and needs no external Python library.</p>
+    <p class="mb-3" style="font-size: 16px;">Needs only the standard <code>mail</code> module. No external library.</p>
     <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">A Bcc needs at least one other recipient (To, Cc or a partner). An email with only a Bcc is not sent.</p>
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -135,35 +110,27 @@
                 <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0</h4>
                 <p class="text-muted mb-0" style="font-size: 13px;">2026-11-08</p>
             </div>
-            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release: Bcc in the full composer and mass mailing, Bcc on mail templates and outgoing emails, Bcc kept in the message log, and <code>message_post</code> support.</p></div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release.</p></div>
         </div>
     </div></div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can the other recipients see the Bcc address?</h4>
-        <p class="mb-0" style="font-size: 14px;">No. The address is used only for delivery and is removed from the headers before the email leaves the server.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can other recipients see the Bcc?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. The address is used for delivery only and removed from the headers.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it replace the standard mail sending?</h4>
-        <p class="mb-0" style="font-size: 14px;">No. It adds the missing connections on top of the standard mail module and does not copy or rewrite the sending code.</p>
-    </div></div>
-    <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Who can see the Bcc addresses in Odoo?</h4>
-        <p class="mb-0" style="font-size: 14px;">Only internal users. The field on the message is not readable by portal or public users.</p>
-    </div></div>
-    <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I use it with the chatter quick box?</h4>
-        <p class="mb-0" style="font-size: 14px;">Not yet. Use the full composer, or call <code>message_post</code> with <code>outgoing_email_bcc</code> from code.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Who can see the Bcc list in Odoo?</h4>
+        <p class="mb-0" style="font-size: 14px;">Internal users only.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Is it free?</h4>
-        <p class="mb-0" style="font-size: 14px;">Yes. It is also the base of the Advanced Email Composer module, but works on its own.</p>
+        <p class="mb-0" style="font-size: 14px;">Yes. It is also the base of the Advanced Email Composer.</p>
     </div></div>
 
     <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
         <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Add a real Bcc to Odoo mail.</p>
-        <p class="mb-2" style="font-size: 15px;">Install it, open the full composer and fill in the Bcc box.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it and fill in the Bcc box of the full composer.</p>
         <p class="text-muted mb-0" style="font-size: 13px;">Developed by DUO-TEK Software Vietnam</p>
     </div>
 

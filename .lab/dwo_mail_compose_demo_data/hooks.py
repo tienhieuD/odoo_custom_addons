@@ -5,7 +5,7 @@ import io
 from datetime import timedelta
 from unittest.mock import patch
 
-from odoo import fields
+from odoo import fields, tools
 
 TAG = "dwo_mail_compose_demo"
 ME_NAME, ME_EMAIL = "Hieu Nguyen", "hieu.nguyen@duotek.example"
@@ -49,16 +49,21 @@ def post_init_hook(env):
         return Partner.create(dict(name=name, email=email, category_id=[(4, tag.id)], **vals))
 
     managers = env["res.users"].with_context(no_reset_password=True).create([
-        {"name": "Linh Tran", "login": "linh.tran.demo", "email": BOSS_EMAIL,
+        {"name": "Linh Tran", "login": "linh.tran.demo", "password": "demo", "email": BOSS_EMAIL,
          "group_ids": [(6, 0, [env.ref("base.group_user").id])]},
-        {"name": "Minh Vu", "login": "minh.vu.demo", "email": "minh.vu@duotek.example",
+        {"name": "Minh Vu", "login": "minh.vu.demo", "password": "demo", "email": "minh.vu@duotek.example",
          "group_ids": [(6, 0, [env.ref("base.group_user").id])]},
     ])
     linh, minh = managers
 
     def incoming(record, days_ago, sender, to, cc, subject, body, attachments=()):
         """An email received: what the mail gateway would have stored."""
+        # the author is the contact who wrote, as the mail gateway would find or create it
+        name, address = tools.mail.email_split_tuples(sender)[0]
+        author = Partner.sudo().search([("email", "=", address)], limit=1) or Partner.sudo().create(
+            {"name": name or address, "email": address, "parent_id": record.id, "type": "contact"})
         return Message.sudo().create({
+            "author_id": author.id,
             "model": record._name, "res_id": record.id, "message_type": "email",
             "subtype_id": env.ref("mail.mt_comment").id, "email_from": sender,
             "incoming_email_to": to, "incoming_email_cc": cc or False,
@@ -84,7 +89,7 @@ def post_init_hook(env):
         env["dwo.mail.address"].create({"email": email, "name": name})
 
     # --- 1. a long conversation: incoming, official reply, customer answer, note and message
-    sakura = partner("Sakura Trading Co.", "lan.pham@sakura-trading.example", is_company=True, city="Ho Chi Minh City")
+    sakura = partner("Sakura Trading Co.", "contact@sakura-trading.example", is_company=True, city="Ho Chi Minh City")
     spec = env["ir.attachment"].create({
         "name": "Specification.txt", "raw": b"Sakura Trading - warehouse scanners\n200 units, delivery in Q1.\n",
         "mimetype": "text/plain", "res_model": "res.partner", "res_id": sakura.id})
@@ -113,7 +118,7 @@ def post_init_hook(env):
         body="@Linh can you confirm the stock for 15 February?", message_type="comment", subtype_xmlid="mail.mt_comment")
 
     # --- 2. an unsent draft with an inline image (pasted, so stored as an attachment link) and a second draft
-    mekong = partner("Mekong Logistics", "mai.hoang@mekong-logistics.example", is_company=True, city="Can Tho")
+    mekong = partner("Mekong Logistics", "contact@mekong-logistics.example", is_company=True, city="Can Tho")
     asked = incoming(
         mekong, 3, "Mai Hoang <mai.hoang@mekong-logistics.example>", "%s <%s>" % (me_name, me_email),
         "Tuan Nguyen <tuan.nguyen@mekong-logistics.example>", "Delivery schedule for March",
@@ -155,7 +160,7 @@ def post_init_hook(env):
     pending.with_user(linh).action_reject("30% is above our limit. Please use 15% and ask again.")
 
     # --- 5. a forward: an incoming email with an attachment
-    pacific = partner("Pacific Foods", "tuan.pham@pacific-foods.example", is_company=True, city="Hai Phong")
+    pacific = partner("Pacific Foods", "contact@pacific-foods.example", is_company=True, city="Hai Phong")
     layout = env["ir.attachment"].create({
         "name": "warehouse-layout.png", "raw": _png("Warehouse layout", (74, 47, 69), (91, 141, 184)),
         "mimetype": "image/png", "res_model": "res.partner", "res_id": pacific.id})
@@ -170,8 +175,8 @@ def post_init_hook(env):
         "name": "Quotation follow-up (demo)", "model_id": env["ir.model"]._get("res.partner").id,
         "subject": "Following up on your request, {{ object.name }}",
         "email_to": "{{ object.email }}", "email_bcc": BOSS_EMAIL,
-        "body_html": "<p>Hello {{ object.name }},</p><p>We wanted to check whether you had the time to look at our "
-                     "quotation. We are happy to answer any question.</p><p>Best regards</p>",
+        "body_html": '<p>Hello <t t-out="object.name"/>,</p><p>We wanted to check whether you had the time to look at '
+                     'our quotation. We are happy to answer any question.</p>',
     })
     # notices to the approvers and the message to followers: nothing must leave from a lab database
     env["mail.mail"].sudo().search([("state", "=", "outgoing")]).write({"state": "cancel"})
@@ -179,7 +184,7 @@ def post_init_hook(env):
 
 def uninstall_hook(env):
     tag = env["res.partner.category"].search([("name", "=", TAG)])
-    partners = env["res.partner"].search([("category_id", "in", tag.ids)])
+    partners = env["res.partner"].search([("id", "child_of", env["res.partner"].search([("category_id", "in", tag.ids)]).ids)])
     env["dwo.mail.email"].sudo().search([("res_model", "=", "res.partner"), ("res_id", "in", partners.ids)]).unlink()
     env["mail.message"].sudo().search([("model", "=", "res.partner"), ("res_id", "in", partners.ids)]).unlink()
     partners.unlink()
