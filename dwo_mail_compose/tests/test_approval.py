@@ -24,6 +24,10 @@ class TestApproval(MailCommon):
             cls.env, login="approver_b", groups="base.group_user", name="Approver B", email="appr.b@x.example")
         cls.approver_c = mail_new_test_user(
             cls.env, login="approver_c", groups="base.group_user", name="Approver C", email="appr.c@x.example")
+        # the approval flow is on; the administrator (the author here) is one of the people who can
+        # still send right away, as after an installation
+        cls.author.company_id.dwo_mail_require_approval = True
+        cls.author.company_id.dwo_mail_exempt_user_ids = cls.author
         cls.env["mail.mail"].sudo().search([]).unlink()
         cls.record = cls.env["res.partner"].create({"name": "Approval thread"})
         cls.Email = cls.env["dwo.mail.email"]
@@ -327,24 +331,89 @@ class TestApproval(MailCommon):
     # settings
     # ------------------------------------------------------------
 
-    def test_require_approval_refuses_the_direct_send_on_the_server(self):
-        self.author.company_id.dwo_mail_require_approval = True
+    def _send_now(self, user=None):
+        return self._composer(user).send("res.partner", self.record.id, {
+            "from": (user or self.author).email, "to": [CUSTOMER], "body": "<p>x</p>"})
+
+    def test_approval_flow_refuses_the_direct_send_of_somebody_not_exempt(self):
+        company = self.author.company_id
+        company.dwo_mail_exempt_user_ids = False
         with self.assertRaises(UserError):
-            self._composer().send("res.partner", self.record.id, {
-                "from": "hieu@dwo.example", "to": [CUSTOMER], "body": "<p>x</p>"})
+            self._send_now()
         self.assertFalse(self._official_messages())
-        self.assertTrue(self._composer().get_state("res.partner", self.record.id)["policy"]["require_approval"])
-        # the approval path still works, even with oneself as approver
+        policy = self._composer().get_state("res.partner", self.record.id)["policy"]
+        self.assertEqual((policy["require_approval"], policy["can_send_now"], policy["can_request_approval"]),
+                         (True, False, True))
+        # the approval path works, even with oneself as approver (allowed by default)
         email = self._request(self.author)
         self._approve(email, self.author)
         self.assertEqual(len(self._official_messages()), 1)
 
-    def test_direct_send_is_allowed_without_the_setting(self):
-        self.assertFalse(self._composer().get_state("res.partner", self.record.id)["policy"]["require_approval"])
+    def test_somebody_exempt_always_sends_now(self):
+        policy = self._composer().get_state("res.partner", self.record.id)["policy"]
+        self.assertEqual((policy["can_send_now"], policy["can_request_approval"]), (True, True))
         with self.mock_mail_gateway():
-            self._composer().send("res.partner", self.record.id, {
-                "from": "hieu@dwo.example", "to": [CUSTOMER], "body": "<p>x</p>"})
+            self._send_now()
         self.assertEqual(len(self._official_messages()), 1)
+        # somebody else of the company is not exempt
+        with self.assertRaises(UserError):
+            self._send_now(self.approver_a)
+
+    def test_without_the_approval_flow_everybody_sends_now_and_cannot_ask(self):
+        self.author.company_id.dwo_mail_require_approval = False
+        self.author.company_id.dwo_mail_exempt_user_ids = False
+        policy = self._composer().get_state("res.partner", self.record.id)["policy"]
+        self.assertEqual((policy["require_approval"], policy["can_send_now"], policy["can_request_approval"]),
+                         (False, True, False))
+        with self.assertRaises(UserError):
+            self._request(self.approver_a)
+        with self.mock_mail_gateway():
+            self._send_now()
+        self.assertEqual(len(self._official_messages()), 1)
+
+    def test_self_approval_can_be_forbidden(self):
+        company = self.author.company_id
+        company.dwo_mail_allow_self_approval = False
+        self.assertFalse(self._composer().get_state("res.partner", self.record.id)["policy"]["allow_self_approval"])
+        with self.assertRaises(UserError):
+            self._request(self.author)
+        with self.assertRaises(UserError):
+            self._request(self.author + self.approver_a)
+        email = self._request(self.approver_a)
+        self.assertEqual(email.approver_ids, self.approver_a)
+        # reassigning to the author is refused too
+        with self.assertRaises(UserError):
+            email.with_user(self.approver_a).action_reassign(self.author)
+
+    def test_approving_your_own_email_is_refused_when_the_company_changed_its_mind(self):
+        email = self._request(self.author)
+        self.author.company_id.dwo_mail_allow_self_approval = False
+        with self.assertRaises(UserError):
+            email.with_user(self.author).action_approve()
+        self.assertEqual(email.state, "pending")
+
+    def test_the_approvers_can_be_limited_to_a_list(self):
+        company = self.author.company_id
+        company.dwo_mail_approver_ids = self.approver_a + self.approver_b
+        self.assertEqual(
+            set(self._composer().get_state("res.partner", self.record.id)["policy"]["approver_ids"]),
+            set((self.approver_a + self.approver_b).ids))
+        with self.assertRaises(UserError):
+            self._request(self.approver_c)
+        with self.assertRaises(UserError):
+            self._request(self.approver_a + self.approver_c)
+        email = self._request(self.approver_a + self.approver_b)
+        self.assertEqual(email.approver_ids, self.approver_a + self.approver_b)
+        with self.assertRaises(UserError):
+            email.with_user(self.approver_a).action_reassign(self.approver_c)
+        # an empty list: every internal user
+        company.dwo_mail_approver_ids = False
+        self.assertEqual(self._request(self.approver_c, subject="Anyone").approver_ids, self.approver_c)
+
+    def test_the_administrator_is_exempt_by_default(self):
+        admin = self.env.ref("base.user_admin")
+        exempt = self.env["res.company"].new({}).dwo_mail_exempt_user_ids
+        self.assertEqual([getattr(user.id, "origin", user.id) for user in exempt], admin.ids)
 
     def test_retention_follows_the_setting_and_covers_every_state(self):
         params = self.env["ir.config_parameter"].sudo()
@@ -408,3 +477,5 @@ class TestApproval(MailCommon):
         view = self.env["res.config.settings"].with_user(self.author).get_view(view_type="form")["arch"]
         self.assertIn("dwo_mail_compose", view)
         self.assertIn("dwo_mail_require_approval", view)
+        for name in ("dwo_mail_allow_self_approval", "dwo_mail_approver_ids", "dwo_mail_exempt_user_ids"):
+            self.assertIn(name, view)

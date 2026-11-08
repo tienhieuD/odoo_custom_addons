@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
     <t t-name="dwo_mail_compose.ApprovalDialog">
         <Dialog title="title" size="'md'">
-            <p class="text-muted">Choose who may approve this email. Anyone of them can: the first decision counts. You can choose yourself. The email is sent when it is approved.</p>
+            <p class="text-muted">Choose who may approve this email. Anyone of them can: the first decision counts. <t t-if="canChooseYourself">You can choose yourself. </t>The email is sent when it is approved.</p>
             <label class="form-label fw-bold" for="dwo_approver_input">Approvers <span class="text-danger">*</span></label>
             <div class="d-flex flex-wrap gap-1 mb-2">
                 <span t-foreach="state.approvers" t-as="user" t-key="user.id" class="o-dwo-approverChip badge rounded-pill text-bg-primary d-inline-flex align-items-center gap-1 fw-normal">

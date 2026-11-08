@@ -143,16 +143,17 @@
                 </div>
 
                 <div class="d-flex flex-column gap-1">
-                    <small t-if="!state.requireApproval" class="o-dwo-directNote text-muted opacity-75">This email is sent directly to the people in To, Cc and Bcc. The followers of the record are not notified.</small>
+                    <small t-if="state.policy.can_send_now" class="o-dwo-directNote text-muted opacity-75">This email is sent directly to the people in To, Cc and Bcc. The followers of the record are not notified.</small>
                     <small t-else="" class="o-dwo-directNote text-muted opacity-75">An approver must approve this email before it is sent to the people in To, Cc and Bcc. The followers of the record are not notified.</small>
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
-                        <Dropdown menuClass="'o-dwo-sendMenu'">
+                        <!-- One way to send: a plain button. Both ways (approval on, and the user can send without it): a menu -->
+                        <Dropdown t-if="state.policy.can_send_now and state.policy.can_request_approval" menuClass="'o-dwo-sendMenu'">
                             <button type="button" class="o-dwo-sendBtn btn btn-primary" data-tooltip="Choose how to send this email." t-att-disabled="state.sending or state.uploading or state.emailState === 'sent'">
                                 <i t-if="state.sending" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-paper-plane"/> Send email <i class="fa fa-caret-down ms-1"/>
                             </button>
                             <t t-set-slot="content">
-                                <DropdownItem t-if="!state.requireApproval" class="'o-dwo-sendNow px-3'" onSelected="() => this.onSend()">
+                                <DropdownItem class="'o-dwo-sendNow px-3'" onSelected="() => this.onSend()">
                                     <i class="fa fa-paper-plane fa-fw"/> Send now
                                     <div class="text-muted small">Goes to the recipients right away.</div>
                                 </DropdownItem>
@@ -162,6 +163,12 @@
                                 </DropdownItem>
                             </t>
                         </Dropdown>
+                        <button t-elif="state.policy.can_send_now" type="button" class="o-dwo-sendBtn o-dwo-sendNow btn btn-primary" data-tooltip="Send this email to the recipients right away." t-on-click="() => this.onSend()" t-att-disabled="state.sending or state.uploading or state.emailState === 'sent'">
+                            <i t-if="state.sending" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-paper-plane"/> Send email
+                        </button>
+                        <button t-else="" type="button" class="o-dwo-sendBtn o-dwo-requestApproval btn btn-primary" data-tooltip="Ask somebody to approve this email. It is sent when it is approved." t-on-click="() => this.onRequestApproval()" t-att-disabled="state.sending or state.uploading or state.emailState === 'sent'">
+                            <i t-if="state.sending" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-user-circle-o"/> Request approval
+                        </button>
                             <button t-if="state.hasDraft" type="button" class="o-dwo-deleteDraft btn btn-outline-secondary text-nowrap" data-tooltip="Delete this email and start again from the default content." t-on-click="askDeleteCurrent"><i class="fa fa-trash-o"/> Delete draft</button>
                         </div>
                         <span class="text-muted small">

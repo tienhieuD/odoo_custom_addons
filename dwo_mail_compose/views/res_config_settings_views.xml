@@ -8,9 +8,26 @@
         <field name="arch" type="xml">
             <xpath expr="//block[@id='discuss']" position="after">
                 <block title="Email Composer" id="dwo_mail_compose">
-                    <setting id="dwo_mail_require_approval_setting" string="Require approval"
-                             help="When on, nobody can send an email with the Send email button right away: every email goes through an approver, who can be the author. Applies to this company.">
+                    <setting id="dwo_mail_require_approval_setting" string="Approval flow"
+                             help="Off: the Send email button sends right away and there is no approval. On: every email must be approved before it is sent. Applies to this company.">
                         <field name="dwo_mail_require_approval"/>
+                        <div class="content-group mt-2" invisible="not dwo_mail_require_approval">
+                            <div class="mt8">
+                                <field name="dwo_mail_allow_self_approval"/>
+                                <label for="dwo_mail_allow_self_approval" class="o_light_label"/>
+                                <div class="text-muted">Off: you cannot choose yourself to approve your own email.</div>
+                            </div>
+                            <div class="mt16">
+                                <label for="dwo_mail_approver_ids" class="o_light_label d-block mb-1"/>
+                                <field name="dwo_mail_approver_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <div class="text-muted">Leave empty: every internal user can approve.</div>
+                            </div>
+                            <div class="mt16">
+                                <label for="dwo_mail_exempt_user_ids" class="o_light_label d-block mb-1"/>
+                                <field name="dwo_mail_exempt_user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <div class="text-muted">These people always see Send now, even when approval is on. Empty: nobody.</div>
+                            </div>
+                        </div>
                     </setting>
                     <setting id="dwo_mail_retention_setting" string="Delete unfinished emails"
                              help="An email written with the Send email button (draft, waiting for approval, rejected or approved) is deleted when nothing happened to it for this number of days.">

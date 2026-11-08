@@ -7,8 +7,13 @@ class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
     dwo_mail_require_approval = fields.Boolean(
-        related="company_id.dwo_mail_require_approval", readonly=False,
-        string="Require approval for emails")
+        related="company_id.dwo_mail_require_approval", readonly=False)
+    dwo_mail_allow_self_approval = fields.Boolean(
+        related="company_id.dwo_mail_allow_self_approval", readonly=False)
+    dwo_mail_approver_ids = fields.Many2many(
+        related="company_id.dwo_mail_approver_ids", readonly=False)
+    dwo_mail_exempt_user_ids = fields.Many2many(
+        related="company_id.dwo_mail_exempt_user_ids", readonly=False)
     dwo_mail_retention_days = fields.Integer(
         "Delete unfinished emails after (days)",
         config_parameter="dwo_mail_compose.retention_days", default=180,

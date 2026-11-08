@@ -258,6 +258,7 @@ class TestComposer(MailCommon):
 
     def test_the_form_opens_on_a_waiting_or_rejected_email_too(self):
         """The newest created is shown whatever its state, not only a draft."""
+        self.admin.company_id.dwo_mail_require_approval = True
         draft = self._save(subject="A draft", body="<p>d</p>")
         newer = self._save(subject="Asked", body="<p>p</p>", to=[CUSTOMER])
         self.composer.request_approval("res.partner", self.record.id, newer["id"], {
@@ -270,6 +271,7 @@ class TestComposer(MailCommon):
 
     def test_deleting_a_waiting_email_from_the_list(self):
         """A submitted or rejected email can be deleted too; the approvers are told."""
+        self.admin.company_id.dwo_mail_require_approval = True
         saved = self._save(subject="To delete", body="<p>x</p>", to=[CUSTOMER])
         self.composer.request_approval("res.partner", self.record.id, saved["id"], {
             "from": "hieu@dwo.example", "to": [CUSTOMER], "subject": "To delete", "body": "<p>x</p>"},

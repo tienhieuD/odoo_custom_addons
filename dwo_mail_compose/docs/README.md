@@ -25,7 +25,7 @@ trả lời tất cả (reply-all), nháp, và phân biệt rõ trong lịch s�
 - Các ô địa chỉ là **badge**: gõ để gợi ý từ `res.users`, `res.partner` và sổ địa chỉ; gõ tự do email hợp lệ. **Không giới hạn giữa To, Cc, Bcc**: cùng một địa chỉ gõ được ở cả ba (chỉ chặn trùng trong cùng một ô).
 - Thanh công cụ dưới body: **Attach**, **Template** (menu như composer gốc), **Advanced** (thêm các trường phụ, hiện tại là Reply-To). Mỗi nhãn có dấu `*` đỏ nếu bắt buộc và biểu tượng (i) giải thích bằng tooltip, nằm cùng dòng với nhãn.
 - Mặc định reply-all, subject `RE:`, quote thư trước ngay trong body.
-- Nút **Send email** mở menu hai lựa chọn: **Send now** hoặc **Request approval and send** (nhờ người duyệt rồi gửi). Dòng mờ phía trên nút nhắc: email gửi trực tiếp tới người nhận, không thông báo follower.
+- Nút **Send email**: tuỳ cấu hình công ty là một nút đơn (Send now, hoặc Request approval khi bật luồng duyệt), hoặc menu hai lựa chọn **Send now** / **Request approval and send** cho người được miễn duyệt (xem mục Cấu hình). Dòng mờ phía trên nút nhắc: email gửi trực tiếp tới người nhận, không thông báo follower.
 - Mỗi message email có một hàng nút outline secondary có icon ngay dưới From/To/Cc: **Reply** (chỉ người gửi, không Cc), **Reply all** (người gửi + To + Cc, giống Send email khi thread đã có email) và **Forward**. Hàng nút này tách khỏi menu tuỳ chọn của message (module không thêm mục nào vào menu đó). Chế độ gọi server: `reply_sender`, `reply` (reply-all), `forward`.
 - Ô địa chỉ: bấm lại vào ô đang có focus (sau khi vừa chọn một gợi ý) vẫn mở lại dropdown; bấm vào vùng trống của ô cũng đặt con trỏ vào và mở gợi ý. Chọn một gợi ý (hoặc Enter, dấu phẩy) huỷ yêu cầu gợi ý đang chờ, nên danh sách không tự mở lại.
 - **Body khi bắt đầu soạn**: 3 dòng trống (`<p><br></p>` x3) để viết vào, rồi chữ ký, rồi khối quote nếu là reply/forward (`_initial_body`). Chọn template khi chưa viết gì (nội dung phía trên quote không đổi so với lúc nạp) thì nội dung template **thay vào 3 dòng trống đó**, chữ ký và quote giữ nguyên (chế độ `fill`). Nếu người dùng đã viết thì vẫn hỏi Overwrite/Append như trước (Overwrite thay cả phần trên quote). Template lưu từ form bỏ các dòng trống ở đầu.
@@ -41,7 +41,7 @@ trả lời tất cả (reply-all), nháp, và phân biệt rõ trong lịch s�
 - Message email có **badge Email** và các dòng From, To, Cc ngay dưới tiêu đề, phân biệt với Message và Note.
 - Sổ địa chỉ riêng lưu các email đã gõ mà không thuộc user hoặc partner, để gợi ý lần sau.
 - **Template**: áp dụng tiêu đề, nội dung, From, To, Cc, Bcc và đính kèm, mọi placeholder được tính trên record đang mở. Chỉ liệt kê template của đúng model.
-- **Duyệt trước khi gửi**: chọn một hoặc nhiều người duyệt (kể cả chính mình), bất kỳ ai duyệt là gửi. Công ty có thể **bắt buộc** mọi email phải qua duyệt.
+- **Duyệt trước khi gửi**: chọn một hoặc nhiều người duyệt (kể cả chính mình nếu công ty cho phép), bất kỳ ai duyệt là gửi. Công ty bật luồng duyệt thì mọi email phải qua duyệt, trừ danh sách miễn duyệt.
 
 ## 3. Quy tắc nội dung mặc định (đã chốt)
 
@@ -176,7 +176,15 @@ Người thực hiện hành động không tự nhận thông báo về hành �
 **Chống gửi đôi:** mỗi thao tác chuyển trạng thái và gửi trực tiếp lấy **khoá hàng** (`SELECT … FOR UPDATE`) rồi **đọc lại trạng thái**; chỉ trạng thái hợp lệ mới được đi tiếp. Hai người duyệt cùng lúc, hoặc người duyệt và người soạn bấm Send now cùng lúc, chỉ một bên gửi.
 
 **Cấu hình** (Settings > General Settings, khối **Email Composer**):
-- *Require approval*: mỗi công ty. Bật thì **không ai** gửi trực tiếp được: menu Send chỉ còn "Request approval", và máy chủ từ chối `send` dù giao diện có bị qua mặt (người duyệt vẫn có thể là chính mình).
+- *Approval flow* (`dwo_mail_require_approval`, mỗi công ty): **hai chế độ, không có chế độ "cả hai"**.
+  - **Tắt**: chỉ có Send now. Nút Send email là một nút đơn, không có menu; "Request approval" bị ẩn và máy chủ từ chối `request_approval`.
+  - **Bật**: chỉ có luồng duyệt. Người dùng thường chỉ thấy một nút **Request approval**; máy chủ từ chối `send` dù giao diện có bị qua mặt. Ngoại lệ là những người trong *Can send without approval*, luôn thấy cả hai (menu Send now / Request approval).
+  - Khi đổi cấu hình lúc đang có email chờ duyệt: các email đó vẫn duyệt được; email bị từ chối thì tác giả gửi thẳng được nếu chế độ đang là Send now.
+- Chỉ hiện khi bật *Approval flow*:
+  - *Allow approving your own emails* (`dwo_mail_allow_self_approval`, **mặc định bật**). Tắt thì người soạn không được chọn mình làm người duyệt: hộp thoại không liệt kê họ, `request_approval` và `action_reassign` từ chối, `action_approve` cũng từ chối nếu cấu hình đổi sau lúc nhờ duyệt.
+  - *Approvers* (`dwo_mail_approver_ids`): danh sách người được chọn làm người duyệt. **Để trống thì mọi người dùng nội bộ đều duyệt được** (có ghi chú ngay dưới ô). Máy chủ kiểm tra danh sách ở `request_approval` và `action_reassign`.
+  - *Can send without approval* (`dwo_mail_exempt_user_ids`): danh sách user (không dùng nhóm). **Mặc định có admin** (đặt lúc cài bằng `post_init_hook` cho các công ty có sẵn, và là giá trị mặc định của công ty mới). Người trong danh sách luôn thấy Send now. Để trống thì không ai được miễn.
+- Chính sách mà form cần được trả về trong `get_state()["policy"]` (`_dwo_policy`): `require_approval`, `can_send_now`, `can_request_approval`, `allow_self_approval`, `approver_ids`, `user_id`.
 - *Delete unfinished emails after (days)*: mặc định **180**. Email nào, ở trạng thái nào, quá số ngày này không có tác động (sửa, đổi trạng thái, quyết định) thì bị dọn bởi `@api.autovacuum`. Giá trị không hợp lệ (≤ 0) thì dùng 180. Xoá email kéo theo xoá hoạt động.
 
 ## 6. Sổ địa chỉ
@@ -239,8 +247,8 @@ Kiểm tra trước khi gửi: có ít nhất một To; mọi địa chỉ hợp
 | P20 | Cc và Bcc là nút bên phải ô To, hiện sẵn khi có giá trị; tính năng phụ vào menu Advanced | Form gọn cho người mới, đủ cho người cần |
 | P21 | Không giới hạn trùng địa chỉ giữa To, Cc, Bcc (chỉ chặn trùng trong cùng một ô) | Yêu cầu của người dùng; `dwo_mail_bcc` (D9) vẫn chỉ gửi một lần một địa chỉ ở tầng gửi |
 | P22 | Menu Template dùng lại logic của `mail_composer_template_selector`; Save as Template sao chép đính kèm và bỏ khối quote | Quen thuộc với người dùng Odoo; template không mang email của khách và không làm mất file đang soạn |
-| P23 | Send email là menu hai lựa chọn; *Require approval* theo công ty, **kiểm tra ở máy chủ** | Ẩn nút không đủ; người dùng có thể gọi RPC trực tiếp |
-| P24 | Người duyệt nhiều người, một người duyệt là gửi, một người từ chối là từ chối; chọn chính mình được | Yêu cầu; quyết định đầu tiên thắng nên không cần bỏ phiếu |
+| P23 | Luồng gửi theo công ty: tắt = chỉ Send now, bật = chỉ duyệt (danh sách miễn duyệt vẫn Send now), **kiểm tra ở máy chủ** | Ẩn nút không đủ; người dùng có thể gọi RPC trực tiếp |
+| P24 | Người duyệt nhiều người, một người duyệt là gửi, một người từ chối là từ chối; tự duyệt là cấu hình (mặc định cho phép), danh sách người duyệt rỗng = mọi user nội bộ | Yêu cầu; quyết định đầu tiên thắng nên không cần bỏ phiếu |
 | P25 | Duyệt gửi bằng `with_user(author).with_company(company)` qua `_send_email` | Mọi kiểm tra (nội bộ, From được phép, đính kèm của mình, quyền đăng) chạy với người soạn |
 | P26 | Khoá hàng rồi đọc lại trạng thái cho mọi chuyển trạng thái và gửi trực tiếp | Hai người duyệt, hoặc người duyệt và người soạn, không thể cùng gửi |
 | P27 | Lưu nội dung đã inline style ở mỗi lần tự lưu | Máy chủ không chạy được `toInline`; thư gửi từ trình duyệt và từ máy chủ giống nhau |
@@ -271,7 +279,7 @@ Kiểm tra trước khi gửi: có ít nhất một To; mọi địa chỉ hợp
   - đọc: người soạn, người duyệt hiện tại và mọi người từng là người duyệt (trường lịch sử), cộng quản trị viên;
   - ghi, tạo, xoá: **chỉ người soạn** (và quản trị viên). Người duyệt không sửa được nội dung; họ quyết định qua các phương thức `action_approve`, `action_reject`, `action_reassign`, mỗi phương thức kiểm tra họ có đang là người duyệt không sau khi khoá hàng;
   - người duyệt không cần quyền đọc bản ghi gốc để xem và duyệt; nút "Open the record" chỉ hiện khi họ có quyền.
-- **Gửi trực tiếp** bị chặn ở máy chủ khi công ty bật *Require approval*, không chỉ bằng cách ẩn nút.
+- **Gửi trực tiếp** bị chặn ở máy chủ khi công ty bật luồng duyệt và người dùng không thuộc danh sách miễn duyệt, không chỉ bằng cách ẩn nút.
 - Sổ địa chỉ: rule theo công ty; xoá chỉ cho `base.group_system`.
 - Tệp đính kèm tạm tải lên qua `/mail/attachment/upload` với `is_pending`, theo cơ chế của core.
 - HTML vào form đến từ server đã làm sạch (`mail.message.body`, `dwo.mail.email.body`) và được editor của Odoo làm sạch thêm; module không tin nội dung thô.
@@ -307,7 +315,7 @@ models/
   dwo_mail_address.py    sổ địa chỉ + gợi ý
   mail_message.py        dwo_is_from_compose, outgoing_email_cc, _to_store_defaults
   mail_thread.py         allow-list message_post, đưa Cc xuống mail.mail
-  res_company.py / res_config_settings.py   Require approval, số ngày giữ email
+  res_company.py / res_config_settings.py   luồng duyệt, tự duyệt, danh sách người duyệt và miễn duyệt, số ngày giữ email
 views/                   trang chi tiết email, danh sách, menu Email Approvals, popup, khối Settings
 data/                    layout thư sạch, loại hoạt động "Email approval"
 security/                quyền và rule (tác giả, người duyệt, lịch sử người duyệt, quản trị)

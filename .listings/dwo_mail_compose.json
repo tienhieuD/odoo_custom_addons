@@ -177,6 +177,59 @@
       "intro": "The reason is shown on the email. Edit it and ask again."
     },
     {
+      "type": "cards",
+      "title": "Your rules, per company",
+      "cols": 3,
+      "accent": "info",
+      "items": [
+        {
+          "title": "Approval flow",
+          "text": "Off: everybody sends right away. On: every email is approved first."
+        },
+        {
+          "title": "Self approval",
+          "text": "Allow it or not. Allowed by default."
+        },
+        {
+          "title": "Who approves",
+          "text": "Pick the people. Empty means every internal user."
+        },
+        {
+          "title": "Who skips approval",
+          "text": "Pick the people who still see Send now. The administrator by default."
+        },
+        {
+          "title": "Clean up",
+          "text": "Unfinished emails are deleted after 180 days. You choose the number."
+        },
+        {
+          "title": "Enforced by the server",
+          "text": "Hiding a button is not enough: the rules are checked when the email is sent."
+        }
+      ]
+    },
+    {
+      "type": "screenshot",
+      "title": "Set the rules",
+      "image": "screenshot_11.png",
+      "alt": "The Email Composer block in the settings: approval flow, self approval, approvers, who can send without approval and the number of days to keep unfinished emails",
+      "intro": "One block in Settings. The options under <em>Approval flow</em> appear only when it is on."
+    },
+    {
+      "type": "screenshot",
+      "title": "Two ways to send",
+      "image": "screenshot_12.png",
+      "alt": "The Send email menu with the Send now and Request approval and send choices",
+      "intro": "People who can send without approval get a menu: <strong>Send now</strong> or <strong>Request approval</strong>."
+    },
+    {
+      "type": "screenshot",
+      "title": "One way to send",
+      "image": "screenshot_13.png",
+      "alt": "The email form with a single Request approval button and the note that an approver must approve",
+      "intro": "Everybody else gets one button. With the approval flow on, it is <strong>Request approval</strong>. With the flow off, it is <strong>Send email</strong>."
+    },
+    {
       "type": "tabs",
       "title": "Requirements &amp; Installation",
       "id_prefix": "dmc",
@@ -247,15 +300,27 @@
             },
             {
               "type": "p",
-              "html": "<strong>Settings &gt; General Settings &gt; Email Composer</strong> has two options for each company:"
+              "html": "<strong>Settings &gt; General Settings &gt; Email Composer</strong>, for each company:"
             },
             {
               "type": "p",
-              "html": "<strong>Require approval</strong>: nobody can send directly, every email goes through approval."
+              "html": "<strong>Approval flow</strong>: off, the Send email button sends right away and there is no approval. On, every email is approved first."
             },
             {
               "type": "p",
-              "html": "<strong>Delete unfinished emails after (days)</strong>: drafts and pending or rejected emails with no activity for this long are removed automatically. Default 180 days."
+              "html": "<strong>Allow approving your own emails</strong> (flow on): on by default. Off, you cannot choose yourself as approver."
+            },
+            {
+              "type": "p",
+              "html": "<strong>Approvers</strong> (flow on): the people who can be chosen. Leave it empty and every internal user can approve."
+            },
+            {
+              "type": "p",
+              "html": "<strong>Can send without approval</strong> (flow on): these people always see Send now. The administrator is in the list by default."
+            },
+            {
+              "type": "p",
+              "html": "<strong>Delete unfinished emails after (days)</strong>: 180 by default."
             }
           ]
         },
@@ -312,8 +377,12 @@
           "a": "Yes. The standard message identifiers are kept, so the mail gateway routes the answer to the same record."
         },
         {
-          "q": "Can I force approval?",
-          "a": "Yes. Turn on <em>Require approval</em> in Settings. The server then refuses direct sending too."
+          "q": "Can I make approval mandatory?",
+          "a": "Yes. Turn on <em>Approval flow</em>. The server then refuses to send right away, except for the people you list in <em>Can send without approval</em>."
+        },
+        {
+          "q": "Can I stop people from approving their own emails?",
+          "a": "Yes. Turn off <em>Allow approving your own emails</em>. You can also limit the approvers to a list of people."
         },
         {
           "q": "Which From can I use?",

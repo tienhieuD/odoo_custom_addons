@@ -15,6 +15,9 @@ export class DwoApprovalDialog extends Component {
         // called with { approverIds, comment }
         onConfirm: Function,
         close: Function,
+        // the people who can be chosen (empty: every internal user) and the one who cannot (the author)
+        allowedIds: { type: Array, optional: true },
+        excludedId: { type: [Number, Boolean], optional: true },
     };
 
     setup() {
@@ -27,8 +30,16 @@ export class DwoApprovalDialog extends Component {
     }
 
     approverDomain() {
-        // internal users only, not already chosen
-        return [["share", "=", false], ["id", "not in", this.state.approvers.map((u) => u.id)]];
+        // internal users only, not already chosen, within the list of the company when it has one
+        const excluded = this.state.approvers.map((u) => u.id);
+        if (this.props.excludedId) {
+            excluded.push(this.props.excludedId);
+        }
+        const domain = [["share", "=", false], ["id", "not in", excluded]];
+        if (this.props.allowedIds?.length) {
+            domain.push(["id", "in", this.props.allowedIds]);
+        }
+        return domain;
     }
 
     async onPicked(records) {
@@ -55,6 +66,11 @@ export class DwoApprovalDialog extends Component {
 
     remove(user) {
         this.state.approvers = this.state.approvers.filter((u) => u.id !== user.id);
+    }
+
+    /** The sentence under the title: the author can be an approver only when the company allows it. */
+    get canChooseYourself() {
+        return !this.props.excludedId;
     }
 
     get canConfirm() {

@@ -52,8 +52,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_send", {
         { trigger: "#dwo_subject", run: "edit Tour subject" },
         { trigger: EDITOR, run: "click" },
         { trigger: EDITOR, run: "editor Hello from the tour" },
-        { trigger: ".o-dwo-sendBtn", run: "click" },
-        { trigger: ".o-dwo-sendNow", run: "click" },
+        { trigger: ".o-dwo-sendBtn.o-dwo-sendNow", run: "click" },
         emailBodyShows("Hello from the tour"),
         { trigger: ".o-mail-Message .o-dwo-emailMeta:contains('new.person@acme.example')" },
         { trigger: ".o-mail-Chatter:not(:has(.o-dwo-emailComposer))" },
@@ -94,7 +93,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_draft", {
             run: function () {
                 const button = document.querySelector(".o-dwo-deleteDraft");
                 const send = document.querySelector(".o-dwo-sendBtn");
-                if (!button.classList.contains("btn-outline-secondary") || button.parentElement !== send.closest(".dropdown")?.parentElement) {
+                if (!button.classList.contains("btn-outline-secondary") || button.parentElement !== (send.closest(".dropdown")?.parentElement || send.parentElement)) {
                     throw new Error("Delete draft should be an outline secondary button next to Send email");
                 }
             },
@@ -251,8 +250,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_image", {
             },
         },
         { trigger: `${EDITOR} img.o_b64_image_to_save` },
-        { trigger: ".o-dwo-sendBtn", run: "click" },
-        { trigger: ".o-dwo-sendNow", run: "click" },
+        { trigger: ".o-dwo-sendBtn.o-dwo-sendNow", run: "click" },
         emailBodyShows("Look at this"),
         { trigger: ".o-mail-Message img[src*='/web/image/']" },
     ],
@@ -419,15 +417,29 @@ registry.category("web_tour.tours").add("dwo_mail_compose_request_approval", {
     ],
 });
 
-// With the setting on, nobody can send right away.
+// With the approval flow on, somebody who cannot send without approval has one button: request approval.
 registry.category("web_tour.tours").add("dwo_mail_compose_approval_required", {
     steps: () => [
         { trigger: ".o-mail-Chatter" },
         { trigger: ".o-mail-Chatter-dwoSendEmail", run: "click" },
-        { trigger: ".o-dwo-sendBtn", run: "click" },
-        { trigger: ".o-dwo-requestApproval" },
-        { trigger: ".o-dwo-sendMenu:not(:has(.o-dwo-sendNow))" },
+        { trigger: ".o-dwo-sendBtn.o-dwo-requestApproval:contains('Request approval')" },
+        { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-sendNow)):not(:has(.o-dwo-sendMenu))" },
         { trigger: ".o-dwo-directNote:contains('An approver must approve')" },
+        // the popup does not offer the author when the company does not allow it
+        { trigger: ".o-dwo-sendBtn.o-dwo-requestApproval", run: "click" },
+        { trigger: ".modal:contains('Request approval')" },
+        { trigger: ".modal:not(:contains('You can choose yourself'))" },
+    ],
+});
+
+// Without the approval flow there is one way to send: right away.
+registry.category("web_tour.tours").add("dwo_mail_compose_direct_only", {
+    steps: () => [
+        { trigger: ".o-mail-Chatter" },
+        { trigger: ".o-mail-Chatter-dwoSendEmail", run: "click" },
+        { trigger: ".o-dwo-sendBtn.o-dwo-sendNow:contains('Send email')" },
+        { trigger: ".o-dwo-emailComposer:not(:has(.o-dwo-requestApproval)):not(:has(.o-dwo-sendMenu))" },
+        { trigger: ".o-dwo-directNote:contains('sent directly')" },
     ],
 });
 

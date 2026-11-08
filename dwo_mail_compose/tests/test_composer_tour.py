@@ -112,6 +112,7 @@ class TestComposerTour(HttpCase):
         self.assertIn("Third body", emails[2].body)
 
     def test_approver_chosen_with_search_more_keeps_its_name_tour(self):
+        self._use_approval()
         for i in range(1, 11):
             mail_new_test_user(
                 self.env, login=f"searchable_{i}", groups="base.group_user", name=f"Searchable User {i}",
@@ -157,7 +158,15 @@ class TestComposerTour(HttpCase):
     # approval
     # ------------------------------------------------------------
 
+    def _use_approval(self, exempt=True):
+        """The approval flow is on; the administrator (the tour user) can still send now, unless not exempt."""
+        company = self.env.ref("base.user_admin").company_id
+        company.dwo_mail_require_approval = True
+        if not exempt:
+            company.dwo_mail_exempt_user_ids = False
+
     def test_request_approval_tour(self):
+        self._use_approval()
         self._start("dwo_mail_compose_request_approval")
         email = self.env["dwo.mail.email"].search([("res_id", "=", self.record.id)])
         self.assertEqual(len(email), 1)
@@ -172,10 +181,15 @@ class TestComposerTour(HttpCase):
             [("model", "=", "res.partner"), ("res_id", "=", self.record.id), ("dwo_is_from_compose", "=", True)])), 1)
 
     def test_approval_required_tour(self):
-        self.env.ref("base.user_admin").company_id.dwo_mail_require_approval = True
+        self._use_approval(exempt=False)
+        self.env.ref("base.user_admin").company_id.dwo_mail_allow_self_approval = False
         self._start("dwo_mail_compose_approval_required")
 
+    def test_direct_only_tour(self):
+        self._start("dwo_mail_compose_direct_only")
+
     def test_email_list_tour(self):
+        self._use_approval()
         admin = self.env.ref("base.user_admin")
         composer = self.env["dwo.mail.composer"].with_user(admin)
         base = {"from": "admin@dwo.example", "to": ["a@acme.example"], "body": "<p>x</p>"}
@@ -187,6 +201,7 @@ class TestComposerTour(HttpCase):
         self._start("dwo_mail_compose_email_list")
 
     def test_approver_approves_tour(self):
+        self._use_approval()
         approver = mail_new_test_user(
             self.env, login="tour_approver", groups="base.group_user", name="Tour Approver",
             email="tour.approver@dwo.example", password="tour_approver")

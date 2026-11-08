@@ -50,11 +50,18 @@ def post_init_hook(env):
 
     managers = env["res.users"].with_context(no_reset_password=True).create([
         {"name": "Linh Tran", "login": "linh.tran.demo", "password": "demo", "email": BOSS_EMAIL,
-         "group_ids": [(6, 0, [env.ref("base.group_user").id])]},
+         "group_ids": [(6, 0, [env.ref("base.group_user").id, env.ref("base.group_partner_manager").id])]},
         {"name": "Minh Vu", "login": "minh.vu.demo", "password": "demo", "email": "minh.vu@duotek.example",
-         "group_ids": [(6, 0, [env.ref("base.group_user").id])]},
+         "group_ids": [(6, 0, [env.ref("base.group_user").id, env.ref("base.group_partner_manager").id])]},
     ])
     linh, minh = managers
+    # the approval flow is on: Linh and Minh are the approvers, the administrator can still send now
+    env.company.write({
+        "dwo_mail_require_approval": True,
+        "dwo_mail_allow_self_approval": True,
+        "dwo_mail_approver_ids": [(6, 0, managers.ids)],
+        "dwo_mail_exempt_user_ids": [(6, 0, admin.ids)],
+    })
 
     def incoming(record, days_ago, sender, to, cc, subject, body, attachments=()):
         """An email received: what the mail gateway would have stored."""

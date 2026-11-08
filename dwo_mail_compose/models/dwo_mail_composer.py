@@ -354,9 +354,44 @@ class DwoMailComposer(models.AbstractModel):
         return self._compute_defaults(thread, ref, mode)
 
     @api.model
-    def _dwo_require_approval(self):
-        """True when the company forbids sending directly: every email goes through an approver."""
-        return bool(self.env.company.dwo_mail_require_approval)
+    def _dwo_require_approval(self, company=None):
+        """True when the company uses the approval flow: an email must be approved to be sent."""
+        return bool((company or self.env.company).dwo_mail_require_approval)
+
+    @api.model
+    def _dwo_can_send_now(self, user=None, company=None):
+        """Send now is for everybody when there is no approval flow, and with the flow only for the
+        people the company let send without approval."""
+        company, user = company or self.env.company, user or self.env.user
+        return not company.dwo_mail_require_approval or user in company.sudo().dwo_mail_exempt_user_ids
+
+    @api.model
+    def _dwo_can_request_approval(self, company=None):
+        return self._dwo_require_approval(company)
+
+    @api.model
+    def _dwo_validate_approvers(self, approvers, author, company=None):
+        """The people asked to approve must be allowed to: in the company list when it has one, and
+        not the author unless the company allows it. Raise otherwise."""
+        company = company or self.env.company
+        allowed = company.sudo().dwo_mail_approver_ids
+        if allowed and (approvers - allowed):
+            raise UserError(self.env._("%s cannot approve emails.", ", ".join((approvers - allowed).mapped("name"))))
+        if author in approvers and not company.dwo_mail_allow_self_approval:
+            raise UserError(self.env._("You cannot approve your own email. Choose somebody else."))
+
+    @api.model
+    def _dwo_policy(self):
+        """What the form needs to know: which buttons to show and who can be chosen to approve."""
+        company = self.env.company
+        return {
+            "require_approval": self._dwo_require_approval(),
+            "can_send_now": self._dwo_can_send_now(),
+            "can_request_approval": self._dwo_can_request_approval(),
+            "allow_self_approval": bool(company.dwo_mail_allow_self_approval),
+            "approver_ids": company.sudo().dwo_mail_approver_ids.ids,
+            "user_id": self.env.uid,
+        }
 
     @api.model
     def _unsent_domain(self, res_model, res_id):
@@ -417,7 +452,7 @@ class DwoMailComposer(models.AbstractModel):
             "defaults": self._compute_defaults(thread, latest, "reply"),
             "newer_email": newer_email,
             "from_options": self._dwo_allowed_from_addresses(),
-            "policy": {"require_approval": self._dwo_require_approval()},
+            "policy": self._dwo_policy(),
         }
 
     @api.model
@@ -505,12 +540,15 @@ class DwoMailComposer(models.AbstractModel):
     @api.model
     def request_approval(self, res_model, res_id, email_id, vals, approver_ids, comment=None):
         """Store the email and ask the approvers to approve and send it. Anyone of them can."""
+        if not self._dwo_can_request_approval():
+            raise UserError(self.env._("Emails are not approved in this company: send the email right away."))
         thread = self._get_thread(res_model, res_id)
         self._prepare_post(thread, vals)  # an email that cannot be sent is not worth an approval
         approvers = self.env["res.users"].browse([int(u) for u in approver_ids or []]).exists().filtered(
             lambda user: user.active and not user.share)
         if not approvers:
             raise UserError(self.env._("Choose at least one approver."))
+        self._dwo_validate_approvers(approvers, self.env.user)
         saved = self.save_email(res_model, res_id, email_id, vals)
         email = self.env["dwo.mail.email"].browse(saved["id"])
         email.request_approval(approvers, comment)
@@ -734,8 +772,9 @@ class DwoMailComposer(models.AbstractModel):
 
     @api.model
     def send(self, res_model, res_id, vals):
-        """Send now. When the company requires approval this is refused, whatever the client shows."""
-        if self._dwo_require_approval():
+        """Send now. Refused, whatever the client shows, when the company uses the approval flow and
+        the user is not one of the people who can send without approval."""
+        if not self._dwo_can_send_now():
             raise UserError(self.env._(
                 "Emails must be approved before they are sent. Ask for an approval instead."))
         email = False

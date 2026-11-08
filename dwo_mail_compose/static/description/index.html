@@ -126,6 +126,76 @@
         <img src="screenshot_10.png" alt="A rejected email with the reason given by the approver" class="img-fluid rounded shadow"/>
     </div>
 
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">Your rules, per company</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Approval flow</h4>
+                    <p class="mb-0" style="font-size: 14px;">Off: everybody sends right away. On: every email is approved first.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Self approval</h4>
+                    <p class="mb-0" style="font-size: 14px;">Allow it or not. Allowed by default.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Who approves</h4>
+                    <p class="mb-0" style="font-size: 14px;">Pick the people. Empty means every internal user.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Who skips approval</h4>
+                    <p class="mb-0" style="font-size: 14px;">Pick the people who still see Send now. The administrator by default.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Clean up</h4>
+                    <p class="mb-0" style="font-size: 14px;">Unfinished emails are deleted after 180 days. You choose the number.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Enforced by the server</h4>
+                    <p class="mb-0" style="font-size: 14px;">Hiding a button is not enough: the rules are checked when the email is sent.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Set the rules</h2>
+    <p class="mb-4" style="font-size: 16px;">One block in Settings. The options under <em>Approval flow</em> appear only when it is on.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_11.png" alt="The Email Composer block in the settings: approval flow, self approval, approvers, who can send without approval and the number of days to keep unfinished emails" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Two ways to send</h2>
+    <p class="mb-4" style="font-size: 16px;">People who can send without approval get a menu: <strong>Send now</strong> or <strong>Request approval</strong>.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_12.png" alt="The Send email menu with the Send now and Request approval and send choices" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">One way to send</h2>
+    <p class="mb-4" style="font-size: 16px;">Everybody else gets one button. With the approval flow on, it is <strong>Request approval</strong>. With the flow off, it is <strong>Send email</strong>.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_13.png" alt="The email form with a single Request approval button and the note that an approver must approve" class="img-fluid rounded shadow"/>
+    </div>
+
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
     <p class="mb-3" style="font-size: 16px;">Needs the standard <code>mail</code> module and the free <code>dwo_mail_bcc</code> (installed with it). No external library.</p>
     <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">For internal users only. Portal and public users cannot use the composer.</p>
@@ -160,9 +230,12 @@
         </div>
         <div class="tab-pane fade" id="dmc_settings" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Email Composer settings</h4>
-            <p class="mb-2" style="font-size: 14px;"><strong>Settings &gt; General Settings &gt; Email Composer</strong> has two options for each company:</p>
-            <p class="mb-2" style="font-size: 14px;"><strong>Require approval</strong>: nobody can send directly, every email goes through approval.</p>
-            <p class="mb-2" style="font-size: 14px;"><strong>Delete unfinished emails after (days)</strong>: drafts and pending or rejected emails with no activity for this long are removed automatically. Default 180 days.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Settings &gt; General Settings &gt; Email Composer</strong>, for each company:</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Approval flow</strong>: off, the Send email button sends right away and there is no approval. On, every email is approved first.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Allow approving your own emails</strong> (flow on): on by default. Off, you cannot choose yourself as approver.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Approvers</strong> (flow on): the people who can be chosen. Leave it empty and every internal user can approve.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Can send without approval</strong> (flow on): these people always see Send now. The administrator is in the list by default.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Delete unfinished emails after (days)</strong>: 180 by default.</p>
         </div>
         <div class="tab-pane fade" id="dmc_limits" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Good to know</h4>
@@ -195,8 +268,12 @@
         <p class="mb-0" style="font-size: 14px;">Yes. The standard message identifiers are kept, so the mail gateway routes the answer to the same record.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I force approval?</h4>
-        <p class="mb-0" style="font-size: 14px;">Yes. Turn on <em>Require approval</em> in Settings. The server then refuses direct sending too.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I make approval mandatory?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. Turn on <em>Approval flow</em>. The server then refuses to send right away, except for the people you list in <em>Can send without approval</em>.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I stop people from approving their own emails?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. Turn off <em>Allow approving your own emails</em>. You can also limit the approvers to a list of people.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Which From can I use?</h4>

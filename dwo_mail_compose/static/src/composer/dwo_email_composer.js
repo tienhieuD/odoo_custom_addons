@@ -151,7 +151,11 @@ export class DwoEmailComposer extends Component {
             editedAfterRequest: false,
             // the unsent emails of the user on this record
             emails: [],
-            requireApproval: false,
+            // from the server: which buttons to show and who can approve (see _dwo_policy)
+            policy: {
+                require_approval: false, can_send_now: true, can_request_approval: false,
+                allow_self_approval: true, approver_ids: [], user_id: 0,
+            },
             newerEmail: false,
             sending: false,
             uploading: 0,
@@ -232,7 +236,7 @@ export class DwoEmailComposer extends Component {
         ]);
         this.state.fromOptions = state.from_options;
         this.state.emails = state.emails;
-        this.state.requireApproval = state.policy.require_approval;
+        this.state.policy = state.policy;
         let data;
         if (this.props.mode) {
             data = await this.orm.call("dwo.mail.composer", "get_defaults", [
@@ -981,7 +985,11 @@ export class DwoEmailComposer extends Component {
     // --- approval -----------------------------------------------------------
 
     onRequestApproval() {
+        const { approver_ids, allow_self_approval, user_id } = this.state.policy;
         this.dialog.add(DwoApprovalDialog, {
+            // empty list: everybody can approve
+            allowedIds: approver_ids,
+            excludedId: allow_self_approval ? false : user_id,
             onConfirm: async ({ approverIds, comment }) => {
                 this.state.sending = true;
                 try {

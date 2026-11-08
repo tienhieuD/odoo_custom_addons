@@ -23,6 +23,7 @@
         "web.assets_backend": ["dwo_mail_compose/static/src/**/*"],
         "web.assets_tests": ["dwo_mail_compose/static/tests/**/*"],
     },
+    "post_init_hook": "post_init_hook",
     "application": False,
     "installable": True,
     "auto_install": False,

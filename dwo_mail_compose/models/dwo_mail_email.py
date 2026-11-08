@@ -336,6 +336,8 @@ class DwoMailEmail(models.Model):
         self.ensure_one()
         self._lock(("pending",))
         self._check_approver()
+        if self.env.user == self.user_id and not self.company_id.dwo_mail_allow_self_approval:
+            raise UserError(self.env._("You cannot approve your own email."))
         message = self._send_as_author()
         self.sudo().write({
             "state": "sent",
@@ -378,6 +380,7 @@ class DwoMailEmail(models.Model):
             raise UserError(self.env._("Choose who takes over."))
         self._lock(("pending",))
         self._check_approver()
+        self.env["dwo.mail.composer"]._dwo_validate_approvers(users, self.user_id, self.company_id)
         actor = self.env.user
         new_users = users - self.approver_ids
         self.sudo().write({
