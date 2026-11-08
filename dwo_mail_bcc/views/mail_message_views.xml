@@ -6,6 +6,7 @@
         <field name="inherit_id" ref="mail.mail_message_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='incoming_email_cc']" position="after">
+                <field name="outgoing_email_cc" groups="base.group_user"/>
                 <field name="outgoing_email_bcc" groups="base.group_user"/>
             </xpath>
         </field>

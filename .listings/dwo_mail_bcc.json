@@ -7,18 +7,18 @@
     "ok": "#0E7C66"
   },
   "icon": {
-    "label": "BCC",
+    "label": "CC BCC",
     "motif": "document"
   },
   "banner": {
     "pill": "ODOO · MAIL ADD-ON",
-    "title_1": "Mail BCC Support",
-    "title_2": "A Real Bcc in Odoo Mail",
-    "subtitle": "Blind copy from the composer to the outgoing queue.",
+    "title_1": "Email Cc Bcc Reply-To",
+    "title_2": "In Every Odoo Email",
+    "subtitle": "Cc, a hidden Bcc and a Reply-To you choose.",
     "chips": [
-      "Bcc in the composer",
-      "Bcc on templates",
-      "Hidden from other recipients"
+      "Cc and Bcc in the composer",
+      "Reply-To in the composer",
+      "Bcc stays hidden"
     ],
     "visual": {
       "type": "icon"
@@ -30,15 +30,15 @@
         "title": "Write a message",
         "rows": [
           "full composer or",
-          "mail template"
+          "a mail template"
         ],
         "icon": "document"
       },
       {
-        "title": "Fill in Bcc",
+        "title": "Fill the fields",
         "rows": [
-          "new field next",
-          "to Cc"
+          "Cc, Bcc and",
+          "Reply-To"
         ],
         "icon": "user",
         "highlight": true
@@ -46,16 +46,16 @@
       {
         "title": "Send",
         "rows": [
-          "one email, sent",
-          "once to Bcc"
+          "one email, one copy",
+          "for each address"
         ],
         "icon": "gear"
       },
       {
-        "title": "Stay hidden",
+        "title": "Done right",
         "rows": [
-          "no one else sees",
-          "the Bcc address"
+          "Bcc hidden, answers",
+          "go where you said"
         ],
         "icon": "check"
       }
@@ -64,15 +64,15 @@
   "sections": [
     {
       "type": "header",
-      "title": "Mail BCC Support for Odoo",
-      "tagline": "A real Bcc in Odoo mail.",
-      "subtitle": "Add a <strong>Bcc</strong> to the composer, to mail templates and to outgoing emails. Other recipients never see it."
+      "title": "Email Cc Bcc Reply-To for Odoo",
+      "tagline": "The three address fields Odoo's composer is missing.",
+      "subtitle": "Add <strong>Cc</strong>, a hidden <strong>Bcc</strong> and a <strong>Reply-To</strong> to the full composer, to templates and to outgoing emails."
     },
     {
       "type": "intro",
       "flow": true,
-      "flow_alt": "Write a message, fill in Bcc, send, the Bcc address stays hidden",
-      "html": "Odoo can send a Bcc, but no screen lets you type one. This module connects the missing parts and keeps the standard sending code untouched."
+      "flow_alt": "Write a message, fill Cc, Bcc and Reply-To, send, each address gets one copy",
+      "html": "Odoo can send a Cc and a Bcc, but no screen lets you type them when you send a message, and a Reply-To is only offered to mass mailing. This module connects the missing parts and keeps the standard sending code untouched."
     },
     {
       "type": "cards",
@@ -81,30 +81,58 @@
       "accent": "primary",
       "items": [
         {
-          "title": "In the composer",
-          "text": "A Bcc box in the full composer and in mass mailing."
+          "title": "Cc",
+          "text": "A Cc box in the composer. Everybody sees it, and it gets one copy."
+        },
+        {
+          "title": "Bcc",
+          "text": "Delivered, but never written in the visible headers."
+        },
+        {
+          "title": "Reply-To",
+          "text": "Choose where the answers go. Checked: one valid address."
         },
         {
           "title": "On templates",
           "text": "A Bcc field with placeholders, computed per record."
         },
         {
-          "title": "Truly blind",
-          "text": "Delivered, but never written in the visible headers."
-        },
-        {
-          "title": "Sent once",
-          "text": "The Bcc address gets one copy, not one per recipient."
-        },
-        {
-          "title": "Logged",
-          "text": "Kept on the outgoing email and in the message log."
+          "title": "Everywhere",
+          "text": "Full composer, mass mailing, outgoing emails and the message log."
         },
         {
           "title": "For developers",
-          "text": "<code>message_post(outgoing_email_bcc=...)</code> is accepted."
+          "text": "<code>message_post(outgoing_email_cc=..., outgoing_email_bcc=...)</code> is accepted."
         }
       ]
+    },
+    {
+      "type": "screenshot",
+      "title": "1. In the composer",
+      "image": "screenshot_1.png",
+      "alt": "The full composer with To, Cc, Bcc, Subject and Reply-To filled in",
+      "intro": "<strong>Cc</strong>, <strong>Bcc</strong> and <strong>Reply-To</strong> are in the full composer, next to the subject."
+    },
+    {
+      "type": "screenshot",
+      "title": "2. On a template",
+      "image": "screenshot_2.png",
+      "alt": "An email template with the To, Cc, Bcc and Reply To fields",
+      "intro": "A template can carry them too: Cc, Bcc and Reply To, with placeholders computed for each record."
+    },
+    {
+      "type": "screenshot",
+      "title": "3. On the outgoing email",
+      "image": "screenshot_3.png",
+      "alt": "An outgoing email with the Cc, Bcc and Reply-To fields",
+      "intro": "The email that left shows its Cc, Bcc and Reply-To."
+    },
+    {
+      "type": "screenshot",
+      "title": "4. In the message log",
+      "image": "screenshot_4.png",
+      "alt": "The Recipients tab of a message with the outgoing Cc and Bcc",
+      "intro": "The message keeps the Cc and the Bcc, visible to internal users only."
     },
     {
       "type": "tabs",
@@ -112,7 +140,7 @@
       "id_prefix": "bcc",
       "intro": "Needs only the standard <code>mail</code> module. No external library.",
       "notes": [
-        "A Bcc needs at least one other recipient (To, Cc or a partner). An email with only a Bcc is not sent."
+        "A Bcc or a Cc needs at least one other recipient (To or a partner). An email with only a Cc or a Bcc is not sent."
       ],
       "tabs": [
         {
@@ -133,7 +161,7 @@
             },
             {
               "type": "p",
-              "html": "3. Search for <em>Mail BCC Support</em> and click <strong>Install</strong>."
+              "html": "3. Search for <em>Email Cc Bcc Reply-To</em> and click <strong>Install</strong>."
             }
           ]
         },
@@ -143,23 +171,23 @@
           "blocks": [
             {
               "type": "h",
-              "text": "Send with a Bcc"
+              "text": "Send with Cc, Bcc and Reply-To"
             },
             {
               "type": "p",
-              "html": "Open the full composer from <strong>Send message</strong> and fill in the <strong>Bcc</strong> box. It also works for mass mailing from a list."
+              "html": "Open the full composer from <strong>Send message</strong> and fill in <strong>Cc</strong>, <strong>Bcc</strong> and <strong>Reply-To</strong>. It also works for mass mailing from a list."
             },
             {
               "type": "h",
-              "text": "Bcc on a template"
+              "text": "On a template"
             },
             {
               "type": "p",
-              "html": "Open an email template and fill in <strong>Bcc</strong>. Placeholders are computed for each record, and the result is added to the Bcc typed by hand without duplicates."
+              "html": "Open an email template (developer mode, tab <em>Settings</em>) and fill in <strong>Bcc</strong> and <strong>Reply To</strong>. Placeholders are computed for each record."
             },
             {
               "type": "muted",
-              "html": "A Bcc address that is already a visible recipient is dropped from the Bcc, so nobody receives two copies."
+              "html": "An address that is already a visible recipient is dropped from the Bcc, so nobody receives two copies."
             }
           ]
         },
@@ -173,15 +201,15 @@
             },
             {
               "type": "p",
-              "html": "The quick message box of the chatter has no Bcc box; only the full composer has one."
+              "html": "<strong>Reply-To</strong> takes one valid address. When you set it, the answers go to that address and not back to the record, as Odoo does for any forced Reply-To."
             },
             {
               "type": "p",
-              "html": "When several records are sent at once, the same Bcc applies to all of them."
+              "html": "The Cc and the Bcc get one copy, not one per recipient. The quick message box of the chatter has no such boxes; only the full composer has."
             },
             {
               "type": "p",
-              "html": "If an outgoing email carrying a Bcc fails to send, the Bcc is delivered when that email is sent again."
+              "html": "If an outgoing email fails to send, its Cc and Bcc are delivered when that email is sent again."
             }
           ]
         }
@@ -193,9 +221,14 @@
       "intro": "Module releases, newest first.",
       "items": [
         {
+          "version": "1.1",
+          "date": "2026-11-08",
+          "text": "Cc and Reply-To in the full composer, Reply-To check, Cc on the message log. The module is now named Email Cc Bcc Reply-To."
+        },
+        {
           "version": "1.0",
           "date": "2026-11-08",
-          "text": "First release."
+          "text": "First release: Bcc in the full composer and mass mailing, Bcc on templates and outgoing emails."
         }
       ]
     },
@@ -208,8 +241,16 @@
           "a": "No. The address is used for delivery only and removed from the headers."
         },
         {
-          "q": "Who can see the Bcc list in Odoo?",
+          "q": "Where do the answers go with a Reply-To?",
+          "a": "To the address you typed. As with any forced Reply-To in Odoo, the answers are not routed back to the record."
+        },
+        {
+          "q": "Who can see the Cc and Bcc lists in Odoo?",
           "a": "Internal users only."
+        },
+        {
+          "q": "Does it change the standard sending?",
+          "a": "No. It adds the missing connections on top of the standard mail module."
         },
         {
           "q": "Is it free?",
@@ -219,8 +260,8 @@
     },
     {
       "type": "cta",
-      "headline": "Add a real Bcc to Odoo mail.",
-      "text": "Install it and fill in the Bcc box of the full composer.",
+      "headline": "Cc, Bcc and Reply-To, where you need them.",
+      "text": "Install it and open the full composer from Send message.",
       "footer": "Developed by DUO-TEK Software Vietnam"
     }
   ]

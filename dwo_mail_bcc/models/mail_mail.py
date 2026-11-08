@@ -16,22 +16,25 @@ class MailMail(models.Model):
         # One message can produce several mail.mail (one per recipient group,
         # per chunk of partners, plus the email-only one). Bcc recipients must
         # be mailed exactly once, so only the first mail.mail of a message keeps
-        # the value. Copies made by the core throttling (``copy()`` with the same
+        # the value; the Cc of the composer follows the same rule, so its people do not get one
+        # copy per recipient either. Copies made by the core throttling (``copy()`` with the same
         # mail_message_id) are covered by the same rule: the original keeps it.
-        if any(vals.get("email_bcc") and vals.get("mail_message_id") for vals in vals_list):
+        fields_once = ("email_bcc", "email_cc")
+        if any(vals.get(name) and vals.get("mail_message_id") for vals in vals_list for name in fields_once):
             vals_list = [dict(vals) for vals in vals_list]
-            seen_message_ids = set()
-            for vals in vals_list:
-                message_id = vals.get("mail_message_id")
-                if not (vals.get("email_bcc") and message_id):
-                    continue
-                if message_id in seen_message_ids or self.sudo().search_count([
-                    ("mail_message_id", "=", message_id),
-                    ("email_bcc", "!=", False),
-                ], limit=1):
-                    vals["email_bcc"] = False
-                else:
-                    seen_message_ids.add(message_id)
+            for name in fields_once:
+                seen_message_ids = set()
+                for vals in vals_list:
+                    message_id = vals.get("mail_message_id")
+                    if not (vals.get(name) and message_id):
+                        continue
+                    if message_id in seen_message_ids or self.sudo().search_count([
+                        ("mail_message_id", "=", message_id),
+                        (name, "!=", False),
+                    ], limit=1):
+                        vals[name] = False
+                    else:
+                        seen_message_ids.add(message_id)
         return super().create(vals_list)
 
     def _prepare_outgoing_list(self, mail_server=False, doc_to_followers=None):

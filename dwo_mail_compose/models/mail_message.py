@@ -13,12 +13,7 @@ class MailMessage(models.Model):
         help="Set when the message was sent with the Send email button of the Advanced Email "
              "Composer. It tells these emails apart from an internal discussion message.",
     )
-    outgoing_email_cc = fields.Char(
-        "Outgoing Emails Cc",
-        copy=False,
-        groups="base.group_user",
-        help="Carbon copy recipients of the outgoing official email.",
-    )
+    # outgoing_email_cc and outgoing_email_bcc come from dwo_mail_bcc (Email Cc Bcc Reply-To)
 
     dwo_incoming_email_to_all = fields.Text(
         "Incoming Emails To (all)",

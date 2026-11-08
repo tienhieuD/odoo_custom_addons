@@ -1,7 +1,30 @@
-# dwo_mail_bcc: Mail BCC Support (Odoo 19)
+# dwo_mail_bcc: Email Cc Bcc Reply-To (Odoo 19)
 
 Module miễn phí, công khai cho cộng đồng. Chỉ phụ thuộc `mail`. License LGPL-3.
-Đây là nền tảng Bcc cho `dwo_mail_compose` (module soạn email nâng cao), nhưng dùng độc lập được.
+Tên kỹ thuật vẫn là `dwo_mail_bcc` (để `dwo_mail_compose` và dữ liệu đã cài không bị ảnh hưởng); tên hiển thị
+là **Email Cc Bcc Reply-To** từ bản 19.0.1.1.0.
+Đây là nền tảng Cc, Bcc và Reply-To cho `dwo_mail_compose` (module soạn email nâng cao), nhưng dùng độc lập được.
+
+## 0. Cc và Reply-To (bản 19.0.1.1.0)
+
+Core đã có `mail.mail.email_cc`, `mail.mail.reply_to`, `mail.template.email_cc` và `reply_to`, nhưng composer ở chế độ
+**Send message** không có ô Cc, và Reply-To chỉ hiện cho gửi hàng loạt. Module bổ sung:
+
+| Vị trí | Thay đổi |
+|---|---|
+| `mail.compose.message` | Trường `email_cc` (ô **Cc**, cạnh Bcc). Chế độ comment: thành `outgoing_email_cc` của message; mass mail: thành `email_cc` của từng `mail.mail` |
+| `mail.compose.message` | Ô **Reply-To** hiện cả ở chế độ Send message (core chỉ hiện cho mass mail). Core đã chuyển `reply_to` xuống `message_post`; module chỉ mở ô và **kiểm tra**: đúng một địa chỉ hợp lệ (giá trị có `{{ ... }}` thì kiểm tra sau khi render) |
+| `mail.message` | Trường `outgoing_email_cc`, chỉ `base.group_user` đọc được, hiện trong tab Recipients (cạnh `outgoing_email_bcc`) |
+| `message_post(...)` | Nhận thêm `outgoing_email_cc` |
+| `mail.mail.create` | Cc của composer chỉ ở `mail.mail` đầu tiên của message, giống Bcc, nên người nhận Cc không nhận nhiều bản |
+
+Lưu ý với core: ở mass mail, Cc của **template** mặc định bị core đổi thành người nhận (partner), không giữ làm header Cc;
+Cc gõ trong composer thì là header Cc. Đặt Reply-To nghĩa là câu trả lời **không** quay về record (hành vi của core với mọi
+Reply-To ép buộc).
+
+**Cc dời từ `dwo_mail_compose` sang module này.** `outgoing_email_cc`, việc chuyển Cc xuống `mail.mail` và danh sách field cho
+`message_post` trước đây nằm ở `dwo_mail_compose`; nay là của module này (compose phụ thuộc module này nên hành vi giữ nguyên,
+đã chạy lại toàn bộ test của compose).
 
 ## 1. Vấn đề
 

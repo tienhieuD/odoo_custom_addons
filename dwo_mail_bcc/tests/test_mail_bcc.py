@@ -6,6 +6,9 @@ from odoo.tools import mail as mail_tools
 
 BCC = "hidden.boss@example.com"
 BCC2 = "archive@example.com"
+CC = "colleague@example.com"
+CC2 = "manager@example.com"
+REPLY_TO = "replies@example.com"
 
 
 @tagged("post_install", "-at_install", "dwo_mail_bcc")
@@ -226,3 +229,127 @@ class TestMailBcc(MailCommon):
         self.assertEqual(len(self._envelopes_with(BCC)), 1)
         self.assertEqual(len(self._envelopes_with(BCC2)), 1)
         self._assert_no_leak()
+
+
+    # ------------------------------------------------------------
+    # CC
+    # ------------------------------------------------------------
+
+    def _composer(self, **values):
+        vals = {"subject": "Wizard", "body": "<p>Hello</p>", "partner_ids": [(6, 0, [self.customer_a.id])],
+                "notify_skip_followers": True}
+        vals.update(values)
+        return self.env["mail.compose.message"].with_user(self.user_employee).with_context(
+            default_model="res.partner", default_res_ids=self.record.ids,
+            default_composition_mode="comment",
+        ).create(vals)
+
+    def _send_composer(self, composer):
+        with self.mock_mail_gateway():
+            composer._action_send_mail()
+            self.env.cr.flush()
+            self.env["mail.mail"].sudo().search([("state", "=", "outgoing")]).send()
+
+    def test_message_post_cc_is_visible_and_received_once(self):
+        """The Cc is written in the headers of one email and its people get one copy."""
+        self._post(
+            partner_ids=[self.customer_a.id, self.customer_b.id],
+            outgoing_email_cc=f"{CC}, {CC2}", notify_skip_followers=True)
+        copies = self._envelopes_with(CC)
+        self.assertEqual(len(copies), 1)
+        self.assertIn(CC, copies[0]["msg_cc"])
+        self.assertIn(CC2, copies[0]["msg_cc"])
+        self.assertEqual(len(self._envelopes_with(CC2)), 1)
+
+    def test_cc_and_bcc_together(self):
+        self._post(
+            partner_ids=[self.customer_a.id], outgoing_email_cc=CC, outgoing_email_bcc=BCC,
+            notify_skip_followers=True)
+        self.assertEqual(len(self._envelopes_with(CC)), 1)
+        self.assertEqual(len(self._envelopes_with(BCC)), 1)
+        self._assert_no_leak()
+        for mail in self.emails:
+            self.assertNotIn(BCC, mail["msg_cc"] or "")
+
+    def test_wizard_cc_comment_mode(self):
+        composer = self._composer(email_cc=f"{CC}, {CC2}")
+        self._send_composer(composer)
+        message = self.record.message_ids[0]
+        self.assertEqual(
+            sorted(mail_tools.email_normalize_all(message.sudo().outgoing_email_cc)), sorted([CC, CC2]))
+        self.assertEqual(len(self._envelopes_with(CC)), 1)
+        self.assertIn(CC, self._envelopes_with(CC)[0]["msg_cc"])
+
+    def test_wizard_cc_invalid(self):
+        composer = self._composer(email_cc="not-an-email")
+        with self.assertRaises(UserError):
+            composer._action_send_mail()
+
+    def test_wizard_cc_not_for_a_log_note(self):
+        composer = self._composer(email_cc=CC)
+        composer.subtype_id = self.env.ref("mail.mt_note")
+        self.assertTrue(composer.subtype_is_log)
+        self.assertFalse(composer.sudo()._prepare_mail_values_static().get("outgoing_email_cc"))
+
+    def test_wizard_cc_mass_mail(self):
+        """Mass mailing: the Cc typed is the Cc of each email. (Core turns the Cc of a template into
+        recipients of the email, it does not keep it as a Cc.)"""
+        template = self._template(email_bcc=False)
+        records = self.record + self.customer_a
+        composer = self.env["mail.compose.message"].with_user(self.user_admin).with_context(
+            default_model="res.partner", default_res_ids=records.ids,
+            default_composition_mode="mass_mail",
+        ).create({"subject": "Mass", "body": "<p>Hello</p>", "template_id": template.id, "email_cc": f"{CC}, {CC2}"})
+        with self.mock_mail_gateway():
+            composer._action_send_mail()
+        mails = self.env["mail.mail"].sudo().search([("model", "=", "res.partner"), ("res_id", "in", records.ids)])
+        self.assertEqual(len(mails), 2)
+        for mail in mails:
+            self.assertEqual(sorted(mail_tools.email_normalize_all(mail.email_cc)), sorted([CC, CC2]))
+
+    def test_direct_mail_mail_cc_is_core(self):
+        """The Cc of a mail.mail is the core field: it still works as before."""
+        mail = self.env["mail.mail"].sudo().create({
+            "subject": "Direct", "body_html": "<p>x</p>", "email_from": "from@example.com",
+            "email_to": "to@example.com", "email_cc": CC})
+        with self.mock_mail_gateway():
+            mail.send()
+        self.assertEqual(len(self._envelopes_with(CC)), 1)
+        self.assertIn(CC, self.emails[0]["msg_cc"])
+
+    # ------------------------------------------------------------
+    # REPLY-TO
+    # ------------------------------------------------------------
+
+    def test_wizard_reply_to_comment_mode(self):
+        """Send message with a Reply-To: the header carries it and the answers leave the record."""
+        composer = self._composer(reply_to=REPLY_TO)
+        self.assertTrue(composer.reply_to_force_new)
+        self._send_composer(composer)
+        message = self.record.message_ids[0]
+        self.assertEqual(message.reply_to, REPLY_TO)
+        self.assertTrue(message.reply_to_force_new)
+        self.assertTrue(any(REPLY_TO in mail["message"] and "Reply-To" in mail["message"] for mail in self.emails))
+
+    def test_wizard_without_reply_to_keeps_the_default(self):
+        composer = self._composer()
+        self.assertFalse(composer.reply_to)
+        self._send_composer(composer)
+        message = self.record.message_ids[0]
+        self.assertNotEqual(message.reply_to, REPLY_TO)
+        self.assertFalse(message.reply_to_force_new)
+
+    def test_wizard_reply_to_must_be_one_valid_address(self):
+        for bad in ("not-an-email", "a@example.com, b@example.com"):
+            composer = self._composer(reply_to=bad)
+            with self.assertRaises(UserError, msg=bad):
+                composer._action_send_mail()
+
+    def test_wizard_reply_to_with_a_placeholder_is_checked_when_rendered(self):
+        composer = self._composer(reply_to="{{ object.email }}")
+        composer._dwo_check_reply_to()   # not refused: it is rendered for each record at sending
+
+    def test_template_reply_to_reaches_the_composer(self):
+        template = self._template(reply_to=REPLY_TO, email_bcc=False)
+        composer = self._composer(template_id=template.id)
+        self.assertEqual(composer.reply_to, REPLY_TO)

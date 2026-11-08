@@ -256,7 +256,7 @@
             },
             {
               "type": "p",
-              "html": "3. Search for <em>Advanced Email Composer</em> and click <strong>Install</strong>. Mail BCC Support is installed with it."
+              "html": "3. Search for <em>Advanced Email Composer</em> and click <strong>Install</strong>. Email Cc Bcc Reply-To is installed with it."
             },
             {
               "type": "muted",
@@ -389,7 +389,7 @@
           "a": "Your own email, the company email and the default sending address."
         },
         {
-          "q": "Does it need Mail BCC Support?",
+          "q": "Does it need Email Cc Bcc Reply-To?",
           "a": "Yes, it is free and installed with this module."
         }
       ]
