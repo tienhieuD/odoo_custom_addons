@@ -1,0 +1,270 @@
+{
+  "brand": {
+    "primary": "#875A7B",
+    "dark": "#4A2F45",
+    "accent": "#FFC857",
+    "info": "#5B8DB8",
+    "ok": "#0E7C66"
+  },
+  "icon": {
+    "label": "FILTER",
+    "motif": "document"
+  },
+  "banner": {
+    "pill": "ODOO · DISCUSS ADD-ON",
+    "title_1": "Message Filter on Chatter",
+    "title_2": "Find Any Message Fast",
+    "subtitle": "One click: discussions, emails, notes, tracking.",
+    "chips": [
+      "Badges under the chatter actions",
+      "A count on every badge",
+      "Load more keeps working"
+    ],
+    "visual": {
+      "type": "icon"
+    }
+  },
+  "flow": {
+    "steps": [
+      {
+        "title": "Open a record",
+        "rows": [
+          "any chatter with",
+          "many messages"
+        ],
+        "icon": "browser"
+      },
+      {
+        "title": "See the badges",
+        "rows": [
+          "each kind with",
+          "its count"
+        ],
+        "icon": "document",
+        "highlight": true
+      },
+      {
+        "title": "Click one",
+        "rows": [
+          "Emails, Notes,",
+          "Tracking..."
+        ],
+        "icon": "gear"
+      },
+      {
+        "title": "Only those",
+        "rows": [
+          "load more works on",
+          "the filtered list"
+        ],
+        "icon": "check"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Message Filter on Chatter for Odoo",
+      "tagline": "Stop scrolling through the whole chatter.",
+      "subtitle": "A row of badges under <strong>Send message</strong>, <strong>Log note</strong> and <strong>Activity</strong>: click one to see only discussions, emails, notes or tracking."
+    },
+    {
+      "type": "intro",
+      "flow": true,
+      "flow_alt": "Open a record, see the badges, click one, only those messages are shown",
+      "html": "A long-lived record has hundreds of messages: talks, emails, notes, changed fields and automatic notices, all mixed. The search box only finds words. <strong>Message Filter on Chatter</strong> shows one kind at a time, with the number of messages of each kind."
+    },
+    {
+      "type": "cards",
+      "title": "In short",
+      "cols": 3,
+      "accent": "primary",
+      "items": [
+        {
+          "title": "Six badges",
+          "text": "All, Discussions, Emails, Notes, Tracking and Other."
+        },
+        {
+          "title": "A count on each",
+          "text": "You see how many messages of each kind before you click."
+        },
+        {
+          "title": "One click",
+          "text": "One kind at a time. Click All to come back."
+        },
+        {
+          "title": "Done by the server",
+          "text": "Load more works on the filtered list, not only on what is loaded."
+        },
+        {
+          "title": "Every message once",
+          "text": "Each message is in exactly one kind, so the counts add up."
+        },
+        {
+          "title": "Always All on open",
+          "text": "The choice is not kept: nobody misses a message without knowing."
+        }
+      ]
+    },
+    {
+      "type": "screenshot",
+      "title": "The whole picture",
+      "image": "screenshot_1.png",
+      "alt": "A record with its chatter on the right: the badges All, Discussions, Emails, Notes, Tracking and Other with their counts, above the messages",
+      "intro": "On a wide screen the chatter sits beside the record. The badges are right under the actions, each with its count."
+    },
+    {
+      "type": "screenshot",
+      "title": "Discussions",
+      "image": "screenshot_2.png",
+      "alt": "The chatter filtered on Discussions",
+      "intro": "Send message, whether it went to internal followers or to a customer linked to the record."
+    },
+    {
+      "type": "screenshot",
+      "title": "Emails",
+      "image": "screenshot_3.png",
+      "alt": "The chatter filtered on Emails",
+      "intro": "Emails received and emails sent. The email sent from the Email Composer is here too."
+    },
+    {
+      "type": "screenshot",
+      "title": "Notes",
+      "image": "screenshot_4.png",
+      "alt": "The chatter filtered on Notes",
+      "intro": "What people wrote with Log note."
+    },
+    {
+      "type": "screenshot",
+      "title": "Tracking",
+      "image": "screenshot_5.png",
+      "alt": "The chatter filtered on Tracking",
+      "intro": "Every change of a field, and nothing else."
+    },
+    {
+      "type": "tabs",
+      "title": "Requirements &amp; Installation",
+      "id_prefix": "dcf",
+      "intro": "Needs only the standard <code>mail</code> module. No external library.",
+      "notes": [
+        "For internal users. The choice of badge is not kept: the next time you open a record, all messages are shown."
+      ],
+      "tabs": [
+        {
+          "id": "install",
+          "title": "Install",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Install the module"
+            },
+            {
+              "type": "p",
+              "html": "1. Copy the <code>dwo_chatter_filter</code> folder into an add-ons path of your Odoo server."
+            },
+            {
+              "type": "p",
+              "html": "2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu."
+            },
+            {
+              "type": "p",
+              "html": "3. Search for <em>Message Filter on Chatter</em> and click <strong>Install</strong>."
+            },
+            {
+              "type": "muted",
+              "html": "Reload your browser page after installing so the new assets are loaded."
+            }
+          ]
+        },
+        {
+          "id": "use",
+          "title": "Use",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Filter the messages"
+            },
+            {
+              "type": "p",
+              "html": "Open any record with a chatter. Click a badge to see that kind of message only. Click <strong>All</strong> to see everything again."
+            },
+            {
+              "type": "h",
+              "text": "What each badge holds"
+            },
+            {
+              "type": "p",
+              "html": "<strong>Discussions</strong>: Send message. <strong>Emails</strong>: emails received and sent. <strong>Notes</strong>: Log note. <strong>Tracking</strong>: changed fields. <strong>Other</strong>: automatic messages and the rest."
+            },
+            {
+              "type": "muted",
+              "html": "A badge with no message is greyed out."
+            }
+          ]
+        },
+        {
+          "id": "limits",
+          "title": "Limits",
+          "blocks": [
+            {
+              "type": "h",
+              "text": "Good to know"
+            },
+            {
+              "type": "p",
+              "html": "It works in the chatter of a record, not in Discuss or the inbox."
+            },
+            {
+              "type": "p",
+              "html": "One kind at a time. While you search messages with the magnifier, the badges are hidden."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "changelog",
+      "title": "Changelog",
+      "intro": "Module releases, newest first.",
+      "items": [
+        {
+          "version": "1.0",
+          "date": "2026-11-09",
+          "text": "First release."
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "q": "In which badge is an email sent from the Email Composer?",
+          "a": "In Emails. It is an outgoing email, even though it has the subtype of a discussion."
+        },
+        {
+          "q": "Where are the changes of a field?",
+          "a": "In Tracking, whatever their subtype."
+        },
+        {
+          "q": "Is my choice kept?",
+          "a": "No. Open the record again and all the messages are shown, so nobody misses a message without knowing."
+        },
+        {
+          "q": "Does Load more work when a badge is chosen?",
+          "a": "Yes. The server returns only that kind, so Load more goes on in the filtered list."
+        },
+        {
+          "q": "Does it work with other modules that change the chatter?",
+          "a": "It adds one row above the messages and does not touch the messages themselves. It runs together with the Email Composer."
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "headline": "Find the message you need in one click.",
+      "text": "Install it and open the chatter of any record.",
+      "footer": "Developed by DUO-TEK Software Vietnam"
+    }
+  ]
+}

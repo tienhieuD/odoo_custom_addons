@@ -1,0 +1,6 @@
+.o-dwo-messageFilter .o-dwo-filterBadge {
+    cursor: pointer;
+    font-size: .8125rem;
+    padding: .35rem .65rem;
+    &.o-dwo-filterEmpty { opacity: .5; cursor: default; }
+}
