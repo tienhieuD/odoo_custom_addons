@@ -212,8 +212,8 @@
       "type": "screenshot",
       "title": "Set the rules",
       "image": "screenshot_11.png",
-      "alt": "The Email Composer block in the settings: approval flow, self approval, approvers, who can send without approval and the number of days to keep unfinished emails",
-      "intro": "One block in Settings. The options under <em>Approval flow</em> appear only when it is on."
+      "alt": "The Email Composer entry of the settings: approval flow, self approval, approvers, who can send without approval and the number of days to keep unfinished emails",
+      "intro": "Its own entry in Settings, like any app. The options under <em>Approval flow</em> appear only when it is on."
     },
     {
       "type": "screenshot",
@@ -300,7 +300,7 @@
             },
             {
               "type": "p",
-              "html": "<strong>Settings &gt; General Settings &gt; Email Composer</strong>, for each company:"
+              "html": "<strong>Settings &gt; Email Composer</strong>, for each company:"
             },
             {
               "type": "p",

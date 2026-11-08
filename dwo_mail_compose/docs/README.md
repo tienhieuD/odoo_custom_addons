@@ -175,7 +175,7 @@ Người thực hiện hành động không tự nhận thông báo về hành �
 
 **Chống gửi đôi:** mỗi thao tác chuyển trạng thái và gửi trực tiếp lấy **khoá hàng** (`SELECT … FOR UPDATE`) rồi **đọc lại trạng thái**; chỉ trạng thái hợp lệ mới được đi tiếp. Hai người duyệt cùng lúc, hoặc người duyệt và người soạn bấm Send now cùng lúc, chỉ một bên gửi.
 
-**Cấu hình** (Settings > General Settings, khối **Email Composer**):
+**Cấu hình** (Settings > mục riêng **Email Composer** ở thanh bên trái):
 - *Approval flow* (`dwo_mail_require_approval`, mỗi công ty): **hai chế độ, không có chế độ "cả hai"**.
   - **Tắt**: chỉ có Send now. Nút Send email là một nút đơn, không có menu; "Request approval" bị ẩn và máy chủ từ chối `request_approval`.
   - **Bật**: chỉ có luồng duyệt. Người dùng thường chỉ thấy một nút **Request approval**; máy chủ từ chối `send` dù giao diện có bị qua mặt. Ngoại lệ là những người trong *Can send without approval*, luôn thấy cả hai (menu Send now / Request approval).
