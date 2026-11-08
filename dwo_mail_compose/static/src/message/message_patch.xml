@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Message" t-inherit-mode="extension">
+        <xpath expr="//span[hasclass('o-mail-Message-author')]" position="after">
+            <span t-if="message.isDwoEmail" class="o-dwo-emailBadge badge rounded-pill text-bg-success me-1 align-self-center">Email</span>
+        </xpath>
+        <xpath expr="//div[hasclass('o-mail-Message-header')]" position="after">
+            <div t-if="message.isDwoEmail and message.dwoMetaLines.length" class="o-dwo-emailMeta smaller text-muted mb-1 text-break">
+                <div t-foreach="message.dwoMetaLines" t-as="line" t-key="line.label">
+                    <b t-out="line.label + ':'"/> <span t-out="line.text"/>
+                </div>
+            </div>
+        </xpath>
+    </t>
+</templates>

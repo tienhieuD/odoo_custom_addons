@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.ApprovalDialog">
+        <Dialog title="title" size="'md'">
+            <p class="text-muted">Choose who may approve this email. Anyone of them can: the first decision counts. You can choose yourself. The email is sent when it is approved.</p>
+            <label class="form-label fw-bold" for="dwo_approver_input">Approvers <span class="text-danger">*</span></label>
+            <div class="d-flex flex-wrap gap-1 mb-2">
+                <span t-foreach="state.approvers" t-as="user" t-key="user.id" class="o-dwo-approverChip badge rounded-pill text-bg-primary d-inline-flex align-items-center gap-1 fw-normal">
+                    <t t-out="user.name"/>
+                    <button type="button" class="btn-close btn-close-white ms-1" style="width:.5rem;height:.5rem;" t-att-aria-label="'Remove ' + user.name" t-on-click="() => this.remove(user)"/>
+                </span>
+            </div>
+            <div class="o-dwo-approverField mb-3">
+                <Many2XAutocomplete t-key="state.key" id="'dwo_approver_input'" resModel="'res.users'" fieldString="'Approvers'" activeActions="fieldActions" getDomain.bind="approverDomain" update.bind="onPicked" value="''" placeholder="'Search a person...'" searchLimit="8"/>
+            </div>
+            <label class="form-label fw-bold" for="dwo_approval_comment">Message for the approvers</label>
+            <textarea id="dwo_approval_comment" class="form-control" rows="3" placeholder="Why do you ask for an approval? (optional)" t-model="state.comment"/>
+            <t t-set-slot="footer">
+                <button type="button" class="o-dwo-approvalConfirm btn btn-primary" t-att-disabled="!canConfirm" t-on-click="confirm">
+                    <i class="fa fa-paper-plane"/> Ask for approval
+                </button>
+                <button type="button" class="btn btn-link" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

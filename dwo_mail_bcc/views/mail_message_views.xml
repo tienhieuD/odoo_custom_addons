@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_message_view_form_dwo_bcc" model="ir.ui.view">
+        <field name="name">mail.message.form.dwo.bcc</field>
+        <field name="model">mail.message</field>
+        <field name="inherit_id" ref="mail.mail_message_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='incoming_email_cc']" position="after">
+                <field name="outgoing_email_bcc" groups="base.group_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

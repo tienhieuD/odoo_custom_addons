@@ -1,0 +1,125 @@
+{
+  "brand": {"primary": "#875A7B", "dark": "#4A2F45", "accent": "#FFC857", "info": "#5B8DB8", "ok": "#0E7C66"},
+  "icon": {"label": "BCC", "motif": "document"},
+  "banner": {
+    "pill": "ODOO · MAIL ADD-ON",
+    "title_1": "Mail BCC Support",
+    "title_2": "A Real Bcc in Odoo Mail",
+    "subtitle": "Blind copy from the composer to the outgoing queue.",
+    "chips": ["Bcc in the composer", "Bcc on templates", "Hidden from other recipients"],
+    "visual": {"type": "icon"}
+  },
+  "flow": {
+    "steps": [
+      {"title": "Write a message", "rows": ["full composer or", "mail template"], "icon": "document"},
+      {"title": "Fill in Bcc", "rows": ["new field next", "to Cc"], "icon": "user", "highlight": true},
+      {"title": "Send", "rows": ["one email, sent", "once to Bcc"], "icon": "gear"},
+      {"title": "Stay hidden", "rows": ["no one else sees", "the Bcc address"], "icon": "check"}
+    ]
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Mail BCC Support for Odoo",
+      "tagline": "Blind carbon copy, finally wired from the composer to the mail server.",
+      "subtitle": "Adds a <strong>Bcc</strong> field to the full composer, to mail templates and to outgoing emails. Bcc recipients receive the email; their addresses never appear in any header seen by the other recipients."
+    },
+    {
+      "type": "intro",
+      "flow": true,
+      "flow_alt": "Write a message, fill in Bcc, send, the Bcc address stays hidden",
+      "html": "Odoo already knows how to send a Bcc at the lowest level, but nothing connects it to the screens people use: the composer has no Bcc box and an outgoing email has no Bcc field. This module <strong>connects those points</strong> without rewriting the sending layer, so it stays small and easy to upgrade. It depends only on the standard <code>mail</code> module."
+    },
+    {
+      "type": "cards",
+      "title": "What you get",
+      "cols": 3,
+      "accent": "primary",
+      "items": [
+        {"title": "Bcc in the composer", "text": "The full composer (Send message) has a Bcc box, for a single record or for mass mailing. It is not shown for Log note."},
+        {"title": "Bcc on mail templates", "text": "A template has its own Bcc field. Placeholders such as <code>{{ object.user_id.email }}</code> work and are computed for each record."},
+        {"title": "Truly blind", "text": "Bcc addresses are delivered to, but never written in the visible headers, so To and Cc recipients cannot see them."},
+        {"title": "Bcc on outgoing emails", "text": "The outgoing email (Technical &gt; Emails) shows the Bcc, and the message log keeps it in the Recipients tab for internal users."},
+        {"title": "Sent once, not many times", "text": "Odoo sends one email per recipient. The Bcc address receives exactly one copy, not one per recipient."},
+        {"title": "For developers", "text": "<code>message_post(outgoing_email_bcc=\"a@x.com, b@y.com\")</code> is accepted, and the composer exposes the field for other modules to build on."}
+      ]
+    },
+    {
+      "type": "steps",
+      "title": "How to use it",
+      "intro": "Nothing to configure.",
+      "items": [
+        {"title": "Open the full composer", "text": "On a record, click <strong>Send message</strong>, then the expand button to open the full composer."},
+        {"title": "Fill in Bcc", "text": "Type one or more email addresses in the <strong>Bcc</strong> box, separated by commas."},
+        {"title": "Send", "text": "Recipients in To and Cc see a normal email. The Bcc recipients get the same email without being listed."}
+      ]
+    },
+    {
+      "type": "tabs",
+      "title": "Requirements &amp; Installation",
+      "id_prefix": "bcc",
+      "intro": "The module depends only on the standard <code>mail</code> module and needs no external Python library.",
+      "notes": [
+        "A Bcc needs at least one other recipient (To, Cc or a partner). An email with only a Bcc is not sent."
+      ],
+      "tabs": [
+        {
+          "id": "install",
+          "title": "Install",
+          "blocks": [
+            {"type": "h", "text": "Install the module"},
+            {"type": "p", "html": "1. Copy the <code>dwo_mail_bcc</code> folder into an add-ons path of your Odoo server."},
+            {"type": "p", "html": "2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu."},
+            {"type": "p", "html": "3. Search for <em>Mail BCC Support</em> and click <strong>Install</strong>."}
+          ]
+        },
+        {
+          "id": "use",
+          "title": "Use",
+          "blocks": [
+            {"type": "h", "text": "Send with a Bcc"},
+            {"type": "p", "html": "Open the full composer from <strong>Send message</strong> and fill in the <strong>Bcc</strong> box. It also works for mass mailing from a list."},
+            {"type": "h", "text": "Bcc on a template"},
+            {"type": "p", "html": "Open an email template and fill in <strong>Bcc</strong>. Placeholders are computed for each record, and the result is added to the Bcc typed by hand without duplicates."},
+            {"type": "muted", "html": "A Bcc address that is already a visible recipient is dropped from the Bcc, so nobody receives two copies."}
+          ]
+        },
+        {
+          "id": "limits",
+          "title": "Limits",
+          "blocks": [
+            {"type": "h", "text": "Good to know"},
+            {"type": "p", "html": "The quick message box of the chatter has no Bcc box; only the full composer has one."},
+            {"type": "p", "html": "When several records are sent at once, the same Bcc applies to all of them."},
+            {"type": "p", "html": "If an outgoing email carrying a Bcc fails to send, the Bcc is delivered when that email is sent again."}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "changelog",
+      "title": "Changelog",
+      "intro": "Module releases, newest first.",
+      "items": [
+        {"version": "1.0", "date": "2026-11-08", "text": "First release: Bcc in the full composer and mass mailing, Bcc on mail templates and outgoing emails, Bcc kept in the message log, and <code>message_post</code> support."}
+      ]
+    },
+    {
+      "type": "faq",
+      "title": "Frequently Asked Questions",
+      "items": [
+        {"q": "Can the other recipients see the Bcc address?", "a": "No. The address is used only for delivery and is removed from the headers before the email leaves the server."},
+        {"q": "Does it replace the standard mail sending?", "a": "No. It adds the missing connections on top of the standard mail module and does not copy or rewrite the sending code."},
+        {"q": "Who can see the Bcc addresses in Odoo?", "a": "Only internal users. The field on the message is not readable by portal or public users."},
+        {"q": "Can I use it with the chatter quick box?", "a": "Not yet. Use the full composer, or call <code>message_post</code> with <code>outgoing_email_bcc</code> from code."},
+        {"q": "Is it free?", "a": "Yes. It is also the base of the Advanced Email Composer module, but works on its own."}
+      ]
+    },
+    {
+      "type": "cta",
+      "headline": "Add a real Bcc to Odoo mail.",
+      "text": "Install it, open the full composer and fill in the Bcc box.",
+      "footer": "Developed by DUO-TEK Software Vietnam"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.AddressInput">
+        <div class="o-dwo-addressInput position-relative d-flex flex-wrap align-items-center gap-1 border rounded px-2 py-1" t-att-class="{ 'o-dwo-invalid': state.invalid }">
+            <span t-foreach="props.value" t-as="address" t-key="address.email"
+                  class="o-dwo-chip badge rounded-pill d-inline-flex align-items-center gap-1 fw-normal"
+                  t-att-class="address.isNew ? 'text-bg-warning' : 'text-bg-primary'"
+                  t-att-title="address.email">
+                <span t-out="address.name || address.email"/>
+                <small t-if="address.name" class="opacity-75" t-out="address.email"/>
+                <small t-if="address.isNew" class="opacity-75">new</small>
+                <button type="button" class="btn-close btn-close-white ms-1" style="width:.5rem;height:.5rem;" t-att-aria-label="'Remove ' + address.email" t-att-title="'Remove ' + address.email" t-on-click="() => this.remove(address)"/>
+            </span>
+            <input t-att-id="props.id" t-ref="input" type="text" class="o-dwo-addressText border-0 flex-grow-1 bg-transparent"
+                   style="min-width:140px;outline:none;"
+                   autocomplete="off"
+                   t-att-placeholder="props.value.length ? '' : props.placeholder"
+                   t-att-value="state.text"
+                   t-on-input="onInput" t-on-keydown="onKeydown" t-on-focus="onFocus" t-on-blur="onBlur" t-on-paste="onPaste"/>
+            <div t-if="state.suggestions.length" class="o-dwo-suggestions dropdown-menu show w-100 start-0 mt-1" style="top:100%;max-height:240px;overflow:auto;">
+                <t t-foreach="state.suggestions" t-as="s" t-key="s.email">
+                    <button type="button" class="dropdown-item d-flex justify-content-between gap-2" t-att-class="{ active: s_index === state.active }"
+                            t-on-mousedown.prevent="() => this.pick(s)">
+                        <span class="text-truncate"><t t-out="s.name"/> <small class="opacity-75" t-out="s.email"/></span>
+                        <small class="opacity-75" t-out="s.source"/>
+                    </button>
+                </t>
+            </div>
+        </div>
+        <small t-if="state.invalid" class="text-danger">This is not a valid email address.</small>
+    </t>
+</templates>

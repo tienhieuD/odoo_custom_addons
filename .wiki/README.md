@@ -9,6 +9,8 @@ Tương tự, module test nội bộ nằm ở thư mục ẩn **`.lab`** (`odoo
 | [web_split_view](web_split_view/README.md) | Chế độ Split (list + form cạnh nhau) tự động cho mọi list, bản 12 đến 20 (12 đến 15 kiến trúc legacy) |
 | [listview_sticky_header_and_column](listview_sticky_header_and_column/README.md) | Ghim cột và header của list, bản 12 đến 20, kèm module test `lab` |
 | [dwo_record_concurrency](dwo_record_concurrency/README.md) | Cảnh báo mềm khi hai người cùng sửa một bản ghi (Record Concurrency Guard), bản 12 đến 20 (12 đến 15 kiến trúc legacy) |
+| [dwo_mail_bcc](dwo_mail_bcc/README.md) | Bcc cho composer, mail.mail và message_post (miễn phí), chỉ bản 19; tài liệu thiết kế nằm trong `docs/` của module |
+| [dwo_mail_compose](dwo_mail_compose/README.md) | Send email trong chatter (thư chính thức, reply-all, quote, template, Reply-To, nhiều email lưu trữ, **duyệt trước khi gửi**, sổ địa chỉ), chỉ bản 19; tài liệu thiết kế nằm trong `docs/` của module |
 
 Các file liên quan nằm ngoài wiki:
 - `listings/<module>.json` (trong wiki): cấu hình trang mô tả cho Odoo Apps (dùng với skill `odoo-apps-listing`).
