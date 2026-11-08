@@ -24,7 +24,7 @@
             'listview_sticky_header_and_column/static/src/xml/*.xml',
         ]
     },
-    'price': 38.00,
+    'price': 35.00,
     'currency': 'EUR',
     'external_dependencies': {}
 }

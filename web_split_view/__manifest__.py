@@ -43,8 +43,6 @@ Features:
         ],
     },
     'images': ['static/description/banner.png'],
-    'price': 35.00,
-    'currency': 'EUR',
     'uninstall_hook': '_uninstall_hook',
     'installable': True,
     'application': False,

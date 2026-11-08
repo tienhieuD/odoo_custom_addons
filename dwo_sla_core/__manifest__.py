@@ -27,7 +27,7 @@ See custom-addons/dwo_sla_core/docs/ for the SRS, TAD, DB Design.
     # Giá/ảnh dưới đây là cho listing Odoo Apps -- xem listings/dwo_sla_core.json.
     # Giá ra mắt 249 EUR (chốt với user 2026-11-07); cân nhắc tăng lên
     # 349-399 sau khi có review/rating (xem tư vấn giá trong hội thoại).
-    'price': 249.0,
+    'price': 89.00,
     'currency': 'EUR',
     'images': ['static/description/banner.png'],
 
