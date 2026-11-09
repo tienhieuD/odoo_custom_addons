@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dwo_mail_address_company_rule" model="ir.rule">
+        <field name="name">Email address book: multi-company</field>
+        <field name="model_id" ref="model_dwo_mail_address"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <!-- The author and every person who has been an approver can read an email. -->
+    <record id="dwo_mail_email_read_rule" model="ir.rule">
+        <field name="name">Email: author and approvers read</field>
+        <field name="model_id" ref="model_dwo_mail_email"/>
+        <field name="domain_force">['|', '|', ('user_id', '=', user.id), ('approver_ids', 'in', [user.id]), ('approver_history_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Only the author changes or deletes an email. An approver decides through the buttons. -->
+    <record id="dwo_mail_email_author_rule" model="ir.rule">
+        <field name="name">Email: only the author writes</field>
+        <field name="model_id" ref="model_dwo_mail_email"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="dwo_mail_email_admin_rule" model="ir.rule">
+        <field name="name">Email: administrators see all</field>
+        <field name="model_id" ref="model_dwo_mail_email"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+    </record>
+</odoo>

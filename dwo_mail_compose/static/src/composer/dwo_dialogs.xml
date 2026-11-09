@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.ConfirmDialog" owl="1">
+        <div class="o-dwo-dialog">
+            <div class="modal-backdrop show" style="z-index:1060;"/>
+            <div class="modal d-block" tabindex="-1" role="dialog" style="z-index:1065;overflow:auto;">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header"><h4 class="modal-title" t-esc="props.title"/></div>
+                        <div class="modal-body"><t t-esc="props.body"/></div>
+                        <div class="modal-footer">
+                            <button type="button" class="o-dwo-confirmOk btn btn-primary" t-on-click="confirm"><t t-esc="props.confirmLabel"/></button>
+                            <button type="button" class="o-dwo-confirmCancel btn btn-link" t-on-click="props.close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.TemplateConflictDialog" owl="1">
+        <div class="o-dwo-dialog">
+            <div class="modal-backdrop show" style="z-index:1060;"/>
+            <div class="modal d-block" tabindex="-1" role="dialog" style="z-index:1065;overflow:auto;">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header"><h4 class="modal-title">Replace what you are writing?</h4></div>
+                        <div class="modal-body">
+                            <p>The subject or the message already contains your own text. What should the template do?</p>
+                            <ul class="mb-0">
+                                <li><b>Overwrite</b>: the template replaces the subject and the message.</li>
+                                <li><b>Add after my text</b>: your message stays and the template text is added after it. Your subject is kept.</li>
+                                <li><b>Cancel</b>: nothing changes.</li>
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="o-dwo-conflictOverwrite btn btn-primary" t-on-click="overwrite">Overwrite</button>
+                            <button type="button" class="o-dwo-conflictAppend btn btn-secondary" t-on-click="append">Add after my text</button>
+                            <button type="button" class="btn btn-link" t-on-click="props.close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.SaveTemplateDialog" owl="1">
+        <div class="o-dwo-dialog">
+            <div class="modal-backdrop show" style="z-index:1060;"/>
+            <div class="modal d-block" tabindex="-1" role="dialog" style="z-index:1065;overflow:auto;">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header"><h4 class="modal-title">Save as Template</h4></div>
+                        <div class="modal-body">
+                            <p class="text-muted">The subject, the message (without the quoted email) and the files become a template for this kind of record. It belongs to you.</p>
+                            <label for="dwo_template_name">Template name</label>
+                            <input id="dwo_template_name" t-ref="name" type="text" class="form-control" placeholder="e.g. Quote follow-up" t-att-value="state.name" t-on-input="onInput" t-on-keydown="onKeydown"/>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="o-dwo-saveTemplateOk btn btn-primary" t-att-disabled="!canSave" t-on-click="save">Save</button>
+                            <button type="button" class="btn btn-link" t-on-click="props.close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.ApprovalDialog" owl="1">
+        <div class="o-dwo-dialog">
+            <div class="modal-backdrop show" style="z-index:1060;"/>
+            <div class="modal d-block" tabindex="-1" role="dialog" style="z-index:1065;overflow:auto;">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header"><h4 class="modal-title">Request approval</h4></div>
+                        <div class="modal-body">
+                            <p class="text-muted">Choose who may approve this email. Anyone of them can: the first decision counts. <t t-if="canChooseYourself">You can choose yourself. </t>The email is sent when it is approved.</p>
+                            <label class="font-weight-bold" for="dwo_approver_input">Approvers <span class="text-danger">*</span></label>
+                            <div class="d-flex flex-wrap mb-2">
+                                <span t-foreach="state.approvers" t-as="user" t-key="user.id" class="o-dwo-approverChip badge badge-pill badge-primary d-inline-flex align-items-center font-weight-normal mr-1">
+                                    <t t-esc="user.name"/>
+                                    <button type="button" class="close text-white ml-2" style="font-size:1rem;line-height:1;float:none;" t-att-data-id="user.id" t-att-aria-label="'Remove ' + user.name" t-on-click="onClickRemove"><span aria-hidden="true">×</span></button>
+                                </span>
+                            </div>
+                            <div class="o-dwo-approverField position-relative mb-3">
+                                <input id="dwo_approver_input" type="text" class="form-control" autocomplete="off" placeholder="Search a person..."
+                                       t-att-value="state.text" t-on-input="onInput" t-on-focus="onFocus" t-on-blur="onBlur"/>
+                                <div t-if="state.matches.length" class="o-dwo-approverMatches dropdown-menu show w-100" style="left:0;top:100%;">
+                                    <t t-foreach="state.matches" t-as="match" t-key="match.id">
+                                        <button type="button" class="dropdown-item" t-att-data-id="match.id" t-on-mousedown="onMousedownMatch"><t t-esc="match.name"/></button>
+                                    </t>
+                                </div>
+                            </div>
+                            <label class="font-weight-bold" for="dwo_approval_comment">Message for the approvers</label>
+                            <textarea id="dwo_approval_comment" class="form-control" rows="3" placeholder="Why do you ask for an approval? (optional)" t-att-value="state.comment" t-on-input="onInputComment"/>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="o-dwo-approvalConfirm btn btn-primary" t-att-disabled="!canConfirm" t-on-click="confirm">
+                                <i class="fa fa-paper-plane"/> Ask for approval
+                            </button>
+                            <button type="button" class="btn btn-link" t-on-click="props.close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

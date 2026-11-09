@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- The Send email button, next to Send message -->
+    <t t-inherit="mail.ChatterTopbar" t-inherit-mode="extension" owl="1">
+        <xpath expr="//button[hasclass('o_ChatterTopbar_buttonSendMessage')]" position="after">
+            <button class="btn btn-link o_ChatterTopbar_button o-mail-Chatter-dwoSendEmail text-nowrap"
+                    type="button"
+                    t-att-class="{
+                        'o-active': chatter.dwoEmailOpen,
+                        'o-bordered': chatter.hasExternalBorder,
+                    }"
+                    t-att-disabled="chatter.isDisabled"
+                    t-on-click="chatter.dwoToggleEmail">
+                Send email<span t-if="chatter.dwoHasDraft and !chatter.dwoEmailOpen" class="o-dwo-draftDot bg-primary ml-1" title="You have a draft"/>
+            </button>
+        </xpath>
+    </t>
+    <t t-inherit="mail.Chatter" t-inherit-mode="extension" owl="1">
+        <!-- The email form takes the room of the chatter: while it is open the messages, the activities
+             and the rest are hidden, and they come back as soon as it is closed. -->
+        <xpath expr="//div[hasclass('o_Chatter_scrollPanel')]" position="attributes">
+            <attribute name="t-att-class">{ 'o-dwo-hiddenByEmail': chatter.dwoEmailOpen }</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_Chatter_fixedPanel')]" position="inside">
+            <DwoEmailComposer t-if="chatter.dwoEmailOpen and chatter.thread"
+                              chatterLocalId="chatter.localId"
+                              t-key="chatter.dwoKey"/>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.AddressInput" owl="1">
+        <div class="o-dwo-addressRoot">
+        <div class="o-dwo-addressInput position-relative d-flex flex-wrap align-items-center border rounded px-2 py-1" t-att-class="{ 'o-dwo-invalid': state.invalid }" t-on-click="onBoxClick">
+            <!-- A long address is cut with "..." inside the chip, so the chips never push Cc and Bcc
+                 out of the row; the title shows the whole address -->
+            <!-- the chips are in their own box: the input after them stays the same element when a chip comes or goes
+                 (it keeps the focus) -->
+            <div class="o-dwo-chips" style="display:contents;">
+            <t t-foreach="props.value" t-as="address" t-key="address.email">
+                <!-- the chip being edited is an input in its place; Enter or leaving saves, Esc cancels -->
+                <input t-if="state.editing and state.editing.email === address.email" t-ref="edit" type="text"
+                       class="o-dwo-chipEdit form-control form-control-sm"
+                       t-att-class="{ 'is-invalid': state.editing.invalid }"
+                       style="width:16rem;max-width:100%;border-radius:1rem;" autocomplete="off"
+                       t-att-value="state.editing.text"
+                       t-on-input="onEditInput" t-on-keydown="onEditKeydown" t-on-blur="onEditBlur"/>
+                <span t-else=""
+                      class="o-dwo-chip badge badge-pill badge-light border d-inline-flex align-items-center font-weight-normal mr-1"
+                      role="button"
+                      t-att-data-email="address.email"
+                      t-att-title="address.name ? address.name + ' &lt;' + address.email + '&gt;' : address.email"
+                      t-on-click="onClickChip">
+                    <span class="o-dwo-chipText text-truncate" t-esc="address.name or address.email"/>
+                    <small t-if="address.name" class="o-dwo-chipEmail text-muted text-truncate ml-1" t-esc="address.email"/>
+                    <small t-if="address.isNew" class="o-dwo-chipNew text-info flex-shrink-0 ml-1">new</small>
+                    <button type="button" class="o-dwo-chipRemove close ml-2 flex-shrink-0" style="font-size:1rem;line-height:1;float:none;" t-att-data-email="address.email" t-att-aria-label="'Remove ' + address.email" t-att-title="'Remove ' + address.email" t-on-click="onClickRemove"><span aria-hidden="true">×</span></button>
+                </span>
+            </t>
+            </div>
+            <input t-att-id="props.id" t-ref="input" type="text" class="o-dwo-addressText border-0 flex-grow-1 bg-transparent"
+                   style="min-width:140px;outline:none;"
+                   autocomplete="off"
+                   t-att-placeholder="props.value.length ? '' : props.placeholder"
+                   t-att-value="state.text"
+                   t-on-input="onInput" t-on-keydown="onKeydown" t-on-focus="onFocus" t-on-click="onClick" t-on-blur="onBlur" t-on-paste="onPaste"/>
+            <div t-if="state.suggestions.length" class="o-dwo-suggestions dropdown-menu show w-100 mt-1" style="left:0;top:100%;max-height:240px;overflow:auto;">
+                <t t-foreach="state.suggestions" t-as="s" t-key="s.email">
+                    <button type="button" class="dropdown-item d-flex justify-content-between" t-att-class="{ active: s_index === state.active }"
+                            t-att-data-index="s_index"
+                            t-on-mousedown="onMousedownSuggestion">
+                        <span class="text-truncate"><t t-esc="s.name"/> <small class="text-muted" t-esc="s.email"/></span>
+                        <small class="text-muted ml-2" t-esc="s.source"/>
+                    </button>
+                </t>
+            </div>
+        </div>
+        <small t-if="state.invalid or (state.editing and state.editing.invalid)" class="text-danger">This is not a valid email address.</small>
+        </div>
+    </t>
+</templates>
