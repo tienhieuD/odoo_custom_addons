@@ -100,6 +100,17 @@ class TestMessageFilter(MailCommon):
             {"tracking": 1, "email": 2, "activity": 1, "note": 1, "discussion": 2, "other": 2})
         self.assertEqual(sum(counts[key] for key in CATEGORIES), counts["all"])
 
+    def test_counts_with_several_tracking_messages(self):
+        # the tracking values of the record belong to several messages (a multi-record set, not a singleton)
+        extra = self.env["mail.message"].create({
+            "model": "res.partner", "res_id": self.record.id, "body": "<p>x</p>",
+            "message_type": "notification", "subtype_id": self.mt_note.id})
+        self.env["mail.tracking.value"].create({
+            "field": self.env["ir.model.fields"]._get("res.partner", "name").id, "field_desc": "Name",
+            "mail_message_id": extra.id, "old_value_char": "A", "new_value_char": "B"})
+        counts = self.env["mail.message"].dwo_filter_counts("res.partner", self.record.id)
+        self.assertEqual(counts["tracking"], 2)
+
     def test_fetch_by_kind_is_paginated_on_the_filtered_list(self):
         Message = self.env["mail.message"].with_user(self.user_employee)
         email = [("dwo_category", "=", "email")]
