@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_template_form_dwo_bcc" model="ir.ui.view">
+        <field name="name">mail.template.form.dwo.bcc</field>
+        <field name="model">mail.template</field>
+        <field name="inherit_id" ref="mail.email_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='email_cc']" position="after">
+                <field name="email_bcc" placeholder="e.g. archive@company.com or {{ object.user_id.email }}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
