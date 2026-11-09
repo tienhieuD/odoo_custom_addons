@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Chatter" t-inherit-mode="extension" owl="1">
+        <!-- Under the planned activities (and the files), above the messages. -->
+        <xpath expr="//t[@t-if='chatter.threadView']" position="before">
+            <DwoMessageFilter t-if="chatter.thread and chatter.thread.id" record="chatter"/>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_chatter_filter.MessageFilter" owl="1">
+        <div t-if="state.counts" class="o-dwo-messageFilter d-flex flex-wrap align-items-center gap-1 px-3 py-2 d-print-none">
+            <span class="o-dwo-filterLabel text-muted me-1">Filter by:</span>
+            <button t-foreach="items" t-as="item" t-key="item.label" type="button"
+                    class="o-dwo-filterBadge badge rounded-pill border d-inline-flex align-items-center gap-1 fw-normal"
+                    t-att-class="{
+                        ['text-bg-' + item.color + ' border-' + item.color]: isActive(item),
+                        ['bg-transparent text-' + item.color + ' border-' + item.color]: !isActive(item),
+                        'o-dwo-filterEmpty': item.count === 0 and item.id,
+                    }"
+                    t-att-data-kind="item.id or 'all'"
+                    t-att-disabled="item.count === 0 and item.id and !isActive(item)"
+                    t-on-click="() => this.select(item)">
+                <span t-esc="item.label"/>
+                <span class="o-dwo-filterCount fw-bold" t-esc="item.count"/>
+            </button>
+        </div>
+    </t>
+</templates>
