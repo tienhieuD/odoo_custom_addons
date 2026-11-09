@@ -71,6 +71,15 @@ def post_init_hook(env):
             "model": "res.partner", "res_id": aurora.id, "message_type": "auto_comment", "body": body,
             "subtype_id": env.ref("mail.mt_note").id, "author_id": env.ref("base.partner_root").id}), days_ago)
 
+    def done_activity(days_ago, xmlid, summary, feedback):
+        """A planned activity marked as done: Odoo leaves a message with the subtype Activities."""
+        activity = aurora.activity_schedule(
+            xmlid, summary=summary, user_id=admin.id, date_deadline=(now - timedelta(days=days_ago)).date())
+        activity.action_feedback(feedback=feedback)
+        message = Message.search([("model", "=", "res.partner"), ("res_id", "=", aurora.id),
+                                  ("subtype_id", "=", env.ref("mail.mt_activities").id)], order="id desc", limit=1)
+        return when(message, days_ago)
+
     # oldest first
     note(9, "<p>Key account: ships every Tuesday. Ask for the packing plan before booking.</p>", linh)
     discussion(8, "<p>Kick-off with the team: Aurora wants 200 pallets a month from February.</p>", linh)
@@ -89,7 +98,10 @@ def post_init_hook(env):
     tracking(2, "city", "Hanoi", "Da Nang")
     discussion(1, "<p>Order confirmed by phone. Lan will send the purchase order tomorrow.</p>", admin, partners=lan)
     note(1, "<p>Remember to add the customer to the Tuesday delivery route.</p>", admin)
-    automatic(0, "<p>Activity done: Call the customer to confirm the first delivery.</p>")
+    done_activity(5, "mail.mail_activity_data_call", "Call Lan about the quotation", "She will answer tomorrow.")
+    done_activity(0, "mail.mail_activity_data_call", "Call the customer to confirm the first delivery",
+                  "Confirmed for next Tuesday.")
+    automatic(0, "<p>Reminder: the purchase order of Aurora Logistics is expected tomorrow.</p>")
 
     # a planned activity: the badges come under it
     aurora.activity_schedule(

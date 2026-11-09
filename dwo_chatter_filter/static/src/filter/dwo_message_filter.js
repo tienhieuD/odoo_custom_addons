@@ -2,17 +2,18 @@ import { Component, onWillUnmount, useEffect, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
-// Each kind has its own colour (a Bootstrap contextual colour): outlined when off, filled when chosen.
+// Each kind has its own colour (a Bootstrap contextual colour, and purple, defined in the stylesheet): outlined when off, filled when chosen.
 const KINDS = [
     { id: "discussion", label: _t("Discussions"), color: "primary" },
     { id: "email", label: _t("Emails"), color: "info" },
+    { id: "activity", label: _t("Activities"), color: "purple" },
     { id: "note", label: _t("Notes"), color: "warning" },
     { id: "tracking", label: _t("Tracking"), color: "success" },
     { id: "other", label: _t("Other"), color: "danger" },
 ];
 
 /**
- * The badges at the top of the chatter: All, Discussions, Emails, Notes, Tracking, Other, each with its
+ * The badges at the top of the chatter: All, Discussions, Emails, Activities, Notes, Tracking, Other, each with its
  * number of messages. One at a time; a click shows only that kind. Closing the record forgets the choice.
  */
 export class DwoMessageFilter extends Component {

@@ -81,8 +81,8 @@
       "accent": "primary",
       "items": [
         {
-          "title": "Six badges",
-          "text": "All, Discussions, Emails, Notes, Tracking and Other, each with its own colour."
+          "title": "Seven badges",
+          "text": "All, Discussions, Emails, Activities, Notes, Tracking and Other, each with its own colour."
         },
         {
           "title": "A count on each",
@@ -110,7 +110,7 @@
       "type": "screenshot",
       "title": "The whole picture",
       "image": "screenshot_1.png",
-      "alt": "A record with its chatter on the right: the Filter by label and the badges All, Discussions, Emails, Notes, Tracking and Other, under the planned activities and above the messages",
+      "alt": "A record with its chatter on the right: the Filter by label and the badges All, Discussions, Emails, Activities, Notes, Tracking and Other, under the planned activities and above the messages",
       "intro": "On a wide screen the chatter sits beside the record. <strong>Filter by:</strong> comes under the planned activities and above the messages. Each badge has its own colour and its count."
     },
     {
@@ -129,15 +129,22 @@
     },
     {
       "type": "screenshot",
-      "title": "Notes",
+      "title": "Activities",
       "image": "screenshot_4.png",
+      "alt": "The chatter filtered on Activities",
+      "intro": "The message Odoo leaves when a planned activity is marked as done, with its feedback."
+    },
+    {
+      "type": "screenshot",
+      "title": "Notes",
+      "image": "screenshot_5.png",
       "alt": "The chatter filtered on Notes",
       "intro": "What people wrote with Log note."
     },
     {
       "type": "screenshot",
       "title": "Tracking",
-      "image": "screenshot_5.png",
+      "image": "screenshot_6.png",
       "alt": "The chatter filtered on Tracking",
       "intro": "Every change of a field, and nothing else."
     },
@@ -194,7 +201,7 @@
             },
             {
               "type": "p",
-              "html": "<strong>Discussions</strong>: Send message. <strong>Emails</strong>: emails received and sent. <strong>Notes</strong>: Log note. <strong>Tracking</strong>: changed fields. <strong>Other</strong>: automatic messages and the rest."
+              "html": "<strong>Discussions</strong>: Send message. <strong>Emails</strong>: emails received and sent. <strong>Activities</strong>: the message left by a done activity. <strong>Notes</strong>: Log note. <strong>Tracking</strong>: changed fields. <strong>Other</strong>: automatic messages and the rest."
             },
             {
               "type": "muted",
@@ -241,6 +248,10 @@
         {
           "q": "In which badge is an email sent from the Email Composer?",
           "a": "In Emails. It is an outgoing email, even though it has the subtype of a discussion."
+        },
+        {
+          "q": "Does the Activities badge filter the planned activities?",
+          "a": "No. It shows the messages left when an activity is marked as done. The planned activities stay in their own list above the badges."
         },
         {
           "q": "Where are the changes of a field?",

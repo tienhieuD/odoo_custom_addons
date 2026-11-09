@@ -13,10 +13,10 @@ trộn lẫn. Muốn xem riêng email hay riêng các lần thay đổi trườn
 Một hàng badge có nhãn **Filter by:**, nằm **dưới danh sách Planned Activities (`o-mail-ActivityList`) và trên danh sách
 message (`o-mail-Thread`)**:
 
-**All · Discussions · Emails · Notes · Tracking · Other**, mỗi badge có số message.
+**All · Discussions · Emails · Activities · Notes · Tracking · Other**, mỗi badge có số message.
 
 - Chữ nhỏ (`.7rem`). Mỗi loại một màu viền riêng, nền trong suốt khi chưa chọn; **bấm vào thì đổi sang màu đặc** của loại đó:
-  All = dark, Discussions = primary, Emails = info, Notes = warning, Tracking = success, Other = danger.
+  All = dark, Discussions = primary, Emails = info, Activities = purple (màu tự định nghĩa trong scss: Bootstrap không có tím), Notes = warning, Tracking = success, Other = danger.
 - Vị trí đặt bằng xpath **trước `SearchMessageResult`** (không phải trước `Thread`), vì hai phần tử này là cặp `t-if` / `t-else`
   của core; chèn vào giữa sẽ làm hỏng cặp đó.
 
@@ -36,13 +36,17 @@ Mỗi message thuộc **đúng một** loại. Kiểm tra theo thứ tự, loạ
 |---|---|---|
 | 1 | **Tracking** | có `mail.tracking.value` trỏ tới message (một trường đã đổi) |
 | 2 | **Emails** | `message_type` là `email` hoặc `email_outgoing` (thư đến và thư đi) |
-| 3 | **Notes** | `message_type = comment` và subtype `mt_note` (Log note) |
-| 4 | **Discussions** | `message_type = comment` và subtype `mt_comment` (Send message, dù người nhận là follower nội bộ hay khách gắn trên bản ghi) |
-| 5 | **Other** | phần còn lại: `auto_comment`, `notification` không có tracking, `out_of_office`, subtype tuỳ biến |
+| 3 | **Activities** | subtype `mt_activities` (message Odoo để lại khi một activity được đánh dấu Done, kèm feedback) và không phải tracking/email |
+| 4 | **Notes** | `message_type = comment` và subtype `mt_note` (Log note) |
+| 5 | **Discussions** | `message_type = comment` và subtype `mt_comment` (Send message, dù người nhận là follower nội bộ hay khách gắn trên bản ghi) |
+| 6 | **Other** | phần còn lại: `auto_comment`, `notification` không có tracking, `out_of_office`, subtype tuỳ biến |
 
 Hệ quả cần nhớ:
 - Email gửi từ `dwo_mail_compose` là `email_outgoing` kèm subtype `mt_comment`: nó là **Emails**, không phải Discussions.
 - Message tracking thường có subtype `mt_note`: nó là **Tracking**, không phải Notes.
+- Badge **Activities** chỉ lọc *message* của activity đã xong, không lọc danh sách Planned Activities (activity chưa xong).
+- Trình duyệt biết message nào là activity nhờ trường `dwo_is_activity` do server gửi kèm (`_to_store_defaults`), vì store
+  của `mail` chỉ có id của `mt_note` và `mt_comment`.
 - Message `comment` mang subtype nội bộ khác (ví dụ subtype riêng của một app) rơi vào **Other**.
 - Tổng số các loại luôn bằng số message của bản ghi, nên không có message thất lạc.
 
@@ -55,7 +59,7 @@ Quy tắc được viết hai lần và phải giữ giống nhau: Python `MailM
   `fetch_params` vào hàm này nên không cần route mới. Hàm thêm domain của loại vào domain gốc.
 - Điều kiện "có tracking" dùng subselect trên bảng `mail_tracking_value`, **không** dùng trường `tracking_value_ids`: trường
   này chỉ dành cho nhóm quản trị, người dùng thường truy vấn sẽ bị `AccessError`.
-- `mail.message.dwo_filter_counts(res_model, res_id)`: trả `{all, tracking, email, note, discussion, other}` bằng 6
+- `mail.message.dwo_filter_counts(res_model, res_id)`: trả `{all, tracking, email, activity, note, discussion, other}` bằng 7
   `search_count` (index `(model, res_id)`).
 - JS: `Thread` (model) có thêm `dwoFilter`, `dwoCounts`; `fetchMessagesData` gửi thêm `dwo_category`. Đổi bộ lọc thì **bỏ
   hết message đã tải** rồi tải lại từ đầu (`dwoSetFilter`), để khi quay về All không bị hổng danh sách giữa hai lần tải.

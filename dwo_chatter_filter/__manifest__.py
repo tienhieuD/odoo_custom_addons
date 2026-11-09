@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Message Filter on Chatter",
-    "version": "19.0.1.0.0",
-    "summary": "Badges above the chatter to show only discussions, emails, notes or tracking messages.",
-    "description": "Adds a row of badges at the top of the chatter, under Send message, Log note and Activity: All, Discussions, Emails, Notes, Tracking and Other, each with its number of messages. A click shows only that kind of message, loaded from the server, so Load more keeps working. Requires only the standard mail module.",
+    "version": "19.0.1.1.0",
+    "summary": "Badges above the chatter to show only discussions, emails, activities, notes or tracking messages.",
+    "description": "Adds a row of badges at the top of the chatter, under Send message, Log note and Activity: All, Discussions, Emails, Activities, Notes, Tracking and Other, each with its number of messages. A click shows only that kind of message, loaded from the server, so Load more keeps working. Requires only the standard mail module.",
     "author": "DUO-TEK Software Vietnam",
     "website": "https://duotek.io.vn",
     "support": "hello@duotek.io.vn",

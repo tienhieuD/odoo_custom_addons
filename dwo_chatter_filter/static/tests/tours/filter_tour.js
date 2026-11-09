@@ -41,13 +41,15 @@ registry.category("web_tour.tours").add("dwo_chatter_filter", {
         { trigger: ".o-dwo-messageFilter .o-dwo-filterLabel:contains('Filter by:')" },
         { trigger: `${badge("discussion")}.text-primary.border-primary` },
         { trigger: `${badge("email")}.text-info.border-info` },
+        { trigger: `${badge("activity")}.text-purple.border-purple` },
         { trigger: `${badge("note")}.text-warning.border-warning` },
         { trigger: `${badge("tracking")}.text-success.border-success` },
         { trigger: `${badge("other")}.text-danger.border-danger` },
         // the numbers
-        { trigger: `${badge("all")}.text-bg-dark:contains('5')` },
+        { trigger: `${badge("all")}.text-bg-dark:contains('6')` },
         { trigger: `${badge("discussion")}:contains('1')` },
         { trigger: `${badge("email")}:contains('1')` },
+        { trigger: `${badge("activity")}:contains('1')` },
         { trigger: `${badge("note")}:contains('1')` },
         { trigger: `${badge("tracking")}:contains('1')` },
         { trigger: `${badge("other")}:contains('1')` },
@@ -63,6 +65,11 @@ registry.category("web_tour.tours").add("dwo_chatter_filter", {
         { trigger: hidden("Talk about the order") },
         { trigger: hidden("Private reminder") },
         { trigger: hidden("Automatic message") },
+        // Activities: the message left by a done activity
+        { trigger: badge("activity"), run: "click" },
+        { trigger: `${badge("activity")}.text-bg-purple` },
+        { trigger: showing("Call done with the customer") },
+        { trigger: hidden("Private reminder") },
         // Notes
         { trigger: badge("note"), run: "click" },
         { trigger: showing("Private reminder") },

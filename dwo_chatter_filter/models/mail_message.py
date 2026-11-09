@@ -2,9 +2,10 @@
 from odoo import api, models
 from odoo.exceptions import AccessError, UserError
 from odoo.fields import Domain
+from odoo.addons.mail.tools.discuss import Store
 
 # Every message is in exactly one of them. The order is the order of the checks.
-CATEGORIES = ("tracking", "email", "note", "discussion", "other")
+CATEGORIES = ("tracking", "email", "activity", "note", "discussion", "other")
 
 
 class MailMessage(models.Model):
@@ -17,10 +18,11 @@ class MailMessage(models.Model):
 
         1. tracking    : it carries tracking values (a field changed)
         2. email       : an email received or sent (``email``, ``email_outgoing``)
-        3. note        : a comment with the subtype Note (Log note)
-        4. discussion  : a comment with the subtype Discussions (Send message, whoever receives it:
+        3. activity    : the message left when a planned activity is marked as done (subtype Activities)
+        4. note        : a comment with the subtype Note (Log note)
+        5. discussion  : a comment with the subtype Discussions (Send message, whoever receives it:
                          internal followers or customers linked to the record)
-        5. other       : everything else (automatic messages, notifications without tracking, custom
+        6. other       : everything else (automatic messages, notifications without tracking, custom
                          subtypes)
 
         The same rule is written in JavaScript (``dwoCategoryOf``): keep them equal.
@@ -34,19 +36,32 @@ class MailMessage(models.Model):
         tracking = Domain("id", "in", with_tracking)
         email = Domain("message_type", "in", ["email", "email_outgoing"]) & ~tracking
         comment = Domain("message_type", "=", "comment") & ~tracking
+        activity = Domain("subtype_id", "=", self.env.ref("mail.mt_activities").id) & ~tracking & ~email
         note = comment & Domain("subtype_id", "=", mt_note)
         discussion = comment & Domain("subtype_id", "=", mt_comment)
         if category == "tracking":
             return tracking
         if category == "email":
             return email
+        if category == "activity":
+            return activity
         if category == "note":
             return note
         if category == "discussion":
             return discussion
         if category == "other":
-            return ~(tracking | email | note | discussion)
+            return ~(tracking | email | activity | note | discussion)
         raise UserError(self.env._("Unknown kind of message: %s", category))
+
+    def _to_store_defaults(self, target):
+        # the browser sorts the messages by kind too (a message that arrives while a kind is chosen):
+        # it needs to know the ones left by a done activity, the store has no id for that subtype
+        return super()._to_store_defaults(target) + [
+            Store.Attr(
+                "dwo_is_activity",
+                value=lambda m: m.sudo().subtype_id.id == m.env.ref("mail.mt_activities").id,
+            )
+        ]
 
     @api.model
     def _message_fetch(self, domain, *, dwo_category=None, **kwargs):

@@ -19,8 +19,8 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Six badges</h4>
-                    <p class="mb-0" style="font-size: 14px;">All, Discussions, Emails, Notes, Tracking and Other, each with its own colour.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Seven badges</h4>
+                    <p class="mb-0" style="font-size: 14px;">All, Discussions, Emails, Activities, Notes, Tracking and Other, each with its own colour.</p>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The whole picture</h2>
     <p class="mb-4" style="font-size: 16px;">On a wide screen the chatter sits beside the record. <strong>Filter by:</strong> comes under the planned activities and above the messages. Each badge has its own colour and its count.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_1.png" alt="A record with its chatter on the right: the Filter by label and the badges All, Discussions, Emails, Notes, Tracking and Other, under the planned activities and above the messages" class="img-fluid rounded shadow"/>
+        <img src="screenshot_1.png" alt="A record with its chatter on the right: the Filter by label and the badges All, Discussions, Emails, Activities, Notes, Tracking and Other, under the planned activities and above the messages" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Discussions</h2>
@@ -84,16 +84,22 @@
         <img src="screenshot_3.png" alt="The chatter filtered on Emails" class="img-fluid rounded shadow"/>
     </div>
 
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Activities</h2>
+    <p class="mb-4" style="font-size: 16px;">The message Odoo leaves when a planned activity is marked as done, with its feedback.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_4.png" alt="The chatter filtered on Activities" class="img-fluid rounded shadow"/>
+    </div>
+
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Notes</h2>
     <p class="mb-4" style="font-size: 16px;">What people wrote with Log note.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_4.png" alt="The chatter filtered on Notes" class="img-fluid rounded shadow"/>
+        <img src="screenshot_5.png" alt="The chatter filtered on Notes" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Tracking</h2>
     <p class="mb-4" style="font-size: 16px;">Every change of a field, and nothing else.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_5.png" alt="The chatter filtered on Tracking" class="img-fluid rounded shadow"/>
+        <img src="screenshot_6.png" alt="The chatter filtered on Tracking" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
@@ -122,7 +128,7 @@
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Filter the messages</h4>
             <p class="mb-2" style="font-size: 14px;">Under <strong>Filter by:</strong>, click a badge to see that kind of message only. Click <strong>All</strong> to see everything again.</p>
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">What each badge holds</h4>
-            <p class="mb-2" style="font-size: 14px;"><strong>Discussions</strong>: Send message. <strong>Emails</strong>: emails received and sent. <strong>Notes</strong>: Log note. <strong>Tracking</strong>: changed fields. <strong>Other</strong>: automatic messages and the rest.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Discussions</strong>: Send message. <strong>Emails</strong>: emails received and sent. <strong>Activities</strong>: the message left by a done activity. <strong>Notes</strong>: Log note. <strong>Tracking</strong>: changed fields. <strong>Other</strong>: automatic messages and the rest.</p>
             <p class="text-muted mb-0" style="font-size: 14px;">A badge with no message is greyed out.</p>
         </div>
         <div class="tab-pane fade" id="dcf_limits" role="tabpanel">
@@ -148,6 +154,10 @@
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">In which badge is an email sent from the Email Composer?</h4>
         <p class="mb-0" style="font-size: 14px;">In Emails. It is an outgoing email, even though it has the subtype of a discussion.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does the Activities badge filter the planned activities?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It shows the messages left when an activity is marked as done. The planned activities stay in their own list above the badges.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Where are the changes of a field?</h4>

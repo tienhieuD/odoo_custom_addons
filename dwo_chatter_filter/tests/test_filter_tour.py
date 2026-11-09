@@ -22,6 +22,8 @@ class TestMessageFilterTour(HttpCase):
         cls.env["mail.tracking.value"].create({
             "field_id": cls.env["ir.model.fields"]._get("res.partner", "name").id,
             "mail_message_id": tracking.id, "old_value_char": "Old name", "new_value_char": "Name changed"})
+        Message.create(dict(base, body="<p>Call done with the customer</p>", message_type="notification",
+                            subtype_id=cls.env.ref("mail.mt_activities").id))
         Message.create(dict(base, body="<p>Automatic message</p>", message_type="auto_comment", subtype_id=mt_note.id))
 
     def test_filter_tour(self):

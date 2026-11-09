@@ -9,3 +9,10 @@
         &.o-dwo-filterEmpty { opacity: .45; cursor: default; }
     }
 }
+
+// Bootstrap has no purple among its contextual colours: the badge of the activities has the same three states
+.o-dwo-messageFilter {
+    .text-purple { color: #6f42c1 !important; }
+    .border-purple { border-color: #6f42c1 !important; }
+    .text-bg-purple { color: #fff !important; background-color: #6f42c1 !important; }
+}

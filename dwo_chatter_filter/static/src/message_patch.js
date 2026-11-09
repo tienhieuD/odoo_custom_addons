@@ -1,4 +1,5 @@
 import { Message } from "@mail/core/common/message_model";
+import { fields } from "@mail/core/common/record";
 import { patch } from "@web/core/utils/patch";
 
 /**
@@ -7,6 +8,7 @@ import { patch } from "@web/core/utils/patch";
  *
  *   tracking    a field changed (it carries tracking values)
  *   email       an email received or sent
+ *   activity    the message left by a done activity (subtype Activities)
  *   note        a comment with the subtype Note (Log note)
  *   discussion  a comment with the subtype Discussions (Send message)
  *   other       everything else
@@ -17,6 +19,9 @@ export function dwoCategoryOf(message) {
     }
     if (["email", "email_outgoing"].includes(message.message_type)) {
         return "email";
+    }
+    if (message.dwo_is_activity) {
+        return "activity";
     }
     if (message.message_type === "comment") {
         if (message.isNote) {
@@ -30,6 +35,12 @@ export function dwoCategoryOf(message) {
 }
 
 patch(Message.prototype, {
+    setup() {
+        super.setup(...arguments);
+        /** Sent by the server: the message was left by a done activity. */
+        this.dwo_is_activity = fields.Attr(false);
+    },
+
     get dwoCategory() {
         return dwoCategoryOf(this);
     },

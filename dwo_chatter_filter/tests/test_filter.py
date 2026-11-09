@@ -32,6 +32,9 @@ class TestMessageFilter(MailCommon):
         cls.env["mail.tracking.value"].create({
             "field_id": cls.env["ir.model.fields"]._get("res.partner", "name").id,
             "mail_message_id": cls.tracking.id, "old_value_char": "Old name", "new_value_char": "New name"})
+        # the message left by a done activity (its subtype is Activities)
+        cls.activity = Message.create(dict(
+            base, message_type="notification", subtype_id=cls.env.ref("mail.mt_activities").id))
         cls.auto = Message.create(dict(base, message_type="auto_comment", subtype_id=cls.mt_note.id))
         cls.system = Message.create(dict(base, message_type="notification", subtype_id=cls.mt_note.id))
         # another record: never counted
@@ -47,6 +50,7 @@ class TestMessageFilter(MailCommon):
         self.assertEqual(self._ids("note"), {self.note.id})
         self.assertEqual(self._ids("email"), {self.email_in.id, self.email_out.id})
         self.assertEqual(self._ids("tracking"), {self.tracking.id})
+        self.assertEqual(self._ids("activity"), {self.activity.id})
         self.assertEqual(self._ids("other"), {self.auto.id, self.system.id})
 
     def test_the_kinds_do_not_overlap_and_cover_everything(self):
@@ -63,16 +67,32 @@ class TestMessageFilter(MailCommon):
         self.assertIn(self.email_out.id, self._ids("email"))
         self.assertNotIn(self.email_out.id, self._ids("discussion"))
 
+    def test_a_done_activity_is_an_activity_unless_it_tracks_a_field(self):
+        self.assertIn(self.activity.id, self._ids("activity"))
+        self.assertNotIn(self.activity.id, self._ids("other"))
+        # tracking wins over the subtype, as everywhere else
+        self.env["mail.tracking.value"].create({
+            "field_id": self.env["ir.model.fields"]._get("res.partner", "name").id,
+            "mail_message_id": self.activity.id, "old_value_char": "A", "new_value_char": "B"})
+        self.assertIn(self.activity.id, self._ids("tracking"))
+        self.assertNotIn(self.activity.id, self._ids("activity"))
+
+    def test_the_store_tells_the_browser_which_message_is_an_activity(self):
+        from odoo.addons.mail.tools.discuss import Store
+        store = Store().add(self.activity | self.note).get_result()
+        flags = {m["id"]: m["dwo_is_activity"] for m in store["mail.message"]}
+        self.assertEqual(flags, {self.activity.id: True, self.note.id: False})
+
     def test_a_tracking_message_is_tracking_even_with_the_subtype_note(self):
         self.assertIn(self.tracking.id, self._ids("tracking"))
         self.assertNotIn(self.tracking.id, self._ids("note"))
 
     def test_counts(self):
         counts = self.env["mail.message"].with_user(self.user_employee).dwo_filter_counts("res.partner", self.record.id)
-        self.assertEqual(counts["all"], 8)
+        self.assertEqual(counts["all"], 9)
         self.assertEqual(
             {key: counts[key] for key in CATEGORIES},
-            {"tracking": 1, "email": 2, "note": 1, "discussion": 2, "other": 2})
+            {"tracking": 1, "email": 2, "activity": 1, "note": 1, "discussion": 2, "other": 2})
         self.assertEqual(sum(counts[key] for key in CATEGORIES), counts["all"])
 
     def test_fetch_by_kind_is_paginated_on_the_filtered_list(self):
@@ -91,7 +111,7 @@ class TestMessageFilter(MailCommon):
     def test_without_a_kind_the_fetch_is_the_core_one(self):
         Message = self.env["mail.message"].with_user(self.user_employee)
         res = Message._message_fetch(None, thread=self.record)
-        self.assertEqual(len(res["messages"]), 8)
+        self.assertEqual(len(res["messages"]), 9)
 
     def test_unknown_kind_is_refused(self):
         with self.assertRaises(UserError):
