@@ -243,6 +243,17 @@ registry.category("web_tour.tours").add("dwo_mail_compose_template", {
         // block) and the signature is still under it
         { trigger: `${EDITOR} > :first-child:contains('Dear DWO Mail Tour Partner')` },
         { trigger: `${EDITOR}:contains('Tour signature')` },
+        // the editor is made again when a template is chosen: the old one must not stay in the page
+        {
+            trigger: ".o-dwo-editorBox",
+            async run() {
+                await new Promise((resolve) => setTimeout(resolve, 500));
+                const count = this.$anchor[0].querySelectorAll(".note-editable").length;
+                if (count !== 1) {
+                    throw new Error(`The form holds ${count} editors, one expected`);
+                }
+            },
+        },
         // removing a file asks first
         { trigger: ".o-dwo-attachment:contains('terms.txt') .o-dwo-attachmentRemove", run: "click" },
         { trigger: ".modal .modal-footer button:contains('Cancel')", run: "click" },

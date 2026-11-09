@@ -329,11 +329,37 @@ export class DwoEmailComposer extends Component {
         this.Wysiwyg = module.Wysiwyg;
     }
 
+    /**
+     * The editor of web_editor builds its editable and its helpers itself, next to the component, so Owl does
+     * not remove them when the component is replaced (a new template, a new email, an email chosen in the
+     * list): the old editable stayed in the page under the new one. Whatever is not the current editor's
+     * is removed.
+     */
+    removeStaleEditor(wysiwyg) {
+        const current = wysiwyg.$editable[0];
+        const box = current.closest(".o-dwo-editorBox");
+        if (!box) {
+            return;
+        }
+        for (const editable of box.querySelectorAll(".note-editable")) {
+            if (editable !== current) {
+                editable.remove();
+            }
+        }
+        // the containers of the table menus of an editor that is gone are empty
+        for (const container of box.querySelectorAll(".o_table_ui_container")) {
+            if (!container.children.length) {
+                container.remove();
+            }
+        }
+    }
+
     /** Called by the Wysiwyg once it is mounted: it starts the editor and gives the adapter below. */
     async onStartWysiwyg(wysiwyg) {
         await wysiwyg.startEdition();
         wysiwyg.odooEditor.addEventListener("historyStep", () => this.onEditorChange());
         wysiwyg.$editable[0].classList.add("o-dwo-editor", "p-2");
+        this.removeStaleEditor(wysiwyg);
         // the few things the form needs from an editor, as the html_editor of 18 offers them
         this.editor = {
             wysiwyg,
