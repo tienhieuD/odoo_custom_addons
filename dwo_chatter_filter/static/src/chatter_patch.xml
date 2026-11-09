@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Chatter" t-inherit-mode="extension">
+        <!-- Under the planned activities (and the files), above the messages. Put before the search
+             result, not before the Thread: those two are a t-if / t-else pair. -->
+        <xpath expr="//SearchMessageResult" position="before">
+            <DwoMessageFilter t-if="state.thread.id and !messageSearch.searching and !messageSearch.searched" thread="state.thread"/>
+        </xpath>
+    </t>
+</templates>
