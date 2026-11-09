@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Message" t-inherit-mode="extension" owl="1">
+        <xpath expr="//small[hasclass('o_Message_headerDate')]" position="before">
+            <span t-if="messageView.message.isDwoEmail" class="o-dwo-emailBadge badge rounded-pill text-bg-primary me-1 align-self-center">Email</span>
+        </xpath>
+        <xpath expr="//div[hasclass('o_Message_header')]" position="after">
+            <div t-if="messageView.message.isDwoEmail and messageView.message.dwoMetaLines.length" class="o-dwo-emailMeta smaller text-muted mb-1 text-break">
+                <div t-foreach="messageView.message.dwoMetaLines" t-as="line" t-key="line.label">
+                    <b t-esc="line.label + ':'"/> <span t-esc="line.text"/>
+                </div>
+            </div>
+            <!-- Reply, Reply all and Forward: their own row under From/To/Cc -->
+            <div t-if="messageView.message.isDwoEmail and messageView.message.originThread" class="o-dwo-emailActions d-flex flex-wrap gap-1 mb-2">
+                <button type="button" class="o-dwo-replyBtn btn btn-sm btn-outline-secondary" data-tooltip="Reply to the sender only"
+                        t-on-click="() => messageView.message.dwoOpenEmail('reply_sender')"><i class="fa fa-reply"/> Reply</button>
+                <button type="button" class="o-dwo-replyAllBtn btn btn-sm btn-outline-secondary" data-tooltip="Reply to the sender and everyone in To and Cc"
+                        t-on-click="() => messageView.message.dwoOpenEmail('reply')"><i class="fa fa-reply-all"/> Reply all</button>
+                <button type="button" class="o-dwo-forwardBtn btn btn-sm btn-outline-secondary" data-tooltip="Forward this email to other people"
+                        t-on-click="() => messageView.message.dwoOpenEmail('forward')"><i class="fa fa-share"/> Forward</button>
+            </div>
+        </xpath>
+    </t>
+</templates>

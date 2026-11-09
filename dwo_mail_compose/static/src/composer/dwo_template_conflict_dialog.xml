@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.TemplateConflictDialog" owl="1">
+        <Dialog title="'Replace what you are writing?'" size="'md'">
+            <p>The subject or the message already contains your own text. What should the template do?</p>
+            <ul class="mb-0">
+                <li><b>Overwrite</b>: the template replaces the subject and the message.</li>
+                <li><b>Add after my text</b>: your message stays and the template text is added after it. Your subject is kept.</li>
+                <li><b>Cancel</b>: nothing changes.</li>
+            </ul>
+            <t t-set-slot="footer">
+                <button type="button" class="btn btn-primary" t-on-click="overwrite">Overwrite</button>
+                <button type="button" class="btn btn-secondary" t-on-click="append">Add after my text</button>
+                <button type="button" class="btn btn-link" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>
