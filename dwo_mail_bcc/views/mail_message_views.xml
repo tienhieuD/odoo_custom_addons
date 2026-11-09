@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_message_view_form_dwo_bcc" model="ir.ui.view">
+        <field name="name">mail.message.form.dwo.bcc</field>
+        <field name="model">mail.message</field>
+        <field name="inherit_id" ref="mail.mail_message_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Odoo 18 has no incoming_email_cc on the form: the Cc and the Bcc go under the notified partners -->
+            <xpath expr="//field[@name='notified_partner_ids']" position="before">
+                <field name="outgoing_email_cc" groups="base.group_user"/>
+                <field name="outgoing_email_bcc" groups="base.group_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
