@@ -17,12 +17,14 @@
     .text-bg-purple { color: #fff !important; background-color: #6f42c1 !important; }
 }
 
-// This version of Bootstrap has no text-bg-* helpers: the chosen badge is filled with its colour here
+// This version has no --bs-primary, --bs-info... variables (they come with Bootstrap 5.2+): a rule built on
+// them is dropped by the browser and the chosen badge keeps its white text on no background at all. The
+// colours come from the SCSS variables of the theme, which exist when the file is compiled.
 .o-dwo-messageFilter {
-    .text-bg-primary { color: #fff !important; background-color: var(--bs-primary) !important; }
-    .text-bg-info { color: #000 !important; background-color: var(--bs-info) !important; }
-    .text-bg-warning { color: #000 !important; background-color: var(--bs-warning) !important; }
-    .text-bg-success { color: #fff !important; background-color: var(--bs-success) !important; }
-    .text-bg-danger { color: #fff !important; background-color: var(--bs-danger) !important; }
-    .text-bg-dark { color: #fff !important; background-color: var(--bs-dark) !important; }
+    .text-bg-primary { color: #fff !important; background-color: $primary !important; }
+    .text-bg-info { color: #000 !important; background-color: $info !important; }
+    .text-bg-warning { color: #000 !important; background-color: $warning !important; }
+    .text-bg-success { color: #fff !important; background-color: $success !important; }
+    .text-bg-danger { color: #fff !important; background-color: $danger !important; }
+    .text-bg-dark { color: #fff !important; background-color: $dark !important; }
 }
