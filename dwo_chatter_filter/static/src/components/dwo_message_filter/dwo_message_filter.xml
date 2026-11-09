@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_chatter_filter.MessageFilter" owl="1">
+        <!-- Owl 1: a component always has a root node, hidden while there are no numbers -->
+        <div class="o-dwo-messageFilter d-flex flex-wrap align-items-center px-3 py-2 d-print-none" t-att-class="{ 'd-none': !state.counts }">
+            <span class="o-dwo-filterLabel text-muted mr-1">Filter by:</span>
+            <t t-foreach="items" t-as="item" t-key="item.label">
+                <button type="button"
+                        class="o-dwo-filterBadge badge badge-pill border d-inline-flex align-items-center font-weight-normal mr-1 mb-1"
+                        t-att-class="{
+                            ['text-bg-' + item.color + ' border-' + item.color]: isActive(item),
+                            ['bg-transparent text-' + item.color + ' border-' + item.color]: !isActive(item),
+                            'o-dwo-filterEmpty': item.count === 0 and item.id,
+                        }"
+                        t-att-data-kind="item.id or 'all'"
+                        t-att-disabled="item.count === 0 and item.id and !isActive(item)"
+                        t-on-click="onClickBadge">
+                    <span t-esc="item.label"/>
+                    <span class="o-dwo-filterCount font-weight-bold ml-1" t-esc="item.count"/>
+                </button>
+            </t>
+        </div>
+    </t>
+</templates>
