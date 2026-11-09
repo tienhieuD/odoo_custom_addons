@@ -35,7 +35,7 @@ class DwoModelConcurrency(models.Model):
     # the watched fields must not hit the database each time
     # ------------------------------------------------------------------
     @api.model
-    @tools.ormcache('model_name')
+    @api.ormcache('model_name')
     def _get_watched_field_names(self, model_name):
         configs = self.sudo().with_context(active_test=True).search([('model', '=', model_name)])
         return tuple(sorted(set(configs.field_ids.mapped('name'))))
