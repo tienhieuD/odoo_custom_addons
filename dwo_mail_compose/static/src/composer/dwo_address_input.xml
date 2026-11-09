@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.AddressInput">
+        <div class="o-dwo-addressInput position-relative d-flex flex-wrap align-items-center gap-1 border rounded px-2 py-1" t-att-class="{ 'o-dwo-invalid': state.invalid }" t-on-click="onBoxClick">
+            <!-- A long address is cut with "..." inside the chip, so the chips never push Cc and Bcc
+                 out of the row; the tooltip shows the whole address -->
+            <t t-foreach="props.value" t-as="address" t-key="address.email">
+                <!-- the chip being edited is an input in its place; Enter or leaving saves, Esc cancels -->
+                <input t-if="state.editing and state.editing.email === address.email" t-ref="edit" type="text"
+                       class="o-dwo-chipEdit form-control form-control-sm rounded-pill"
+                       t-att-class="{ 'is-invalid': state.editing.invalid }"
+                       style="width:16rem;max-width:100%;" autocomplete="off"
+                       t-att-value="state.editing.text"
+                       t-on-input="onEditInput" t-on-keydown="onEditKeydown" t-on-blur="onEditBlur"/>
+                <span t-else=""
+                      class="o-dwo-chip badge rounded-pill text-bg-light border d-inline-flex align-items-center gap-1 fw-normal"
+                      role="button"
+                      t-att-data-email="address.email"
+                      t-att-data-tooltip="address.name ? address.name + ' &lt;' + address.email + '&gt;' : address.email"
+                      t-on-click.stop="() => this.startEdit(address)">
+                    <span class="o-dwo-chipText text-truncate" t-out="address.name || address.email"/>
+                    <small t-if="address.name" class="o-dwo-chipEmail opacity-75 text-truncate" t-out="address.email"/>
+                    <small t-if="address.isNew" class="o-dwo-chipNew text-info flex-shrink-0">new</small>
+                    <button type="button" class="btn-close ms-1 flex-shrink-0" style="width:.5rem;height:.5rem;" t-att-aria-label="'Remove ' + address.email" t-att-title="'Remove ' + address.email" t-on-click.stop="() => this.remove(address)"/>
+                </span>
+            </t>
+            <input t-att-id="props.id" t-ref="input" type="text" class="o-dwo-addressText border-0 flex-grow-1 bg-transparent"
+                   style="min-width:140px;outline:none;"
+                   autocomplete="off"
+                   t-att-placeholder="props.value.length ? '' : props.placeholder"
+                   t-att-value="state.text"
+                   t-on-input="onInput" t-on-keydown="onKeydown" t-on-focus="onFocus" t-on-click="onClick" t-on-blur="onBlur" t-on-paste="onPaste"/>
+            <div t-if="state.suggestions.length" class="o-dwo-suggestions dropdown-menu show w-100 start-0 mt-1" style="top:100%;max-height:240px;overflow:auto;">
+                <t t-foreach="state.suggestions" t-as="s" t-key="s.email">
+                    <button type="button" class="dropdown-item d-flex justify-content-between gap-2" t-att-class="{ active: s_index === state.active }"
+                            t-on-mousedown.prevent="() => this.pick(s)">
+                        <span class="text-truncate"><t t-out="s.name"/> <small class="opacity-75" t-out="s.email"/></span>
+                        <small class="opacity-75" t-out="s.source"/>
+                    </button>
+                </t>
+            </div>
+        </div>
+        <small t-if="state.invalid or state.editing?.invalid" class="text-danger">This is not a valid email address.</small>
+    </t>
+</templates>

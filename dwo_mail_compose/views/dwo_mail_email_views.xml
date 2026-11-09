@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dwo_mail_email_view_form" model="ir.ui.view">
+        <field name="name">dwo.mail.email.form</field>
+        <field name="model">dwo.mail.email</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_open_approve" type="object" string="Approve and send" class="btn-primary"
+                            invisible="state != 'pending' or not is_approver"/>
+                    <button name="action_open_reject" type="object" string="Reject"
+                            invisible="state != 'pending' or not is_approver"/>
+                    <button name="action_open_reassign" type="object" string="Reassign"
+                            invisible="state != 'pending' or not is_approver"/>
+                    <button name="action_open_record" type="object" string="Open the record" icon="fa-external-link"
+                            invisible="not can_open_record"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,pending,rejected,sent"/>
+                </header>
+                <sheet>
+                    <field name="is_author" invisible="1"/>
+                    <field name="is_approver" invisible="1"/>
+                    <field name="can_open_record" invisible="1"/>
+                    <div class="alert alert-warning" role="alert" invisible="not edited_after_request or state != 'pending'">
+                        The author changed this email after asking for approval. What you see is the current content.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="display_name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id" string="Author"/>
+                            <field name="record_name" string="About"/>
+                            <field name="email_from" string="From"/>
+                            <field name="to_display" string="To"/>
+                            <field name="cc_display" string="Cc" invisible="not cc_display"/>
+                            <field name="bcc_display" string="Bcc" invisible="not bcc_display"/>
+                            <field name="reply_to" invisible="not reply_to_custom"/>
+                            <field name="attachments_summary" string="Files" invisible="not attachments_summary"/>
+                        </group>
+                        <group>
+                            <field name="approver_ids" widget="many2many_tags" string="Approvers"/>
+                            <field name="request_date" invisible="not request_date"/>
+                            <field name="request_comment" invisible="not request_comment"/>
+                            <field name="decided_by_id" invisible="not decided_by_id"/>
+                            <field name="decision_date" invisible="not decision_date"/>
+                            <field name="decision_comment" invisible="not decision_comment"/>
+                            <field name="edited_after_request" invisible="1"/>
+                            <field name="reply_to_custom" invisible="1"/>
+                        </group>
+                    </group>
+                    <separator string="Message"/>
+                    <field name="body" widget="html" readonly="1" options="{'sandboxedPreview': false}"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="dwo_mail_email_view_list" model="ir.ui.view">
+        <field name="name">dwo.mail.email.list</field>
+        <field name="model">dwo.mail.email</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0" decoration-info="state == 'pending'" decoration-danger="state == 'rejected'"
+                  decoration-muted="state == 'sent'">
+                <field name="display_name" string="Subject"/>
+                <field name="user_id" string="Author"/>
+                <field name="record_name" string="About"/>
+                <field name="approver_ids" widget="many2many_tags"/>
+                <field name="state" widget="badge"/>
+                <field name="last_action_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="dwo_mail_email_view_search" model="ir.ui.view">
+        <field name="name">dwo.mail.email.search</field>
+        <field name="model">dwo.mail.email</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="subject"/>
+                <field name="user_id" string="Author"/>
+                <filter name="to_approve" string="To approve by me"
+                        domain="[('state', '=', 'pending'), ('approver_ids', 'in', [uid])]"/>
+                <filter name="mine" string="My emails" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="pending" string="Waiting for approval" domain="[('state', '=', 'pending')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter name="sent" string="Approved and sent" domain="[('state', '=', 'sent')]"/>
+                <group>
+                    <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="group_author" string="Author" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="dwo_mail_email_action" model="ir.actions.act_window">
+        <field name="name">Email Approvals</field>
+        <field name="res_model">dwo.mail.email</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_to_approve': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No email is waiting for your approval</p>
+            <p>When someone asks you to approve and send an email, it appears here and in your activities.</p>
+        </field>
+    </record>
+
+    <menuitem id="dwo_mail_email_menu"
+              name="Email Approvals"
+              parent="mail.menu_root_discuss"
+              action="dwo_mail_email_action"
+              groups="base.group_user"
+              sequence="4"/>
+
+    <!-- Decision popup: approve, reject or reassign. The comment is never required. -->
+    <record id="dwo_mail_decision_view_form" model="ir.ui.view">
+        <field name="name">dwo.mail.decision.form</field>
+        <field name="model">dwo.mail.decision</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="email_id" invisible="1"/>
+                <field name="decision" invisible="1"/>
+                <group>
+                    <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"
+                           invisible="decision != 'reassign'" required="decision == 'reassign'"
+                           placeholder="Who takes over the approval?"/>
+                    <field name="comment" placeholder="A comment, saved on the email (optional)"/>
+                </group>
+                <footer>
+                    <button string="Confirm" type="object" name="action_confirm" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
