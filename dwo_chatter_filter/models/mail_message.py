@@ -64,7 +64,7 @@ class MailMessage(models.Model):
         tracking = self.env["mail.tracking.value"].sudo()
         if res_model and res_id:
             values = tracking.search([("mail_message_id.model", "=", res_model), ("mail_message_id.res_id", "=", res_id)])
-            return values.mail_message_id.ids
+            return values.mapped("mail_message_id").ids
         self.env.cr.execute("SELECT DISTINCT mail_message_id FROM mail_tracking_value WHERE mail_message_id IS NOT NULL")
         return [row[0] for row in self.env.cr.fetchall()]
 
