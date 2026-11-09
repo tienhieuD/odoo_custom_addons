@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- The badges at the top of the chatter. Odoo 12: a widget template (the chatter is not made of Owl components) -->
+    <t t-name="dwo_chatter_filter.MessageFilter">
+        <span class="o-dwo-filterLabel text-muted mr-1">Filter by:</span>
+        <t t-foreach="items" t-as="item">
+            <button type="button"
+                    t-attf-class="o-dwo-filterBadge badge badge-pill border d-inline-flex align-items-center font-weight-normal mr-1 mb-1 #{item.active ? ('text-bg-' + item.color + ' border-' + item.color) : ('bg-transparent text-' + item.color + ' border-' + item.color)} #{(!item.active and item.count === 0 and item.id) ? 'o-dwo-filterEmpty' : ''}"
+                    t-att-data-kind="item.id or 'all'"
+                    t-att-disabled="(item.count === 0 and item.id and !item.active) ? 'disabled' : undefined">
+                <span><t t-esc="item.label"/></span>
+                <span class="o-dwo-filterCount font-weight-bold ml-1"><t t-esc="item.count"/></span>
+            </button>
+        </t>
+    </t>
+</templates>
