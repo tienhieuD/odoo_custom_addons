@@ -1,0 +1,28 @@
+.o-dwo-messageFilter {
+    font-size: .75rem;
+    .o-dwo-filterLabel { font-size: .75rem; }
+    .o-dwo-filterBadge {
+        cursor: pointer;
+        font-size: .7rem;
+        padding: .25rem .55rem;
+        line-height: 1.2;
+        &.o-dwo-filterEmpty { opacity: .45; cursor: default; }
+    }
+}
+
+// Bootstrap has no purple among its contextual colours: the badge of the activities has the same three states
+.o-dwo-messageFilter {
+    .text-purple { color: #6f42c1 !important; }
+    .border-purple { border-color: #6f42c1 !important; }
+    .text-bg-purple { color: #fff !important; background-color: #6f42c1 !important; }
+}
+
+// This version of Bootstrap has no text-bg-* helpers: the chosen badge is filled with its colour here
+.o-dwo-messageFilter {
+    .text-bg-primary { color: #fff !important; background-color: var(--bs-primary) !important; }
+    .text-bg-info { color: #000 !important; background-color: var(--bs-info) !important; }
+    .text-bg-warning { color: #000 !important; background-color: var(--bs-warning) !important; }
+    .text-bg-success { color: #fff !important; background-color: var(--bs-success) !important; }
+    .text-bg-danger { color: #fff !important; background-color: var(--bs-danger) !important; }
+    .text-bg-dark { color: #fff !important; background-color: var(--bs-dark) !important; }
+}

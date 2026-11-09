@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Chatter" t-inherit-mode="extension">
+        <!-- Under the planned activities and the files, above the messages. -->
+        <xpath expr="//t[@t-if='props.hasMessageList']" position="before">
+            <DwoMessageFilter t-if="state.thread.id and !state.isSearchOpen" thread="state.thread"/>
+        </xpath>
+    </t>
+</templates>
