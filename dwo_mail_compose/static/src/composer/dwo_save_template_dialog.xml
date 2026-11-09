@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.SaveTemplateDialog">
+        <Dialog title="'Save as Template'" size="'md'">
+            <p class="text-muted">The subject, the message (without the quoted email) and the files become a template for this kind of record. It belongs to you.</p>
+            <label class="form-label" for="dwo_template_name">Template name</label>
+            <input id="dwo_template_name" t-ref="this.inputRef" type="text" class="form-control" placeholder="e.g. Quote follow-up" t-model.proxy="this.state.name" t-on-keydown="this.onKeydown"/>
+            <t t-set-slot="footer">
+                <button type="button" class="btn btn-primary" t-att-disabled="!this.state.name.trim() or this.state.saving" t-on-click="this.save">Save</button>
+                <button type="button" class="btn btn-link" t-on-click="this.props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

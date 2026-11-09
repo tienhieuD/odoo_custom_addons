@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- One activity per approver. It is marked done as soon as the email is approved, rejected
+         or sent directly by its author. -->
+    <record id="mail_activity_type_email_approval" model="mail.activity.type">
+        <field name="name">Email approval</field>
+        <field name="icon">mail</field>
+        <field name="res_model">dwo.mail.email</field>
+        <field name="delay_count">0</field>
+        <field name="sequence">100</field>
+    </record>
+</odoo>

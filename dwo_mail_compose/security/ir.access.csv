@@ -1,0 +1,8 @@
+id,name,model_id,group_id/id,operation,domain
+access_dwo_mail_address_user,dwo.mail.address user,dwo.mail.address,base.group_user,cru,
+access_dwo_mail_address_admin,dwo.mail.address admin,dwo.mail.address,base.group_system,crud,
+dwo_mail_address_company_rule,Email address book: multi-company,dwo.mail.address,,crud,"[('company_id', 'in', company_ids)]"
+access_dwo_mail_email_read,Email: author and approvers read,dwo.mail.email,base.group_user,r,"['|', '|', ('user_id', '=', user.id), ('approver_ids', 'in', [user.id]), ('approver_history_ids', 'in', [user.id])]"
+access_dwo_mail_email_author,Email: only the author writes,dwo.mail.email,base.group_user,cud,"[('user_id', '=', user.id)]"
+access_dwo_mail_email_admin,Email: administrators see all,dwo.mail.email,base.group_system,crud,"[(1, '=', 1)]"
+access_dwo_mail_decision_user,dwo.mail.decision user,dwo.mail.decision,base.group_user,crud,

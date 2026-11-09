@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.TemplateDropdown">
+        <Dropdown onOpened="() => this.fetchTemplates()" menuClass="'o-dwo-templateMenu d-flex flex-column'">
+            <button type="button" class="o-dwo-templateBtn btn btn-sm btn-light" data-tooltip="Fill the email from a template, computed for this record. Only the templates made for this kind of record are listed.">
+                <i data-icon="description" class="oi"/> Template
+            </button>
+            <t t-set-slot="content">
+                <div class="px-3 pb-1 text-muted">Select a Template</div>
+                <div t-if="this.state.templates.length > 0" class="overflow-y-auto" style="max-height: 40vh;">
+                    <t t-foreach="this.state.templates" t-as="template" t-key="template.id">
+                        <DropdownItem class="'text-truncate px-3'" onSelected="() => this.props.onPick(template)">
+                            <t t-if="template.display_name" t-out="template.display_name"/>
+                            <span t-else="" class="fst-italic">Untitled</span>
+                        </DropdownItem>
+                    </t>
+                    <DropdownItem t-if="this.state.templates.length >= this.limit" class="'px-3'" onSelected="() => this.searchMore()">
+                        <a href="#">Search More...</a>
+                    </DropdownItem>
+                </div>
+                <div t-else="" class="fst-italic px-3">No saved templates</div>
+                <div class="dropdown-divider"/>
+                <DropdownItem class="'o-dwo-saveTemplate px-3'" onSelected="() => this.props.onSave()">Save as Template</DropdownItem>
+                <div class="dropdown-divider"/>
+                <a href="#" class="px-3" t-on-click="() => this.manage()">Manage Templates</a>
+            </t>
+        </Dropdown>
+    </t>
+</templates>
