@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.EmailComposer">
+        <div class="o-dwo-emailComposer d-flex flex-column gap-3">
+          <div class="o-dwo-formBox bg-view border rounded p-2 d-flex flex-column gap-2">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <span class="d-flex align-items-center gap-2" style="min-width:0;">
+                    <strong class="o-dwo-title text-truncate" t-att-title="title" t-out="title"/>
+                    <span t-if="state.emailId" class="o-dwo-stateBadge badge rounded-pill" t-att-class="{
+                        'text-bg-secondary': state.emailState === 'draft',
+                        'text-bg-info': state.emailState === 'pending',
+                        'text-bg-danger': state.emailState === 'rejected',
+                        'text-bg-success': state.emailState === 'sent',
+                    }" t-out="stateLabel"/>
+                </span>
+                <button type="button" class="o-dwo-closeBtn btn btn-sm btn-light" aria-label="Close" data-tooltip="Close the form. Your draft is kept and comes back when you open it again." t-on-click="onClose"><i class="fa fa-times"/></button>
+            </div>
+            <div t-if="state.loading" class="text-muted p-3 text-center"><i class="fa fa-circle-o-notch fa-spin"/> Loading</div>
+            <t t-else="">
+                <div t-if="state.newerEmail" class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-2 py-1 px-2 mb-0">
+                    <span>A new email from <b t-out="state.newerEmail.from"/> arrived on <t t-out="state.newerEmail.date"/>, after you saved this draft.</span>
+                    <span>
+                        <button type="button" class="btn btn-sm btn-warning" data-tooltip="Replace this draft with the default reply to the newest email. Your changes are lost." t-on-click="onApplyDefaults">Apply defaults again</button>
+                        <button type="button" class="btn btn-sm btn-link" t-on-click="onDismissBanner">Dismiss</button>
+                    </span>
+                </div>
+
+                <div t-if="state.emailState === 'sent'" class="o-dwo-sentNote alert alert-success d-flex flex-wrap justify-content-between align-items-center gap-2 py-1 px-2 mb-0">
+                    <span>This email was approved<t t-if="state.decidedBy"> by <b t-out="state.decidedBy"/></t> and sent. It cannot be changed anymore.</span>
+                    <button type="button" class="btn btn-sm btn-success" t-on-click="onNewEmail">Start a new email</button>
+                </div>
+                <div t-if="state.emailState === 'pending'" class="o-dwo-pendingNote alert alert-info py-1 px-2 mb-0">
+                    Waiting for the approval of <b t-out="approverNames"/>. Anyone of them can approve. You can keep editing; the approver sees the content as it is when they decide.
+                    <div t-if="state.requestComment" class="fst-italic" t-out="state.requestComment"/>
+                </div>
+                <div t-if="state.emailState === 'rejected'" class="o-dwo-rejectedNote alert alert-danger py-1 px-2 mb-0">
+                    Rejected<t t-if="state.decidedBy"> by <b t-out="state.decidedBy"/></t>. Edit it and ask again, or send it now.
+                    <div t-if="state.decisionComment" class="fst-italic" t-out="state.decisionComment"/>
+                </div>
+
+                <div class="o-dwo-row">
+                    <label class="o-dwo-label" for="dwo_from">
+                        <span>From</span><span class="o-dwo-required">*</span>
+                        <i class="fa fa-info-circle o-dwo-info" data-tooltip="The address the email is sent from. Only the addresses you are allowed to use are listed."/>
+                    </label>
+                    <div class="flex-grow-1" data-field="from">
+                        <AutoComplete id="'dwo_from'" t-key="state.fromKey" value="fromLabel" sources="fromSources" onSelect.bind="onFromSelect" onChange.bind="onFromTyped" placeholder="'Choose a sender...'"/>
+                    </div>
+                </div>
+
+                <div class="o-dwo-row">
+                    <label class="o-dwo-label" for="dwo_to">
+                        <span>To</span><span class="o-dwo-required">*</span>
+                        <i class="fa fa-info-circle o-dwo-info" data-tooltip="Main recipients. Everyone in To and Cc sees who else received the email."/>
+                    </label>
+                    <div class="flex-grow-1" data-field="to">
+                        <DwoAddressInput id="'dwo_to'" value="state.to" placeholder="'Type a name or an email, then press Enter or comma'" onChange="(v) => this.onFieldChange('to', v)"/>
+                    </div>
+                    <div class="o-dwo-ccbcc d-flex gap-2 pt-1">
+                        <button t-if="!state.showCc" type="button" class="o-dwo-ccBtn btn btn-link btn-sm p-0" data-tooltip="Carbon copy: people who are kept informed. Their addresses are visible to all recipients." t-on-click="showCcField">Cc</button>
+                        <button t-if="!state.showBcc" type="button" class="o-dwo-bccBtn btn btn-link btn-sm p-0" data-tooltip="Blind carbon copy: receives the email, but the other recipients never see these addresses." t-on-click="showBccField">Bcc</button>
+                    </div>
+                </div>
+
+                <div t-if="state.showCc" class="o-dwo-row">
+                    <label class="o-dwo-label" for="dwo_cc">
+                        <span>Cc</span>
+                        <i class="fa fa-info-circle o-dwo-info" data-tooltip="Carbon copy: people who are kept informed. Their addresses are visible to all recipients."/>
+                    </label>
+                    <div class="flex-grow-1" data-field="cc">
+                        <DwoAddressInput id="'dwo_cc'" value="state.cc" placeholder="'People to keep informed (visible to everyone)'" onChange="(v) => this.onFieldChange('cc', v)"/>
+                    </div>
+                </div>
+
+                <div t-if="state.showBcc" class="o-dwo-row">
+                    <label class="o-dwo-label" for="dwo_bcc">
+                        <span>Bcc</span>
+                        <i class="fa fa-info-circle o-dwo-info" data-tooltip="Blind carbon copy: receives the email, but the other recipients never see these addresses."/>
+                    </label>
+                    <div class="flex-grow-1" data-field="bcc">
+                        <DwoAddressInput id="'dwo_bcc'" value="state.bcc" placeholder="'Hidden recipients (nobody else sees them)'" onChange="(v) => this.onFieldChange('bcc', v)"/>
+                    </div>
+                </div>
+
+                <div class="o-dwo-row">
+                    <label class="o-dwo-label" for="dwo_subject">
+                        <span>Subject</span>
+                        <i class="fa fa-info-circle o-dwo-info" data-tooltip="RE: or FW: is added for you and is never repeated."/>
+                    </label>
+                    <input id="dwo_subject" type="text" class="form-control form-control-sm" placeholder="What is this email about?" t-att-value="state.subject" t-on-input="(ev) => this.onFieldChange('subject', ev.target.value)"/>
+                </div>
+
+                <div t-if="state.showReplyTo" class="o-dwo-row" data-field="reply_to">
+                    <label class="o-dwo-label" for="dwo_replyto">
+                        <span>Reply-To</span>
+                        <i class="fa fa-info-circle o-dwo-info" data-tooltip="Where the answers of your recipients go. By default this is the address Odoo uses for the record (in CRM, the address of the sales team), so the answer comes back to this record."/>
+                    </label>
+                    <div class="flex-grow-1 d-flex align-items-center gap-2">
+                        <input id="dwo_replyto" type="text" class="form-control form-control-sm" t-att-class="{ 'text-muted': !state.replyToCustom }" placeholder="Where the answers go" t-att-value="state.replyTo" t-on-input="onReplyToInput" t-on-change="refreshReplyTo"/>
+                        <i t-if="state.replyToCustom and !state.replyToManaged" class="o-dwo-replyToWarning fa fa-exclamation-triangle text-warning" data-tooltip="Odoo may not receive this address. If it does not, the answers could go to that mailbox and might not come back to this record."/>
+                        <button t-if="state.replyToCustom" type="button" class="o-dwo-replyToReset btn btn-link btn-sm p-0 text-nowrap" data-tooltip="Go back to the address Odoo uses for this record" t-on-click="resetReplyTo">Use the default</button>
+                        <button t-else="" type="button" class="btn btn-link btn-sm p-0 text-muted" aria-label="Hide" data-tooltip="Hide this field" t-on-click="hideReplyTo"><i class="fa fa-times"/></button>
+                    </div>
+                </div>
+
+                <div class="o-dwo-editorBox border rounded position-relative" t-att-class="{ 'o-dwo-expanded bg-view': state.expanded }">
+                    <div t-if="state.expanded" class="o-dwo-expandedBar d-flex justify-content-between align-items-center border-bottom px-3 py-2">
+                        <strong><t t-out="state.subject or 'New email'"/></strong>
+                        <button type="button" class="o-dwo-collapseBtn btn btn-sm btn-primary" data-tooltip="Back to the form (Esc)" t-on-click="toggleExpanded"><i class="fa fa-compress"/> Back to the form</button>
+                    </div>
+                    <button t-else="" type="button" class="o-dwo-expandBtn btn btn-sm btn-light position-absolute" aria-label="Expand" data-tooltip="Edit the message on the whole screen" t-on-click="toggleExpanded"><i class="fa fa-expand"/></button>
+                    <t t-component="Wysiwyg" options="editorConfig" startWysiwyg.bind="onStartWysiwyg" t-key="state.editorKey"/>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <label class="o-dwo-attachBtn btn btn-sm btn-light mb-0" data-tooltip="Attach files from your computer.">
+                        <i t-if="state.uploading" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-paperclip"/> Attach
+                        <input type="file" multiple="multiple" class="d-none" t-on-change="onFilesSelected"/>
+                    </label>
+                    <DwoTemplateDropdown t-key="state.templateDropdownKey" model="model" onPick.bind="onTemplatePicked" onSave.bind="onSaveTemplate"/>
+                    <Dropdown menuClass="'o-dwo-advancedMenu'" togglerClass="'o-dwo-advancedBtn btn btn-sm btn-light'" tooltip="'More settings of the email.'">
+            <t t-set-slot="toggler">
+                            <i class="fa fa-sliders"/> Advanced
+                        </t>
+                            <div class="px-3 pb-1 text-muted">Add a field to the email</div>
+                            <DropdownItem class="'o-dwo-addReplyTo px-3'" onSelected="() => this.addReplyTo()">
+                                Reply to <span class="text-muted">(default: <t t-out="state.replyToDefault || '...'"/>)</span>
+                                <i t-if="state.showReplyTo" class="fa fa-check ms-2 text-success"/>
+                            </DropdownItem>
+                        
+                    </Dropdown>
+                    <span t-if="state.templateId" class="o-dwo-templateBadge badge text-bg-light border fw-normal d-inline-flex align-items-center gap-1" data-tooltip="Template applied. Remove it to take back the recipients and files it added; your text stays.">
+                        <i class="fa fa-file-text-o"/> <t t-out="state.templateName"/>
+                        <button type="button" class="btn-close ms-1" style="width:.5rem;height:.5rem;" aria-label="Remove the template" t-on-click="clearTemplate"/>
+                    </span>
+                </div>
+                <div t-if="state.attachments.length" class="d-flex flex-wrap align-items-center gap-2">
+                    <span t-foreach="state.attachments" t-as="att" t-key="att.id" class="o-dwo-attachment badge text-bg-light border fw-normal d-inline-flex align-items-center gap-1">
+                        <i class="fa fa-paperclip"/> <t t-out="att.name"/>
+                        <button type="button" class="o-dwo-attachmentRemove btn-close ms-1" style="width:.5rem;height:.5rem;" t-att-aria-label="'Remove ' + att.name" t-on-click="() => this.askRemoveAttachment(att)"/>
+                    </span>
+                </div>
+
+                <div class="d-flex flex-column gap-1">
+                    <small t-if="state.policy.can_send_now" class="o-dwo-directNote text-muted opacity-75">This email is sent directly to the people in To, Cc and Bcc. The followers of the record are not notified.</small>
+                    <small t-else="" class="o-dwo-directNote text-muted opacity-75">An approver must approve this email before it is sent to the people in To, Cc and Bcc. The followers of the record are not notified.</small>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                        <!-- One way to send: a plain button. Both ways (approval on, and the user can send without it): a menu -->
+                        <Dropdown t-if="state.policy.can_send_now and state.policy.can_request_approval" menuClass="'o-dwo-sendMenu'" togglerClass="'o-dwo-sendBtn btn btn-primary'" tooltip="'Choose how to send this email.'" disabled="state.sending or state.uploading or state.emailState === 'sent'">
+            <t t-set-slot="toggler">
+                                <i t-if="state.sending" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-paper-plane"/> Send email <i class="fa fa-caret-down ms-1"/>
+                            </t>
+                                <DropdownItem class="'o-dwo-sendNow px-3'" onSelected="() => this.onSend()">
+                                    <i class="fa fa-paper-plane fa-fw"/> Send now
+                                    <div class="text-muted small">Goes to the recipients right away.</div>
+                                </DropdownItem>
+                                <DropdownItem class="'o-dwo-requestApproval px-3'" onSelected="() => this.onRequestApproval()">
+                                    <i class="fa fa-user-circle-o fa-fw"/> Request approval and send
+                                    <div class="text-muted small">Somebody approves it, then it is sent.</div>
+                                </DropdownItem>
+                            
+                        </Dropdown>
+                        <button t-elif="state.policy.can_send_now" type="button" class="o-dwo-sendBtn o-dwo-sendNow btn btn-primary" data-tooltip="Send this email to the recipients right away." t-on-click="() => this.onSend()" t-att-disabled="state.sending or state.uploading or state.emailState === 'sent'">
+                            <i t-if="state.sending" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-paper-plane"/> Send email
+                        </button>
+                        <button t-else="" type="button" class="o-dwo-sendBtn o-dwo-requestApproval btn btn-primary" data-tooltip="Ask somebody to approve this email. It is sent when it is approved." t-on-click="() => this.onRequestApproval()" t-att-disabled="state.sending or state.uploading or state.emailState === 'sent'">
+                            <i t-if="state.sending" class="fa fa-circle-o-notch fa-spin"/><i t-else="" class="fa fa-user-circle-o"/> Request approval
+                        </button>
+                            <button t-if="state.hasDraft" type="button" class="o-dwo-deleteDraft btn btn-outline-secondary text-nowrap" data-tooltip="Delete this email and start again from the default content." t-on-click="askDeleteCurrent"><i class="fa fa-trash-o"/> Delete draft</button>
+                        </div>
+                        <span class="text-muted small">
+                            <span t-if="state.hasDraft"><t t-if="state.emailState === 'draft'">Draft saved</t><t t-else="">Saved</t> <t t-out="state.savedAt"/></span>
+                            <span t-else="">No draft yet</span>
+                        </span>
+                    </div>
+                </div>
+
+            </t>
+          </div>
+
+          <!-- Second area: the emails of the user on this record, with their own border -->
+                <div t-if="!state.loading and state.emails.length" class="o-dwo-emailList bg-view border rounded p-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small fw-bold">Your emails on this record, not sent yet</span>
+                        <button type="button" class="o-dwo-newEmail btn btn-link btn-sm p-0" data-tooltip="Start another email. The one you are writing is saved." t-on-click="onNewEmail"><i class="fa fa-plus"/> New email</button>
+                    </div>
+                    <div class="o-dwo-emailRows list-group list-group-flush">
+                        <div t-foreach="state.emails" t-as="email" t-key="email.id" role="button" tabindex="0"
+                             class="o-dwo-emailRow list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-2 py-1 px-2"
+                             t-att-class="{ active: email.id === state.emailId }"
+                             data-tooltip="Open this email in the form" t-on-click="() => this.onOpenEmail(email)">
+                            <div class="flex-grow-1 text-truncate">
+                                <div class="text-truncate"><t t-out="email.subject or '(No subject)'"/></div>
+                                <small class="o-dwo-emailDates opacity-75 d-flex flex-column"><span class="o-dwo-emailCreated" data-tooltip="Created"><i class="fa fa-calendar-plus-o fa-fw me-1"/><span class="visually-hidden">Created </span><t t-out="formatListDate(email.created)"/></span><span class="o-dwo-emailUpdated" data-tooltip="Last updated"><i class="fa fa-pencil fa-fw me-1"/><span class="visually-hidden">Updated </span><t t-out="formatListDate(email.updated)"/></span></small>
+                            </div>
+                            <span class="d-flex align-items-center gap-2 flex-shrink-0">
+                                <span class="badge rounded-pill" t-att-class="{
+                                    'text-bg-secondary': email.state === 'draft',
+                                    'text-bg-info': email.state === 'pending',
+                                    'text-bg-danger': email.state === 'rejected',
+                                }"><t t-if="email.state === 'draft'">Draft</t><t t-elif="email.state === 'pending'">Waiting for approval</t><t t-else="">Rejected</t></span>
+                                <button type="button" class="o-dwo-rowDelete btn btn-link btn-sm p-0 text-danger" aria-label="Delete" data-tooltip="Delete this email" t-on-click.stop="() => this.onDeleteListed(email)"><i class="fa fa-trash-o"/></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </t>
+</templates>

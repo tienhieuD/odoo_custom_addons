@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Chatter" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o-mail-Chatter-sendMessage')]" position="after">
+            <button class="o-mail-Chatter-dwoSendEmail btn text-nowrap me-1"
+                    t-att-class="{
+                        'btn-primary': state.composerType === 'email',
+                        'btn-outline-primary': state.composerType !== 'email',
+                        'active': state.composerType === 'email',
+                        'my-2': !props.compactHeight
+                    }"
+                    t-on-click="() => this.dwoToggleEmail()">
+                Send email<span t-if="dwo.hasDraft and state.composerType !== 'email'" class="o-dwo-draftDot bg-primary ms-1" title="You have a draft"/>
+            </button>
+        </xpath>
+        <!-- The email form takes the room of the chatter: while it is open the messages, the
+             activities and the rest are hidden, and they come back as soon as it is closed. -->
+        <xpath expr="//div[hasclass('o-mail-Chatter-content')]" position="attributes">
+            <attribute name="t-att-class">{ 'o-dwo-hiddenByEmail': state.composerType === 'email' }</attribute>
+        </xpath>
+        <xpath expr="//SuggestedRecipientsList" position="attributes">
+            <attribute name="t-if">props.hasFollowers and state.composerType !== 'note' and state.composerType !== 'email'</attribute>
+        </xpath>
+        <xpath expr="//Composer" position="attributes">
+            <attribute name="t-if">state.composerType !== 'email'</attribute>
+        </xpath>
+        <xpath expr="//Composer" position="after">
+            <DwoEmailComposer t-if="state.composerType === 'email'"
+                              thread="state.thread"
+                              mode="dwo.mode"
+                              refMessageId="dwo.refMessageId"
+                              preferredEmailId="dwo.rememberedEmailId"
+                              onEmailChange.bind="dwoOnEmailChange"
+                              onClose.bind="dwoOnEmailClose"
+                              onSent.bind="dwoOnEmailSent"
+                              t-key="dwo.key"/>
+        </xpath>
+    </t>
+</templates>
