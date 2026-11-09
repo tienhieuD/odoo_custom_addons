@@ -1,0 +1,179 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Email Cc Bcc Reply-To for Odoo</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">The three address fields Odoo's composer is missing.</p>
+        <p class="mb-4" style="font-size: 15px;">Add <strong>Cc</strong>, a hidden <strong>Bcc</strong> and a <strong>Reply-To</strong> to the full composer, to templates and to outgoing emails.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Odoo can send a Cc and a Bcc, but no screen lets you type them when you send a message, and a Reply-To is only offered to mass mailing. This module connects the missing parts and keeps the standard sending code untouched.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="Write a message, fill Cc, Bcc and Reply-To, send, each address gets one copy" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">In short</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Cc</h4>
+                    <p class="mb-0" style="font-size: 14px;">A Cc box in the composer. Everybody sees it, and it gets one copy.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Bcc</h4>
+                    <p class="mb-0" style="font-size: 14px;">Delivered, but never written in the visible headers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Reply-To</h4>
+                    <p class="mb-0" style="font-size: 14px;">Choose where the answers go. Checked: one valid address.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">On templates</h4>
+                    <p class="mb-0" style="font-size: 14px;">A Bcc field with placeholders, computed per record.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Everywhere</h4>
+                    <p class="mb-0" style="font-size: 14px;">Full composer, mass mailing, outgoing emails and the message log.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">For developers</h4>
+                    <p class="mb-0" style="font-size: 14px;"><code>message_post(outgoing_email_cc=..., outgoing_email_bcc=...)</code> is accepted.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">1. In the composer</h2>
+    <p class="mb-4" style="font-size: 16px;"><strong>Cc</strong>, <strong>Bcc</strong> and <strong>Reply-To</strong> are in the full composer, next to the subject.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_1.png" alt="The full composer with To, Cc, Bcc, Subject and Reply-To filled in" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">2. On a template</h2>
+    <p class="mb-4" style="font-size: 16px;">A template can carry them too: Cc, Bcc and Reply To, with placeholders computed for each record.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_2.png" alt="An email template with the To, Cc, Bcc and Reply To fields" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">3. On the outgoing email</h2>
+    <p class="mb-4" style="font-size: 16px;">The email that left shows its Cc, Bcc and Reply-To.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_3.png" alt="An outgoing email with the Cc, Bcc and Reply-To fields" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">4. In the message log</h2>
+    <p class="mb-4" style="font-size: 16px;">The message keeps the Cc and the Bcc, visible to internal users only.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_4.png" alt="The Recipients tab of a message with the outgoing Cc and Bcc" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">Needs only the standard <code>mail</code> module. No external library.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">A Bcc or a Cc needs at least one other recipient (To or a partner). An email with only a Cc or a Bcc is not sent.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#bcc_install" role="tab" aria-controls="bcc_install" aria-selected="true">Install</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#bcc_use" role="tab" aria-controls="bcc_use" aria-selected="false">Use</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#bcc_limits" role="tab" aria-controls="bcc_limits" aria-selected="false">Limits</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="bcc_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
+            <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_mail_bcc</code> folder into an add-ons path of your Odoo server.</p>
+            <p class="mb-2" style="font-size: 14px;">2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu.</p>
+            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Email Cc Bcc Reply-To</em> and click <strong>Install</strong>.</p>
+        </div>
+        <div class="tab-pane fade" id="bcc_use" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Send with Cc, Bcc and Reply-To</h4>
+            <p class="mb-2" style="font-size: 14px;">Open the full composer from <strong>Send message</strong> and fill in <strong>Cc</strong>, <strong>Bcc</strong> and <strong>Reply-To</strong>. It also works for mass mailing from a list.</p>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">On a template</h4>
+            <p class="mb-2" style="font-size: 14px;">Open an email template (developer mode, tab <em>Settings</em>) and fill in <strong>Bcc</strong> and <strong>Reply To</strong>. Placeholders are computed for each record.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">An address that is already a visible recipient is dropped from the Bcc, so nobody receives two copies.</p>
+        </div>
+        <div class="tab-pane fade" id="bcc_limits" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Good to know</h4>
+            <p class="mb-2" style="font-size: 14px;"><strong>Reply-To</strong> takes one valid address. When you set it, the answers go to that address and not back to the record, as Odoo does for any forced Reply-To.</p>
+            <p class="mb-2" style="font-size: 14px;">The Cc and the Bcc get one copy, not one per recipient. The quick message box of the chatter has no such boxes; only the full composer has.</p>
+            <p class="mb-2" style="font-size: 14px;">If an outgoing email fails to send, its Cc and Bcc are delivered when that email is sent again.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Changelog</h2>
+    <p class="mb-3" style="font-size: 16px;">Module releases, newest first.</p>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.1</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-08</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Cc and Reply-To in the full composer, Reply-To check, Cc on the message log. The module is now named Email Cc Bcc Reply-To.</p></div>
+        </div>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-08</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release: Bcc in the full composer and mass mailing, Bcc on templates and outgoing emails.</p></div>
+        </div>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can other recipients see the Bcc?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. The address is used for delivery only and removed from the headers.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Where do the answers go with a Reply-To?</h4>
+        <p class="mb-0" style="font-size: 14px;">To the address you typed. As with any forced Reply-To in Odoo, the answers are not routed back to the record.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Who can see the Cc and Bcc lists in Odoo?</h4>
+        <p class="mb-0" style="font-size: 14px;">Internal users only.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it change the standard sending?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It adds the missing connections on top of the standard mail module.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Is it free?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. It is also the base of the Advanced Email Composer.</p>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Cc, Bcc and Reply-To, where you need them.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it and open the full composer from Send message.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DUO-TEK Software Vietnam</p>
+    </div>
+
+</div>
+</section>
