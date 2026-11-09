@@ -14,7 +14,9 @@ def split_and_format_normalize(text):
         return native(text)
     result = []
     # Odoo 18 reads ';' as a separator too
-    for name, address in mail_tools.email_split_tuples((text or "").replace(";", ",")):
+    # older versions find no address at all in a text with an empty item (a trailing comma)
+    text = (text or "").replace(";", ",").strip(" ,")
+    for name, address in mail_tools.email_split_tuples(text):
         result.append(mail_tools.formataddr((name, mail_tools.email_normalize(address) or address)))
     return result
 

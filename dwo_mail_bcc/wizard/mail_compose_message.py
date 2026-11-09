@@ -10,7 +10,7 @@ from ..models.mail_compat import split_and_format_normalize
 def merge_addresses(*texts):
     """Several address lists as one 'Name <email>, ...', an address once (first wins)."""
     seen, unique = set(), []
-    for formatted in split_and_format_normalize(",".join(text or "" for text in texts)):
+    for formatted in split_and_format_normalize(",".join(text for text in texts if text and text.strip())):
         normalized = tools.mail.email_normalize(formatted)
         if normalized not in seen:
             seen.add(normalized)
