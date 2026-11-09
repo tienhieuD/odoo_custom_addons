@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_compose_message_wizard_form_dwo_bcc" model="ir.ui.view">
+        <field name="name">mail.compose.message.form.dwo.bcc</field>
+        <field name="model">mail.compose.message</field>
+        <field name="inherit_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='subject']" position="before">
+                <field name="email_cc"
+                       groups="base.group_user"
+                       placeholder="e.g. colleague@company.com, manager@company.com"
+                       invisible="subtype_is_log"/>
+                <field name="email_bcc"
+                       groups="base.group_user"
+                       placeholder="e.g. archive@company.com, boss@company.com"
+                       invisible="subtype_is_log"/>
+            </xpath>
+            <!-- Reply-To: Odoo 18 shows it only to mass mailing, in the Settings page. It is also allowed when
+                 sending a message: the answers then go to this address, and not to the record. -->
+            <xpath expr="//field[@name='subject']" position="after">
+                <field name="reply_to" string="Reply-To" groups="base.group_user"
+                       placeholder="e.g. info@company.com"
+                       invisible="composition_mode != 'comment' or subtype_is_log"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
