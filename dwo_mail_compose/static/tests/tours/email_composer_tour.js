@@ -172,7 +172,7 @@ registry.category("web_tour.tours").add("dwo_mail_compose_template", {
         { trigger: "#dwo_subject:value(Quote for DWO Mail Tour Partner)" },
         { trigger: `${EDITOR}:contains('Dear DWO Mail Tour Partner, here is your quote.')` },
         { trigger: `${EDITOR}:not(:contains('<'))` },
-        // nothing was written: the text took the place of the three empty lines (it is the first
+        // nothing was written: the text took the place of the two empty lines (it is the first
         // block) and the signature is still under it
         { trigger: `${EDITOR} > :first-child:contains('Dear DWO Mail Tour Partner')` },
         { trigger: `${EDITOR}:contains('Tour signature')` },

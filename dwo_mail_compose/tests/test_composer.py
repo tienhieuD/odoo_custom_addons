@@ -613,18 +613,18 @@ class TestComposer(MailCommon):
     # EMPTY LINES TO WRITE IN
     # ------------------------------------------------------------
 
-    def test_a_new_email_starts_with_three_empty_lines_then_the_signature(self):
+    def test_a_new_email_starts_with_two_empty_lines_then_the_signature(self):
         self.admin.signature = "<p>Best regards, Hieu</p>"
         body = self.composer.get_defaults("res.partner", self.record.id)["body"]
-        self.assertTrue(body.startswith("<p><br></p>" * 3), body)
-        self.assertIn("Best regards, Hieu", body[len("<p><br></p>" * 3):])
+        self.assertTrue(body.startswith("<p><br></p>" * 2), body)
+        self.assertIn("Best regards, Hieu", body[len("<p><br></p>" * 2):])
 
     def test_the_empty_lines_come_before_the_quote_of_a_reply(self):
         self._incoming()
         body = self.composer.get_defaults("res.partner", self.record.id)["body"]
-        self.assertTrue(body.startswith("<p><br></p>" * 3), body)
+        self.assertTrue(body.startswith("<p><br></p>" * 2), body)
         self.assertLess(body.index("<p><br></p>"), body.index("divRplyFwdMsg"))
 
     def test_a_saved_template_does_not_keep_the_empty_lines(self):
-        body = "<p><br></p><p><br></p><p><br></p><p>Dear customer</p><p><br></p>"
+        body = "<p><br></p><p><br></p><p>Dear customer</p><p><br></p>"
         self.assertEqual(self.composer._body_without_quote(body), "<p>Dear customer</p><p><br></p>")

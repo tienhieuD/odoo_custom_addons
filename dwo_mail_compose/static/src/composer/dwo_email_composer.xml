@@ -194,7 +194,7 @@
                              data-tooltip="Open this email in the form" t-on-click="() => this.onOpenEmail(email)">
                             <div class="flex-grow-1 text-truncate">
                                 <div class="text-truncate"><t t-out="email.subject or '(No subject)'"/></div>
-                                <small class="o-dwo-emailDates opacity-75">Created <t t-out="formatListDate(email.created)"/> · Updated <t t-out="formatListDate(email.updated)"/></small>
+                                <small class="o-dwo-emailDates opacity-75 d-flex flex-column"><span class="o-dwo-emailCreated" data-tooltip="Created"><i class="fa fa-calendar-plus-o fa-fw me-1"/><span class="visually-hidden">Created </span><t t-out="formatListDate(email.created)"/></span><span class="o-dwo-emailUpdated" data-tooltip="Last updated"><i class="fa fa-pencil fa-fw me-1"/><span class="visually-hidden">Updated </span><t t-out="formatListDate(email.updated)"/></span></small>
                             </div>
                             <span class="d-flex align-items-center gap-2 flex-shrink-0">
                                 <span class="badge rounded-pill" t-att-class="{

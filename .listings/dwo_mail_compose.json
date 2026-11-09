@@ -139,7 +139,7 @@
       "title": "4. Reply all in one click",
       "image": "screenshot_5.png",
       "alt": "A reply with To and Cc filled, the signature and the quoted original email",
-      "intro": "The right people in To and Cc, an <code>RE:</code> subject, three empty lines to write in, and the previous email quoted."
+      "intro": "The right people in To and Cc, an <code>RE:</code> subject, two empty lines to write in, and the previous email quoted."
     },
     {
       "type": "screenshot",

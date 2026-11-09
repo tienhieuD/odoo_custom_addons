@@ -197,10 +197,10 @@ class DwoMailComposer(models.AbstractModel):
 
     @api.model
     def _initial_body(self, quote=Markup("")):
-        """What the editor holds when an email is started: three empty lines to write in, then the
+        """What the editor holds when an email is started: two empty lines to write in, then the
         signature, then the quote of the email answered. A template chosen on this untouched body
         is written into those lines."""
-        return Markup("<p><br></p>") * 3 + self._signature_html() + quote
+        return Markup("<p><br></p>") * 2 + self._signature_html() + quote
 
     @api.model
     def _signature_html(self):
