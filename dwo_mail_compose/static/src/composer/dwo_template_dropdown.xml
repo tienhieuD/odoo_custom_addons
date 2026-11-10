@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_mail_compose.TemplateDropdown" owl="1">
+        <div class="dropdown o-dwo-templateHost" t-att-class="{ show: state.open }">
+            <button type="button" class="o-dwo-templateBtn btn btn-sm btn-light" title="Fill the email from a template, computed for this record. Only the templates made for this kind of record are listed." t-on-click="toggle">
+                <i class="fa fa-file-text-o"/> Template
+            </button>
+            <div class="o-dwo-templateMenu dropdown-menu flex-column" t-att-class="{ show: state.open }">
+                <div class="px-3 pb-1 text-muted">Select a Template</div>
+                <div t-if="state.templates.length > 0" style="max-height: 40vh; overflow-y: auto;">
+                    <t t-foreach="state.templates" t-as="template" t-key="template.id">
+                        <button type="button" class="o-dwo-templateItem dropdown-item text-truncate" t-att-data-id="template.id" t-on-click="onClickTemplate">
+                            <t t-if="template.display_name" t-esc="template.display_name"/>
+                            <span t-else="" class="font-italic">Untitled</span>
+                        </button>
+                    </t>
+                </div>
+                <div t-else="" class="font-italic px-3">No saved templates</div>
+                <div class="dropdown-divider"/>
+                <button type="button" class="o-dwo-saveTemplate dropdown-item" t-on-click="onClickSave">Save as Template</button>
+                <div class="dropdown-divider"/>
+                <a href="#" class="dropdown-item" t-on-click="manage">Manage Templates</a>
+            </div>
+        </div>
+    </t>
+</templates>
