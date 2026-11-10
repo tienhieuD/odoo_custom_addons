@@ -14,14 +14,14 @@
                         </DropdownItem>
                     </t>
                     <DropdownItem t-if="state.templates.length >= limit" class="'px-3'" onSelected="() => this.searchMore()">
-                        <a href="#">Search More...</a>
+                        <a role="button" style="cursor: pointer">Search More...</a>
                     </DropdownItem>
                 </div>
                 <div t-else="" class="fst-italic px-3">No saved templates</div>
                 <div class="dropdown-divider"/>
                 <DropdownItem class="'o-dwo-saveTemplate px-3'" onSelected="() => props.onSave()">Save as Template</DropdownItem>
                 <div class="dropdown-divider"/>
-                <a href="#" class="px-3" t-on-click="() => this.manage()">Manage Templates</a>
+                <a role="button" style="cursor: pointer" class="px-3" t-on-click="() => this.manage()">Manage Templates</a>
             
         </Dropdown>
     </t>
