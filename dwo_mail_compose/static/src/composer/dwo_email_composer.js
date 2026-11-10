@@ -927,8 +927,9 @@ export class DwoEmailComposer extends Component {
     }
 
     onKeydown(ev) {
-        // a dialog opened from the editor (a link, an image) has its own Esc
-        if (ev.key === 'Escape' && this.state.expanded && !document.querySelector('.modal')) {
+        // a dialog opened from the editor (a link, an image) has its own Esc; the hidden dialogs the editor keeps in the page do not count
+        const openDialog = [...document.querySelectorAll('.modal')].some((modal) => modal.offsetParent !== null);
+        if (ev.key === 'Escape' && this.state.expanded && !openDialog) {
             this.state.expanded = false;
         }
     }
