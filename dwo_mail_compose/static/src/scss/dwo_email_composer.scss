@@ -1,0 +1,161 @@
+// Colours come from the Bootstrap utility classes or the SCSS variables of the backend bundle.
+.o-dwo-emailComposer {
+    .o-dwo-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: .5rem;
+    }
+    // wide enough for the longest label, and the info icon stays on the same line
+    .o-dwo-label {
+        flex: 0 0 6.5rem;
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        padding-top: .3rem;
+        margin: 0;
+        color: $text-muted;
+        .o-dwo-info { margin-left: .25rem; }
+    }
+    .o-dwo-field {
+        flex: 1 1 auto;
+        min-width: 0;
+        margin-right: .5rem;
+    }
+    .o-dwo-required {
+        color: $danger;
+        font-weight: 700;
+    }
+    .o-dwo-info { cursor: help; }
+    .o-dwo-editorBox { min-height: 6rem; }
+    .o-dwo-editorHost .note-editor {
+        border: 0;
+        margin: 0;
+    }
+    .o-dwo-editorHost .note-editable {
+        min-height: 6rem;
+        max-height: 19rem;
+        overflow: auto;
+        padding: .5rem;
+    }
+    .o-dwo-expandBtn {
+        top: .25rem;
+        right: .25rem;
+        z-index: 2;
+    }
+    .o-dwo-editorBox.o-dwo-expanded {
+        position: fixed !important;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        display: flex;
+        flex-direction: column;
+        border-radius: 0 !important;
+        border: 0 !important;
+        margin: 0 !important;
+        .o-dwo-editorHost {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        .o-dwo-editorHost .note-editor,
+        .o-dwo-editorHost .note-editing-area {
+            height: auto !important;
+        }
+        .o-dwo-editorHost .note-editable {
+            min-height: 0 !important;
+            max-height: none !important;
+            height: calc(100vh - 7rem) !important;
+        }
+        .o-dwo-editorHost .note-statusbar { display: none; }
+    }
+    // a long list scrolls instead of pushing the form away
+    .o-dwo-emailRows {
+        max-height: 11rem;
+        overflow-y: auto;
+    }
+    .o-dwo-addressInput {
+        min-width: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        .o-dwo-chips { display: contents; }
+        .o-dwo-addressText { flex: 1 1 140px; }
+        &:focus-within { border-color: $primary !important; }
+        &.o-dwo-invalid { border-color: $danger !important; }
+        .o-dwo-suggestions.show { display: block; }
+    }
+    .o-dwo-chip {
+        max-width: 100%;
+        min-width: 0;
+        margin-right: .25rem;
+        padding: .3rem .6rem;
+        font-size: .85rem;
+        cursor: default;
+        .o-dwo-chipEmail { margin-left: .25rem; opacity: .75; }
+        .o-dwo-chipNew { margin-left: .25rem; }
+        .close { float: none; font-size: 1rem; line-height: 1; vertical-align: middle; }
+    }
+    .o-dwo-approverChip .close { float: none; font-size: 1rem; line-height: 1; vertical-align: middle; }
+    .o-dwo-attachment .close, .o-dwo-templateBadge .close { float: none; font-size: 1rem; line-height: 1; vertical-align: middle; }
+    .o-dwo-emailActions .btn { margin-right: .25rem; }
+    .o-dwo-deleteDraft:hover,
+    .o-dwo-deleteDraft:focus {
+        color: $white;
+        background-color: $danger;
+        border-color: $danger;
+    }
+}
+
+.o_chatter .o-dwo-draftDot {
+    display: inline-block;
+    width: .5rem;
+    height: .5rem;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+// On hover the button takes the colour of the dot: the dot takes the colour of the text
+.o_chatter .btn:hover .o-dwo-draftDot,
+.o_chatter .btn.o_active .o-dwo-draftDot {
+    background-color: currentColor !important;
+}
+
+// The email form takes the room of the chatter: while it is open the messages and the activities are hidden
+.o_chatter.o-dwo-emailOpen > :not(.o_chatter_topbar):not(.o-dwo-emailComposer) {
+    display: none !important;
+}
+
+.o_chatter .o_dwo_chatter_button_email.o_active {
+    font-weight: bold;
+}
+
+// While the body is expanded, the sticky statusbar of the form must not be above it.
+.o-dwo-composeExpanded .o_form_view .o_form_statusbar {
+    z-index: 0 !important;
+}
+
+// The dates under the subject of an email of the list: smaller and fainter than the subject
+.o-dwo-emailRow .o-dwo-emailDates {
+    font-size: 0.72rem;
+    line-height: 1.3;
+    opacity: 0.55;
+    margin-top: 1px;
+}
+
+// the Email badge and the From / To / Cc lines of an email in the thread
+.o_thread_message .o-dwo-emailMeta { word-break: break-word; }
+
+// the thread paints the text of the messages that are not discussions: the buttons keep their own colours
+.o_thread_message .o-dwo-emailActions .btn {
+    color: $gray-700;
+    background-color: transparent;
+    border: 1px solid $gray-500;
+    margin-right: .25rem;
+    &:hover, &:focus {
+        color: $white;
+        background-color: $gray-600;
+        border-color: $gray-600;
+    }
+}

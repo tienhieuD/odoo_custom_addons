@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Odoo 13 has no @api.autovacuum (14+): a daily job deletes the emails nobody touched for the retention period -->
+    <record id="ir_cron_dwo_mail_gc" model="ir.cron">
+        <field name="name">Advanced Email Composer: delete old unsent emails</field>
+        <field name="model_id" ref="model_dwo_mail_email"/>
+        <field name="state">code</field>
+        <field name="code">model._dwo_gc_old_emails()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+</odoo>

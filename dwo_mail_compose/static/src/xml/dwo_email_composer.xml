@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- ===================================================================== -->
+    <!-- The Send email button, next to Send message                            -->
+    <!-- ===================================================================== -->
+    <t t-extend="mail.chatter.Buttons">
+        <t t-jquery="button.o_chatter_button_new_message" t-operation="after">
+            <button t-if="newMessageButton" type="button" class="btn btn-link o_dwo_chatter_button_email" title="Send an official email to the people you choose" disabled="disabled">
+                Send email
+            </button>
+        </t>
+    </t>
+
+    <!-- ===================================================================== -->
+    <!-- The badge, the From / To / Cc lines and Reply / Forward of an email    -->
+    <!-- ===================================================================== -->
+    <t t-extend="mail.widget.Thread.Message">
+        <t t-jquery="p.o_mail_info" t-operation="after">
+            <t t-if="thread.getType() === 'document_thread' and message.dwoIsEmail()">
+                <div class="o-dwo-emailHead mb-1">
+                    <span class="o-dwo-emailBadge badge badge-pill badge-primary mr-1">Email</span>
+                </div>
+                <div t-if="message.dwoMetaLines().length" class="o-dwo-emailMeta small text-muted mb-1">
+                    <div t-foreach="message.dwoMetaLines()" t-as="line">
+                        <b><t t-esc="line.label"/>:</b> <span t-esc="line.text"/>
+                    </div>
+                </div>
+                <div class="o-dwo-emailActions mb-2">
+                    <button type="button" class="o-dwo-replyBtn btn btn-sm btn-outline-secondary" title="Reply to the sender only" t-att-data-message-id="message.getID()" data-mode="reply_sender"><i class="fa fa-reply"/> Reply</button>
+                    <button type="button" class="o-dwo-replyAllBtn btn btn-sm btn-outline-secondary" title="Reply to the sender and everyone in To and Cc" t-att-data-message-id="message.getID()" data-mode="reply"><i class="fa fa-reply-all"/> Reply all</button>
+                    <button type="button" class="o-dwo-forwardBtn btn btn-sm btn-outline-secondary" title="Forward this email to other people" t-att-data-message-id="message.getID()" data-mode="forward"><i class="fa fa-share"/> Forward</button>
+                </div>
+            </t>
+        </t>
+    </t>
+
+    <!-- ===================================================================== -->
+    <!-- The form                                                               -->
+    <!-- ===================================================================== -->
+    <t t-name="dwo_mail_compose.EmailComposer">
+        <div class="o-dwo-emailComposer">
+            <div class="o-dwo-formBox bg-white border rounded p-2">
+                <div class="o-dwo-header d-flex justify-content-between align-items-center mb-2">
+                    <span class="d-flex align-items-center" style="min-width:0;">
+                        <strong class="o-dwo-title text-truncate"/>
+                        <span class="o-dwo-stateBadge badge badge-pill ml-2 d-none"/>
+                    </span>
+                    <button type="button" class="o-dwo-closeBtn btn btn-sm btn-light" aria-label="Close" title="Close the form. Your draft is kept and comes back when you open it again."><i class="fa fa-times"/></button>
+                </div>
+                <div class="o-dwo-loading text-muted p-3 text-center"><i class="fa fa-circle-o-notch fa-spin"/> Loading</div>
+                <div class="o-dwo-content d-none">
+                    <div class="o-dwo-notes"/>
+
+                    <div class="o-dwo-row">
+                        <label class="o-dwo-label" for="dwo_from"><span>From</span><span class="o-dwo-required">*</span>
+                            <i class="fa fa-info-circle o-dwo-info" title="The address the email is sent from. Only the addresses you are allowed to use are listed."/></label>
+                        <div class="o-dwo-field" data-field="from"><select id="dwo_from" class="form-control form-control-sm"/></div>
+                    </div>
+
+                    <div class="o-dwo-row">
+                        <label class="o-dwo-label" for="dwo_to"><span>To</span><span class="o-dwo-required">*</span>
+                            <i class="fa fa-info-circle o-dwo-info" title="Main recipients. Everyone in To and Cc sees who else received the email."/></label>
+                        <div class="o-dwo-field" data-field="to"/>
+                        <div class="o-dwo-ccbcc pt-1"/>
+                    </div>
+
+                    <div class="o-dwo-row o-dwo-ccRow d-none">
+                        <label class="o-dwo-label" for="dwo_cc"><span>Cc</span>
+                            <i class="fa fa-info-circle o-dwo-info" title="Carbon copy: people who are kept informed. Their addresses are visible to all recipients."/></label>
+                        <div class="o-dwo-field" data-field="cc"/>
+                    </div>
+
+                    <div class="o-dwo-row o-dwo-bccRow d-none">
+                        <label class="o-dwo-label" for="dwo_bcc"><span>Bcc</span>
+                            <i class="fa fa-info-circle o-dwo-info" title="Blind carbon copy: receives the email, but the other recipients never see these addresses."/></label>
+                        <div class="o-dwo-field" data-field="bcc"/>
+                    </div>
+
+                    <div class="o-dwo-row">
+                        <label class="o-dwo-label" for="dwo_subject"><span>Subject</span>
+                            <i class="fa fa-info-circle o-dwo-info" title="RE: or FW: is added for you and is never repeated."/></label>
+                        <div class="o-dwo-field"><input id="dwo_subject" type="text" class="form-control form-control-sm" placeholder="What is this email about?"/></div>
+                    </div>
+
+                    <div class="o-dwo-replyToSlot"/>
+
+                    <div class="o-dwo-editorBox border rounded position-relative mb-2">
+                        <div class="o-dwo-expandedBar d-none justify-content-between align-items-center border-bottom px-3 py-2">
+                            <strong class="o-dwo-expandedTitle"/>
+                            <button type="button" class="o-dwo-collapseBtn btn btn-sm btn-primary" title="Back to the form (Esc)"><i class="fa fa-compress"/> Back to the form</button>
+                        </div>
+                        <button type="button" class="o-dwo-expandBtn btn btn-sm btn-light position-absolute" aria-label="Expand" title="Edit the message on the whole screen"><i class="fa fa-expand"/></button>
+                        <div class="o-dwo-editorHost"/>
+                    </div>
+
+                    <div class="o-dwo-toolbar mb-2">
+                        <label class="o-dwo-attachBtn btn btn-sm btn-light mb-0 mr-1" title="Attach files from your computer.">
+                            <i class="o-dwo-attachIcon fa fa-paperclip"/> Attach
+                            <input type="file" multiple="multiple" class="d-none o-dwo-fileInput"/>
+                        </label>
+                        <span class="o-dwo-templateDropdown dropdown d-inline-block mr-1">
+                            <button type="button" class="o-dwo-templateBtn btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" title="Fill the email from a template, computed for this record. Only the templates made for this kind of record are listed."><i class="fa fa-file-text-o"/> Template</button>
+                            <div class="o-dwo-templateMenu dropdown-menu"/>
+                        </span>
+                        <span class="o-dwo-advancedDropdown dropdown d-inline-block mr-1">
+                            <button type="button" class="o-dwo-advancedBtn btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" title="More settings of the email."><i class="fa fa-sliders"/> Advanced</button>
+                            <div class="o-dwo-advancedMenu dropdown-menu">
+                                <div class="px-3 pb-1 text-muted">Add a field to the email</div>
+                                <a href="#" class="o-dwo-addReplyTo dropdown-item">Reply to <span class="text-muted">(default: <span class="o-dwo-replyToDefault">...</span>)</span> <i class="o-dwo-replyToCheck fa fa-check ml-2 text-success d-none"/></a>
+                            </div>
+                        </span>
+                        <span class="o-dwo-templateBadgeSlot"/>
+                    </div>
+                    <div class="o-dwo-attachments mb-2"/>
+
+                    <div>
+                        <small class="o-dwo-directNote text-muted"/>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mt-1">
+                            <div class="o-dwo-sendArea d-flex align-items-center"/>
+                            <span class="o-dwo-savedAt text-muted small"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="o-dwo-emailListSlot"/>
+        </div>
+    </t>
+
+    <!-- The notes under the title -->
+    <t t-name="dwo_mail_compose.ReplyToRow">
+        <div class="o-dwo-row o-dwo-replyToRow" data-field="reply_to">
+            <label class="o-dwo-label" for="dwo_replyto"><span>Reply-To</span>
+                <i class="fa fa-info-circle o-dwo-info" title="Where the answers of your recipients go. By default this is the address Odoo uses for the record, so the answer comes back to this record."/></label>
+            <div class="o-dwo-field d-flex align-items-center">
+                <input id="dwo_replyto" type="text" class="form-control form-control-sm" placeholder="Where the answers go"/>
+                <span class="o-dwo-replyToActions d-flex align-items-center"/>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.ReplyToActions">
+        <i t-if="st.replyToCustom and !st.replyToManaged" class="o-dwo-replyToWarning fa fa-exclamation-triangle text-warning ml-2" title="Odoo may not receive this address. If it does not, the answers could go to that mailbox and might not come back to this record."/>
+        <button t-if="st.replyToCustom" type="button" class="o-dwo-replyToReset btn btn-link btn-sm p-0 ml-2 text-nowrap" title="Go back to the address Odoo uses for this record">Use the default</button>
+        <button t-else="" type="button" class="o-dwo-replyToHide btn btn-link btn-sm p-0 ml-2 text-muted" aria-label="Hide" title="Hide this field"><i class="fa fa-times"/></button>
+    </t>
+
+    <t t-name="dwo_mail_compose.TemplateBadge">
+        <span class="o-dwo-templateBadge badge badge-light border font-weight-normal" title="Template applied. Remove it to take back the recipients and files it added; your text stays.">
+            <i class="fa fa-file-text-o"/> <span class="o-dwo-templateName"><t t-esc="name"/></span>
+            <button type="button" class="o-dwo-templateRemove close ml-1" aria-label="Remove the template"><span aria-hidden="true">×</span></button>
+        </span>
+    </t>
+
+    <t t-name="dwo_mail_compose.CcBccButtons">
+        <button t-if="showCc" type="button" class="o-dwo-ccBtn btn btn-link btn-sm p-0 mr-2" title="Carbon copy: people who are kept informed. Their addresses are visible to all recipients.">Cc</button>
+        <button t-if="showBcc" type="button" class="o-dwo-bccBtn btn btn-link btn-sm p-0" title="Blind carbon copy: receives the email, but the other recipients never see these addresses.">Bcc</button>
+    </t>
+
+    <t t-name="dwo_mail_compose.Notes">
+        <div t-if="st.newerEmail" class="o-dwo-newerNote alert alert-warning py-1 px-2 mb-2">
+            <span>A new email from <b><t t-esc="st.newerEmail.from"/></b> arrived on <t t-esc="st.newerEmail.date"/>, after you saved this draft.</span>
+            <button type="button" class="o-dwo-applyDefaults btn btn-sm btn-warning ml-2" title="Replace this draft with the default reply to the newest email. Your changes are lost.">Apply defaults again</button>
+            <button type="button" class="o-dwo-dismissBanner btn btn-sm btn-link">Dismiss</button>
+        </div>
+        <div t-if="st.emailState === 'sent'" class="o-dwo-sentNote alert alert-success py-1 px-2 mb-2">
+            This email was approved<t t-if="st.decidedBy"> by <b><t t-esc="st.decidedBy"/></b></t> and sent. It cannot be changed anymore.
+            <button type="button" class="o-dwo-startNew btn btn-sm btn-success ml-2">Start a new email</button>
+        </div>
+        <div t-if="st.emailState === 'pending'" class="o-dwo-pendingNote alert alert-info py-1 px-2 mb-2">
+            Waiting for the approval of <b><t t-esc="approverNames"/></b>. Anyone of them can approve. You can keep editing; the approver sees the content as it is when they decide.
+            <div t-if="st.requestComment" class="font-italic"><t t-esc="st.requestComment"/></div>
+        </div>
+        <div t-if="st.emailState === 'rejected'" class="o-dwo-rejectedNote alert alert-danger py-1 px-2 mb-2">
+            Rejected<t t-if="st.decidedBy"> by <b><t t-esc="st.decidedBy"/></b></t>. Edit it and ask again, or send it now.
+            <div t-if="st.decisionComment" class="font-italic"><t t-esc="st.decisionComment"/></div>
+        </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.FromOptions">
+        <t t-foreach="options" t-as="option">
+            <option t-att-value="option.email" t-att-selected="option.email === current ? 'selected' : undefined"><t t-esc="option.name + ' &lt;' + option.email + '&gt;'"/></option>
+        </t>
+    </t>
+
+    <t t-name="dwo_mail_compose.Attachments">
+        <span t-foreach="attachments" t-as="att" class="o-dwo-attachment badge badge-light border font-weight-normal mr-1" t-att-data-id="att.id">
+            <i class="fa fa-paperclip"/> <t t-esc="att.name"/>
+            <button type="button" class="o-dwo-attachmentRemove close ml-1" t-att-data-id="att.id" t-att-aria-label="'Remove ' + att.name"><span aria-hidden="true">×</span></button>
+        </span>
+    </t>
+
+    <t t-name="dwo_mail_compose.TemplateMenu">
+        <div class="px-3 pb-1 text-muted">Select a Template</div>
+        <div t-if="templates.length" style="max-height: 40vh; overflow-y: auto;">
+            <a t-foreach="templates" t-as="template" href="#" class="o-dwo-templateItem dropdown-item text-truncate" t-att-data-id="template.id">
+                <t t-if="template.display_name"><t t-esc="template.display_name"/></t>
+                <span t-else="" class="font-italic">Untitled</span>
+            </a>
+        </div>
+        <div t-else="" class="font-italic px-3">No saved templates</div>
+        <div class="dropdown-divider"/>
+        <a href="#" class="o-dwo-saveTemplate dropdown-item">Save as Template</a>
+        <div class="dropdown-divider"/>
+        <a href="#" class="o-dwo-manageTemplates dropdown-item">Manage Templates</a>
+    </t>
+
+    <t t-name="dwo_mail_compose.SendArea">
+        <t t-if="st.policy.can_send_now and st.policy.can_request_approval">
+            <span class="dropdown d-inline-block">
+                <button type="button" class="o-dwo-sendBtn btn btn-primary dropdown-toggle" data-toggle="dropdown" t-att-disabled="busy ? 'disabled' : undefined" title="Choose how to send this email.">
+                    <i t-attf-class="fa #{st.sending ? 'fa-circle-o-notch fa-spin' : 'fa-paper-plane'}"/> Send email
+                </button>
+                <div class="o-dwo-sendMenu dropdown-menu">
+                    <a href="#" class="o-dwo-sendNow dropdown-item"><i class="fa fa-paper-plane fa-fw"/> Send now<div class="text-muted small">Goes to the recipients right away.</div></a>
+                    <a href="#" class="o-dwo-requestApproval dropdown-item"><i class="fa fa-user-circle-o fa-fw"/> Request approval and send<div class="text-muted small">Somebody approves it, then it is sent.</div></a>
+                </div>
+            </span>
+        </t>
+        <t t-elif="st.policy.can_send_now">
+            <button type="button" class="o-dwo-sendBtn o-dwo-sendNow btn btn-primary" t-att-disabled="busy ? 'disabled' : undefined" title="Send this email to the recipients right away.">
+                <i t-attf-class="fa #{st.sending ? 'fa-circle-o-notch fa-spin' : 'fa-paper-plane'}"/> Send email
+            </button>
+        </t>
+        <t t-else="">
+            <button type="button" class="o-dwo-sendBtn o-dwo-requestApproval btn btn-primary" t-att-disabled="busy ? 'disabled' : undefined" title="Ask somebody to approve this email. It is sent when it is approved.">
+                <i t-attf-class="fa #{st.sending ? 'fa-circle-o-notch fa-spin' : 'fa-user-circle-o'}"/> Request approval
+            </button>
+        </t>
+        <button t-if="st.hasDraft" type="button" class="o-dwo-deleteDraft btn btn-outline-secondary text-nowrap ml-2" title="Delete this email and start again from the default content."><i class="fa fa-trash-o"/> Delete draft</button>
+    </t>
+
+    <t t-name="dwo_mail_compose.EmailList">
+      <div class="o-dwo-emailList bg-white border rounded p-2 mt-2">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-muted small font-weight-bold">Your emails on this record, not sent yet</span>
+            <button type="button" class="o-dwo-newEmail btn btn-link btn-sm p-0" title="Start another email. The one you are writing is saved."><i class="fa fa-plus"/> New email</button>
+        </div>
+        <div class="o-dwo-emailRows list-group list-group-flush">
+            <div t-foreach="st.emails" t-as="email" role="button" tabindex="0" t-attf-class="o-dwo-emailRow list-group-item list-group-item-action d-flex justify-content-between align-items-center py-1 px-2 #{email.id === st.emailId and 'active' or ''}" t-att-data-id="email.id" title="Open this email in the form">
+                <div class="flex-grow-1 text-truncate">
+                    <div class="text-truncate"><t t-esc="email.subject or '(No subject)'"/></div>
+                    <small class="o-dwo-emailDates d-block">
+                        <span class="o-dwo-emailCreated" title="Created"><i class="fa fa-calendar-plus-o fa-fw mr-1"/><span class="sr-only">Created </span><t t-esc="formatDate(email.created)"/></span><br/>
+                        <span class="o-dwo-emailUpdated" title="Last updated"><i class="fa fa-pencil fa-fw mr-1"/><span class="sr-only">Updated </span><t t-esc="formatDate(email.updated)"/></span>
+                    </small>
+                </div>
+                <span class="d-flex align-items-center flex-shrink-0">
+                    <span t-attf-class="badge badge-pill #{email.state === 'draft' and 'badge-secondary' or (email.state === 'pending' and 'badge-info' or 'badge-danger')}"><t t-if="email.state === 'draft'">Draft</t><t t-elif="email.state === 'pending'">Waiting for approval</t><t t-else="">Rejected</t></span>
+                    <button type="button" class="o-dwo-rowDelete btn btn-link btn-sm p-0 ml-2 text-danger" aria-label="Delete" title="Delete this email" t-att-data-id="email.id"><i class="fa fa-trash-o"/></button>
+                </span>
+            </div>
+        </div>
+      </div>
+    </t>
+
+    <!-- ===================================================================== -->
+    <!-- The address field                                                      -->
+    <!-- ===================================================================== -->
+    <t t-name="dwo_mail_compose.AddressInput">
+      <div class="o-dwo-addressWrap">
+        <div class="o-dwo-addressInput position-relative border rounded px-2 py-1">
+            <span class="o-dwo-chips"/>
+            <input t-att-id="widget.inputId" type="text" class="o-dwo-addressText border-0 bg-transparent" style="min-width:140px;outline:none;" autocomplete="off"/>
+        </div>
+        <small class="o-dwo-invalidMsg text-danger d-none">This is not a valid email address.</small>
+      </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.AddressChips">
+        <span t-foreach="chips" t-as="address" class="o-dwo-chip badge badge-pill badge-light border font-weight-normal" t-att-data-email="address.email" t-att-title="address.name ? address.name + ' &lt;' + address.email + '&gt;' : address.email">
+            <span class="o-dwo-chipText"><t t-esc="address.name || address.email"/></span>
+            <small t-if="address.name" class="o-dwo-chipEmail"><t t-esc="address.email"/></small>
+            <small t-if="address.isNew" class="o-dwo-chipNew text-info">new</small>
+            <button type="button" class="o-dwo-chipRemove close ml-1" t-att-data-email="address.email" t-att-title="'Remove ' + address.email"><span aria-hidden="true">×</span></button>
+        </span>
+    </t>
+
+    <t t-name="dwo_mail_compose.Suggestions">
+        <a t-foreach="suggestions" t-as="s" href="#" t-attf-class="o-dwo-suggestion dropdown-item d-flex justify-content-between #{s_index === active and 'active' or ''}" t-att-data-index="s_index">
+            <span class="text-truncate"><t t-esc="s.name"/> <small class="opacity-75"><t t-esc="s.email"/></small></span>
+            <small class="ml-2"><t t-esc="s.source"/></small>
+        </a>
+    </t>
+
+    <!-- ===================================================================== -->
+    <!-- Dialogs                                                                -->
+    <!-- ===================================================================== -->
+    <t t-name="dwo_mail_compose.ApprovalDialog">
+        <div class="o-dwo-approvalDialog">
+            <p class="text-muted">Choose who may approve this email. Anyone of them can: the first decision counts. <t t-if="canChooseYourself">You can choose yourself. </t>The email is sent when it is approved.</p>
+            <label class="font-weight-bold" for="dwo_approver_input">Approvers <span class="text-danger">*</span></label>
+            <div class="o-dwo-approverChips mb-2"/>
+            <div class="o-dwo-approverField mb-3 position-relative">
+                <input id="dwo_approver_input" type="text" class="form-control" placeholder="Search a person..." autocomplete="off"/>
+                <div class="o-dwo-approverResults dropdown-menu w-100" style="max-height:240px;overflow:auto;"/>
+            </div>
+            <label class="font-weight-bold" for="dwo_approval_comment">Message for the approvers</label>
+            <textarea id="dwo_approval_comment" class="form-control" rows="3" placeholder="Why do you ask for an approval? (optional)"/>
+        </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.ApproverChips">
+        <span t-foreach="approvers" t-as="user" class="o-dwo-approverChip badge badge-pill badge-primary font-weight-normal mr-1">
+            <t t-esc="user.name"/>
+            <button type="button" class="o-dwo-approverRemove close text-white ml-1" t-att-data-id="user.id" t-att-aria-label="'Remove ' + user.name"><span aria-hidden="true">×</span></button>
+        </span>
+    </t>
+
+    <t t-name="dwo_mail_compose.SaveTemplateDialog">
+        <div>
+            <p class="text-muted">The subject, the message (without the quoted email) and the files become a template for this kind of record. It belongs to you.</p>
+            <label for="dwo_template_name">Template name</label>
+            <input id="dwo_template_name" type="text" class="form-control" placeholder="e.g. Quote follow-up"/>
+        </div>
+    </t>
+
+    <t t-name="dwo_mail_compose.TemplateConflictDialog">
+        <div>
+            <p>The subject or the message already contains your own text. What should the template do?</p>
+            <ul class="mb-0">
+                <li><b>Overwrite</b>: the template replaces the subject and the message.</li>
+                <li><b>Add after my text</b>: your message stays and the template text is added after it. Your subject is kept.</li>
+                <li><b>Cancel</b>: nothing changes.</li>
+            </ul>
+        </div>
+    </t>
+</templates>

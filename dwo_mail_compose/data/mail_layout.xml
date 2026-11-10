@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Minimal layout for official emails: just the body, no notification
+         header, no access button, no "Powered by" footer. -->
+    <template id="mail_layout_official" name="Official email layout">
+        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 14px;" t-raw="message.body"/>
+    </template>
+</odoo>
