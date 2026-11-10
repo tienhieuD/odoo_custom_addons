@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Odoo 12 has no web.assets_tests bundle: the tour is in the backend bundle, like the tours of the standard modules -->
+    <template id="assets_backend" name="Advanced Email Composer assets" inherit_id="web.assets_backend">
+        <xpath expr="//link[last()]" position="after">
+            <link rel="stylesheet" type="text/scss" href="/dwo_mail_compose/static/src/scss/dwo_email_composer.scss"/>
+        </xpath>
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript" src="/dwo_mail_compose/static/src/js/dwo_address_input.js"/>
+            <script type="text/javascript" src="/dwo_mail_compose/static/src/js/dwo_dialogs.js"/>
+            <script type="text/javascript" src="/dwo_mail_compose/static/src/js/dwo_email_composer.js"/>
+            <script type="text/javascript" src="/dwo_mail_compose/static/src/js/dwo_chatter.js"/>
+            <script type="text/javascript" src="/dwo_mail_compose/static/tests/tours/email_composer_tour.js"/>
+        </xpath>
+    </template>
+</odoo>

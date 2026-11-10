@@ -1,0 +1,57 @@
+# -*- coding: utf-8 -*-
+from odoo import fields, models, tools
+from odoo.addons.dwo_mail_bcc.models.mail_compat import _split_tuples as email_split_tuples
+
+
+class MailMessage(models.Model):
+    _inherit = "mail.message"
+
+    dwo_is_from_compose = fields.Boolean(
+        "Sent from Email Composer",
+        copy=False,
+        index=True,
+        help="Set when the message was sent with the Send email button of the Advanced Email "
+             "Composer. It tells these emails apart from an internal discussion message.",
+    )
+    # outgoing_email_cc and outgoing_email_bcc come from dwo_mail_bcc (Email Cc Bcc Reply-To)
+
+    dwo_incoming_email_to_all = fields.Text(
+        "Incoming Emails To (all)",
+        copy=False,
+        groups="base.group_user",
+        help="The To of an email received, with the aliases of the system (catchall, alias of the "
+             "record) that the core leaves out of incoming_email_to.",
+    )
+
+    # Odoo 19 has these two in core; Odoo 18 does not, so the module keeps them (the To and Cc of an
+    # email received) under the same names.
+    outgoing_email_to = fields.Char("Emails To (outgoing)", copy=False, groups="base.group_user")
+    incoming_email_to = fields.Text("Emails To", copy=False, groups="base.group_user")
+    incoming_email_cc = fields.Char("Emails Cc", copy=False, groups="base.group_user")
+
+    def _notify_compute_recipients(self, record, msg_vals):
+        """Odoo 12 computes the recipients here, on the message (13: on the thread, 16 and later:
+        _notify_get_recipients): the email of the composer is sent by the module itself, the core notifies nobody."""
+        if self.env.context.get("dwo_no_core_notification"):
+            return {"partners": [], "channels": []}
+        return super()._notify_compute_recipients(record, msg_vals)
+
+    def message_format(self, *args, **kwargs):
+        """Odoo 17 has no Store: the values for the browser are a list of dicts."""
+        formatted = super().message_format(*args, **kwargs)
+        internal = self.env.user.has_group("base.group_user")
+        by_id = {message.id: message for message in self.sudo()}
+        for values in formatted:
+            message = by_id.get(values["id"])
+            if not message:
+                continue
+            values["dwo_is_from_compose"] = message.dwo_is_from_compose
+            if internal:
+                values.update({
+                    "dwo_incoming_email_to_all": email_split_tuples(message.dwo_incoming_email_to_all or ""),
+                    "incoming_email_to": email_split_tuples(message.incoming_email_to or ""),
+                    "incoming_email_cc": email_split_tuples(message.incoming_email_cc or ""),
+                    "outgoing_email_to": message.outgoing_email_to or "",
+                    "outgoing_email_cc": message.outgoing_email_cc or "",
+                })
+        return formatted

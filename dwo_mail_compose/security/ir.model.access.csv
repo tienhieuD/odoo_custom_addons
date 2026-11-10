@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dwo_mail_address_user,dwo.mail.address user,model_dwo_mail_address,base.group_user,1,1,1,0
+access_dwo_mail_address_admin,dwo.mail.address admin,model_dwo_mail_address,base.group_system,1,1,1,1
+access_dwo_mail_email_user,dwo.mail.email user,model_dwo_mail_email,base.group_user,1,1,1,1
+access_dwo_mail_decision_user,dwo.mail.decision user,model_dwo_mail_decision,base.group_user,1,1,1,1
