@@ -1,4 +1,7 @@
 // Colours come from the Bootstrap utility classes or the SCSS variables of the backend bundle.
+// the menu entries are links without a target (a "#" would clear the address of the page): they still look clickable
+.o-dwo-emailComposer .dropdown-item, .o-dwo-approvalDialog .dropdown-item { cursor: pointer; }
+
 .o-dwo-emailComposer {
     .o-dwo-row {
         display: flex;

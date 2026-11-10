@@ -289,9 +289,12 @@ class DwoMailEmail(models.Model):
             # (16 and later: also here): the link to the email is written in the body
             body += Markup('<p><a href="/mail/view?model=%s&amp;res_id=%s">%s</a></p>') % (
                 self._name, self.id, _("Open the email"))
-        self.sudo().message_notify(
-            partner_ids=users.mapped("partner_id").ids, subject=title, body=body,
-            author_id=self.env.user.partner_id.id, notif_layout="mail.mail_notification_light")  # Odoo 12: notif_layout (13: email_layout_xmlid)
+        # Odoo 12: message_notify makes a message without a record (13: with one); the notice is posted on the email,
+        # which is what gives the people notified the way to open it
+        self.sudo().with_context(mail_create_nosubscribe=True).message_post(
+            partner_ids=users.mapped("partner_id").ids, subject=title, body=body, message_type="notification",
+            subtype="mail.mt_note", author_id=self.env.user.partner_id.id,
+            notif_layout="mail.mail_notification_light")
         payload = {
             "kind": kind, "email_id": self.id, "title": title, "message": text,
             "comment": comment or "", "subject": self.display_name,

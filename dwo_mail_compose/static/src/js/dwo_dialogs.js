@@ -75,7 +75,7 @@ function openApprovalDialog(parent, options) {
             }
             $results.empty();
             _.each(result, function (item) {
-                $('<a href="#" class="o-dwo-approverItem dropdown-item"/>')
+                $('<a role="button" class="o-dwo-approverItem dropdown-item"/>')
                     .attr('data-id', item[0]).text(item[1]).appendTo($results);
             });
             $results.toggleClass('show', result.length > 0);

@@ -204,7 +204,7 @@ var EmailComposer = Widget.extend({
         $('body').removeClass('o-dwo-composeExpanded');
         if (this.dirty && !this.locked && this.st.emailId !== undefined && !this.isDestroyed()) {
             this._syncBody();
-            this._save(this.bodyHtml);
+            this._save(this.bodyHtml).catch(function () {});
         }
         this.editorToken++;
         if (this.wysiwyg) {
@@ -562,19 +562,23 @@ var EmailComposer = Widget.extend({
      * @private
      */
     _fetchTemplates: async function () {
-        var fields = ['display_name'];
-        var templates = await this._callModel('mail.template', 'search_read', [
-            [['model', '=', this.model], ['user_id', '=', session.uid]], fields], {limit: TEMPLATE_LIMIT});
-        if (templates.length < TEMPLATE_LIMIT) {
-            templates = templates.concat(await this._callModel('mail.template', 'search_read', [
-                [['model', '=', this.model], ['user_id', '=', false]], fields],
-                {limit: TEMPLATE_LIMIT - templates.length}));
+        try {
+            var fields = ['display_name'];
+            var templates = await this._callModel('mail.template', 'search_read', [
+                [['model', '=', this.model], ['user_id', '=', session.uid]], fields], {limit: TEMPLATE_LIMIT});
+            if (templates.length < TEMPLATE_LIMIT) {
+                templates = templates.concat(await this._callModel('mail.template', 'search_read', [
+                    [['model', '=', this.model], ['user_id', '=', false]], fields],
+                    {limit: TEMPLATE_LIMIT - templates.length}));
+            }
+            if (this.isDestroyed()) {
+                return;
+            }
+            this.st.templates = templates;
+            this.$('.o-dwo-templateMenu').html(QWeb.render('dwo_mail_compose.TemplateMenu', {templates: templates}));
+        } catch (e) {
+            // a request cut by a page that closes: nothing to show
         }
-        if (this.isDestroyed()) {
-            return;
-        }
-        this.st.templates = templates;
-        this.$('.o-dwo-templateMenu').html(QWeb.render('dwo_mail_compose.TemplateMenu', {templates: templates}));
     },
 
     //--------------------------------------------------------------------------
@@ -764,7 +768,7 @@ var EmailComposer = Widget.extend({
         }
         this.dirty = true;
         clearTimeout(this.saveTimer);
-        this.saveTimer = setTimeout(function () { self._saveNow(); }, SAVE_DELAY);
+        this.saveTimer = setTimeout(function () { self._saveNow().catch(function () {}); }, SAVE_DELAY);
     },
     /**
      * Saves are chained: a save never starts before the previous one is stored.
@@ -939,22 +943,26 @@ var EmailComposer = Widget.extend({
      * @private
      */
     _refreshReplyTo: async function () {
-        if (this.isDestroyed()) {
-            return;
+        try {
+            if (this.isDestroyed()) {
+                return;
+            }
+            var st = this.st;
+            var result = await this._call('get_reply_to', [
+                this.model, this.resId, st.from || false, st.replyToCustom ? st.replyTo : false,
+            ]);
+            if (this.isDestroyed()) {
+                return;
+            }
+            st.replyToDefault = result.default.email;
+            st.replyToManaged = result.managed;
+            if (!st.replyToCustom) {
+                st.replyTo = result.default.email;
+            }
+            this._renderReplyTo();
+        } catch (e) {
+            // a request cut by a page that closes: nothing to show
         }
-        var st = this.st;
-        var result = await this._call('get_reply_to', [
-            this.model, this.resId, st.from || false, st.replyToCustom ? st.replyTo : false,
-        ]);
-        if (this.isDestroyed()) {
-            return;
-        }
-        st.replyToDefault = result.default.email;
-        st.replyToManaged = result.managed;
-        if (!st.replyToCustom) {
-            st.replyTo = result.default.email;
-        }
-        this._renderReplyTo();
     },
     /**
      * @private
@@ -1383,15 +1391,19 @@ var EmailComposer = Widget.extend({
      * @private
      */
     _refreshList: async function () {
-        if (this.isDestroyed()) {
-            return;
+        try {
+            if (this.isDestroyed()) {
+                return;
+            }
+            var emails = await this._call('list_emails', [this.model, this.resId]);
+            if (this.isDestroyed()) {
+                return;
+            }
+            this.st.emails = emails;
+            this._renderList();
+        } catch (e) {
+            // a request cut by a page that closes: nothing to show
         }
-        var emails = await this._call('list_emails', [this.model, this.resId]);
-        if (this.isDestroyed()) {
-            return;
-        }
-        this.st.emails = emails;
-        this._renderList();
     },
     /**
      * Open an email of the list in the form, after saving the one being written.

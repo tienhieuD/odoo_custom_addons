@@ -37,7 +37,11 @@ class TestApproval(MailCommon):
     # ------------------------------------------------------------
 
     def _composer(self, user=None):
-        return self.env["dwo.mail.composer"].sudo(user or self.author)
+        composer = self.env["dwo.mail.composer"].sudo(user or self.author)
+        # Odoo 12: the environment of another user has a cache of its own, which a write made in this one does not
+        # reach (in a real request each environment starts empty)
+        composer.env.cache.invalidate()
+        return composer
 
     def _request(self, approvers, comment="please check", **vals):
         """The author writes an email and asks for approval. Returns the stored email."""
@@ -98,9 +102,9 @@ class TestApproval(MailCommon):
         self.assertIn(str(email.id), body)
         # the approvers got a message on the email, with a way to open it
         notice = self.env["mail.message"].search([
-            ("model", "=", "dwo.mail.email"), ("res_id", "=", email.id), ("message_type", "=", "user_notification")])
-        self.assertTrue(notice)
-        self.assertEqual(notice.partner_ids, (self.approver_a | self.approver_b).partner_id)
+            ("model", "=", "dwo.mail.email"), ("res_id", "=", email.id), ("partner_ids", "!=", False)])
+        self.assertTrue(notice)  # Odoo 12 has no user_notification type: it is a notification with recipients
+        self.assertEqual(notice.partner_ids, (self.approver_a | self.approver_b).mapped("partner_id"))
 
     def test_comment_is_optional(self):
         email = self._request(self.approver_a, comment=False)

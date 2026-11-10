@@ -107,7 +107,7 @@
                             <button type="button" class="o-dwo-advancedBtn btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" title="More settings of the email."><i class="fa fa-sliders"/> Advanced</button>
                             <div class="o-dwo-advancedMenu dropdown-menu">
                                 <div class="px-3 pb-1 text-muted">Add a field to the email</div>
-                                <a href="#" class="o-dwo-addReplyTo dropdown-item">Reply to <span class="text-muted">(default: <span class="o-dwo-replyToDefault">...</span>)</span> <i class="o-dwo-replyToCheck fa fa-check ml-2 text-success d-none"/></a>
+                                <a class="o-dwo-addReplyTo dropdown-item">Reply to <span class="text-muted">(default: <span class="o-dwo-replyToDefault">...</span>)</span> <i class="o-dwo-replyToCheck fa fa-check ml-2 text-success d-none"/></a>
                             </div>
                         </span>
                         <span class="o-dwo-templateBadgeSlot"/>
@@ -148,7 +148,7 @@
     <t t-name="dwo_mail_compose.TemplateBadge">
         <span class="o-dwo-templateBadge badge badge-light border font-weight-normal" title="Template applied. Remove it to take back the recipients and files it added; your text stays.">
             <i class="fa fa-file-text-o"/> <span class="o-dwo-templateName"><t t-esc="name"/></span>
-            <button type="button" class="o-dwo-templateRemove close ml-1" aria-label="Remove the template"><span aria-hidden="true">×</span></button>
+            <button type="button" class="o-dwo-templateRemove close ml-1" aria-label="Remove the template"><span>×</span></button>
         </span>
     </t>
 
@@ -186,23 +186,23 @@
     <t t-name="dwo_mail_compose.Attachments">
         <span t-foreach="attachments" t-as="att" class="o-dwo-attachment badge badge-light border font-weight-normal mr-1" t-att-data-id="att.id">
             <i class="fa fa-paperclip"/> <t t-esc="att.name"/>
-            <button type="button" class="o-dwo-attachmentRemove close ml-1" t-att-data-id="att.id" t-att-aria-label="'Remove ' + att.name"><span aria-hidden="true">×</span></button>
+            <button type="button" class="o-dwo-attachmentRemove close ml-1" t-att-data-id="att.id" t-att-aria-label="'Remove ' + att.name"><span>×</span></button>
         </span>
     </t>
 
     <t t-name="dwo_mail_compose.TemplateMenu">
         <div class="px-3 pb-1 text-muted">Select a Template</div>
         <div t-if="templates.length" style="max-height: 40vh; overflow-y: auto;">
-            <a t-foreach="templates" t-as="template" href="#" class="o-dwo-templateItem dropdown-item text-truncate" t-att-data-id="template.id">
+            <a t-foreach="templates" t-as="template" class="o-dwo-templateItem dropdown-item text-truncate" t-att-data-id="template.id">
                 <t t-if="template.display_name"><t t-esc="template.display_name"/></t>
                 <span t-else="" class="font-italic">Untitled</span>
             </a>
         </div>
         <div t-else="" class="font-italic px-3">No saved templates</div>
         <div class="dropdown-divider"/>
-        <a href="#" class="o-dwo-saveTemplate dropdown-item">Save as Template</a>
+        <a class="o-dwo-saveTemplate dropdown-item">Save as Template</a>
         <div class="dropdown-divider"/>
-        <a href="#" class="o-dwo-manageTemplates dropdown-item">Manage Templates</a>
+        <a class="o-dwo-manageTemplates dropdown-item">Manage Templates</a>
     </t>
 
     <t t-name="dwo_mail_compose.SendArea">
@@ -212,8 +212,8 @@
                     <i t-attf-class="fa #{st.sending ? 'fa-circle-o-notch fa-spin' : 'fa-paper-plane'}"/> Send email
                 </button>
                 <div class="o-dwo-sendMenu dropdown-menu">
-                    <a href="#" class="o-dwo-sendNow dropdown-item"><i class="fa fa-paper-plane fa-fw"/> Send now<div class="text-muted small">Goes to the recipients right away.</div></a>
-                    <a href="#" class="o-dwo-requestApproval dropdown-item"><i class="fa fa-user-circle-o fa-fw"/> Request approval and send<div class="text-muted small">Somebody approves it, then it is sent.</div></a>
+                    <a class="o-dwo-sendNow dropdown-item"><i class="fa fa-paper-plane fa-fw"/> Send now<div class="text-muted small">Goes to the recipients right away.</div></a>
+                    <a class="o-dwo-requestApproval dropdown-item"><i class="fa fa-user-circle-o fa-fw"/> Request approval and send<div class="text-muted small">Somebody approves it, then it is sent.</div></a>
                 </div>
             </span>
         </t>
@@ -272,12 +272,12 @@
             <span class="o-dwo-chipText"><t t-esc="address.name || address.email"/></span>
             <small t-if="address.name" class="o-dwo-chipEmail"><t t-esc="address.email"/></small>
             <small t-if="address.isNew" class="o-dwo-chipNew text-info">new</small>
-            <button type="button" class="o-dwo-chipRemove close ml-1" t-att-data-email="address.email" t-att-title="'Remove ' + address.email"><span aria-hidden="true">×</span></button>
+            <button type="button" class="o-dwo-chipRemove close ml-1" t-att-data-email="address.email" t-att-title="'Remove ' + address.email"><span>×</span></button>
         </span>
     </t>
 
     <t t-name="dwo_mail_compose.Suggestions">
-        <a t-foreach="suggestions" t-as="s" href="#" t-attf-class="o-dwo-suggestion dropdown-item d-flex justify-content-between #{s_index === active and 'active' or ''}" t-att-data-index="s_index">
+        <a t-foreach="suggestions" t-as="s" t-attf-class="o-dwo-suggestion dropdown-item d-flex justify-content-between #{s_index === active and 'active' or ''}" t-att-data-index="s_index">
             <span class="text-truncate"><t t-esc="s.name"/> <small class="opacity-75"><t t-esc="s.email"/></small></span>
             <small class="ml-2"><t t-esc="s.source"/></small>
         </a>
@@ -303,7 +303,7 @@
     <t t-name="dwo_mail_compose.ApproverChips">
         <span t-foreach="approvers" t-as="user" class="o-dwo-approverChip badge badge-pill badge-primary font-weight-normal mr-1">
             <t t-esc="user.name"/>
-            <button type="button" class="o-dwo-approverRemove close text-white ml-1" t-att-data-id="user.id" t-att-aria-label="'Remove ' + user.name"><span aria-hidden="true">×</span></button>
+            <button type="button" class="o-dwo-approverRemove close text-white ml-1" t-att-data-id="user.id" t-att-aria-label="'Remove ' + user.name"><span>×</span></button>
         </span>
     </t>
 
