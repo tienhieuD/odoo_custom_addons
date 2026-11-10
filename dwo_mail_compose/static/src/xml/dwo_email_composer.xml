@@ -107,7 +107,7 @@
                             <button type="button" class="o-dwo-advancedBtn btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" title="More settings of the email."><i class="fa fa-sliders"/> Advanced</button>
                             <div class="o-dwo-advancedMenu dropdown-menu">
                                 <div class="px-3 pb-1 text-muted">Add a field to the email</div>
-                                <a href="#" class="o-dwo-addReplyTo dropdown-item">Reply to <span class="text-muted">(default: <span class="o-dwo-replyToDefault">...</span>)</span> <i class="o-dwo-replyToCheck fa fa-check ml-2 text-success d-none"/></a>
+                                <a class="o-dwo-addReplyTo dropdown-item">Reply to <span class="text-muted">(default: <span class="o-dwo-replyToDefault">...</span>)</span> <i class="o-dwo-replyToCheck fa fa-check ml-2 text-success d-none"/></a>
                             </div>
                         </span>
                         <span class="o-dwo-templateBadgeSlot"/>
@@ -193,16 +193,16 @@
     <t t-name="dwo_mail_compose.TemplateMenu">
         <div class="px-3 pb-1 text-muted">Select a Template</div>
         <div t-if="templates.length" style="max-height: 40vh; overflow-y: auto;">
-            <a t-foreach="templates" t-as="template" href="#" class="o-dwo-templateItem dropdown-item text-truncate" t-att-data-id="template.id">
+            <a t-foreach="templates" t-as="template" class="o-dwo-templateItem dropdown-item text-truncate" t-att-data-id="template.id">
                 <t t-if="template.display_name"><t t-esc="template.display_name"/></t>
                 <span t-else="" class="font-italic">Untitled</span>
             </a>
         </div>
         <div t-else="" class="font-italic px-3">No saved templates</div>
         <div class="dropdown-divider"/>
-        <a href="#" class="o-dwo-saveTemplate dropdown-item">Save as Template</a>
+        <a class="o-dwo-saveTemplate dropdown-item">Save as Template</a>
         <div class="dropdown-divider"/>
-        <a href="#" class="o-dwo-manageTemplates dropdown-item">Manage Templates</a>
+        <a class="o-dwo-manageTemplates dropdown-item">Manage Templates</a>
     </t>
 
     <t t-name="dwo_mail_compose.SendArea">
@@ -212,8 +212,8 @@
                     <i t-attf-class="fa #{st.sending ? 'fa-circle-o-notch fa-spin' : 'fa-paper-plane'}"/> Send email
                 </button>
                 <div class="o-dwo-sendMenu dropdown-menu">
-                    <a href="#" class="o-dwo-sendNow dropdown-item"><i class="fa fa-paper-plane fa-fw"/> Send now<div class="text-muted small">Goes to the recipients right away.</div></a>
-                    <a href="#" class="o-dwo-requestApproval dropdown-item"><i class="fa fa-user-circle-o fa-fw"/> Request approval and send<div class="text-muted small">Somebody approves it, then it is sent.</div></a>
+                    <a class="o-dwo-sendNow dropdown-item"><i class="fa fa-paper-plane fa-fw"/> Send now<div class="text-muted small">Goes to the recipients right away.</div></a>
+                    <a class="o-dwo-requestApproval dropdown-item"><i class="fa fa-user-circle-o fa-fw"/> Request approval and send<div class="text-muted small">Somebody approves it, then it is sent.</div></a>
                 </div>
             </span>
         </t>
@@ -277,7 +277,7 @@
     </t>
 
     <t t-name="dwo_mail_compose.Suggestions">
-        <a t-foreach="suggestions" t-as="s" href="#" t-attf-class="o-dwo-suggestion dropdown-item d-flex justify-content-between #{s_index === active and 'active' or ''}" t-att-data-index="s_index">
+        <a t-foreach="suggestions" t-as="s" t-attf-class="o-dwo-suggestion dropdown-item d-flex justify-content-between #{s_index === active and 'active' or ''}" t-att-data-index="s_index">
             <span class="text-truncate"><t t-esc="s.name"/> <small class="opacity-75"><t t-esc="s.email"/></small></span>
             <small class="ml-2"><t t-esc="s.source"/></small>
         </a>

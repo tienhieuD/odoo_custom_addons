@@ -202,6 +202,8 @@ var AddressInput = Widget.extend({
                 self.active = -1;
                 self._renderSuggestions();
             }
+        }).catch(function () {
+            // a request cut by a page that closes: no suggestions
         });
     },
     /**

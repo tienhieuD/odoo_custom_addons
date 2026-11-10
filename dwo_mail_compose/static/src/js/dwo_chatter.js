@@ -249,6 +249,8 @@ Chatter.include({
             if (!self.isDestroyed() && self.record.res_id === resId) {
                 self._dwoSetDot(hasDraft);
             }
+        }).catch(function () {
+            // a request cut by a page that closes: the dot stays as it is
         });
     },
 
@@ -364,5 +366,6 @@ var DwoApprovalService = AbstractService.extend({
 });
 
 core.serviceRegistry.add('dwo_mail_approval', DwoApprovalService);
+
 
 });
