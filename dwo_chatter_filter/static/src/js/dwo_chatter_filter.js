@@ -54,10 +54,23 @@ DocumentThread.include({
      */
     getMessages: function () {
         const messages = this._super.apply(this, arguments);
-        if (!this._dwoFilter || !this._dwoIDs) {
-            return messages;
+        if (this._dwoFilter && this._dwoIDs) {
+            return _.filter(messages, (message) => _.contains(this._dwoIDs, message.getID()));
         }
-        return _.filter(messages, (message) => _.contains(this._dwoIDs, message.getID()));
+        // All: the filter may have loaded older messages of its kind. Only the messages without a hole (from the
+        // newest one, no gap) are shown, so the history never has holes; "Load more" fills the gaps in order.
+        const loaded = {};
+        _.each(messages, (message) => { loaded[message.getID()] = true; });
+        const known = {};
+        _.each(this._messageIDs, (id) => { known[id] = true; });
+        const visible = {};
+        for (const id of _.sortBy(this._messageIDs, (id) => -id)) {
+            if (!loaded[id]) {
+                break;
+            }
+            visible[id] = true;
+        }
+        return _.filter(messages, (message) => visible[message.getID()] || !known[message.getID()]);
     },
     /**
      * While a kind is chosen, the ids of that kind come from the server.
@@ -129,6 +142,8 @@ ThreadField.include({
             $wrap.insertBefore($thread);
             $wrap.append(self._$dwoFilter, $thread);
             self.setElement($wrap);
+            // setElement removes every '.widget_events' handler of the old element, the ones of the thread widget too
+            self._threadWidget._delegateEvents();
             self._$dwoFilter.on('click', '.o-dwo-filterBadge', self._dwoOnClickBadge.bind(self));
         });
     },
