@@ -1,3 +1,5 @@
+// Each chip has its own colour (--dwo-chip, set on the chip): outlined when off, filled when chosen.
+// --dwo-chip-text is the colour of the text on a filled chip, chosen to read on that colour.
 .o-dwo-messageFilter {
     font-size: .75rem;
     .o-dwo-filterLabel { font-size: .75rem; }
@@ -6,13 +8,14 @@
         font-size: .7rem;
         padding: .25rem .55rem;
         line-height: 1.2;
+        color: var(--dwo-chip);
+        background-color: transparent;
+        border-color: var(--dwo-chip) !important;
+        &.o-dwo-filterActive {
+            color: var(--dwo-chip-text);
+            background-color: var(--dwo-chip);
+        }
         &.o-dwo-filterEmpty { opacity: .45; cursor: default; }
     }
-}
-
-// Bootstrap has no purple among its contextual colours: the badge of the activities has the same three states
-.o-dwo-messageFilter {
-    .text-purple { color: #6f42c1 !important; }
-    .border-purple { border-color: #6f42c1 !important; }
-    .text-bg-purple { color: #fff !important; background-color: #6f42c1 !important; }
+    .o-dwo-filterEdit { font-size: .7rem; }
 }
