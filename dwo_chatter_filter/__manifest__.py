@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Message Filter on Chatter",
-    "version": "19.0.1.1.0",
+    "name": "Chatter Quick Filter",
+    "version": "19.0.2.0.0",
     "summary": "Badges above the chatter to show only discussions, emails, activities, notes or tracking messages.",
     "description": "Adds a row of badges at the top of the chatter, under Send message, Log note and Activity: All, Discussions, Emails, Activities, Notes, Tracking and Other, each with its number of messages. A click shows only that kind of message, loaded from the server, so Load more keeps working. Requires only the standard mail module.",
     "author": "DUO-TEK Software Vietnam",
@@ -10,6 +10,11 @@
     "category": "Productivity/Discuss",
     "images": ["static/description/banner.png"],
     "depends": ["mail"],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/dwo_chatter_filter_data.xml",
+        "views/dwo_chatter_filter_views.xml",
+    ],
     "assets": {
         "web.assets_backend": ["dwo_chatter_filter/static/src/**/*"],
         "web.assets_tests": ["dwo_chatter_filter/static/tests/**/*"],

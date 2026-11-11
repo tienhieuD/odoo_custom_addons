@@ -77,49 +77,67 @@ class TestMessageFilter(MailCommon):
         self.assertIn(self.activity.id, self._ids("tracking"))
         self.assertNotIn(self.activity.id, self._ids("activity"))
 
-    def test_the_store_tells_the_browser_which_message_is_an_activity(self):
-        from odoo.addons.mail.tools.discuss import Store
-        store = Store().add(self.activity | self.note).get_result()
-        flags = {m["id"]: m["dwo_is_activity"] for m in store["mail.message"]}
-        self.assertEqual(flags, {self.activity.id: True, self.note.id: False})
-
     def test_a_tracking_message_is_tracking_even_with_the_subtype_note(self):
         self.assertIn(self.tracking.id, self._ids("tracking"))
         self.assertNotIn(self.tracking.id, self._ids("note"))
 
-    def test_counts(self):
-        counts = self.env["mail.message"].with_user(self.user_employee).dwo_filter_counts("res.partner", self.record.id)
-        self.assertEqual(counts["all"], 9)
-        self.assertEqual(
-            {key: counts[key] for key in CATEGORIES},
-            {"tracking": 1, "email": 2, "activity": 1, "note": 1, "discussion": 2, "other": 2})
-        self.assertEqual(sum(counts[key] for key in CATEGORIES), counts["all"])
+    def _chip(self, kind):
+        return self.env.ref("dwo_chatter_filter.dwo_filter_" + kind)
 
-    def test_fetch_by_kind_is_paginated_on_the_filtered_list(self):
+    def test_counts(self):
+        result = self.env["mail.message"].with_user(self.user_employee).dwo_filter_chips("res.partner", self.record.id)
+        self.assertEqual(result["all"], 9)
+        counts = {chip["name"]: chip["count"] for chip in result["chips"]}
+        self.assertEqual(counts, {"Tracking": 1, "Emails": 2, "Activities": 1, "Notes": 1, "Discussions": 2, "Other": 2})
+        self.assertEqual(sum(counts.values()), result["all"])
+        # in the order of the sequence
+        self.assertEqual([c["name"] for c in result["chips"]],
+                         ["Discussions", "Emails", "Activities", "Notes", "Tracking", "Other"])
+
+    def test_the_kind_is_a_field_that_can_be_searched_and_read(self):
+        Message = self.env["mail.message"]
+        base = [("model", "=", "res.partner"), ("res_id", "=", self.record.id)]
+        self.assertEqual(set(Message.search(base + [("dwo_kind", "=", "email")]).ids),
+                         {self.email_in.id, self.email_out.id})
+        self.assertEqual(len(Message.search(base + [("dwo_kind", "in", ["note", "tracking"])])), 2)
+        self.assertEqual(len(Message.search(base + [("dwo_kind", "!=", "email")])), 7)
+        self.assertEqual((self.note | self.email_in | self.tracking).mapped("dwo_kind"), ["note", "email", "tracking"])
+
+    def test_fetch_by_chip_is_paginated_on_the_filtered_list(self):
         Message = self.env["mail.message"].with_user(self.user_employee)
-        first = Message._message_fetch(None, thread=self.record, dwo_category="email", limit=1)
+        chip = self._chip("email").id
+        first = Message._message_fetch(None, thread=self.record, dwo_filter_id=chip, limit=1)
         self.assertEqual(len(first["messages"]), 1)
-        older = Message._message_fetch(None, thread=self.record, dwo_category="email", limit=1,
+        older = Message._message_fetch(None, thread=self.record, dwo_filter_id=chip, limit=1,
                                        before=first["messages"].id)
         self.assertEqual(len(older["messages"]), 1)
         self.assertEqual({first["messages"].id, older["messages"].id}, {self.email_in.id, self.email_out.id})
         # nothing older of that kind
-        end = Message._message_fetch(None, thread=self.record, dwo_category="email", limit=1,
+        end = Message._message_fetch(None, thread=self.record, dwo_filter_id=chip, limit=1,
                                      before=older["messages"].id)
         self.assertFalse(end["messages"])
 
-    def test_without_a_kind_the_fetch_is_the_core_one(self):
+    def test_without_a_chip_the_fetch_is_the_core_one(self):
         Message = self.env["mail.message"].with_user(self.user_employee)
         res = Message._message_fetch(None, thread=self.record)
         self.assertEqual(len(res["messages"]), 9)
+
+    def test_an_archived_or_deleted_chip_filters_nothing(self):
+        Message = self.env["mail.message"].with_user(self.user_employee)
+        chip = self._chip("email")
+        chip.active = False
+        self.assertEqual(len(Message._message_fetch(None, thread=self.record, dwo_filter_id=chip.id)["messages"]), 9)
+        gone = chip.id
+        chip.unlink()
+        self.assertEqual(len(Message._message_fetch(None, thread=self.record, dwo_filter_id=gone)["messages"]), 9)
 
     def test_unknown_kind_is_refused(self):
         with self.assertRaises(UserError):
             self.env["mail.message"]._dwo_category_domain("nonsense")
 
-    def test_portal_cannot_ask_for_counts(self):
+    def test_portal_cannot_ask_for_chips(self):
         portal = self.env["res.users"].with_context(no_reset_password=True).create({
             "name": "Portal", "login": "portal_filter", "email": "portal.filter@example.com",
             "group_ids": [(6, 0, [self.env.ref("base.group_portal").id])]})
         with self.assertRaises(AccessError):
-            self.env["mail.message"].with_user(portal).dwo_filter_counts("res.partner", self.record.id)
+            self.env["mail.message"].with_user(portal).dwo_filter_chips("res.partner", self.record.id)
