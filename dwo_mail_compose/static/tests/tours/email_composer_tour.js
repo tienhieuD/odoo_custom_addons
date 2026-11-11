@@ -32,10 +32,48 @@ const adapt = (step) => {
     return { in_modal: false, ...step, run };
 };
 
+// The tour manager of this version calls "run" and does not wait for what it returns: a step whose run is
+// async (a wait, a call to the server) would be over at once and its checks would be lost. The async run is
+// started by one step and the next step waits for a mark on the body that says it is finished; an error of
+// the run is thrown by that next step, so the tour fails.
+const ASYNC_DONE = "o-dwo-asyncDone";
+const isAsync = (fn) => typeof fn === "function" && fn.constructor.name === "AsyncFunction";
+const expandAsync = (steps) =>
+    steps.flatMap((step) => {
+        if (!isAsync(step.run)) {
+            return [step];
+        }
+        const run = step.run;
+        return [
+            {
+                ...step,
+                run: function (helper) {
+                    document.body.classList.remove(ASYNC_DONE);
+                    window.__dwoAsyncError = null;
+                    run.call(this, helper)
+                        .catch((error) => {
+                            window.__dwoAsyncError = error;
+                        })
+                        .then(() => document.body.classList.add(ASYNC_DONE));
+                },
+            },
+            {
+                trigger: `body.${ASYNC_DONE}`,
+                in_modal: false,
+                isCheck: true,
+                run: () => {
+                    if (window.__dwoAsyncError) {
+                        throw window.__dwoAsyncError;
+                    }
+                },
+            },
+        ];
+    });
+
 // the tours of Odoo 16 are registered with the legacy API
 const tours = {
     add(name, definition) {
-        tour.register(name, { test: true }, definition.steps().map(adapt));
+        tour.register(name, { test: true }, expandAsync(definition.steps().map(adapt)));
     },
 };
 
