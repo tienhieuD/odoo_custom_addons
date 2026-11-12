@@ -3562,3 +3562,14 @@ msgid ""
 msgstr ""
 "現在までに消費した稼働時間：稼働時間に、現在進行中の区間を加えたものです。画面の読み込み時に計算されるため、並べ替え・絞り込み・グループ化はできません。レポートでは稼働時間を使用します。例：保存済みの稼働時間が"
 " 1.0 のまま実行中のタスクで 2.5。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. partner_id.resource_calendar_id"
+msgstr "例：partner_id.resource_calendar_id"
+
+#. module: dwo_sla_core
+#: code:addons/dwo_sla_core/models/sla_apply_wizard.py:0
+#, python-format
+msgid "Only an SLA Configuration Administrator can apply an SLA to existing records."
+msgstr "既存のレコードにSLAを適用できるのは、SLA設定管理者のみです。"
