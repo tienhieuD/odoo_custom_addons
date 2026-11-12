@@ -9,8 +9,11 @@ class TestStickyTour(HttpCase):
 
     browser_size = "1366,768"
 
-    def test_header_sticky_on_vertical_scroll(self):
+    def test_header_sticky_without_pinned_column(self):
         self.start_tour(PARTNER_LIST, 'lshc_header_sticky', login='admin')
+
+    def test_header_sticky_when_column_pinned(self):
+        self.start_tour(PARTNER_LIST, 'lshc_header_sticky_pinned', login='admin')
 
     def test_pin_buttons_added_once(self):
         self.start_tour(PARTNER_LIST, 'lshc_pin_buttons', login='admin')
@@ -33,3 +36,10 @@ class TestStickyTour(HttpCase):
 
     def test_list_in_dialog(self):
         self.start_tour('/web#action=base.action_partner_form&view_type=form&id=', 'lshc_dialog', login='admin')
+
+    def test_pin_first_column(self):
+        group = self.env.ref('base.group_user')
+        self.start_tour('/web#action=base.action_res_groups&view_type=form&id=%d' % group.id, 'lshc_pin_first_column', login='admin')
+
+    def test_unpin_then_reopen_list(self):
+        self.start_tour(PARTNER_LIST, 'lshc_unpin_remount', login='admin')
