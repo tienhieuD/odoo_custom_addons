@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import glob
+import importlib.util
+import os
 import random
 
 from odoo.addons.mail.tests.common import MailCommon
@@ -43,6 +46,20 @@ class TestChatterFilterChips(MailCommon):
                          ["Discussions", "Emails", "Activities", "Notes", "Tracking", "Other"])
         self.assertEqual(chips.mapped("color"),
                          ["#71639e", "#17a2b8", "#6f42c1", "#ffac00", "#28a745", "#dc3545"])
+
+    def test_the_upgrade_creates_the_six_chips_once(self):
+        # the post-migrate script of this version: a database that had the fixed badges gets the six chips
+        path = glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "migrations", "*", "post-migrate.py"))[0]
+        spec = importlib.util.spec_from_file_location("dwo_chatter_filter_post_migrate", path)
+        script = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(script)
+        self.Chip.with_context(active_test=False).search([]).unlink()
+        script.migrate(self.env.cr, "1.1.0")
+        self.assertEqual(self.Chip.search([]).mapped("name"),
+                         ["Discussions", "Emails", "Activities", "Notes", "Tracking", "Other"])
+        # a chip deleted afterwards is only gone: the update never creates it again (forcecreate="0")
+        self.Chip.search([("name", "=", "Other")]).unlink()
+        self.assertEqual(len(self.Chip.search([])), 5)
 
     # ---- who can edit
 
