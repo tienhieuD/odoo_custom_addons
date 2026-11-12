@@ -5,7 +5,10 @@ import { replace } from '@mail/model/model_field_command';
 
 registerInstancePatchModel('mail.thread_cache', 'dwo_chatter_filter/static/src/models/thread_cache/thread_cache.js', {
     /**
-     * A message that arrives while a kind is chosen (bus) is hidden when it is of another kind.
+     * Odoo 15 shows in the main cache the messages it fetched and every newer message of the thread that is in
+     * the store. While a chip is chosen only the messages the server returned for that chip are shown: the
+     * browser cannot tell by itself which ones the chip would show. A message that arrives is asked for again
+     * (see DwoMessageFilter) and shows up if the chip holds it.
      *
      * @override
      */
@@ -14,11 +17,6 @@ registerInstancePatchModel('mail.thread_cache', 'dwo_chatter_filter/static/src/m
         if (!this.thread || !this.thread.dwoFilter) {
             return result;
         }
-        const messages = this.fetchedMessages.concat(
-            this.lastFetchedMessage
-                ? this.thread.messages.filter((message) => message.id > this.lastFetchedMessage.id)
-                : this.thread.messages
-        );
-        return replace(messages.filter((message) => message.dwoCategory === this.thread.dwoFilter));
+        return replace(this.fetchedMessages);
     },
 });

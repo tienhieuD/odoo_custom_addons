@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="dwo_chatter_filter.MessageFilter" owl="1">
-        <!-- Owl 1: a component always has a root node, hidden while there are no numbers -->
-        <div class="o-dwo-messageFilter d-flex flex-wrap align-items-center px-3 py-2 d-print-none" t-att-class="{ 'd-none': !state.counts }">
+        <!-- Owl 1: a component always has a root node, hidden while there is no data -->
+        <div class="o-dwo-messageFilter d-flex flex-wrap align-items-center px-3 py-2 d-print-none" t-att-class="{ 'd-none': !state.data }">
             <span class="o-dwo-filterLabel text-muted mr-1">Filter by:</span>
-            <t t-foreach="items" t-as="item" t-key="item.label">
+            <t t-foreach="items" t-as="item" t-key="item.id or 'all'">
                 <button type="button"
                         class="o-dwo-filterBadge badge badge-pill border d-inline-flex align-items-center font-weight-normal mr-1 mb-1"
                         t-att-class="{
-                            ['text-bg-' + item.color + ' border-' + item.color]: isActive(item),
-                            ['bg-transparent text-' + item.color + ' border-' + item.color]: !isActive(item),
-                            'o-dwo-filterEmpty': item.count === 0 and item.id,
+                            'o-dwo-filterActive': isActive(item),
+                            'o-dwo-filterEmpty': isDisabled(item),
                         }"
-                        t-att-data-kind="item.id or 'all'"
-                        t-att-disabled="item.count === 0 and item.id and !isActive(item)"
-                        t-on-click="onClickBadge">
+                        t-att-style="chipStyle(item)"
+                        t-att-data-chip="item.id or 'all'"
+                        t-att-data-chip-name="item.label"
+                        t-att-disabled="isDisabled(item)"
+                        t-on-click="onClickChip">
                     <span t-esc="item.label"/>
-                    <span class="o-dwo-filterCount font-weight-bold ml-1" t-esc="item.count"/>
+                    <span class="o-dwo-filterCount font-weight-bold ml-1" t-esc="item.count === null ? '?' : item.count"/>
                 </button>
             </t>
+            <button t-if="isAdmin" type="button" class="o-dwo-filterEdit btn btn-link btn-sm p-0 ml-1"
+                    t-on-click="onClickEdit">Edit</button>
         </div>
     </t>
 </templates>

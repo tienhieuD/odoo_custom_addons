@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The chips that come with the module, the same as before the chips could be edited. noupdate: an update
+         of the module does not overwrite what the administrator changed; forcecreate="0": a chip that was
+         deleted does not come back at the next update. An upgrade from 19.0.1.x creates them in
+         migrations/19.0.2.0.0/post-migrate.py. -->
+    <data noupdate="1">
+        <record id="dwo_filter_discussion" model="dwo.chatter.filter" forcecreate="0">
+            <field name="name">Discussions</field>
+            <field name="sequence">10</field>
+            <field name="color">#71639e</field>
+            <field name="domain">[('dwo_kind', '=', 'discussion')]</field>
+        </record>
+        <record id="dwo_filter_email" model="dwo.chatter.filter" forcecreate="0">
+            <field name="name">Emails</field>
+            <field name="sequence">20</field>
+            <field name="color">#17a2b8</field>
+            <field name="domain">[('dwo_kind', '=', 'email')]</field>
+        </record>
+        <record id="dwo_filter_activity" model="dwo.chatter.filter" forcecreate="0">
+            <field name="name">Activities</field>
+            <field name="sequence">30</field>
+            <field name="color">#6f42c1</field>
+            <field name="domain">[('dwo_kind', '=', 'activity')]</field>
+        </record>
+        <record id="dwo_filter_note" model="dwo.chatter.filter" forcecreate="0">
+            <field name="name">Notes</field>
+            <field name="sequence">40</field>
+            <field name="color">#ffac00</field>
+            <field name="domain">[('dwo_kind', '=', 'note')]</field>
+        </record>
+        <record id="dwo_filter_tracking" model="dwo.chatter.filter" forcecreate="0">
+            <field name="name">Tracking</field>
+            <field name="sequence">50</field>
+            <field name="color">#28a745</field>
+            <field name="domain">[('dwo_kind', '=', 'tracking')]</field>
+        </record>
+        <record id="dwo_filter_other" model="dwo.chatter.filter" forcecreate="0">
+            <field name="name">Other</field>
+            <field name="sequence">60</field>
+            <field name="color">#dc3545</field>
+            <field name="domain">[('dwo_kind', '=', 'other')]</field>
+        </record>
+    </data>
+</odoo>

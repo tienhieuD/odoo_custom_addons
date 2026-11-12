@@ -1,3 +1,5 @@
+// Each chip has its own colour (--dwo-chip, set on the chip): outlined when off, filled when chosen.
+// --dwo-chip-text is the colour of the text on a filled chip, chosen to read on that colour.
 .o-dwo-messageFilter {
     font-size: .75rem;
     .o-dwo-filterLabel { font-size: .75rem; }
@@ -6,25 +8,14 @@
         font-size: .7rem;
         padding: .25rem .55rem;
         line-height: 1.2;
+        color: var(--dwo-chip);
+        background-color: transparent;
+        border-color: var(--dwo-chip) !important;
+        &.o-dwo-filterActive {
+            color: var(--dwo-chip-text);
+            background-color: var(--dwo-chip);
+        }
         &.o-dwo-filterEmpty { opacity: .45; cursor: default; }
     }
-}
-
-// Bootstrap has no purple among its contextual colours: the badge of the activities has the same three states
-.o-dwo-messageFilter {
-    .text-purple { color: #6f42c1 !important; }
-    .border-purple { border-color: #6f42c1 !important; }
-    .text-bg-purple { color: #fff !important; background-color: #6f42c1 !important; }
-}
-
-// This version has no --bs-primary, --bs-info... variables (they come with Bootstrap 5.2+): a rule built on
-// them is dropped by the browser and the chosen badge keeps its white text on no background at all. The
-// colours come from the SCSS variables of the theme, which exist when the file is compiled.
-.o-dwo-messageFilter {
-    .text-bg-primary { color: #fff !important; background-color: $primary !important; }
-    .text-bg-info { color: #000 !important; background-color: $info !important; }
-    .text-bg-warning { color: #000 !important; background-color: $warning !important; }
-    .text-bg-success { color: #fff !important; background-color: $success !important; }
-    .text-bg-danger { color: #fff !important; background-color: $danger !important; }
-    .text-bg-dark { color: #fff !important; background-color: $dark !important; }
+    .o-dwo-filterEdit { font-size: .7rem; }
 }
