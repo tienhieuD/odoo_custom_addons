@@ -1,7 +1,7 @@
 #!/bin/zsh
 # usage: legacy_port.sh <NN>  -- copy the 15.0 module to <NN> (14, 13, 12) and adapt manifest/assets
 v=$1
-M=/Users/hieu/Documents/Odoo/myproject
+M=$HOME/Documents/Project/odoo_appstore
 rm -rf $M/odoo_custom_addons$v/dwo_record_concurrency
 rsync -a --exclude __pycache__ --exclude .DS_Store $M/odoo_custom_addons15/dwo_record_concurrency/ $M/odoo_custom_addons$v/dwo_record_concurrency/
 cd $M/odoo_custom_addons$v/dwo_record_concurrency
