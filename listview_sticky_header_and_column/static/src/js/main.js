@@ -37,12 +37,13 @@ odoo.define('listview_sticky_header_and_column.ListRenderer', function (require)
             return this._super.apply(this, arguments).then(function (result) {
                 // the table is rebuilt on every render: remove the stale style and freeze again
                 self._lshcRemoveOldStyle();
+                self._lshcMarkStickyHead();
                 setTimeout(function () {
                     if (self.isDestroyed && self.isDestroyed()) {
                         return;
                     }
                     var columnIndex = self._lshcGetColumnIndex();
-                    if (columnIndex) {
+                    if (columnIndex !== null) {
                         self._lshcFreezeColumnListView(columnIndex);
                     }
                 }, 300);
@@ -76,8 +77,34 @@ odoo.define('listview_sticky_header_and_column.ListRenderer', function (require)
             return MODULE_KEY + '__model_' + (this.state && this.state.model) + field;
         },
 
+        /** Always-sticky header (even with no pinned column): class read by main.scss. Not for an x2many list in a form. */
+        _lshcMarkStickyHead: function () {
+            var parent = this.getParent();
+            if (parent && parent.attrs && parent.name) {
+                return;
+            }
+            this._lshcGetWrapper().addClass('lshc-sticky-head');
+        },
+
+        /** Saved column index; null when no column is pinned (0 is a valid index: the first column). */
         _lshcGetColumnIndex: function () {
-            return Number(localStorage.getItem(this._lshcGetKey()));
+            var key = this._lshcGetKey();
+            var result = localStorage.getItem(key);
+            if (result === null || result === '') {
+                return null;
+            }
+            var index = Number(result);
+            if (!Number.isInteger(index) || index < 0) {
+                // legacy "-1" left by older versions after an unpin, or garbage: nothing pinned
+                localStorage.removeItem(key);
+                return null;
+            }
+            return index;
+        },
+
+        /** Forget the pinned column (removes the localStorage key). */
+        _lshcClearColumnIndex: function () {
+            localStorage.removeItem(this._lshcGetKey());
         },
 
         _lshcSaveColumnIndex: function (index) {
@@ -94,8 +121,10 @@ odoo.define('listview_sticky_header_and_column.ListRenderer', function (require)
 
         _lshcOnPinClick: function ($th) {
             var columnIndex = $th.index();
-            if (this._lshcGetColumnIndex() === columnIndex) {
-                this._lshcSaveColumnIndex(-1);
+            var saved = this._lshcGetColumnIndex();
+            if (saved !== null && saved === columnIndex) {
+                // Unpin: null = nothing pinned, never store a sentinel like -1
+                this._lshcClearColumnIndex();
                 this._lshcRemoveOldStyle();
             } else {
                 this._lshcSaveColumnIndex(columnIndex);
@@ -115,7 +144,8 @@ odoo.define('listview_sticky_header_and_column.ListRenderer', function (require)
             // Scope every rule to THIS list only
             $wrapper.attr('data-lshc-id', this.lshcUid);
             var isEmbedded = !!this.$el.closest('.o_field_widget, .o_field_x2many').length;
-            var scope = '.o_content .table-responsive[data-lshc-id="' + this.lshcUid + '"]';
+            // `.o_content` for list views / x2many in forms, `.modal-body` for lists in dialogs
+            var scope = ':is(.o_content, .modal-body) .table-responsive[data-lshc-id="' + this.lshcUid + '"]';
 
             var headBg = opaqueBackground($wrapper.find('thead th')[0]);
             var baseBg = opaqueBackground($wrapper[0]);
