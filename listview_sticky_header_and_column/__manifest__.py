@@ -22,6 +22,9 @@
             'listview_sticky_header_and_column/static/src/scss/main.scss',
             'listview_sticky_header_and_column/static/src/js/main.js',
             'listview_sticky_header_and_column/static/src/xml/*.xml',
+        ],
+        'web.assets_tests': [
+            'listview_sticky_header_and_column/static/tests/tours/**/*',
         ]
     },
     'price': 34.00,
