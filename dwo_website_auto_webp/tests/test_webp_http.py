@@ -9,12 +9,15 @@ from .test_webp import ACCEPT_WEBP, make_image
 class TestWebpHttp(HttpCase):
     """End to end through /web/image: real request, Accept header, Content-Type."""
 
+    readonly_enabled = False  # Odoo 18: no read-only transaction for the readonly /web/image route (see setUpClass)
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         # /web/image is a readonly route: in test mode it gets a real read-only transaction, whereas a production
         # server without a replica gives a read/write cursor. Test the usual production setup.
-        cls.set_registry_readonly_mode(False)
+        if hasattr(cls, 'set_registry_readonly_mode'):  # Odoo 19+
+            cls.set_registry_readonly_mode(False)
         port = cls.http_port()
         # websites are told apart by the host of the request
         cls.site_a = cls.env['website'].create({'name': 'WebP HTTP A', 'domain': f'127.0.0.1:{port}'})
