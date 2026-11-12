@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="dwo_chatter_filter.MessageFilter">
-        <div t-if="this.state.counts" class="o-dwo-messageFilter d-flex flex-wrap align-items-center gap-1 px-3 py-2 d-print-none">
+        <div t-if="this.state.data" class="o-dwo-messageFilter d-flex flex-wrap align-items-center gap-1 px-3 py-2 d-print-none">
             <span class="o-dwo-filterLabel text-muted me-1">Filter by:</span>
-            <button t-foreach="this.items" t-as="item" t-key="item.label" type="button"
+            <button t-foreach="this.items" t-as="item" t-key="item.id or 'all'" type="button"
                     class="o-dwo-filterBadge badge rounded-pill border d-inline-flex align-items-center gap-1 fw-normal"
                     t-att-class="{
-                        ['text-bg-' + item.color + ' border-' + item.color]: this.isActive(item),
-                        ['bg-transparent text-' + item.color + ' border-' + item.color]: !this.isActive(item),
-                        'o-dwo-filterEmpty': item.count === 0 and item.id,
+                        'o-dwo-filterActive': this.isActive(item),
+                        'o-dwo-filterEmpty': this.isDisabled(item),
                     }"
-                    t-att-data-kind="item.id or 'all'"
-                    t-att-disabled="item.count === 0 and item.id and !this.isActive(item)"
+                    t-att-style="this.chipStyle(item)"
+                    t-att-data-chip="item.id or 'all'"
+                    t-att-data-chip-name="item.label"
+                    t-att-disabled="this.isDisabled(item)"
                     t-on-click="() => this.select(item)">
                 <span t-out="item.label"/>
-                <span class="o-dwo-filterCount fw-bold" t-out="item.count"/>
+                <span class="o-dwo-filterCount fw-bold" t-out="item.count ?? '?'"/>
             </button>
+            <button t-if="this.isAdmin" type="button" class="o-dwo-filterEdit btn btn-link btn-sm p-0 ms-1"
+                    t-on-click="() => this.edit()">Edit</button>
         </div>
     </t>
 </templates>

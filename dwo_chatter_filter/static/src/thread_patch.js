@@ -1,18 +1,15 @@
 import { fields } from "@mail/model/export";
-import { Thread } from "@mail/core/common/thread";
 import { Thread as ThreadModel } from "@mail/core/common/thread_model";
 import { patch } from "@web/core/utils/patch";
 
 patch(ThreadModel.prototype, {
     setup() {
         super.setup(...arguments);
-        /** The kind of message shown, false for all of them. */
+        /** The id of the chip chosen (the messages it shows are the only ones loaded), false for all. */
         this.dwoFilter = fields.Attr(false);
-        /** The number of messages: { all, tracking, email, note, discussion, other } */
-        this.dwoCounts = fields.Attr(null);
     },
 
-    /** While a kind is chosen, the server only returns that kind (Load more included). */
+    /** While a chip is chosen, the server only returns the messages of that chip (Load more included). */
     async fetchMessagesData({
         fetchParams: { after, around, before, limit } = {},
         routeParams = {},
@@ -30,7 +27,7 @@ patch(ThreadModel.prototype, {
                     after,
                     around,
                     before,
-                    dwo_category: this.dwoFilter,
+                    dwo_filter_id: this.dwoFilter,
                 },
             },
             { readonly: false, requestData: true }
@@ -45,13 +42,19 @@ patch(ThreadModel.prototype, {
         this.loadNewer = false;
     },
 
-    /** Show one kind of message (false: all of them), loaded from the server. */
-    async dwoSetFilter(category) {
-        category = category || false;
-        if (this.dwoFilter === category) {
+    /** Show the messages of one chip (false: all of them), loaded from the server. */
+    async dwoSetFilter(chipId) {
+        chipId = chipId || false;
+        if (this.dwoFilter === chipId) {
             return;
         }
-        this.dwoFilter = category;
+        this.dwoFilter = chipId;
+        this.dwoForgetMessages();
+        await this.fetchNewMessages();
+    },
+
+    /** Load the messages of the chosen chip again (a message arrived: the server says if it belongs). */
+    async dwoReload() {
         this.dwoForgetMessages();
         await this.fetchNewMessages();
     },
@@ -62,14 +65,5 @@ patch(ThreadModel.prototype, {
             this.dwoFilter = false;
             this.dwoForgetMessages();
         }
-    },
-});
-
-// A message that arrives while a kind is chosen (bus) is hidden when it is of another kind.
-patch(Thread.prototype, {
-    get orderedMessages() {
-        const messages = super.orderedMessages;
-        const filter = this.props.thread.dwoFilter;
-        return filter ? messages.filter((message) => message.dwoCategory === filter) : messages;
     },
 });
