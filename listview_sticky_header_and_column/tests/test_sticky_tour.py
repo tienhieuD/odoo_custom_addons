@@ -31,5 +31,12 @@ class TestStickyTour(HttpCase):
         group = self.env.ref('base.group_user')
         self.start_tour('/web#action=base.action_res_groups&view_type=form&id=%d' % group.id, 'lshc_o2m_form', login='admin')
 
+    def test_pin_first_column(self):
+        group = self.env.ref('base.group_user')
+        self.start_tour('/web#action=base.action_res_groups&view_type=form&id=%d' % group.id, 'lshc_pin_first_column', login='admin')
+
+    def test_unpin_then_reopen_list(self):
+        self.start_tour(PARTNER_LIST, 'lshc_unpin_remount', login='admin')
+
     def test_list_in_dialog(self):
         self.start_tour('/web#action=base.action_partner_form&view_type=form&id=', 'lshc_dialog', login='admin')
