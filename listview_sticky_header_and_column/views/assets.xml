@@ -11,5 +11,11 @@
             </xpath>
         </template>
 
+        <template id="assets_tests" name="Sticky list tours" inherit_id="web.assets_tests">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/listview_sticky_header_and_column/static/tests/tours/sticky_tour.js" />
+            </xpath>
+        </template>
+
     </data>
 </odoo>
