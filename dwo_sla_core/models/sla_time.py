@@ -65,10 +65,12 @@ class SlaTime(models.AbstractModel):
     def _apply_tz_override(self, definition, calendar):
         """Trả `calendar`, hoặc bản sao đổi tz nếu `calendar_tz_override` khác tz gốc.
 
-        Logic: scope-add "calendar_tz_override" (Cách A đã chốt). Không có
-        override, hoặc override bằng đúng tz hiện tại của `calendar`, thì
-        trả thẳng `calendar` (không tạo gì cả -- đường phổ biến, không tốn
-        query thêm cho mọi định nghĩa không dùng tính năng này).
+        Logic: scope-add "calendar_tz_override" (Cách A đã chốt). Timezone của
+        định nghĩa luôn thắng tz của calendar và là field bắt buộc; nhánh
+        `not calendar_tz_override` chỉ còn là phòng thủ cho dữ liệu ghi thẳng
+        SQL. Override bằng đúng tz hiện tại của `calendar` thì trả thẳng
+        `calendar` (không tạo bản sao, không tốn query thêm).
+        Refs: plan-improvement-sla-01-review §6.5
         """
         if not calendar or not definition.calendar_tz_override \
                 or definition.calendar_tz_override == calendar.tz:

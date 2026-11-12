@@ -9,3 +9,5 @@ access_sla_event_user,sla.event.user,model_sla_event,group_sla_user,1,0,0,0
 access_sla_event_manager,sla.event.manager,model_sla_event,group_sla_manager,1,0,0,0
 access_ir_model_sla_manager,ir.model.sla.manager,base.model_ir_model,group_sla_manager,1,0,0,0
 access_ir_model_fields_sla_manager,ir.model.fields.sla.manager,base.model_ir_model_fields,group_sla_manager,1,0,0,0
+access_sla_apply_job_manager,sla.apply.job.manager,model_sla_apply_job,group_sla_manager,1,0,0,0
+access_sla_apply_wizard_manager,sla.apply.wizard.manager,model_sla_apply_wizard,group_sla_manager,1,1,1,1

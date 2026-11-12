@@ -78,31 +78,35 @@ class TestDefinitionForm(UiCase):
                 form.name = "changed"
 
     def test_uix_004_005_help_warnings(self):
-        """TC-UIX-004/005 + CMP-009: help của start/pause nêu cảnh báo; cancel/resume thì không; cả 6 nêu giới hạn."""
+        """TC-UIX-004/005 + CMP-009: help của 6 điều kiện ngắn, trỏ sang tab Note; Note nêu
+        cảnh báo subset/mutually exclusive và giới hạn field không lưu/quan hệ."""
         info = self.Definition.with_user(self.manager).fields_get(
             [name + '_domain' for name in ('start', 'cancel', 'pause', 'resume', 'stop', 'reset')],
             attributes=['help'])
-        for name in ('start', 'pause'):
-            text = info[name + '_domain']['help'].lower()
-            self.assertIn('subset', text, name)
-            self.assertIn('mutually exclusive', text, name)
-        for name in ('cancel', 'resume'):
-            text = info[name + '_domain']['help'].lower()
-            self.assertNotIn('subset', text, name)
-            self.assertNotIn('mutually exclusive', text, name)
         for name, values in info.items():
             text = values['help'].lower()
-            self.assertIn('non-stored computed', text, name)
-            self.assertIn('re-evaluate', text, name)
+            self.assertIn('note tab', text, name)
+            self.assertNotIn('re-evaluate', text, name)
+            self.assertNotIn('subset', text, name)
+            self.assertNotIn('mutually exclusive', text, name)
+            self.assertLess(len(text), 500, name)
+        note = self.note_text('sla.definition')
+        for expected in ('subset', 'mutually exclusive', 'non-stored computed', 're-check conditions'):
+            self.assertIn(expected, note)
+
+    def note_text(self, model):
+        root = self.arch(model, 'form')
+        page = root.xpath("//page[@name='note']")
+        self.assertEqual(len(page), 1)
+        return ' '.join(''.join(page[0].itertext()).split()).lower()
 
     def test_uix_009_calendar_fallback_note_in_arch(self):
-        """TC-UIX-009: ghi chú lịch dự phòng chỉ hiện khi schedule_source = record."""
+        """TC-UIX-009: ghi chú lịch dự phòng nằm trong tab Note (không còn banner trên form)."""
         root = self.arch('sla.definition', 'form')
-        notes = root.xpath("//div[contains(@class, 'alert-warning')][@invisible]")
-        notes = [n for n in notes if 'schedule_source' in n.get('invisible')]
-        self.assertEqual(len(notes), 1)
-        self.assertIn("!= 'record'", notes[0].get('invisible'))
-        text = ' '.join(''.join(notes[0].itertext()).split()).lower()
+        banners = [n for n in root.xpath("//div[contains(@class, 'alert-warning')][@invisible]")
+                   if 'schedule_source' in n.get('invisible')]
+        self.assertEqual(banners, [])
+        text = self.note_text('sla.definition')
         self.assertIn('default working calendar', text)
         self.assertIn('24x7', text)
 
@@ -244,10 +248,13 @@ class TestReevaluateAndEvents(UiCase):
             task.with_user(self.manager).action_reevaluate()
         self.assertEqual((task.stage, task.end_time, task.business_duration), ('achieved', T0 + hours(2), 2.0))
         self.assertEqual(self.events(task).count('complete'), 1)
-        snapshot = (task.stage, task.end_time, task.business_duration, len(task.event_ids))
+        # Mỗi lần bấm nút ghi thêm một event `reevaluate` (dấu vết); event của engine không đổi.
+        engine_events = lambda: len(task.event_ids.filtered(lambda e: e.event != 'reevaluate'))  # noqa: E731
+        snapshot = (task.stage, task.end_time, task.business_duration, engine_events())
         with self.at(T0 + hours(5)):
             task.with_user(self.manager).action_reevaluate()
-        self.assertEqual((task.stage, task.end_time, task.business_duration, len(task.event_ids)), snapshot)
+        self.assertEqual((task.stage, task.end_time, task.business_duration, engine_events()), snapshot)
+        self.assertEqual(len(task.event_ids.filtered(lambda e: e.event == 'reevaluate')), 2)
         with self.assertRaises(AccessError):
             task.with_user(self.viewer).action_reevaluate()
         names = lambda user: [b.get('name') for b in self.arch('sla.task', 'form', user).iter('button')]  # noqa: E731

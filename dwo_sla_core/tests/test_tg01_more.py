@@ -54,15 +54,15 @@ class TestAttachEdges(SlaCase):
         self.assertEqual(self.events(t), ['attach'])
 
     def test_att_009_start_and_stop_no_attach(self):
-        """TC-ATT-009: start `[]` và stop cùng khớp -> không task, không event."""
-        d = self.make_definition(start_domain="[]")
+        """TC-ATT-009: start match-all và stop cùng khớp -> không task, không event."""
+        d = self.make_definition(start_domain="[('id', '!=', 0)]")
         p = self.make_partner('DONE')
         self.assertFalse(self.tasks(p, d))
         self.assertFalse(self.Event.sudo().search([('definition_id', '=', d.id)]))
 
     def test_att_010_start_and_cancel_no_attach(self):
-        """TC-ATT-010: start `[]` và cancel cùng khớp (cancel_mode condition) -> không task."""
-        d = self.make_definition(start_domain="[]", cancel_mode='condition')
+        """TC-ATT-010: start match-all và cancel cùng khớp (cancel_mode condition) -> không task."""
+        d = self.make_definition(start_domain="[('id', '!=', 0)]", cancel_mode='condition')
         p = self.make_partner('CANCEL')
         self.assertFalse(self.tasks(p, d))
         self.assertFalse(self.Event.sudo().search([('definition_id', '=', d.id)]))
@@ -87,8 +87,8 @@ class TestAttachEdges(SlaCase):
         self.assertEqual(len(t.event_ids), n_events)
 
     def test_att_016_cancelled_start_and_stop(self):
-        """TC-ATT-016: task cancelled, start `[]` khớp nhưng stop khớp -> không task mới."""
-        d = self.make_definition(start_domain="[]", cancel_mode='condition')
+        """TC-ATT-016: task cancelled, start match-all khớp nhưng stop khớp -> không task mới."""
+        d = self.make_definition(start_domain="[('id', '!=', 0)]", cancel_mode='condition')
         p = self.make_partner('NEW')
         self.write(p, {'ref': 'CANCEL'}, T0 + hours(1))
         t = self.task_of(p, d)
@@ -213,8 +213,8 @@ class TestPauseResumeEdges(SlaCase):
         self.assertEqual(t.event_ids.filtered(lambda e: e.event == 'resume').event_dt, T0 + hours(2))
 
     def test_pau_007_pause_unmatched_still_paused(self):
-        """TC-PAU-007: pause_unmatched, pause còn khớp dù resume `[]` khớp -> vẫn paused."""
-        d = self.make_definition(name="PU2", resume_mode='pause_unmatched', resume_domain="[]")
+        """TC-PAU-007: pause_unmatched, pause còn khớp dù resume match-all khớp -> vẫn paused."""
+        d = self.make_definition(name="PU2", resume_mode='pause_unmatched', resume_domain="[('id', '!=', 0)]")
         p = self.make_partner('WORK')
         self.write(p, {'ref': 'HOLD'}, T0 + hours(1))
         self.write(p, {'ref': 'HOLD'}, T0 + hours(2))

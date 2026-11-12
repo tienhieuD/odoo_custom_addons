@@ -58,7 +58,7 @@ class SlaEngine(models.AbstractModel):
         except Exception:  # noqa: BLE001 -- không được chặn lưu record (REQ-FUNC-030)
             _logger.exception("SLA engine evaluate() lỗi không lường trước sau khi lưu record")
 
-    def evaluate(self, records, now=None, changed=None):
+    def evaluate(self, records, now=None, changed=None, definitions=None):
         """Đánh giá SLA cho `records` theo mọi định nghĩa áp dụng.
 
         Logic: `changed` là tập tên field vừa đổi giá trị trong lần ghi đang
@@ -68,20 +68,23 @@ class SlaEngine(models.AbstractModel):
         Cờ `_sla_evaluating` chặn hook lồng trong lúc đánh giá; các thay đổi
         field compute bị hoãn được đánh giá bù ngay sau lượt ngoài cùng
         (tối đa vài vòng để không lặp vô hạn), việc đánh giá lại idempotent
-        (REQ-FUNC-015).
-        Refs: REQ-FUNC-004, 005, 014, 050
+        (REQ-FUNC-015). `definitions` (recordset `sla.definition`) giới hạn lượt
+        đánh giá đầu tiên vào đúng các định nghĩa đó, kể cả định nghĩa đã tắt;
+        None = mọi định nghĩa của model (hành vi mặc định của hook/cron). Lượt
+        đánh giá bù field compute KHÔNG dùng tham số này, giữ hành vi cũ.
+        Refs: REQ-FUNC-004, 005, 014, 050, plan-improvement-sla-01-review §6.18
         """
         if not records:
             return
         cr = self.env.cr
         if getattr(cr, '_sla_evaluating', False):
             # Gọi lồng trực tiếp (không qua hook): chạy thẳng, lượt ngoài lo phần bù.
-            self._evaluate_once(records, now, changed)
+            self._evaluate_once(records, now, changed, definitions)
             return
         cr._sla_evaluating = True
         cr._sla_pending = {}
         try:
-            self._evaluate_once(records, now, changed)
+            self._evaluate_once(records, now, changed, definitions)
             for _round in range(5):
                 pending, cr._sla_pending = cr._sla_pending, {}
                 if not pending:
@@ -94,18 +97,21 @@ class SlaEngine(models.AbstractModel):
             cr._sla_evaluating = False
             cr._sla_pending = {}
 
-    def _evaluate_once(self, records, now, changed):
-        """Một lượt đánh giá `records` theo mọi định nghĩa (xem `evaluate`).
+    def _evaluate_once(self, records, now, changed, definitions=None):
+        """Một lượt đánh giá `records` theo mọi định nghĩa, hoặc theo `definitions` nếu có.
 
-        Refs: REQ-FUNC-004, 005, 060, REQ-OBS-001
+        Refs: REQ-FUNC-004, 005, 060, REQ-OBS-001, plan-improvement-sla-01-review §6.18
         """
         now = now or fields.Datetime.now()
         changed = changed or set()
         self.env['sla.definition'].sudo()._ensure_hook_registered()
         # Định nghĩa archive vẫn được đánh giá để task đang chạy tiếp tục
         # stop/cancel/pause/resume (REQ-FUNC-060); chỉ không gắn task mới (REQ-FUNC-033).
-        definitions = self.env['sla.definition'].sudo().with_context(
-            active_test=False).search([('model_name', '=', records._name)])
+        if definitions is not None:
+            definitions = definitions.sudo()
+        else:
+            definitions = self.env['sla.definition'].sudo().with_context(
+                active_test=False).search([('model_name', '=', records._name)])
         for definition in definitions:
             defn_records = self._filter_company(definition, records)
             if defn_records:
@@ -141,14 +147,18 @@ class SlaEngine(models.AbstractModel):
         Refs: REQ-FUNC-004, 007, 014, 030, AD-03, AD-07
         """
         SlaTask = self.env['sla.task'].sudo()
-        match = self._match_sets(definition, records)
-
         active_tasks = SlaTask.search([
             ('sla_id', '=', definition.id),
             ('res_model', '=', records._name),
             ('res_id', 'in', records.ids),
             ('stage', 'in', ACTIVE_STAGES),
         ])
+        # Định nghĩa tắt mà không có task đang chạy thì không có gì để làm: bỏ qua
+        # trước khi tính 6 điều kiện (đường nóng, tắt là trạng thái bình thường).
+        if not definition.active and not active_tasks:
+            return
+        match = self._match_sets(definition, records)
+
         active_by_res = {t.res_id: t for t in active_tasks}
         no_active_ids = [rid for rid in records.ids if rid not in active_by_res]
         last_by_res = self._last_task_by_res(definition, records._name, no_active_ids) \
@@ -220,8 +230,8 @@ class SlaEngine(models.AbstractModel):
     def _match_sets(self, definition, records):
         """Tính tập id khớp cho 6 điều kiện, mỗi điều kiện một `filtered_domain`.
 
-        Logic: điều kiện rỗng (chưa cấu hình) không bao giờ khớp (tập rỗng);
-        domain `[]` khớp mọi record (REQ-FUNC-003).
+        Logic: điều kiện rỗng hoặc `[]` (chưa cấu hình) không bao giờ khớp (tập
+        rỗng); muốn khớp mọi record phải viết `[('id', '!=', 0)]` (REQ-FUNC-003).
         Refs: REQ-FUNC-003, AD-03
         """
         result = {}
@@ -266,7 +276,7 @@ class SlaEngine(models.AbstractModel):
             self._cancel(task, now)
             return
 
-        if definition.reset_domain and rid in match['reset'] and start_match:
+        if rid in match['reset'] and start_match:
             if self._reset_field_changed(definition, changed):
                 self._reset(definition, task, record, now, changed, match)
                 return

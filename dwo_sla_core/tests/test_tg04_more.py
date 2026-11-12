@@ -23,7 +23,7 @@ class ResetCase(SlaCase):
         names = fields_ if isinstance(fields_, (list, tuple)) else [fields_]
         ids = self.env['ir.model.fields'].search([
             ('model', '=', 'res.partner'), ('name', 'in', names)]).ids
-        base = {'start_domain': START_RESET, 'reset_domain': "[]", 'reset_field_ids': [(6, 0, ids)]}
+        base = {'start_domain': START_RESET, 'reset_domain': "[('id', '!=', 0)]", 'reset_field_ids': [(6, 0, ids)]}
         base.update(vals)
         return self.make_definition(**base)
 
@@ -264,7 +264,9 @@ class TestResetOnField(ResetCase):
         with self.at(T0 + hours(1)):
             t.with_user(manager).action_reevaluate()
         self.Processor._process_task(t, T0 + hours(2))
-        self.assertEqual((len(self.tasks(p, d)), t.stage, self.reset_count(p, d), len(t.event_ids)),
+        # Event `reevaluate` là dấu vết của chính nút Re-check Conditions, không tính.
+        engine_events = t.event_ids.filtered(lambda e: e.event != 'reevaluate')
+        self.assertEqual((len(self.tasks(p, d)), t.stage, self.reset_count(p, d), len(engine_events)),
                          (1, 'in_progress', 0, 1))
 
     def test_can_029_empty_reset_domain(self):

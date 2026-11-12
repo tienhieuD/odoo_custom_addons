@@ -31,15 +31,14 @@ class SlaDefinitionHook(models.Model):
         active_models = set(
             self.env['sla.definition'].sudo().search([('active', '=', True)])
             .mapped('model_name'))
-        archived_with_task = set(
-            self.env['sla.definition'].sudo()
-            .with_context(active_test=False)
-            .search([('active', '=', False)])
-            .filtered(lambda d: self.env['sla.task'].sudo().search_count([
-                ('sla_id', '=', d.id),
-                ('stage', 'in', ('in_progress', 'paused')),
-            ]))
-            .mapped('model_name'))
+        # Một truy vấn cho mọi định nghĩa tắt còn task hoạt động, không search_count
+        # theo từng định nghĩa (đường nóng: gọi ở đầu mỗi lượt đánh giá).
+        archived_with_task = {
+            definition.model_name
+            for (definition,) in self.env['sla.task'].sudo()._read_group(
+                [('stage', 'in', ('in_progress', 'paused')),
+                 ('sla_id.active', '=', False)],
+                ['sla_id'])}
         # Không bao giờ patch model bị cấm (ir.*, sla.*, mail.*, transient...), kể cả khi
         # có định nghĩa lọt qua (ví dụ ghi thẳng SQL) — REQ-FUNC-002.
         return {
@@ -72,7 +71,11 @@ class SlaDefinitionHook(models.Model):
                     if isinstance(leaf, (list, tuple)) and len(leaf) == 3:
                         names.add(str(leaf[0]).split('.')[0])
             names.update(definition.reset_field_ids.mapped('name'))
-            if definition.reset_domain and not definition.reset_field_ids:
+            try:
+                has_reset = definition._get_domain('reset') is not None
+            except Exception:  # noqa: BLE001 -- domain hỏng: Engine ghi event error riêng
+                has_reset = False
+            if has_reset and not definition.reset_field_ids:
                 names.add('*')  # reset theo điều kiện thuần: mọi lần ghi đều cần đánh giá
             if definition.company_id:
                 names.add('company_id')

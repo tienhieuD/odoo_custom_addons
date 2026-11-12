@@ -8,11 +8,41 @@
         <field name="name">sla.definition.form</field>
         <field name="model">sla.definition</field>
         <field name="arch" type="xml">
-            <form string="SLA Definition" class="nev_field_border_container">
+            <form string="SLA Definition" class="nev_field_border_container"
+                  js_class="sla_definition_form">
+                <!-- Refs: plan-improvement-sla-01-review §6.3 -->
+                <header>
+                    <button name="action_enable" type="object" string="Enable"
+                            class="btn-primary" invisible="active"
+                            groups="dwo_sla_core.group_sla_manager"
+                            confirm="Enable this SLA? It will start attaching to matching records."/>
+                    <button name="action_disable" type="object" string="Disable"
+                            invisible="not active"
+                            groups="dwo_sla_core.group_sla_manager"
+                            confirm="Disable this SLA? No new tasks will be created; running tasks keep being tracked."/>
+                    <!-- Refs: plan-improvement-sla-01-review §6.16 -->
+                    <button name="action_open_apply_wizard" type="object"
+                            string="Apply to Existing Records"
+                            invisible="not active"
+                            groups="dwo_sla_core.group_sla_manager"
+                            help="Attach this SLA to records that already exist and match the Start Condition."/>
+                </header>
                 <sheet>
-                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                    <!-- Refs: plan-improvement-sla-01-review §6.7 -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_tasks" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                groups="dwo_sla_core.group_sla_user">
+                            <field name="running_task_count" widget="statinfo"
+                                   string="Running Tasks"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Disabled" bg_color="text-bg-danger"
                             invisible="active"/>
                     <field name="active" invisible="1"/>
+                    <!-- Refs: plan-improvement-sla-01-review §6.14: form JS
+                         đọc số này để hỏi xác nhận trước khi lưu. -->
+                    <field name="running_task_count" invisible="1"/>
                     <div class="oe_title">
                         <label for="name"/>
                         <h1><field name="name" placeholder="SLA definition name"/></h1>
@@ -48,6 +78,9 @@
                         <group string="Duration">
                             <field name="duration" widget="float_time_unit"
                                    placeholder="e.g. 4"/>
+                            <!-- Refs: plan-improvement-sla-01-review §6.10 -->
+                            <field name="due_soon_hours"
+                                   placeholder="e.g. 2 (0 = use Settings)"/>
                         </group>
                         <!-- Đổi tiêu đề nhóm từ "Schedule" sang "Calendar":
                              cả 4 field bên trong đều có label bắt đầu bằng
@@ -75,31 +108,21 @@
                                    required="schedule_source == 'record'"/>
                             <!-- Refs: scope-add "calendar_tz_override", label
                                  Python đổi thành "Timezone" (ngắn gọn theo
-                                 yêu cầu user); placeholder nêu rõ hành vi
-                                 khi để trống. -->
+                                 yêu cầu user); bắt buộc, được điền sẵn bởi
+                                 onchange (plan-improvement-sla-01-review §6.5).
+                                 Giải thích bản sao calendar: tab Note. -->
                             <field name="calendar_tz_override"
-                                   placeholder="Leave empty to use the calendar's own timezone"/>
-                            <div class="alert alert-info mb-0" colspan="2"
-                                 invisible="not calendar_tz_override" role="alert">
-                                A clone of the working calendar with the same work-hour
-                                pattern but this timezone will be auto-created (or
-                                reused if one already exists) and used instead of the
-                                calendar's own timezone.
-                            </div>
-                            <!-- Refs: REQ-FUNC-020 -->
-                            <div class="alert alert-warning mb-0" colspan="2"
-                                 invisible="schedule_source != 'record'" role="alert">
-                                Fallback order when the record's calendar cannot be used:
-                                <ul class="mb-0">
-                                    <li>The record's company default working calendar.</li>
-                                    <li>If the company's calendar cannot be used either, the SLA runs 24x7.</li>
-                                </ul>
-                            </div>
+                                   placeholder="e.g. Asia/Ho_Chi_Minh"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Start Condition" name="start_condition">
                             <group>
+                                <!-- Refs: plan-improvement-sla-01-review §6.8 -->
+                                <div class="text-muted small" colspan="2">
+                                    A condition with no rule is not configured and never
+                                    matches, even though the editor shows "Match all records".
+                                </div>
                                 <field name="start_domain"
                                        widget="domain" options="{'model': 'model_name'}"/>
                                 <field name="retroactive"/>
@@ -110,60 +133,12 @@
                                        placeholder="e.g. Created on"
                                        domain="[('model', '=', model_name), ('ttype', '=', 'datetime')]"/>
                             </group>
-                            <!-- Refs: REQ-FUNC-042, REQ-FUNC-016. Banner đặt
-                                 cuối tab, dùng ul/li vì có 2 lưu ý độc lập. -->
-                            <div class="alert alert-info mt-4 mb-0" role="alert">
-                                <ul class="mb-0">
-                                    <li>
-                                        For non-stored computed fields, or
-                                        conditions that traverse a relation
-                                        (e.g. <code>partner_id.country_id</code>)
-                                        when only the related record changes:
-                                        the system MAY NOT automatically
-                                        re-evaluate. Use the "Re-evaluate"
-                                        action on the task to get a result
-                                        consistent with current data.
-                                    </li>
-                                    <li>
-                                        Avoid three common mistakes: a Start
-                                        Condition that is a subset of the Stop
-                                        Condition (the SLA never attaches); a
-                                        Pause Condition that is a subset of the
-                                        Start Condition (the task attaches
-                                        paused and is cancelled when the pause
-                                        ends); Start and Pause Conditions that
-                                        are mutually exclusive (the task is
-                                        cancelled before it can pause).
-                                    </li>
-                                </ul>
-                            </div>
                         </page>
                         <page string="Stop Condition" name="stop_condition">
                             <group>
                                 <field name="stop_domain"
                                        widget="domain" options="{'model': 'model_name'}"/>
                             </group>
-                            <!-- Refs: REQ-FUNC-042, REQ-FUNC-016 -->
-                            <div class="alert alert-info mt-4 mb-0" role="alert">
-                                <ul class="mb-0">
-                                    <li>
-                                        For non-stored computed fields, or
-                                        conditions that traverse a relation
-                                        (e.g. <code>partner_id.country_id</code>)
-                                        when only the related record changes:
-                                        the system MAY NOT automatically
-                                        re-evaluate. Use the "Re-evaluate"
-                                        action on the task to get a result
-                                        consistent with current data.
-                                    </li>
-                                    <li>
-                                        When the record matches, the task
-                                        completes (achieved/breached).
-                                        Reminder: Start Condition must be a
-                                        subset of this Stop Condition.
-                                    </li>
-                                </ul>
-                            </div>
                         </page>
                         <page string="Pause/Resume Condition" name="pause_resume_condition">
                             <group>
@@ -180,27 +155,6 @@
                                     <field name="retroactive_pause_warning" nolabel="1" readonly="1"/>
                                 </div>
                             </group>
-                            <!-- Refs: REQ-FUNC-042, REQ-FUNC-016 -->
-                            <div class="alert alert-info mt-4 mb-0" role="alert">
-                                <ul class="mb-0">
-                                    <li>
-                                        For non-stored computed fields, or
-                                        conditions that traverse a relation
-                                        (e.g. <code>partner_id.country_id</code>)
-                                        when only the related record changes:
-                                        the system MAY NOT automatically
-                                        re-evaluate. Use the "Re-evaluate"
-                                        action on the task to get a result
-                                        consistent with current data.
-                                    </li>
-                                    <li>
-                                        Three common mistakes to avoid: Pause
-                                        Condition must be a subset of Start
-                                        Condition; Start Condition and Pause
-                                        Condition MUST be mutually exclusive.
-                                    </li>
-                                </ul>
-                            </div>
                         </page>
                         <page string="Cancel Condition" name="cancel_condition">
                             <group>
@@ -209,16 +163,6 @@
                                        widget="domain" options="{'model': 'model_name'}"
                                        invisible="cancel_mode != 'condition'"/>
                             </group>
-                            <!-- Refs: REQ-FUNC-042. Chỉ 1 lưu ý nên không cần
-                                 ul/li. -->
-                            <div class="alert alert-info mt-4 mb-0" role="alert">
-                                For non-stored computed fields, or conditions that
-                                traverse a relation (e.g. <code>partner_id.country_id</code>)
-                                when only the related record changes: the system
-                                MAY NOT automatically re-evaluate. Use the
-                                "Re-evaluate" action on the task to get a result
-                                consistent with current data.
-                            </div>
                         </page>
                         <page string="Reset Condition" name="reset_condition">
                             <group>
@@ -230,15 +174,6 @@
                                        placeholder="e.g. Priority, Stage"
                                        domain="[('model', '=', model_name)]"/>
                             </group>
-                            <!-- Refs: REQ-FUNC-042 -->
-                            <div class="alert alert-info mt-4 mb-0" role="alert">
-                                For non-stored computed fields, or conditions that
-                                traverse a relation (e.g. <code>partner_id.country_id</code>)
-                                when only the related record changes: the system
-                                MAY NOT automatically re-evaluate. Use the
-                                "Re-evaluate" action on the task to get a result
-                                consistent with current data.
-                            </div>
                         </page>
                         <page string="Escalation" name="escalations">
                             <!-- List chỉ hiện 2 cột gọn (percent_display,
@@ -284,16 +219,131 @@
                                     </group>
                                 </form>
                             </field>
-                            <!-- Refs: REQ-SEC-004 -->
-                            <div class="alert alert-info mt-4 mb-0" role="alert">
-                                A Server Action runs with the permissions of the
-                                user assigned to background processing (the SLA
-                                `ir.cron`), NOT the permissions of the user
-                                editing the source record.
+                        </page>
+                        <!-- Refs: plan-improvement-sla-01-review §6.16 -->
+                        <page string="Manual Apply" name="manual_apply"
+                              groups="dwo_sla_core.group_sla_manager">
+                            <p class="text-muted">
+                                Runs started with "Apply to Existing Records". Finished
+                                runs are removed automatically after
+                                <field name="apply_retention_days" class="oe_inline"/> days.
+                            </p>
+                            <field name="apply_job_ids">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="create_date" string="Created"/>
+                                    <field name="user_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'done'"
+                                           decoration-info="state in ('queued', 'running')"
+                                           decoration-warning="state == 'cancelled'"
+                                           decoration-danger="state == 'failed'"/>
+                                    <field name="processed" string="Progress" widget="progressbar"
+                                           options="{'max_value': 'total'}"/>
+                                    <field name="attached"/>
+                                    <field name="error_count"/>
+                                    <field name="filter_domain" optional="hide"/>
+                                    <field name="note" optional="hide"/>
+                                    <button name="action_cancel" type="object" string="Cancel"
+                                            icon="fa-times"
+                                            invisible="state not in ('queued', 'running')"
+                                            confirm="Stop this run? Records already processed keep their tasks."
+                                            groups="dwo_sla_core.group_sla_manager"/>
+                                </list>
+                            </field>
+                        </page>
+                        <!-- Tab Note: HTML tĩnh (dịch được qua i18n), gom mọi lưu ý/cảnh báo
+                             của form definition theo nhóm vấn đề. Refs:
+                             plan-improvement-sla-01 §3.4, review §6.4; REQ-FUNC-016, 020, 042,
+                             REQ-SEC-004, REQ-INT-002, REQ-INT-003 -->
+                        <page string="Note" name="note">
+                            <div class="px-3 py-2" style="max-width: 900px;">
+                                <h4>1. Turning the SLA on and off</h4>
+                                <ul>
+                                    <li>A new definition starts <b>disabled</b> (a draft). Finish configuring it, then press <b>Enable</b>.</li>
+                                    <li><b>Disable</b> only stops attaching the SLA to <b>new</b> records. Tasks that are already running keep running, can still breach and escalate, and finish normally. Nothing is cancelled when you disable.</li>
+                                    <li>Enabling with an empty Start Condition shows a warning (nothing will start) but is not blocked.</li>
+                                </ul>
+
+                                <h4>2. Conditions (Start, Cancel, Pause, Resume, Stop, Reset)</h4>
+                                <ul>
+                                    <li>A condition of <code>[]</code> (or empty) means <b>not configured and never matches</b>. The domain editor shows "Match all records" for it; that label does not apply here.
+                                        <ul>
+                                            <li>To apply an SLA to every record, use an always-true rule such as <code>[('id', '!=', 0)]</code>.</li>
+                                            <li>A Stop condition left empty never completes the task; a Pause condition left empty never pauses it.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Common mistakes to avoid:
+                                        <ul>
+                                            <li>A Start Condition that is a <b>subset</b> of the Stop Condition: the SLA never attaches.</li>
+                                            <li>A Pause Condition that is a <b>subset</b> of the Start Condition: the task attaches paused and is cancelled as soon as the pause ends.</li>
+                                            <li>Start and Pause Conditions that are <b>mutually exclusive</b>: the task is cancelled before it can pause.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Limits: for non-stored computed fields, and for conditions that go through a relation (for example <code>partner_id.country_id</code>) when only the related record changes, the SLA is <b>not</b> re-evaluated automatically. Use <b>Re-check Conditions</b> on the task to get a result that matches the current data.</li>
+                                    <li>Retroactive Pause only works when the model keeps a change history (<code>mail.thread</code>) and every field used in the Pause Condition is tracked. A warning appears under the option when this is not the case.</li>
+                                </ul>
+
+                                <h4>3. Stopping an SLA the right way</h4>
+                                <ul>
+                                    <li>There are no buttons to pause, resume or cancel a task by hand. A task's state is always derived from the source record, so a manual change would be overwritten the next time the record is saved and would distort the KPIs.</li>
+                                    <li>To hold the clock, add a field on the source record (for example an "On hold" checkbox, or a status such as "Waiting customer") and use it in the <b>Pause Condition</b>. Change the record, and the task follows.</li>
+                                    <li>If the record changed but was not saved again, or you changed a condition, use <b>Re-check Conditions</b> on the task.</li>
+                                </ul>
+
+                                <h4>4. Timezone and calendar</h4>
+                                <ul>
+                                    <li>The <b>Timezone</b> is required and is always the timezone used to read working hours, whatever timezone the calendar itself has. It is filled in for you: the fixed calendar's timezone when you pick one (only while the field is empty, an existing value is never overwritten), otherwise your own.</li>
+                                    <li>When the timezone differs from the calendar's own, a hidden <b>copy</b> of the calendar with that timezone is created and reused; the original calendar is never changed.
+                                        <ul>
+                                            <li>The copy contains the working hours and the public holidays <b>as they were when the copy was made</b>. It is <b>not</b> kept in sync: later changes to the original calendar do not reach the copy.</li>
+                                            <li>With Calendar Source "Calendar of each record", every calendar that has a different timezone gets its own hidden copy.</li>
+                                        </ul>
+                                    </li>
+                                    <li>When the record's calendar cannot be used, the fallback order is: the record's company default working calendar, then 24x7 if that cannot be used either.</li>
+                                    <li>Tasks keep the calendar (and so the timezone) they had when they started. Changing the timezone of the definition does not move the deadline of running tasks; use <b>Apply Current Settings</b> on a task to bring it up to date.</li>
+                                </ul>
+
+                                <h4>5. Due Soon</h4>
+                                <ul>
+                                    <li><b>Due Soon (hours)</b> is the window before the deadline in which a running task counts as "due soon". Leave it empty or 0 to use the value from Settings.</li>
+                                    <li>Warning: if it is equal to or longer than the Duration, every task is flagged Due Soon from the moment it starts. Example: 8 hours of Due Soon on a 4-hour SLA.</li>
+                                    <li>The status chip on the form of the source record uses the same rule.</li>
+                                </ul>
+
+                                <h4>6. Editing and deleting a definition, escalation rules</h4>
+                                <ul>
+                                    <li><b>Copied to the task when it starts</b>, so editing the definition does not change running tasks: the target duration, the calendar and the timezone. Use <b>Apply Current Settings</b> on a task to apply the new values.</li>
+                                    <li><b>Applied immediately</b> to running tasks at their next evaluation: the six conditions, Cancel Mode, Resume Mode and the escalation rules. A change to the conditions can stop, cancel or pause many tasks at once, so saving asks for confirmation when tasks are running.</li>
+                                    <li>A new escalation rule does not fire retroactively: running tasks already past its percentage are marked as done for that rule.</li>
+                                    <li>The Model cannot be changed once the definition has tasks.</li>
+                                    <li>A definition that has tasks cannot be deleted. Use <b>Disable</b> instead. Changes to the important fields are recorded in the chatter.</li>
+                                    <li>A Server Action escalation runs with the permissions of the user assigned to the SLA background job, not the permissions of the user who edits the source record.</li>
+                                </ul>
+
+                                <h4>7. When the source record is deleted</h4>
+                                <ul>
+                                    <li>Its tasks are removed by the daily clean-up, within about 24 hours. The <b>measurement history of that record is lost</b>.</li>
+                                    <li>Until the clean-up runs, those tasks still count in reports.</li>
+                                </ul>
+
+                                <h4>8. Records that already exist</h4>
+                                <ul>
+                                    <li>The SLA is not attached to old records by itself. Use <b>Apply to Existing Records</b> (the Manual Apply tab lists every run). Only records that match the Start Condition get a task, and records that already have one are skipped.</li>
+                                    <li>Tasks created this way do not trigger old escalation steps: steps already passed are marked as done.</li>
+                                </ul>
+
+                                <h4>9. What you see on screen</h4>
+                                <ul>
+                                    <li><b>% Used</b> is calculated when a view loads and does not refresh by itself. It cannot be sorted, filtered or grouped on.</li>
+                                    <li>The SLA status chip next to the pager of a record's form appears only for models that have an enabled SLA. After you create the first definition for a new model, reload the page to see the chip. It can be turned off in Settings.</li>
+                                    <li>Only the light colour scheme is supported.</li>
+                                </ul>
                             </div>
                         </page>
                     </notebook>
                 </sheet>
+                <!-- Refs: plan-improvement-sla-01-review §6.14 -->
+                <chatter/>
             </form>
         </field>
     </record>
@@ -302,15 +352,29 @@
         <field name="name">sla.definition.list</field>
         <field name="model">sla.definition</field>
         <field name="arch" type="xml">
-            <list string="SLA Definitions">
+            <!-- Refs: plan-improvement-sla-01-review §6.6 -->
+            <list string="SLA Definitions" decoration-muted="not active">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="model_id"/>
-                <field name="type" optional="hide"/>
-                <field name="target" optional="hide"/>
+                <field name="type"/>
                 <field name="duration" widget="float_time_unit"/>
                 <field name="schedule_source"/>
+                <field name="calendar_tz_override"/>
+                <field name="target" optional="hide"/>
+                <field name="schedule_id" optional="hide"/>
+                <field name="due_soon_hours" optional="hide"/>
+                <field name="service_commitment" optional="hide"/>
                 <field name="company_id" column_invisible="True"/>
+                <field name="active" column_invisible="True"/>
+                <button name="action_enable" type="object" icon="fa-toggle-off"
+                        title="Enable" invisible="active"
+                        groups="dwo_sla_core.group_sla_manager"
+                        confirm="Enable this SLA? It will start attaching to matching records."/>
+                <button name="action_disable" type="object" icon="fa-toggle-on"
+                        title="Disable" invisible="not active"
+                        groups="dwo_sla_core.group_sla_manager"
+                        confirm="Disable this SLA? No new tasks will be created; running tasks keep being tracked."/>
             </list>
         </field>
     </record>
@@ -322,7 +386,7 @@
             <search string="SLA Definitions">
                 <field name="name"/>
                 <field name="model_id"/>
-                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="Disabled" name="inactive" domain="[('active', '=', False)]"/>
                 <group>
                     <filter string="Model" name="group_model" context="{'group_by': 'model_id'}"/>
                     <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
@@ -336,7 +400,11 @@
         <field name="name">SLA Definitions</field>
         <field name="res_model">sla.definition</field>
         <field name="view_mode">list,form</field>
-        <field name="context">{'search_default_group_model': 1}</field>
+        <!-- Refs: plan-improvement-sla-01-review §6.6: domain nhắc tới `active`
+             nên Odoo không tự lọc bản ghi inactive; hiện cả bản nháp/đã tắt. -->
+        <field name="domain">['|', ('active', '=', True), ('active', '=', False)]</field>
+        <!-- Ghi tường minh {} vì bỏ field khỏi XML không xoá context cũ trong DB khi nâng cấp. -->
+        <field name="context">{}</field>
         <!-- Refs: REQ-FUNC-001 -->
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

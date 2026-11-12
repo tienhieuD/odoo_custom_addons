@@ -42,11 +42,16 @@ class SlaEvent(models.Model):
             ('escalate', "Escalate"),
             ('escalate_failed', "Escalate Failed"),
             ('error', "Error"),
+            ('recalculate', "Settings Applied"),
+            ('reevaluate', "Conditions Re-checked"),
         ],
         string="Event Type", required=True,
         help=('Type of event: Attach (SLA started), Pause, Resume, Complete, '
               'Reset, Cancel, Breach (deadline passed), Escalate, Escalate '
-              'Failed, Error. Example: filter on Error to find problems.'))
+              'Failed, Error, Settings Applied (a manager pushed the current '
+              'settings onto the task), Conditions Re-checked (a manager '
+              'ran the conditions again). Example: filter on Error to find '
+              'problems.'))
     event_dt = fields.Datetime(string="Timestamp", required=True,
         help='When the event happened (UTC). Example: 2026-03-02 05:00:00.')
     note = fields.Text(
@@ -81,7 +86,7 @@ class SlaEvent(models.Model):
 
     _event_check = models.Constraint(
         "CHECK(event IN ('attach','pause','resume','complete','reset','cancel',"
-        "'breach','escalate','escalate_failed','error'))",
+        "'breach','escalate','escalate_failed','error','recalculate','reevaluate'))",
         "Invalid event type.")
     _task_dt_idx = models.Index("(task_id, event_dt)")
     _error_unresolved_idx = models.Index(
@@ -119,7 +124,7 @@ class SlaEvent(models.Model):
         """
         if not self.env.user.has_group('dwo_sla_core.group_sla_manager'):
             raise AccessError(get_message(
-                MessageCode.ACC_REEVALUATE_SLA_MANAGER_ONLY))
+                MessageCode.ACC_REEVALUATE_EVENTS_SLA_MANAGER_ONLY))
         now = fields.Datetime.now()
         SlaEvent = self.env['sla.event'].sudo()
         last_event = SlaEvent.search([], order='id desc', limit=1)

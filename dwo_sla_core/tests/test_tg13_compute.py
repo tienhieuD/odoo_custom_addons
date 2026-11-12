@@ -58,7 +58,7 @@ class CmpCase(SlaCase):
     def cmp_definition(self, **vals):
         base = {'name': "DEF-CMP", 'model_id': self.cmp_model.id, 'duration': 4,
                 'schedule_source': 'none', 'start_domain': "[('x_stage', 'in', ['new', 'work'])]",
-                'stop_domain': "[('x_is_resolved', '=', True)]"}
+                'stop_domain': "[('x_is_resolved', '=', True)]", 'active': True}
         base.update(vals)
         return self.Definition.create(base)
 
@@ -218,7 +218,7 @@ class TestManualReevaluate(CmpCase):
     def test_cmp_014_no_reset_on_manual_reevaluate(self):
         """TC-CMP-014: Đánh giá lại thủ công không reset dù field theo dõi đã khác."""
         weight = self.env['ir.model.fields']._get(MODEL, 'x_weight')
-        d = self.cmp_definition(name="DEF-R", reset_domain="[]", reset_field_ids=[(6, 0, weight.ids)])
+        d = self.cmp_definition(name="DEF-R", reset_domain="[('id', '!=', 0)]", reset_field_ids=[(6, 0, weight.ids)])
         k = self.ticket(x_weight=10)
         task = self.task_events(k, d)[0]
         self.env.cr.execute("UPDATE %s SET x_weight=99 WHERE id=%%s" % MODEL, (k.id,))

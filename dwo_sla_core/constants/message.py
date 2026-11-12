@@ -77,11 +77,16 @@ class MessageCode:
     VAL_ESCALATION_ACTION_MODEL_MISMATCH = "VAL_017"
     VAL_ESCALATION_EMAIL_FIELD_REQUIRED = "VAL_018"
     VAL_ESCALATION_EMAIL_FIELD_WRONG_MODEL = "VAL_019"
+    VAL_MODEL_LOCKED_HAS_TASKS = "VAL_020"
+    VAL_SOURCE_RECORD_MISSING = "VAL_021"
+    VAL_APPLY_JOB_ALREADY_RUNNING = "VAL_022"
+    VAL_APPLY_DEFINITION_INACTIVE = "VAL_023"
 
     # --- Access/permission errors (ir.exceptions.AccessError) ---
     ACC_RECALCULATE_SLA_MANAGER_ONLY = "ACC_001"
     ACC_REEVALUATE_SLA_MANAGER_ONLY = "ACC_002"
     ACC_MARK_RESOLVED_SLA_MANAGER_ONLY = "ACC_003"
+    ACC_REEVALUATE_EVENTS_SLA_MANAGER_ONLY = "ACC_004"
 
     # --- Informational notes stored on sla.event.note (shown to users in
     # the Event Log, not raised as exceptions) ---
@@ -96,6 +101,21 @@ class MessageCode:
     NOTE_BATCH_EVALUATE_ERROR = "NOTE_009"
     NOTE_BACKGROUND_PROCESSING_ERROR = "NOTE_010"
     NOTE_ESCALATION_EMAIL_BODY = "NOTE_011"
+    NOTE_RECALCULATE_APPLIED = "NOTE_012"
+    NOTE_REEVALUATE_CHANGED = "NOTE_013"
+    NOTE_REEVALUATE_UNCHANGED = "NOTE_014"
+    NOTE_APPLY_JOB_FAILED = "NOTE_015"
+
+    # --- Notifications shown to the user after an action button ---
+    INF_ENABLE_WITHOUT_START_TITLE = "INF_001"
+    INF_ENABLE_WITHOUT_START_BODY = "INF_002"
+    INF_RECALCULATE_RESULT_TITLE = "INF_003"
+    INF_RECALCULATE_RESULT_BODY = "INF_004"
+    INF_REEVALUATE_RESULT_TITLE = "INF_005"
+    INF_REEVALUATE_RESULT_BODY = "INF_006"
+    INF_APPLY_RESULT_TITLE = "INF_007"
+    INF_APPLY_RESULT_BODY = "INF_008"
+    INF_APPLY_RESULT_CONTINUES = "INF_009"
 
     # --- Computed display labels shown read-only in list/kanban views (not
     # errors, not event notes) ---
@@ -155,10 +175,23 @@ MESSAGE_IDS = {
     MessageCode.VAL_ESCALATION_EMAIL_FIELD_WRONG_MODEL: _ltparams(_lt(
         "Field '%s' is not usable here; it must be a %s field on the "
         "definition's model.")),
+    MessageCode.VAL_MODEL_LOCKED_HAS_TASKS: _ltparams(_lt(
+        "Cannot change the model of an SLA definition that already has "
+        "tasks. Create a new definition for the other model instead.")),
+    MessageCode.VAL_SOURCE_RECORD_MISSING: _ltparams(_lt(
+        "Source record no longer exists.")),
+    MessageCode.VAL_APPLY_JOB_ALREADY_RUNNING: _ltparams(_lt(
+        "This SLA already has a manual apply run that is queued or "
+        "running. Wait for it to finish or cancel it first.")),
+    MessageCode.VAL_APPLY_DEFINITION_INACTIVE: _ltparams(_lt(
+        "Enable the SLA definition before applying it to existing "
+        "records.")),
     MessageCode.ACC_RECALCULATE_SLA_MANAGER_ONLY: _ltparams(_lt(
-        "Only an SLA Manager can use the \"Recalculate\" action.")),
+        "Only an SLA Manager can use the \"Apply Current Settings\" action.")),
     MessageCode.ACC_REEVALUATE_SLA_MANAGER_ONLY: _ltparams(_lt(
-        "Only an SLA Manager can use the \"Re-evaluate\" action.")),
+        "Only an SLA Manager can use the \"Re-check Conditions\" action.")),
+    MessageCode.ACC_REEVALUATE_EVENTS_SLA_MANAGER_ONLY: _ltparams(_lt(
+        "Only an SLA Manager can re-evaluate SLA error events.")),
     MessageCode.ACC_MARK_RESOLVED_SLA_MANAGER_ONLY: _ltparams(_lt(
         "Only an SLA Manager can mark SLA events as resolved.")),
     MessageCode.NOTE_CALENDAR_PATH_UNUSABLE: _ltparams(_lt(
@@ -188,6 +221,34 @@ MESSAGE_IDS = {
         "Background processing error: %s")),
     MessageCode.NOTE_ESCALATION_EMAIL_BODY: _ltparams(_lt(
         "<p>SLA \"%s\" reached %s%% on %s.</p>")),
+    MessageCode.NOTE_RECALCULATE_APPLIED: _ltparams(_lt(
+        "Current settings applied by %s. Target: %s -> %s. Calendar: %s -> "
+        "%s. Deadline: %s -> %s.")),
+    MessageCode.NOTE_REEVALUATE_CHANGED: _ltparams(_lt(
+        "Conditions re-checked by %s. Stage: %s -> %s.")),
+    MessageCode.NOTE_REEVALUATE_UNCHANGED: _ltparams(_lt(
+        "Conditions re-checked by %s. No change (stage: %s).")),
+    MessageCode.NOTE_APPLY_JOB_FAILED: _ltparams(_lt(
+        "Manual apply stopped by an unexpected error: %s")),
+    MessageCode.INF_ENABLE_WITHOUT_START_TITLE: _ltparams(_lt(
+        "Enabled, but nothing will start")),
+    MessageCode.INF_ENABLE_WITHOUT_START_BODY: _ltparams(_lt(
+        "The Start Condition has no rule, so no record will get an SLA "
+        "task. Add a rule to the Start Condition.")),
+    MessageCode.INF_RECALCULATE_RESULT_TITLE: _ltparams(_lt(
+        "Current settings applied")),
+    MessageCode.INF_RECALCULATE_RESULT_BODY: _ltparams(_lt(
+        "%s task(s) updated, %s skipped.")),
+    MessageCode.INF_REEVALUATE_RESULT_TITLE: _ltparams(_lt(
+        "Conditions re-checked")),
+    MessageCode.INF_REEVALUATE_RESULT_BODY: _ltparams(_lt(
+        "%s task(s) checked, %s changed stage.")),
+    MessageCode.INF_APPLY_RESULT_TITLE: _ltparams(_lt(
+        "Applied to existing records")),
+    MessageCode.INF_APPLY_RESULT_BODY: _ltparams(_lt(
+        "%s record(s) processed, %s task(s) created, %s error(s). %s")),
+    MessageCode.INF_APPLY_RESULT_CONTINUES: _ltparams(_lt(
+        "The remaining records continue in the background.")),
     MessageCode.DISP_ESCALATION_NOT_CONFIGURED: _ltparams(_lt(
         "Not configured yet")),
     MessageCode.DISP_ESCALATION_SERVER_ACTION: _ltparams(_lt(

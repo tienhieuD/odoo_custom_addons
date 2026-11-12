@@ -2,8 +2,9 @@
 from datetime import timedelta
 
 from odoo import api, fields, models
-from odoo.exceptions import AccessError
-from odoo.tools import SQL
+from odoo.exceptions import AccessError, UserError
+from odoo.orm.domains import Domain
+from odoo.tools import SQL, format_datetime
 
 from ..constants.message import MessageCode, get_message
 
@@ -61,7 +62,7 @@ class SlaTask(models.Model):
         string="Target Duration", required=True,
         help=('Time allowed for this task, copied from the definition when it '
               'started. Changing the definition later does not change running '
-              'tasks unless Recalculate is used. Example: 4.0.'))
+              'tasks unless Apply Current Settings is used. Example: 4.0.'))
     schedule_id = fields.Many2one(
         'resource.calendar', string="Calendar", index=True, ondelete='restrict',
         help=('Working calendar used to count time for this task, copied at '
@@ -160,12 +161,36 @@ class SlaTask(models.Model):
         help=('History of what happened to this task: attach, pause, resume, '
               'breach, escalations and errors, each with its time. Example: '
               'attach, pause, resume, complete.'))
+    # Refs: plan-improvement-sla-01-review §6.12 -- cùng bảng sla.event, chỉ lọc loại event.
+    escalation_event_ids = fields.One2many(
+        'sla.event', 'task_id', string="Escalation History", readonly=True,
+        domain=[('event', 'in', ('escalate', 'escalate_failed'))],
+        help=('Times this task ran an escalation, including failed attempts, '
+              'newest first. It does not say which rule ran; see Escalations '
+              'Done for that. Example: one "Escalated" line at 75% and one '
+              '"Escalation failed" line when the email could not be sent.'))
     # Refs: REQ-INT-023
     business_percent_used = fields.Integer(
         string="% Duration Used (Business)", compute='_compute_percent_used',
         help=('Share of the target time already consumed, counted in WORKING '
               'hours (elapsed divided by target, rounded down); can exceed '
               '100. Example: 110 means 10% over the target.'))
+    # Bản "live" của business_duration/duration: giá trị đã chốt cộng đoạn đang
+    # chạy tới lúc đọc. Chỉ để HIỂN THỊ (không lưu nên không sort/filter/group
+    # được); báo cáo vẫn dùng hai cột lưu, vốn chỉ được chốt lúc pause/complete.
+    business_duration_live = fields.Float(
+        string="Business Duration (live)", compute='_compute_duration_live',
+        help=('Working hours consumed up to now: Business Duration plus the '
+              'period currently running. Computed when the view is loaded, so '
+              'it cannot be sorted, filtered or grouped; reports use Business '
+              'Duration. Example: 2.5 on a running task whose stored Business '
+              'Duration is still 1.0.'))
+    duration_live = fields.Float(
+        string="Duration (live)", compute='_compute_duration_live',
+        help=('Real (wall-clock) hours elapsed up to now: Duration plus the '
+              'period currently running. Computed when the view is loaded, so '
+              'it cannot be sorted, filtered or grouped; reports use Duration. '
+              'Example: 50.0 on a task running over a weekend.'))
     display_name = fields.Char(compute='_compute_display_name',
         help=('Readable name of the task made of the definition name and the '
               'source record. Example: "Ticket Response - res.partner#42".'))
@@ -293,8 +318,21 @@ class SlaTask(models.Model):
         thì coi như đã dùng hết ngay (100%) để tránh chia cho 0.
         Refs: REQ-INT-023
         """
-        now = fields.Datetime.now()
-        # Gom task đang chạy theo lịch để chỉ đọc lịch/ngày nghỉ một lần mỗi lịch
+        extra = self._running_business_hours(fields.Datetime.now())
+        for task in self:
+            elapsed = task.business_duration + extra.get(task.id, 0.0)
+            if task.target_duration:
+                task.business_percent_used = int((elapsed / task.target_duration) * 100)
+            else:
+                task.business_percent_used = 100 if elapsed else 0
+
+    def _running_business_hours(self, now):
+        """Giờ làm của đoạn đang chạy (`running_since` tới `now`) theo id task.
+
+        Logic: chỉ task `in_progress` có đoạn đang chạy; gom theo lịch để chỉ
+        đọc lịch/ngày nghỉ một lần mỗi lịch. Task khác không có trong kết quả.
+        Refs: REQ-FUNC-043, REQ-INT-023
+        """
         running = self.filtered(lambda t: t.stage == 'in_progress' and t.running_since)
         extra = {}
         for calendar in list(running.schedule_id) + [self.env['resource.calendar']]:
@@ -302,12 +340,26 @@ class SlaTask(models.Model):
             hours = self.env['sla.time'].settle_batch(
                 calendar, [t.running_since for t in group], now)
             extra.update(zip(group.ids, hours))
+        return extra
+
+    @api.depends('business_duration', 'duration', 'stage', 'running_since', 'schedule_id')
+    def _compute_duration_live(self):
+        """Thời gian đã trôi tính tới lúc đọc: giá trị đã chốt + đoạn đang chạy.
+
+        Logic: hai cột lưu chỉ được cộng dồn khi task pause/complete nên đứng
+        yên trong lúc `in_progress`; ở đây cộng thêm đoạn từ `running_since`
+        tới hiện tại (giờ làm qua lịch, và giờ đồng hồ). Task không chạy thì
+        bằng đúng giá trị đã lưu.
+        Refs: REQ-FUNC-043
+        """
+        now = fields.Datetime.now()
+        extra = self._running_business_hours(now)
         for task in self:
-            elapsed = task.business_duration + extra.get(task.id, 0.0)
-            if task.target_duration:
-                task.business_percent_used = int((elapsed / task.target_duration) * 100)
-            else:
-                task.business_percent_used = 100 if elapsed else 0
+            task.business_duration_live = task.business_duration + extra.get(task.id, 0.0)
+            clock = 0.0
+            if task.stage == 'in_progress' and task.running_since and now > task.running_since:
+                clock = (now - task.running_since).total_seconds() / 3600.0
+            task.duration_live = task.duration + clock
 
     @api.depends('res_model', 'res_id', 'sla_id.name')
     def _compute_display_name(self):
@@ -316,27 +368,34 @@ class SlaTask(models.Model):
             task.display_name = "%s - %s#%s" % (
                 task.sla_id.name, task.res_model, task.res_id)
 
-    def _due_soon_threshold(self):
-        """Đọc ngưỡng X giờ của bộ lọc "Sắp đến hạn" từ cấu hình (REQ-INT-012)."""
-        hours = int(self.env['ir.config_parameter'].sudo().get_param(
+    def _due_soon_hours_global(self):
+        """Đọc ngưỡng X giờ toàn hệ thống của "Sắp đến hạn" từ cấu hình (REQ-INT-012)."""
+        return float(self.env['ir.config_parameter'].sudo().get_param(
             'dwo_sla_core.due_soon_hours', 4))
-        return fields.Datetime.now() + timedelta(hours=hours)
 
-    @api.depends('stage', 'has_breached', 'planned_end_time')
+    @api.depends('stage', 'has_breached', 'planned_end_time', 'sla_id.due_soon_hours')
     def _compute_is_due_soon(self):
-        """Tính "Sắp đến hạn" không lưu trữ, phụ thuộc ngưỡng cấu hình hiện hành.
+        """Tính "Sắp đến hạn" không lưu trữ; ngưỡng theo definition, trống thì theo Settings.
 
-        Refs: REQ-INT-012
+        Refs: REQ-INT-012, plan-improvement-sla-01-review §6.10
         """
-        threshold = self._due_soon_threshold()
+        now = fields.Datetime.now()
+        default_hours = self._due_soon_hours_global()
         for task in self:
+            hours = task.sla_id.due_soon_hours or default_hours
             task.is_due_soon = (
                 task.stage == 'in_progress' and not task.has_breached
-                and bool(task.planned_end_time) and task.planned_end_time <= threshold)
+                and bool(task.planned_end_time)
+                and task.planned_end_time <= now + timedelta(hours=hours))
 
     def _search_is_due_soon(self, operator, value):
-        """Domain tương đương cho bộ lọc "Sắp đến hạn" (REQ-INT-012 AC1/AC2)."""
-        threshold = self._due_soon_threshold()
+        """Domain tương đương cho bộ lọc "Sắp đến hạn" (REQ-INT-012 AC1/AC2).
+
+        Logic: mỗi giá trị giờ khác nhau trên definition là một nhánh với mốc
+        thời gian riêng; definition để trống dùng ngưỡng toàn hệ thống. Phần
+        phủ định lấy bằng `~` của domain dương, không phải tải id task.
+        Refs: plan-improvement-sla-01-review §6.10
+        """
         # Odoo có thể chuẩn hóa ('=', True) thành ('in', [True]); xử lý cả hai dạng để
         # không đảo ngược kết quả bộ lọc (REQ-INT-012).
         if operator in ('in', 'not in'):
@@ -346,42 +405,122 @@ class SlaTask(models.Model):
             positive = wanted.pop() == (operator == 'in')
         else:
             positive = (operator == '=' and bool(value)) or (operator == '!=' and not value)
-        if positive:
-            return [
-                ('stage', '=', 'in_progress'), ('has_breached', '=', False),
-                ('planned_end_time', '<=', threshold),
-            ]
-        # Phủ định De Morgan của domain dương ở trên.
-        return [
-            '|', '|',
-            ('stage', '!=', 'in_progress'), ('has_breached', '=', True),
-            ('planned_end_time', '>', threshold),
-        ]
+        now = fields.Datetime.now()
+        default_hours = self._due_soon_hours_global()
+        groups = self.env['sla.definition'].sudo().with_context(active_test=False)._read_group(
+            [], ['due_soon_hours'], ['id:array_agg'])
+        by_hours = {}
+        for hours, ids in groups:
+            by_hours.setdefault(hours or default_hours, []).extend(ids)
+        branches = [
+            Domain('sla_id', 'in', ids)
+            & Domain('planned_end_time', '<=', now + timedelta(hours=hours))
+            for hours, ids in by_hours.items()]
+        domain = (Domain('stage', '=', 'in_progress') & Domain('has_breached', '=', False)
+                  & Domain.OR(branches))
+        return domain if positive else ~domain
+
+    @api.model
+    def get_record_sla_summary(self, res_model, res_id):
+        """Tóm tắt SLA của một record cho chip trạng thái trên form.
+
+        Logic: không `sudo()` (nhóm SLA đã có quyền đọc và rule theo công ty).
+        Có task đang chạy/tạm dừng thì `state` là của task "gấp nhất" theo thứ
+        tự `breached` > `due_soon` > `paused` > `running`, đồng hạng thì lấy
+        task có `business_percent_used` cao nhất; không có thì `met` (có task
+        đúng hạn), `missed` (có task trễ) hoặc `None` (không có gì để hiện).
+        `percent` luôn <= 100: client không bao giờ phải hiện % vượt hạn.
+        Refs: plan-improvement-sla-01-review §6.9, REQ-INT-024
+        """
+        if not res_model or not res_id:
+            return {'state': None}
+        key = [('res_model', '=', res_model), ('res_id', '=', res_id)]
+        tasks = self.search(key + [('stage', 'in', ('in_progress', 'paused'))])
+        if not tasks:
+            counts = dict(self._read_group(
+                key + [('stage', 'in', ('achieved', 'breached'))], ['stage'], ['__count']))
+            late, ok = counts.get('breached', 0), counts.get('achieved', 0)
+            state = 'missed' if late else 'met' if ok else None
+            return {'state': state, 'count': late + ok, 'late_count': late}
+
+        rank = {'breached': 3, 'due_soon': 2, 'paused': 1, 'running': 0}
+
+        def task_state(task):
+            if task.has_breached:
+                return 'breached'
+            if task.is_due_soon:
+                return 'due_soon'
+            return 'paused' if task.stage == 'paused' else 'running'
+
+        lines = [{
+            'name': task.sla_id.name,
+            'state': task_state(task),
+            'percent': min(task.business_percent_used, 100),
+            'planned_end_time': fields.Datetime.to_string(task.planned_end_time) or False,
+        } for task in tasks]
+        main = max(lines, key=lambda line: (rank[line['state']], line['percent']))
+        return {
+            'state': main['state'],
+            'count': len(lines),
+            'late_count': sum(1 for line in lines if line['state'] == 'breached'),
+            'percent': main['percent'],
+            'planned_end_time': main['planned_end_time'],
+            'lines': lines,
+        }
+
+    def action_open_source_record(self):
+        """Mở form của record gốc; không sudo nên thiếu quyền thì Odoo tự báo lỗi.
+
+        Logic: record gốc là tham chiếu mềm (không FK) nên có thể đã bị xoá,
+        hoặc model đã gỡ; khi đó báo thân thiện thay vì lỗi kỹ thuật.
+        Refs: plan-improvement-sla-01-review §6.13
+        """
+        self.ensure_one()
+        if (self.res_model not in self.env
+                or not self.env[self.res_model].browse(self.res_id).exists()):
+            raise UserError(get_message(MessageCode.VAL_SOURCE_RECORD_MISSING))
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self.res_model,
+            'res_id': self.res_id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     def action_recalculate(self):
-        """"Tính lại": áp cấu hình hiện hành của định nghĩa/record lên task.
+        """"Apply Current Settings": áp cấu hình hiện hành của định nghĩa/record lên task.
 
         Logic: chỉ SLA Manager được gọi (AC4, kiểm tra cứng chứ không chỉ ẩn
-        nút); chỉ tác dụng trên task `in_progress`/`paused`, task khác bỏ qua
-        (AC3); giữ nguyên `business_duration` đã trôi, lấy lại `target_duration`
-        và lịch hiện hành (REQ-FUNC-021, 052); với task `in_progress` chưa vi
-        phạm thì xếp lại `planned_end_time` = hiện tại + phần giờ còn lại theo
-        lịch mới (AC1, AC2); task đã vi phạm giữ nguyên `planned_end_time`
-        (nhất quán với REQ-FUNC-044 AC2); task `paused` chỉ cập nhật
-        `target_duration`/lịch, `planned_end_time` được xếp lại khi resume (theo
-        đúng lời văn REQ-INT-005, không tính lại ở đây). KHÔNG đụng
-        `original_breach_time` (deadline gốc, bất biến sau attach).
-        Refs: REQ-INT-005
+        nút); chỉ tác dụng trên task `in_progress`/`paused`, task khác hoặc
+        record gốc đã mất thì bỏ qua và được đếm vào "skipped" (AC3); giữ
+        nguyên `business_duration` đã trôi, lấy lại `target_duration` và lịch
+        hiện hành (REQ-FUNC-021, 052); với task `in_progress` chưa vi phạm thì
+        xếp lại `planned_end_time` = hiện tại + phần giờ còn lại theo lịch mới
+        (AC1, AC2); task đã vi phạm giữ nguyên `planned_end_time` (nhất quán
+        với REQ-FUNC-044 AC2); task `paused` chỉ cập nhật `target_duration`/lịch,
+        `planned_end_time` được xếp lại khi resume (theo đúng lời văn
+        REQ-INT-005, không tính lại ở đây). KHÔNG đụng `original_breach_time`
+        (deadline gốc, bất biến sau attach). Task nào thực sự đổi (mục tiêu,
+        lịch hoặc deadline) được ghi một event `recalculate` (người bấm, cũ →
+        mới); mọi event tạo bằng MỘT lệnh create sau vòng lặp. Trả thông báo
+        "N updated, M skipped" rồi tải lại view.
+        Refs: REQ-INT-005, plan-improvement-sla-01-review §6.17
         """
         if not self.env.user.has_group('dwo_sla_core.group_sla_manager'):
             raise AccessError(get_message(
                 MessageCode.ACC_RECALCULATE_SLA_MANAGER_ONLY))
         now = fields.Datetime.now()
         time_srv = self.env['sla.time']
-        for task in self.sudo().filtered(lambda t: t.stage in ('in_progress', 'paused')):
-            record = self.env[task.res_model].browse(task.res_id).exists()
+        user_name = self.env.user.name
+        events = []
+        updated = skipped = 0
+        for task in self.sudo():
+            record = self.env[task.res_model].browse(task.res_id).exists() \
+                if task.stage in ('in_progress', 'paused') else None
             if not record:
+                skipped += 1
                 continue
+            old = (task.target_duration, task.schedule_id, task.planned_end_time)
             target_duration = task.sla_id._get_target_hours(record)
             calendar, _note = time_srv.resolve_calendar(task.sla_id, record)
             vals = {
@@ -396,29 +535,136 @@ class SlaTask(models.Model):
             task.write(vals)
             if task.stage == 'in_progress':
                 task.next_due_at = time_srv.next_due_at(task, now)
+            updated += 1
+            new = (task.target_duration, task.schedule_id, task.planned_end_time)
+            if new != old:
+                events.append({
+                    'task_id': task.id,
+                    'event': 'recalculate',
+                    'event_dt': now,
+                    'note': get_message(
+                        MessageCode.NOTE_RECALCULATE_APPLIED, user_name,
+                        "%.2f h" % old[0], "%.2f h" % new[0],
+                        old[1].display_name or "-", new[1].display_name or "-",
+                        format_datetime(self.env, old[2]) if old[2] else "-",
+                        format_datetime(self.env, new[2]) if new[2] else "-"),
+                    'definition_id': task.sla_id.id,
+                    'company_id': task.company_id.id,
+                })
+        if events:
+            self.env['sla.event'].sudo().create(events)
+        return self._result_notification(
+            MessageCode.INF_RECALCULATE_RESULT_TITLE,
+            get_message(MessageCode.INF_RECALCULATE_RESULT_BODY, updated, skipped))
 
     def action_reevaluate(self):
-        """"Đánh giá lại": chạy lại 6 điều kiện cho record gốc (REQ-INT-020).
+        """"Re-check Conditions": chạy lại 6 điều kiện của ĐÚNG định nghĩa của từng task (REQ-INT-020).
 
         Logic: chỉ SLA Manager được gọi (AC2); dùng thời điểm hiện tại,
         không coi field nào là "vừa đổi" nên không kích hoạt reset theo
         field (REQ-FUNC-032, REQ-FUNC-050 AC3); task đã kết thúc không đổi
-        vì `evaluate()` tự tôn trọng bất biến REQ-FUNC-007 (AC3); gom các
-        task theo `res_model` để gọi `evaluate()` theo lô thay vì từng
-        record (AD-03).
-        Refs: REQ-INT-020, REQ-FUNC-032
+        vì `evaluate()` tự tôn trọng bất biến REQ-FUNC-007 (AC3); gom task theo
+        `(res_model, sla_id)` để gọi `evaluate()` theo lô (AD-03) và chỉ với
+        định nghĩa đó, nên task của định nghĩa khác trên cùng record không bị
+        chạm. Mỗi task được ghi một event `reevaluate` (người bấm, stage cũ →
+        mới hoặc "không đổi") bằng MỘT lệnh create. Nếu điều kiện Reset khớp,
+        task hiện tại đóng và task mới được tạo; task mới không nằm trong số đếm.
+        Refs: REQ-INT-020, REQ-FUNC-032, plan-improvement-sla-01-review §6.18
         """
         if not self.env.user.has_group('dwo_sla_core.group_sla_manager'):
             raise AccessError(get_message(
                 MessageCode.ACC_REEVALUATE_SLA_MANAGER_ONLY))
         now = fields.Datetime.now()
-        by_model = {}
-        for task in self.sudo():
-            by_model.setdefault(task.res_model, []).append(task.res_id)
-        for res_model, res_ids in by_model.items():
+        tasks = self.sudo()
+        before = {task.id: task.stage for task in tasks}
+        groups = {}
+        for task in tasks:
+            groups.setdefault((task.res_model, task.sla_id.id), []).append(task.res_id)
+        for (res_model, sla_id), res_ids in groups.items():
             records = self.env[res_model].sudo().browse(res_ids).exists()
-            if records:
-                self.env['sla.engine'].evaluate(records, now=now, changed=set())
+            self.env['sla.engine'].evaluate(
+                records, now=now, changed=set(),
+                definitions=self.env['sla.definition'].sudo().browse(sla_id))
+        tasks.invalidate_recordset(['stage'])
+        labels = dict(self._fields['stage']._description_selection(self.env))
+        user_name = self.env.user.name
+        events = []
+        changed = 0
+        for task in tasks:
+            old_stage, new_stage = before[task.id], task.stage
+            if old_stage != new_stage:
+                changed += 1
+                note = get_message(
+                    MessageCode.NOTE_REEVALUATE_CHANGED, user_name,
+                    labels[old_stage], labels[new_stage])
+            else:
+                note = get_message(
+                    MessageCode.NOTE_REEVALUATE_UNCHANGED, user_name,
+                    labels[old_stage])
+            events.append({
+                'task_id': task.id,
+                'event': 'reevaluate',
+                'event_dt': now,
+                'note': note,
+                'definition_id': task.sla_id.id,
+                'company_id': task.company_id.id,
+            })
+        if events:
+            self.env['sla.event'].sudo().create(events)
+        return self._result_notification(
+            MessageCode.INF_REEVALUATE_RESULT_TITLE,
+            get_message(MessageCode.INF_REEVALUATE_RESULT_BODY, len(tasks), changed))
+
+    @staticmethod
+    def _result_notification(title_code, message):
+        """Thông báo kết quả của nút hàng loạt, rồi tải lại view hiện tại.
+
+        Refs: plan-improvement-sla-01-review §6.17, §6.18
+        """
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': get_message(title_code),
+                'message': message,
+                'type': 'success',
+                'sticky': False,
+                'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
+            },
+        }
+
+    def _mark_passed_escalations_done(self, escalations=None):
+        """Đánh dấu mốc escalation đã vượt phần trăm của task là đã xử lý, không bắn bù.
+
+        Logic: với mỗi task đang hoạt động (`in_progress`/`paused`), mốc nào
+        có `percent` không cao hơn phần trăm hiện tại của task được thêm vào
+        `done_escalation_ids` NGAY (không chạy action, không ghi event) để xử
+        lý nền không bao giờ bắn bù (REQ-FUNC-053 AC1). `escalations` None =
+        mọi mốc của định nghĩa của task; truyền recordset thì chỉ xét các mốc
+        đó (đúng định nghĩa của từng task). Sau đó task `in_progress` được tính
+        lại `next_due_at` vì tập mốc chờ đã đổi (AC2, 024). Dùng bởi
+        `sla.escalation.create` và backfill của `sla.apply.job`.
+        Refs: REQ-FUNC-053, plan-improvement-sla-01-review §2.3, §6.16
+        """
+        now = fields.Datetime.now()
+        processor = self.env['sla.processor']
+        time_srv = self.env['sla.time']
+        for task in self.sudo().filtered(lambda t: t.stage in ('in_progress', 'paused')):
+            candidates = task.sla_id.escalation_ids if escalations is None \
+                else escalations.filtered(lambda e: e.definition_id == task.sla_id)
+            if task.stage == 'in_progress':
+                current_percent = processor._current_percent(task, now)
+            elif task.target_duration > 0:
+                current_percent = task.business_duration / task.target_duration * 100.0
+            else:
+                current_percent = 100.0
+            passed = candidates.filtered(lambda e: current_percent >= e.percent)
+            if passed:
+                task.write({'done_escalation_ids': [(4, e.id) for e in passed]})
+            if task.stage == 'in_progress':
+                # Mốc mới có thể đến hạn sớm hơn mốc đang chờ: tính lại để
+                # xử lý nền không bắn muộn (REQ-FUNC-053 AC2, 024).
+                task.next_due_at = time_srv.next_due_at(task, now)
 
     @api.autovacuum
     def _gc_orphan_tasks(self):

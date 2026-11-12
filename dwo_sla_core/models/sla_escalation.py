@@ -279,24 +279,9 @@ class SlaEscalation(models.Model):
         Refs: REQ-FUNC-053
         """
         escalations = super().create(vals_list)
-        now = fields.Datetime.now()
-        processor = self.env['sla.processor']
-        for escalation in escalations:
-            tasks = self.env['sla.task'].sudo().search([
-                ('sla_id', '=', escalation.definition_id.id),
-                ('stage', 'in', ('in_progress', 'paused')),
-            ])
-            for task in tasks:
-                if task.stage == 'in_progress':
-                    current_percent = processor._current_percent(task, now)
-                elif task.target_duration > 0:
-                    current_percent = task.business_duration / task.target_duration * 100.0
-                else:
-                    current_percent = 100.0
-                if current_percent >= escalation.percent:
-                    task.write({'done_escalation_ids': [(4, escalation.id)]})
-                elif task.stage == 'in_progress':
-                    # Mốc mới có thể đến hạn sớm hơn mốc đang chờ: tính lại để
-                    # xử lý nền không bắn muộn (REQ-FUNC-053 AC2, 024).
-                    task.next_due_at = self.env['sla.time'].next_due_at(task, now)
+        tasks = self.env['sla.task'].sudo().search([
+            ('sla_id', 'in', escalations.definition_id.ids),
+            ('stage', 'in', ('in_progress', 'paused')),
+        ])
+        tasks._mark_passed_escalations_done(escalations)
         return escalations

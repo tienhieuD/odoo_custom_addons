@@ -33,6 +33,7 @@ class SlaDefinition(models.Model):
     Refs: REQ-FUNC-001, 030, DB Design §3 bảng sla_definition
     """
     _name = 'sla.definition'
+    _inherit = ['mail.thread']
     _description = "SLA Definition"
     _order = 'sequence, id'
 
@@ -40,10 +41,14 @@ class SlaDefinition(models.Model):
         help=('Name of the SLA rule, shown in lists and on every task it '
               'creates. Use something that tells users what is measured. '
               'Example: "Ticket Response - Priority 1".'))
-    active = fields.Boolean(default=True,
-        help=('Untick (archive) to stop attaching this SLA to new records. '
-              'Tasks that are already running keep being tracked until they '
-              'finish. Example: archive an old SLA after replacing it with a '
+    # Refs: plan-improvement-sla-01-review §6.3 -- mặc định tắt: định nghĩa mới
+    # là bản nháp cho tới khi người dùng bấm Enable.
+    active = fields.Boolean(default=False, tracking=True,
+        help=('Whether this SLA is enabled. A new definition starts disabled '
+              'so you can finish configuring it; press Enable when ready. '
+              'Disabling stops attaching this SLA to new records, while tasks '
+              'that are already running keep being tracked until they '
+              'finish. Example: disable an old SLA after replacing it with a '
               'new one instead of deleting it.'))
     sequence = fields.Integer(default=10,
         help=('Display order of definitions in lists; lower numbers come '
@@ -57,12 +62,14 @@ class SlaDefinition(models.Model):
               'Vietnam" so tickets of other companies never get this SLA.'))
     model_id = fields.Many2one(
         'ir.model', string="Model", required=True, ondelete='cascade',
+        tracking=True,
         help=('The business model whose records are measured by this SLA. '
               'Every record of that model that meets the Start Condition gets '
               'its own SLA task. Example: "Helpdesk Ticket" or "Contact".'))
     # Refs: AD-01, AD-10
     model_name = fields.Char(
-        string="Model Technical Name", required=True, index=True,
+        related='model_id.model', store=True, readonly=True, index=True,
+        string="Model Technical Name",
         help=('Technical name of the selected model, filled in automatically '
               'from Model. Used internally for fast lookups; do not edit. '
               'Example: res.partner.'))
@@ -70,7 +77,7 @@ class SlaDefinition(models.Model):
     # `contract_sla.duration` của ServiceNow (tên và label); đơn vị vẫn là
     # giờ (Float), chỉ đổi tên/nhãn.
     duration = fields.Float(
-        string="Duration", required=True, default=0,
+        string="Duration", required=True, default=0, tracking=True,
         help=('Time allowed to finish, in hours. With a working calendar it '
               'counts working hours only, otherwise clock hours (24x7). 0 is '
               'accepted and means the deadline is the start time. Example: 4 '
@@ -84,6 +91,7 @@ class SlaDefinition(models.Model):
             ('record', "Calendar read from the record"),
         ],
         string="Calendar Source", default='none', required=True,
+        tracking=True,
         help=('Where the working calendar comes from. No calendar: time runs '
               '24x7. Fixed calendar on the definition: always use the '
               'calendar selected below. Calendar read from the record: follow '
@@ -92,6 +100,7 @@ class SlaDefinition(models.Model):
               'support hours.'))
     schedule_id = fields.Many2one(
         'resource.calendar', string="Fixed Calendar", ondelete='restrict',
+        tracking=True,
         help=('Working calendar used when Calendar Source is "Fixed calendar '
               'on the definition". It must be a fixed-hours calendar with at '
               'least one working period. Example: "Standard 40 hours/week '
@@ -112,70 +121,52 @@ class SlaDefinition(models.Model):
     # cùng mẫu giờ làm nhưng đổi tz -- áp dụng ở
     # `sla.time._apply_tz_override()`/`resource.calendar._sla_get_tz_variant()`
     # (tìm-hoặc-tạo, cache qua field kỹ thuật `sla_tz_override_source_id`).
+    # Refs: plan-improvement-sla-01-review §6.5 -- bắt buộc, có default (tz
+    # người dùng hoặc UTC) để form mới không bị ô trống; onchange/create đổi
+    # sang tz của calendar cố định khi có.
     calendar_tz_override = fields.Selection(
-        selection='_get_tz_selection', string="Timezone",
-        help=('Timezone used to interpret the resolved calendar\'s working '
-              'hours, instead of the timezone stored on that calendar. Leave '
-              'empty to use the calendar\'s own timezone -- most definitions '
-              'should leave this empty. Applied by automatically creating '
-              '(and reusing) a hidden copy of the resolved calendar with '
-              'this timezone; the original calendar is never modified, so '
-              'it keeps working normally wherever else it is used. Example: '
-              'override to "America/New_York" to reuse a calendar defined '
-              'in another timezone for a US team.'))
-    start_domain = fields.Text(string="Start Condition",
+        selection='_get_tz_selection', string="Timezone", required=True,
+        default=lambda self: self.env.user.tz or 'UTC', tracking=True,
+        help=('Timezone in which the working hours of the calendar are '
+              'read and the SLA clock runs; it always wins over the '
+              'calendar\'s own timezone. Filled in for you. Example: '
+              '"America/New_York". See the Note tab for how calendar copies '
+              'work.'))
+    start_domain = fields.Text(string="Start Condition", default='[]', tracking=True,
         help=('Condition that makes a record start being measured. Written as '
-              'a domain list. An empty value means "not configured" (never '
-              "matches); [] matches every record. Example: [('priority', '=', "
+              'a domain list. An empty rule list [] means "not configured" '
+              "and never matches; to match every record write "
+              "[('id', '!=', 0)]. Example: [('priority', '=', "
               "'3')] starts the SLA for urgent tickets."
-              ' Avoid: a Start Condition that is a subset of the Stop Condition (the SLA '
-              'would never attach), and a Start Condition that is mutually exclusive '
-              'with the Pause Condition (the task is cancelled before it can pause).'
-              ' Limit: non-stored computed fields and conditions through a relation '
-              '(for example partner_id.country_id) are not re-evaluated automatically '
-              'when only the related data changes; use Re-evaluate to refresh.'))
-    cancel_domain = fields.Text(string="Cancel Condition",
+              ' See the Note tab for limits and common mistakes.'))
+    cancel_domain = fields.Text(string="Cancel Condition", default='[]', tracking=True,
         help=('Condition that cancels the running SLA when Cancel Mode is '
               '"When the cancel condition matches". A cancelled SLA is '
               'discarded and not counted as achieved or breached. Example: '
               "[('stage_id.name', '=', 'Cancelled')]."
-              ' Limit: non-stored computed fields and conditions through a relation '
-              '(for example partner_id.country_id) are not re-evaluated automatically '
-              'when only the related data changes; use Re-evaluate to refresh.'))
-    pause_domain = fields.Text(string="Pause Condition",
+              ' See the Note tab for limits and common mistakes.'))
+    pause_domain = fields.Text(string="Pause Condition", default='[]', tracking=True,
         help=('Condition that pauses the clock while it matches, for example '
               'while waiting for the customer. The paused time is not counted '
               "against the target. Example: [('state', '=', "
               "'waiting_customer')]."
-              ' Avoid: a Pause Condition that is a subset of the Start Condition (the task '
-              'attaches paused and is cancelled as soon as the pause ends), a Start '
-              'Condition that is a subset of the Stop Condition, and conditions that '
-              'are mutually exclusive with the Start Condition.'
-              ' Limit: non-stored computed fields and conditions through a relation '
-              '(for example partner_id.country_id) are not re-evaluated automatically '
-              'when only the related data changes; use Re-evaluate to refresh.'))
-    resume_domain = fields.Text(string="Resume Condition",
+              ' See the Note tab for limits and common mistakes.'))
+    resume_domain = fields.Text(string="Resume Condition", default='[]', tracking=True,
         help=('Condition that restarts a paused clock when Resume Mode is '
               '"When the resume condition matches". Example: [(\'state\', \'=\', '
               "'in_progress')]."
-              ' Limit: non-stored computed fields and conditions through a relation '
-              '(for example partner_id.country_id) are not re-evaluated automatically '
-              'when only the related data changes; use Re-evaluate to refresh.'))
-    stop_domain = fields.Text(string="Stop Condition",
+              ' See the Note tab for limits and common mistakes.'))
+    stop_domain = fields.Text(string="Stop Condition", default='[]', tracking=True,
         help=('Condition that completes the SLA. The task becomes Achieved, '
               'or Breached if the deadline had already passed. Example: '
               "[('state', 'in', ['resolved', 'closed'])]."
-              ' Limit: non-stored computed fields and conditions through a relation '
-              '(for example partner_id.country_id) are not re-evaluated automatically '
-              'when only the related data changes; use Re-evaluate to refresh.'))
-    reset_domain = fields.Text(string="Reset Condition",
+              ' See the Note tab for limits and common mistakes.'))
+    reset_domain = fields.Text(string="Reset Condition", default='[]', tracking=True,
         help=('Condition that, together with the Start Condition, ends the '
               'current SLA and starts a fresh one, for example when a ticket '
               'is reopened. Combine with Reset-Trigger Fields to react only '
               "to real changes. Example: [('state', '=', 'reopened')]."
-              ' Limit: non-stored computed fields and conditions through a relation '
-              '(for example partner_id.country_id) are not re-evaluated automatically '
-              'when only the related data changes; use Re-evaluate to refresh.'))
+              ' See the Note tab for limits and common mistakes.'))
     cancel_mode = fields.Selection(
         [
             ('start_unmatched', "When start no longer matches"),
@@ -183,6 +174,7 @@ class SlaDefinition(models.Model):
             ('never', "Never cancel"),
         ],
         string="Cancel Mode", default='start_unmatched', required=True,
+        tracking=True,
         help=('How cancellation is decided. When start no longer matches: '
               'cancel as soon as the record leaves the Start Condition. When '
               'the cancel condition matches: use the Cancel Condition. Never '
@@ -194,6 +186,7 @@ class SlaDefinition(models.Model):
             ('pause_unmatched', "When pause no longer matches"),
         ],
         string="Resume Mode", default='condition', required=True,
+        tracking=True,
         help=('How a paused task restarts. When the resume condition matches: '
               'use the Resume Condition. When pause no longer matches: resume '
               'as soon as the Pause Condition stops matching. Example: choose '
@@ -204,6 +197,7 @@ class SlaDefinition(models.Model):
             ('complete', "Complete the previous task"),
         ],
         string="Reset Action", default='cancel', required=True,
+        tracking=True,
         help=('What happens to the previous task when a reset occurs. Cancel: '
               'it is discarded. Complete: it is closed as Achieved or '
               'Breached according to the deadline. Example: use "Complete" to '
@@ -232,6 +226,31 @@ class SlaDefinition(models.Model):
               'value. Leave empty to reset every time the Reset Condition is '
               'met. Example: select "Priority" so a reset occurs only when '
               'the priority is edited.'))
+    # Refs: plan-improvement-sla-01-review §6.10
+    due_soon_hours = fields.Float(
+        string="Due Soon (hours)", tracking=True,
+        help=('Hours before the deadline when a running task counts as "Due '
+              'Soon" for this SLA. Leave empty or 0 to use the global value '
+              'in Settings. Must not be negative. Example: 2 on a 4-hour SLA '
+              'flags tasks in their last 2 hours; 24 on a 3-day SLA flags '
+              'the last day.'))
+    # Refs: plan-improvement-sla-01-review §6.7
+    running_task_count = fields.Integer(
+        string="Running Tasks", compute='_compute_running_task_count',
+        help=('Number of tasks of this SLA that are in progress or paused. '
+              'Shown on the smart button and used to warn before saving '
+              'changes that affect running tasks. Example: 12 means 12 '
+              'records are being measured right now.'))
+    # Refs: plan-improvement-sla-01-review §6.16
+    apply_job_ids = fields.One2many(
+        'sla.apply.job', 'definition_id', string="Manual Apply Runs", readonly=True,
+        help=('History of "Apply to Existing Records" runs for this SLA, '
+              'newest first. Example: a run that created 112 tasks.'))
+    apply_retention_days = fields.Integer(
+        string="Run History Retention", compute='_compute_apply_retention_days',
+        help=('Days after which finished manual apply runs are removed '
+              'automatically; it follows the event log retention in Settings. '
+              'Example: 365.'))
     escalation_ids = fields.One2many(
         'sla.escalation', 'definition_id', string="Escalations",
         help=('Actions fired automatically when a task reaches a percentage '
@@ -311,6 +330,9 @@ class SlaDefinition(models.Model):
     _calendar_record_check = models.Constraint(
         "CHECK(schedule_source <> 'record' OR schedule_path IS NOT NULL)",
         "Calendar source 'record' requires a path to be entered.")
+    _due_soon_hours_check = models.Constraint(
+        'CHECK(due_soon_hours IS NULL OR due_soon_hours >= 0)',
+        "The \"due soon\" hours cannot be negative.")
     _type_check = models.Constraint(
         "CHECK(type IN ('sla','ola'))", "Invalid Type.")
     _model_name_active_idx = models.Index(
@@ -326,35 +348,139 @@ class SlaDefinition(models.Model):
         """
         return [(tz, tz) for tz in sorted(zoneinfo.available_timezones())]
 
+    @api.onchange('schedule_source', 'schedule_id')
+    def _onchange_schedule_suggest_tz(self):
+        """Điền timezone của calendar cố định khi người dùng chọn nguồn lịch.
+
+        Logic: chỉ áp cho nguồn 'definition' có calendar. Bản ghi chưa lưu thì
+        luôn lấy tz calendar (người dùng đang dựng form); bản ghi đã lưu chỉ
+        điền khi ô đang trống, không ghi đè lựa chọn đã có.
+        Refs: plan-improvement-sla-01-review §6.5
+        """
+        if (self.schedule_source == 'definition' and self.schedule_id
+                and (not self.calendar_tz_override or not self._origin)):
+            self.calendar_tz_override = self.schedule_id.tz
+
     @api.model_create_multi
     def create(self, vals_list):
-        """Tạo định nghĩa và đồng bộ model_name, rồi đăng ký lại hook.
+        """Tạo định nghĩa, điền timezone nếu thiếu, rồi đăng ký lại hook.
 
-        Logic: model_name là bản lưu của ir_model.model để hook tra nhanh mà
-        không phải join bảng ir_model trên đường nóng (AD-01). Sau khi tạo,
-        tập model có định nghĩa có thể đổi nên phải đăng ký lại patch.
-        Refs: REQ-FUNC-001, AD-01
+        Logic: model_name là related stored (tự đồng bộ từ ir_model.model, AD-01).
+        Timezone là bắt buộc: create qua ORM/import thiếu giá trị mà nguồn là
+        'definition' có calendar thì lấy tz calendar, còn lại để `default` của
+        field (tz người dùng hoặc UTC) lo. Sau khi tạo, tập model có định nghĩa có thể đổi nên
+        phải đăng ký lại patch.
+        Refs: REQ-FUNC-001, AD-01, plan-improvement-sla-01-review §6.5
         """
         for vals in vals_list:
-            if vals.get('model_id') and not vals.get('model_name'):
-                vals['model_name'] = self.env['ir.model'].browse(vals['model_id']).model
+            if (not vals.get('calendar_tz_override')
+                    and vals.get('schedule_source') == 'definition'
+                    and vals.get('schedule_id')):
+                vals['calendar_tz_override'] = self.env['resource.calendar'].browse(
+                    vals['schedule_id']).tz
         definitions = super().create(vals_list)
         self._register_sla_hook()
         return definitions
 
     def write(self, vals):
-        """Sửa định nghĩa; đồng bộ model_name nếu đổi model, đăng ký lại hook.
+        """Sửa định nghĩa; đăng ký lại hook nếu đổi model hoặc bật/tắt.
 
         Logic: các field ảnh hưởng tới tập model cần patch là model_id,
-        active; đổi các field này phải đăng ký lại hook (AD-01).
-        Refs: AD-01
+        active; đổi các field này phải đăng ký lại hook (AD-01). Đổi model
+        thật sự khi định nghĩa đã có task bị chặn: task giữ `res_model` cũ
+        nên engine sẽ đánh giá nó bằng domain của model khác.
+        Refs: AD-01, plan-improvement-sla-01-review §6.14
         """
-        if vals.get('model_id'):
-            vals['model_name'] = self.env['ir.model'].browse(vals['model_id']).model
+        if 'model_id' in vals:
+            changed = self.filtered(lambda d: d.model_id.id != vals['model_id'])
+            if changed and self.env['sla.task'].sudo().search_count(
+                    [('sla_id', 'in', changed.ids)], limit=1):
+                raise ValidationError(get_message(
+                    MessageCode.VAL_MODEL_LOCKED_HAS_TASKS))
         res = super().write(vals)
         if {'model_id', 'active'} & set(vals):
             self._register_sla_hook()
         return res
+
+    def _compute_running_task_count(self):
+        """Đếm task đang chạy hoặc tạm dừng của từng định nghĩa.
+
+        Logic: một `_read_group` theo `sla_id` (sudo giống `sla.mixin`).
+        Refs: plan-improvement-sla-01-review §6.7
+        """
+        counts = dict(self.env['sla.task'].sudo()._read_group(
+            [('sla_id', 'in', self.ids), ('stage', 'in', ('in_progress', 'paused'))],
+            ['sla_id'], ['__count']))
+        for definition in self:
+            definition.running_task_count = counts.get(definition, 0)
+
+    def _compute_apply_retention_days(self):
+        """Số ngày giữ lịch sử apply thủ công, đọc từ cấu hình (cùng `event_retention_days`).
+
+        Refs: plan-improvement-sla-01-review §6.16
+        """
+        days = int(self.env['ir.config_parameter'].sudo().get_param(
+            'dwo_sla_core.event_retention_days', 365))
+        for definition in self:
+            definition.apply_retention_days = days
+
+    def action_open_apply_wizard(self):
+        """Mở wizard "Apply to Existing Records" cho định nghĩa này.
+
+        Refs: plan-improvement-sla-01-review §6.16
+        """
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': "Apply to Existing Records",
+            'res_model': 'sla.apply.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_definition_id': self.id},
+        }
+
+    def action_view_tasks(self):
+        """Mở danh sách mọi task của định nghĩa này (smart button).
+
+        Refs: plan-improvement-sla-01-review §6.7
+        """
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'dwo_sla_core.action_sla_task')
+        action['domain'] = [('sla_id', '=', self.id)]
+        action['context'] = {}
+        return action
+
+    def action_enable(self):
+        """Bật định nghĩa; cảnh báo (không chặn) nếu Start Condition chưa cấu hình.
+
+        Logic: bật xong tải lại form bằng `soft_reload`. Start `[]` là "chưa cấu
+        hình" nên bật mà không có rule thì sẽ không bao giờ attach task.
+        Refs: plan-improvement-sla-01-review §6.3
+        """
+        self.write({'active': True})
+        reload_action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+        if any(definition._get_domain('start') is None for definition in self):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': get_message(MessageCode.INF_ENABLE_WITHOUT_START_TITLE),
+                    'message': get_message(MessageCode.INF_ENABLE_WITHOUT_START_BODY),
+                    'type': 'warning',
+                    'sticky': False,
+                    'next': reload_action,
+                },
+            }
+        return reload_action
+
+    def action_disable(self):
+        """Tắt định nghĩa (task đang chạy vẫn được theo dõi), rồi tải lại form.
+
+        Refs: plan-improvement-sla-01-review §6.3, REQ-FUNC-060
+        """
+        self.write({'active': False})
+        return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
 
     def unlink(self):
         """Xóa định nghĩa rồi đăng ký lại hook (tập model có thể đổi)."""
@@ -711,15 +837,16 @@ class SlaDefinition(models.Model):
         """Trả domain literal (dạng list) đã lưu cho một điều kiện.
 
         Logic: điểm mở rộng để module khác trả domain động thay vì chuỗi đã
-        lưu; mặc định parse chuỗi đã lưu bằng ast.literal_eval. Rỗng = chưa
-        cấu hình (trả None).
+        lưu; mặc định parse chuỗi đã lưu bằng ast.literal_eval. Rỗng hoặc `[]`
+        = chưa cấu hình (trả None, không bao giờ khớp).
         Refs: REQ-INT-017
         """
         self.ensure_one()
         value = self['%s_domain' % cond]
         if not value:
             return None
-        return ast.literal_eval(value)  # pyright: ignore[reportArgumentType]
+        domain = ast.literal_eval(value)  # pyright: ignore[reportArgumentType]
+        return domain or None
 
     def _get_target_hours(self, record):
         """Trả thời lượng mục tiêu (giờ) áp dụng cho record.

@@ -44,6 +44,37 @@ class ResConfigSettings(models.TransientModel):
               'without blocking the server. Must be greater than 0. Example: '
               '50.'))
 
+    # Refs: plan-improvement-sla-01 §3.9 (chip trạng thái SLA trên form)
+    # Không dùng `config_parameter=`: Boolean kiểu đó XOÁ bản ghi tham số khi
+    # tắt, nên "chưa có bản ghi" không phân biệt được với "đã tắt" và mặc định
+    # bật phải seed bằng data (bị tạo lại ở mỗi lần -u). Thay vào đó lưu chuỗi
+    # 'True'/'False' tường minh; chưa có bản ghi = bật (xem get/set_values).
+    sla_show_form_status = fields.Boolean(
+        string="Show SLA Status on Form View",
+        help=('Show a small SLA status chip next to the pager on the form of '
+              'every record that is measured by an SLA. Example: turn it off '
+              'to hide the chip on all forms.'))
+
+    @api.model
+    def _sla_show_form_status(self):
+        """Cờ hiển thị chip SLA trên form; chưa cấu hình thì coi là bật.
+
+        Refs: plan-improvement-sla-01 §3.9
+        """
+        return self.env['ir.config_parameter'].sudo().get_param(
+            'dwo_sla_core.show_form_sla_status', 'True') != 'False'
+
+    def get_values(self):
+        res = super().get_values()
+        res['sla_show_form_status'] = self._sla_show_form_status()
+        return res
+
+    def set_values(self):
+        super().set_values()
+        self.env['ir.config_parameter'].sudo().set_param(
+            'dwo_sla_core.show_form_sla_status',
+            'True' if self.sla_show_form_status else 'False')
+
     @api.constrains('sla_event_retention_days', 'sla_due_soon_hours', 'sla_batch_size')
     def _check_sla_params_positive(self):
         """Từ chối giá trị tham số SLA <= 0.

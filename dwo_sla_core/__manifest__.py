@@ -20,7 +20,7 @@ See custom-addons/dwo_sla_core/docs/ for the SRS, TAD, DB Design.
     'support': 'hello@duotek.io.vn',
 
     'category': 'Services',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'installable': True,
     'application': False,
     'license': 'OPL-1',
@@ -51,6 +51,7 @@ See custom-addons/dwo_sla_core/docs/ for the SRS, TAD, DB Design.
         'views/sla_definition_views.xml',
         'views/sla_task_views.xml',
         'views/sla_event_views.xml',
+        'views/sla_apply_views.xml',
         'views/res_config_settings_views.xml',
         'views/sla_menus.xml',
     ],
@@ -63,6 +64,11 @@ See custom-addons/dwo_sla_core/docs/ for the SRS, TAD, DB Design.
             'dwo_sla_core/static/src/sla_progress/sla_progress_widget.scss',
             'dwo_sla_core/static/src/float_time_unit/float_time_unit_field.js',
             'dwo_sla_core/static/src/float_time_unit/float_time_unit_field.xml',
+            'dwo_sla_core/static/src/definition_form/definition_form_controller.js',
+            'dwo_sla_core/static/src/form_sla_status/form_sla_status.js',
+            'dwo_sla_core/static/src/form_sla_status/form_sla_status.xml',
+            'dwo_sla_core/static/src/form_sla_status/form_sla_status.scss',
         ],
+        'web.assets_tests': ['dwo_sla_core/static/tests/**/*'],
     },
 }

@@ -24,3 +24,11 @@ from . import test_tg21_new_fields
 from . import test_tg22_retroactive_pause
 from . import test_tg23_tz_override
 from . import test_tg24_clock_duration
+from . import test_tg25_enable_conditions_tz
+from . import test_tg26_definition_ux
+from . import test_tg27_recheck_conditions
+from . import test_tg28_apply_settings
+from . import test_tg29_apply_existing
+from . import test_tg30_form_status
+from . import test_tg31_notes_i18n
+from . import test_tg32_duration_live

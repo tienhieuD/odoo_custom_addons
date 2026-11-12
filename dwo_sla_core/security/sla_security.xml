@@ -52,4 +52,11 @@
         <field name="model_id" ref="model_sla_event"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
     </record>
+
+    <!-- Lần apply thủ công theo công ty của định nghĩa (cùng mẫu 3 rule trên). -->
+    <record id="rule_sla_apply_job_company" model="ir.rule">
+        <field name="name">sla.apply.job: company</field>
+        <field name="model_id" ref="model_sla_apply_job"/>
+        <field name="domain_force">['|', ('definition_id.company_id', '=', False), ('definition_id.company_id', 'in', company_ids)]</field>
+    </record>
 </odoo>

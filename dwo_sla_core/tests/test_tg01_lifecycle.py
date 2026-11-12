@@ -104,7 +104,7 @@ class TestAttachStop(SlaCase):
 
     def test_att_001_empty_stop_never_matches(self):
         """TC-ATT-001: stop rỗng (chưa cấu hình) không bao giờ khớp dù ref=DONE."""
-        d = self.make_definition(stop_domain=False, start_domain='[]')
+        d = self.make_definition(stop_domain=False, start_domain="[('id', '!=', 0)]")
         p = self.make_partner('DONE')
         self.write(p, {'ref': 'DONE'}, T0 + hours(1))
         t = self.task_of(p, d)
@@ -112,8 +112,8 @@ class TestAttachStop(SlaCase):
         self.assertNotIn('complete', self.events(t))
 
     def test_att_002_empty_list_matches_all(self):
-        """TC-ATT-002: start = [] khớp mọi record."""
-        d = self.make_definition(start_domain='[]')
+        """TC-ATT-002: start = [('id', '!=', 0)] khớp mọi record."""
+        d = self.make_definition(start_domain="[('id', '!=', 0)]")
         ps = [self.make_partner(r) for r in ('A', 'B', False)]
         for p in ps:
             self.assertEqual(len(self.tasks(p, d)), 1)
@@ -387,7 +387,7 @@ class TestGeneric(SlaCase):
         d1 = self.make_definition(name="Partners")
         d2 = self.Definition.create({
             'name': "Categories", 'model_id': categ_model.id, 'duration': 2,
-            'start_domain': "[('name', '=', 'VIP')]",
+            'start_domain': "[('name', '=', 'VIP')]", 'active': True,
         })
         p = self.make_partner('NEW')
         with self.at(T0):

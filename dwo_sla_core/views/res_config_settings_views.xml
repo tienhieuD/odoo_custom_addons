@@ -28,6 +28,11 @@
                                  help="Maximum number of tasks the background process handles per run.">
                             <field name="sla_batch_size"/>
                         </setting>
+                        <!-- Refs: plan-improvement-sla-01 §3.9 -->
+                        <setting string="Show SLA Status on Form View" id="sla_show_form_status_setting"
+                                 help="Show an SLA status chip next to the pager on the form of records that are measured by an SLA.">
+                            <field name="sla_show_form_status"/>
+                        </setting>
                     </block>
                 </app>
             </xpath>

@@ -37,14 +37,14 @@ class TestSecurityMore(SlaCase):
         self.assertIn(self.env.ref('dwo_sla_core.menu_sla_root').id, visible)
 
     def test_sec_015_escalation_permission_note(self):
-        """TC-SEC-015: form định nghĩa có ghi chú: action chạy theo quyền user xử lý nền, không phải người sửa record."""
+        """TC-SEC-015: tab Note của form định nghĩa ghi: action chạy theo quyền user xử lý nền, không phải người sửa record."""
         root = etree.fromstring(
             self.env['sla.definition'].with_user(self.manager).get_view(view_type='form')['arch'])
-        pages = root.xpath("//page[@name='escalations']")
+        pages = root.xpath("//page[@name='note']")
         self.assertEqual(len(pages), 1)
-        text = ' '.join(''.join(pages[0].xpath(".//div[contains(@class, 'alert')]")[0].itertext()).split())
-        self.assertIn('permissions of the user assigned to background processing', text)
-        self.assertIn('NOT the permissions of the user editing the source record', text)
+        text = ' '.join(''.join(pages[0].itertext()).split())
+        self.assertIn('permissions of the user assigned to the SLA background job', text)
+        self.assertIn('not the permissions of the user who edits the source record', text)
 
     def test_sec_001_menu_hidden(self):
         """TC-SEC-001: menu SLA ẩn với người dùng không thuộc nhóm SLA."""

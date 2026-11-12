@@ -78,6 +78,7 @@ class SlaCase(TransactionCase):
     def make_definition(self, **overrides):
         """Tạo FX-DEF-STD trên res.partner; `overrides` ghi đè từng field."""
         vals = {
+            'active': True,
             'name': "SLA test",
             'model_id': self.partner_model.id,
             'duration': 4,
@@ -87,6 +88,10 @@ class SlaCase(TransactionCase):
             **STD_DOMAINS,
         }
         vals.update(overrides)
+        if vals['schedule_source'] == 'record':
+            # Timezone SLA luôn thắng: lịch fixture (FX-CAL-VN) dùng tz ICT, nên đặt
+            # trùng tz đó để không sinh bản sao calendar (trừ khi test chủ ý đổi).
+            vals.setdefault('calendar_tz_override', 'Asia/Ho_Chi_Minh')
         return self.Definition.create(vals)
 
     def make_partner(self, ref=False, now=T0, **vals):

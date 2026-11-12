@@ -161,8 +161,10 @@ class TestCalendarSource(SlaCase):
 
     def test_cal_011_013_fallbacks(self):
         """TC-CAL-011/013: đường dẫn trống -> lịch công ty + ghi lý do; công ty cũng không dùng được -> 24x7 + lý do."""
+        # Timezone của định nghĩa đặt trùng tz lịch công ty để không sinh bản sao tz.
         d = self.make_definition(schedule_source='record',
-                                 schedule_path='company_id.resource_calendar_id')
+                                 schedule_path='company_id.resource_calendar_id',
+                                 calendar_tz_override=self.env.company.resource_calendar_id.tz)
         p = self.make_partner('NEW', company_id=False)
         t = self.task_of(p, d)
         self.assertEqual(t.schedule_id, self.env.company.resource_calendar_id)

@@ -21,7 +21,7 @@ from odoo.tests.common import BaseCase, get_db_name
 
 T0 = datetime(2026, 3, 2, 2, 0)
 STD = {
-    'duration': 4, 'schedule_source': 'none', 'cancel_mode': 'start_unmatched',
+    'active': True, 'duration': 4, 'schedule_source': 'none', 'cancel_mode': 'start_unmatched',
     'resume_mode': 'condition',
     'start_domain': "[('ref', 'in', ['NEW', 'WORK', 'HOLD'])]", 'stop_domain': "[('ref', '=', 'DONE')]",
     'pause_domain': "[('ref', '=', 'HOLD')]", 'resume_domain': "[('ref', '=', 'WORK')]",

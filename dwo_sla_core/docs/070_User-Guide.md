@@ -51,7 +51,7 @@ Two access groups control who can do what. Ask your administrator to add you to 
 | Group | Can do |
 |---|---|
 | **SLA / User** | Read SLA Definitions, SLA Tasks and the Event Log. Enough to answer "why is this record late?" without being able to change how any SLA is configured. |
-| **SLA / Manager** | Everything a User can do, plus create and edit SLA Definitions, run **Recalculate** and **Re-evaluate** on a task, and mark an error event resolved. |
+| **SLA / Manager** | Everything a User can do, plus create and edit SLA Definitions, run **Apply Current Settings** and **Re-check Conditions** on a task, and mark an error event resolved. |
 
 You do not need to know Python. You do need to be comfortable with Odoo's own domain/filter builder (the same
 widget used everywhere in Odoo to build a filter such as *Priority is Urgent*) — every SLA condition in this module
@@ -79,8 +79,10 @@ re-evaluated from scratch).
 
 ## 4. The Six Conditions
 
-Every SLA Definition is built from up to six conditions, each a plain Odoo domain on the target model. Leave a
-condition empty to mean "not used"; use `[]` to mean "always true".
+Every SLA Definition is built from up to six conditions, each a plain Odoo domain on the target model. An
+empty condition, or the empty domain `[]`, means "not configured" and **never matches** (the domain editor labels `[]`
+as "Match all records", but here it does not). To mean "every record", use an always-true rule such as
+`[('id', '!=', 0)]`.
 
 | Condition | Controls | Example |
 |---|---|---|
@@ -101,7 +103,8 @@ condition empty to mean "not used"; use `[]` to mean "always true".
 
 Limit to keep in mind: a condition that reads a non-stored computed field, or one that reaches across a relation
 (for example `partner_id.country_id`), is not automatically re-evaluated when only the related record changes. Use
-the **Re-evaluate** button on the task (or **Re-evaluate** on the error list for a batch) to refresh it on demand.
+the **Re-check Conditions** button on the task (or **Re-evaluate** on the error list for a batch) to refresh it on demand.
+The **Note** tab of the definition form collects these limits and the common mistakes in one place.
 
 ![Start Condition tab showing Odoo's domain builder with rules on Project and Priority fields](../static/description/screenshot_2.png)
 
@@ -113,12 +116,22 @@ the **Re-evaluate** button on the task (or **Re-evaluate** on the error list for
 2. Give it a clear **Name** — it is shown on every task it creates (for example "Ticket Response — Priority 1").
 3. Pick the **Model** to watch. This can be any model installed in your database.
 4. Under **Start Condition**, build the domain that defines which records this SLA applies to.
-5. Under **Stop Condition**, build the domain that means "this record is done". Remember: Start must be a subset of
+5. Under **Stop Condition**, build the domain that means "this record is done". Remember: Start must not be a subset of
    Stop (see the warning above).
 6. Set the **Duration** (in hours) and, if you want business hours instead of a 24/7 clock, a **Calendar Source**
    (see section 6).
-7. Save. The very next record that matches the Start Condition gets its own SLA Task automatically — no restart, no
-   manual action.
+7. Save, then press **Enable**. A new definition starts **disabled** (a draft), so nothing is attached until you
+   enable it. From then on, the next record that matches the Start Condition gets its own SLA Task automatically —
+   no restart, no manual action. **Disable** stops attaching the SLA to new records; tasks that are already running
+   keep running.
+8. Records that existed before the definition was enabled do not get a task by themselves. Press **Apply to Existing
+   Records** to attach the SLA to the ones that match the Start Condition (a first batch runs immediately, larger sets
+   continue in the background; every run is listed in the **Manual Apply** tab).
+
+The definition list shows disabled definitions greyed out; the toggle button on each row enables or disables it (it asks
+for confirmation). Saving a change to the conditions of a definition that has running tasks asks for confirmation too,
+because the new conditions apply to those tasks at their next evaluation. Changes to the important fields are
+recorded in the chatter of the definition. The Model cannot be changed once a definition has tasks.
 
 Pause/Resume, Cancel, Reset and Escalation are all optional and can be added later; a definition only needs a
 Model, a Start Condition, a Stop Condition and a Duration to work.
@@ -132,9 +145,14 @@ Model, a Start Condition, a Stop Condition and a Duration to work.
 | **Calendar read from the record** | Follows a calendar found by walking a dot-separated path of Many2one fields from the record (Calendar Path), for example `partner_id.resource_calendar_id`. If any step is empty or the calendar cannot be used, the company's calendar is used, then plain 24/7 as a last resort. |
 
 **Timezone** (on the Schedule section) lets you reuse one working calendar's hour pattern (say, 08:00–17:00) under a
-different timezone for a specific SLA, without touching the original calendar or anything else that uses it. Leave it empty to use the calendar's own timezone. The
-module automatically creates (and reuses) a hidden copy of the resolved calendar in the chosen timezone the first
-time it is needed.
+different timezone for a specific SLA, without touching the original calendar or anything else that uses it. **Timezone is required** and always wins over the timezone stored on the calendar. It is filled in for you (the fixed
+calendar's timezone when you pick one, otherwise your own); an existing value is never overwritten. When it differs
+from the calendar's timezone, the module automatically creates (and reuses) a hidden copy of the calendar in that
+timezone. The copy keeps the working hours and public holidays as they were when it was created and is **not** kept in
+sync with the original calendar afterwards.
+
+**Due Soon (hours)** (next to Duration) sets the "due soon" window for this SLA; leave it empty or 0 to use the value in
+Settings. If it is equal to or longer than the Duration, every task is flagged Due Soon from the start.
 
 ## 7. Classification: SLA vs. OLA
 
@@ -256,10 +274,21 @@ Below the card, the **Overview** tab groups every field the task carries:
 | **Progress (Business Time)** | Running Since, Business Duration, Total Paused Hours (Business), Breached. |
 | **Progress (Wall-clock Time)** | Paused Since, Duration, Total Paused Hours (Clock) — the same measurements in real elapsed hours, not excluding non-working time. |
 
-SLA Managers see two buttons in the header: **Recalculate** (recompute the Planned End from the current target
-duration and calendar — useful after editing those on the definition) and **Re-evaluate** (check all six conditions
-again against the current state of the record — useful after a non-stored or relation-crossing condition may be
-stale, see section 4).
+SLA Managers see two buttons in the header (and in the header of the task list, for several tasks at once); both ask
+for confirmation and write what they changed in the History tab:
+
+| Button | What it changes |
+|---|---|
+| **Apply Current Settings** | The *configuration* of the task: copies the definition's current target duration, calendar and timezone onto it and recomputes the deadline from the moment you press the button. A task that has already breached keeps its deadline; a paused task only gets the new settings. |
+| **Re-check Conditions** | The *state* of the task: checks the six conditions of **this** SLA again against the source record (other SLAs on the same record are not touched), for example after a condition was edited or a relation-crossing condition went stale. If the Reset condition matches, a new task is created. |
+
+Finished and cancelled tasks are never changed by either button. The **Note** tab of the task explains both with
+examples. The header also has **Open Source Record**.
+
+On a record whose model has an SLA, a small **SLA status chip** appears next to the pager of the form (green running,
+yellow due soon or paused, red late, grey met or missed). Click it to see the record's SLA tasks. It is shown only to
+SLA users, can be turned off in Settings, and for a model that gets its first definition it appears after you reload the
+page.
 
 ## 12. Event Log & Audit Trail
 
@@ -275,6 +304,8 @@ a timestamp and (where relevant) a note explaining why.
 | Reset | A tracked field change invalidated the measurement and it restarted. |
 | Breach | The deadline passes while the task is still running. |
 | Escalate / Escalate Failed | An escalation (email or server action) ran, or failed. |
+| Settings Applied | A manager pressed **Apply Current Settings** and the task changed (old and new values are in the note). |
+| Conditions Re-checked | A manager pressed **Re-check Conditions** (the note says the old and new stage, or no change). |
 | Error | The engine could not process this task (for example a broken condition); never blocks saving the source record. SLA Managers can mark these resolved from **Unresolved Error Events** once fixed. |
 
 ## 13. Reporting
@@ -290,12 +321,13 @@ SLA Tasks ship with ready-to-use List, Pivot and Graph views. Two measures are p
 
 ## 14. Administration Settings
 
-SLA Managers can tune three parameters from **Settings → SLA**:
+SLA Managers can tune these parameters from **Settings → SLA**:
 
 | Setting | Default | Effect |
 |---|---|---|
 | Event Log Retention (days) | 365 | SLA events older than this are deleted automatically. |
-| "Due Soon" Window (hours) | 4 | Size of the window used by the Due Soon badge and filter. |
+| "Due Soon" Window (hours) | 4 | Size of the window used by the Due Soon badge and filter, for definitions that do not set their own Due Soon (hours). |
+| Show SLA Status on Form View | On | Shows the SLA status chip next to the pager of records measured by an SLA. |
 | Background Processing Batch Size | 50 | How many tasks the background job processes per run, so a large backlog is worked off over several runs instead of blocking. |
 
 The background job itself needs no setup: it runs once a minute as a standard Odoo scheduled action (`ir.cron`),
@@ -305,12 +337,12 @@ visible like any other under **Settings → Technical → Scheduled Actions** fo
 
 | Symptom | Likely cause & fix |
 |---|---|
-| No task is ever created for an SLA Definition. | The Start Condition is probably a subset of the Stop Condition — every record that could start already matches Stop. Widen Start or narrow Stop. |
+| No task is ever created for an SLA Definition. | First check that the definition is **enabled** (new ones start disabled) and that the Start Condition is not empty or `[]` (that never matches; use `[('id', '!=', 0)]` for every record). Otherwise the Start Condition is probably a subset of the Stop Condition — every record that could start already matches Stop. Widen Start or narrow Stop. |
 | A task attaches already paused and is immediately cancelled. | The Pause Condition is a subset of the Start Condition. Make sure a record can match Start without also matching Pause. |
-| A task's fields look stale after editing an unrelated record. | A condition reads a non-stored computed field or crosses a relation; those are not auto-refreshed. Use **Re-evaluate**. |
+| A task's fields look stale after editing an unrelated record. | A condition reads a non-stored computed field or crosses a relation; those are not auto-refreshed. Use **Re-check Conditions**. |
 | Retroactive Pause shows a warning and credits no time. | The model (or a field used in the Pause Condition) is not change-tracked in Odoo. The backdated window is counted as running time, same as with Retroactive Pause off. |
-| An escalation did not run, or shows Escalate Failed. | Check the task's Event Log for the error note. For email: confirm the chosen field actually holds a value on that record (Notify = Responsible/Email Field reads live). For Server Action: confirm its model matches the SLA Definition's model. The engine does not retry automatically — fix the configuration, then use **Re-evaluate** or wait for the next threshold. |
-| I changed a definition's Duration but existing tasks did not change. | By design — a task snapshots its configuration when it attaches. Use **Recalculate** on the task, or wait for it to complete and let the next one pick up the new value. |
+| An escalation did not run, or shows Escalate Failed. | Check the task's Event Log for the error note. For email: confirm the chosen field actually holds a value on that record (Notify = Responsible/Email Field reads live). For Server Action: confirm its model matches the SLA Definition's model. The engine does not retry automatically — fix the configuration, then use **Re-check Conditions** or wait for the next threshold. |
+| I changed a definition's Duration but existing tasks did not change. | By design — a task snapshots its configuration when it attaches. Use **Apply Current Settings** on the task, or wait for it to complete and let the next one pick up the new value. |
 
 ## 16. Glossary
 
@@ -320,7 +352,7 @@ visible like any other under **Settings → Technical → Scheduled Actions** fo
 | **Breach** | The deadline has passed while a task was still active; never cleared once set. |
 | **Escalation** | An email or Server Action fired automatically once a task reaches a configured percentage of its target. |
 | **OLA** | Operational Level Agreement — an internal commitment supporting a customer-facing SLA. |
-| **Planned End** | The current computed deadline; recomputed on resume or Recalculate. |
+| **Planned End** | The current computed deadline; recomputed on resume or Apply Current Settings. |
 | **Original Breach Time** | The deadline as first computed when the task attached, kept unchanged afterwards. |
 | **Retroactive Start** | Starting the clock from a date already on the record, instead of the moment the task attaches. |
 | **Retroactive Pause** | Crediting a backdated window with any hold time already visible in the record's change history. |

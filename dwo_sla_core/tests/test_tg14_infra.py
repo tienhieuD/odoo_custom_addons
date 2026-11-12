@@ -55,9 +55,10 @@ class TestModelRestrictions(SlaCase):
         """TC-INF-009: model ir.attachment không bị quan sát dù có định nghĩa lọt qua (SQL)."""
         self.env.cr.execute(
             "INSERT INTO sla_definition (name, model_id, model_name, duration, start_domain, "
-            "schedule_source, cancel_mode, resume_mode, reset_action, active, sequence) "
-            "SELECT 'SQL', id, 'ir.attachment', 4, '[]', 'none', 'start_unmatched', 'condition', "
-            "'cancel', true, 10 FROM ir_model WHERE model='ir.attachment'")
+            "schedule_source, calendar_tz_override, cancel_mode, resume_mode, reset_action, "
+            "active, sequence) "
+            "SELECT 'SQL', id, 'ir.attachment', 4, '[(''id'', ''!='', 0)]', 'none', 'UTC', "
+            "'start_unmatched', 'condition', 'cancel', true, 10 FROM ir_model WHERE model='ir.attachment'")
         self.Definition.invalidate_model()
         self.Definition._register_sla_hook()
         n_task, n_event = self.Task.sudo().search_count([]), self.Event.sudo().search_count([])
@@ -260,10 +261,14 @@ class TestSchemaAndSource(SlaCase):
                  for root, _d, files in os.walk(MODULE_PATH) for f in files
                  if f.endswith('.js')]
         allowed_dir = os.path.join('static', 'src')
+        # Tour kiểm thử (web.assets_tests) nằm ở static/tests theo quy ước của Odoo.
         for rel in found:
-            self.assertTrue(rel.startswith(allowed_dir), rel)
+            self.assertTrue(
+                rel.startswith((allowed_dir, os.path.join('static', 'tests'))), rel)
         self.assertIn(os.path.join(allowed_dir, 'sla_progress', 'sla_progress_widget.js'), found)
         self.assertIn(os.path.join(allowed_dir, 'float_time_unit', 'float_time_unit_field.js'), found)
+        self.assertIn(os.path.join(allowed_dir, 'definition_form', 'definition_form_controller.js'), found)
+        self.assertIn(os.path.join(allowed_dir, 'form_sla_status', 'form_sla_status.js'), found)
 
     def test_ins_005_pylintrc_covers_module(self):
         """TC-INS-005: .pylintrc không bỏ qua dwo_sla_core."""
