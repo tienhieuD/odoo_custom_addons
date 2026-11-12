@@ -1,106 +1,86 @@
-# dwo_chatter_filter: Message Filter on Chatter (Odoo 17)
+# dwo_chatter_filter: Chatter Quick Filter (Odoo 12)
 
-Module của DUO-TEK, chỉ phụ thuộc `mail`. License LGPL-3. Giá 9 EUR (đặt tròn, vì Odoo Apps tối thiểu 9 EUR; 9 USD
-quy ra khoảng 8,1 EUR là dưới mức đó). Bản 17 port từ bản 19.
+Module của DUO-TEK, chỉ phụ thuộc `mail`. License LGPL-3. Giá 9 EUR (Odoo Apps tối thiểu 9 EUR). Tên kỹ thuật giữ là
+`dwo_chatter_filter`; tên hiển thị đổi từ "Message Filter on Chatter" thành **Chatter Quick Filter** ở `12.0.2.0.0`.
+Bản 12 port từ bản 19 (2.0.0: chip chỉnh được).
 
 ## 1. Vấn đề
 
-Chatter của một bản ghi lâu ngày có hàng trăm message: trao đổi, email, ghi chú, thay đổi trường, thông báo tự động
-trộn lẫn. Muốn xem riêng email hay riêng các lần thay đổi trường thì phải cuộn, vì ô tìm kiếm của core chỉ tìm theo chữ.
+Chatter của một bản ghi lâu ngày có hàng trăm message trộn lẫn (trao đổi, email, ghi chú, thay đổi trường, thông báo tự
+động). Ô tìm kiếm của core chỉ tìm theo chữ, nên muốn xem riêng một loại phải cuộn.
 
 ## 2. Tính năng
 
-Một hàng badge có nhãn **Filter by:**, nằm **dưới danh sách Planned Activities (`o-mail-ActivityList`) và trên danh sách
-message (`o-mail-Thread`)**:
+Một hàng chip có nhãn **Filter by:**, dưới danh sách Planned Activities (`o-mail-ActivityList`) và trên danh sách message
+(`o-mail-Thread`): **All** rồi các chip do admin định nghĩa, mỗi chip có số message.
 
-**All · Discussions · Emails · Activities · Notes · Tracking · Other**, mỗi badge có số message.
+- Bấm một chip thì chỉ hiện message của chip đó; **một chip tại một thời điểm**; bấm **All** để quay về. Không lưu lựa chọn.
+- Chip có số 0 thì mờ và không bấm được (trừ All). Chip có filter hỏng (trường của module đã gỡ) hiện dấu `?`.
+- Lọc ở **máy chủ**, nên "Load more" chạy đúng trên danh sách đã lọc. Message mới đến khi đang lọc: chờ ~0,4 giây rồi tải lại
+  danh sách đã lọc (máy chủ quyết định message đó có thuộc chip hay không).
+- Một message có thể thuộc **nhiều chip** (các chip do admin tạo có thể chồng nhau).
+- Chỉ người dùng nội bộ. Tối đa 15 chip hiển thị (mỗi chip tốn một lần đếm khi mở bản ghi).
+- Chip đang chọn bị archive/xoá thì quay về All. Admin đổi chip thì người khác thấy ở lần mở bản ghi kế tiếp (tải lại).
 
-- Chữ nhỏ (`.7rem`). Mỗi loại một màu viền riêng, nền trong suốt khi chưa chọn; **bấm vào thì đổi sang màu đặc** của loại đó:
-  All = dark, Discussions = primary, Emails = info, Activities = purple (màu tự định nghĩa trong scss: Bootstrap không có tím), Notes = warning, Tracking = success, Other = danger.
-- Vị trí đặt bằng xpath **trước `SearchMessageResult`** (không phải trước `Thread`), vì hai phần tử này là cặp `t-if` / `t-else`
-  của core; chèn vào giữa sẽ làm hỏng cặp đó.
+## 3. Chỉnh sửa chip (chỉ admin: `base.group_system`)
 
-- Bấm một badge thì chỉ hiện loại đó. **Chọn một loại tại một thời điểm**; bấm **All** để quay về tất cả.
-- Không lưu lựa chọn: mở lại bản ghi là thấy tất cả (tránh việc ai đó bỏ sót message mà không biết đang lọc).
-- Badge có số 0 thì mờ và không bấm được (trừ All).
-- Lọc ở **máy chủ**, nên nút "Load more" chạy đúng trên danh sách đã lọc, không chỉ trên 30 message đã tải.
-- Message mới đến (bus) khi đang lọc: hiện nếu đúng loại, ẩn nếu khác; số đếm cập nhật sau khoảng 0,4 giây.
-- Tự ẩn khi form Send email của `dwo_mail_compose` đang mở (nằm trong vùng nội dung chatter) và khi đang tìm kiếm.
-- Chỉ người dùng nội bộ (portal không dùng được `dwo_filter_counts`).
+- Link **Edit** nằm sau chip cuối cùng, chỉ hiện với admin; quyền thật được chặn ở máy chủ (ACL: người dùng nội bộ chỉ đọc).
+- **List**: tay cầm (`handle`) kéo thả đổi thứ tự (lưu bằng `web_resequence`), cột màu, nút bật/tắt **Active** (archive).
+  Dòng đã archive vẫn hiện (mờ) để bật lại; action dùng `domain active in [True, False]`, không đổi context.
+- **Form**: tên, Active, màu, bộ chọn domain trên `mail.message` (có trường `Kind of message`, xem mục 4).
+- **Màu** của chip mới tự sinh: hue ở giữa khoảng trống lớn nhất giữa các màu đang dùng (có ngẫu nhiên nhẹ), tối đến mức
+  độ tương phản với nền trắng ≥ 4,5:1 (độ sáng tương đối ≤ 0,18) nên đọc được trên nền sáng ở cả chip viền lẫn chip đặc.
+  Màu lưu dạng `#rrggbb`; chữ trên chip đặc là trắng hoặc đen, chọn cái dễ đọc hơn.
+- Chip mới nhận thứ tự cuối. Sáu chip mặc định xoá/archive/sửa được như chip khác.
 
-## 3. Quy tắc phân loại
+## 4. Sáu chip mặc định và trường `dwo_kind`
 
-Mỗi message thuộc **đúng một** loại. Kiểm tra theo thứ tự, loại đầu tiên khớp thì giữ message:
+Thứ tự, tên, màu như bản 1.1.0: Discussions `#71639e`, Emails `#17a2b8`, Activities `#6f42c1`, Notes `#ffac00`, Tracking
+`#28a745`, Other `#dc3545`. Domain của chúng là `[('dwo_kind', '=', ...)]`.
+
+`mail.message.dwo_kind` là trường **không lưu, tìm kiếm được** (Selection) giữ nguyên luật phân loại loại trừ của bản cũ
+(`MailMessage._dwo_category_domain`, kiểm tra theo thứ tự, loại đầu khớp thì giữ message):
 
 | # | Loại | Điều kiện |
 |---|---|---|
-| 1 | **Tracking** | có `mail.tracking.value` trỏ tới message (một trường đã đổi) |
-| 2 | **Emails** | `message_type` là `email` hoặc `email_outgoing` (thư đến và thư đi) |
-| 3 | **Activities** | subtype `mt_activities` (message Odoo để lại khi một activity được đánh dấu Done, kèm feedback) và không phải tracking/email |
-| 4 | **Notes** | `message_type = comment` và subtype `mt_note` (Log note) |
-| 5 | **Discussions** | `message_type = comment` và subtype `mt_comment` (Send message, dù người nhận là follower nội bộ hay khách gắn trên bản ghi) |
-| 6 | **Other** | phần còn lại: `auto_comment`, `notification` không có tracking, `out_of_office`, subtype tuỳ biến |
+| 1 | tracking | có `mail.tracking.value` trỏ tới message (dùng subselect trên bảng, vì `tracking_value_ids` chỉ admin đọc được) |
+| 2 | email | `message_type` là `email` hoặc `email_outgoing` (và không phải tracking) |
+| 3 | activity | subtype `mt_activities`, không phải tracking/email |
+| 4 | note | `message_type = comment` và subtype `mt_note` |
+| 5 | discussion | `message_type = comment` và subtype `mt_comment` |
+| 6 | other | phần còn lại |
 
-Hệ quả cần nhớ:
-- Email gửi từ `dwo_mail_compose` là `email_outgoing` kèm subtype `mt_comment`: nó là **Emails**, không phải Discussions.
-- Message tracking thường có subtype `mt_note`: nó là **Tracking**, không phải Notes.
-- Badge **Activities** chỉ lọc *message* của activity đã xong, không lọc danh sách Planned Activities (activity chưa xong).
-- Trình duyệt biết message nào là activity nhờ trường `dwo_is_activity` do server gửi kèm (`_to_store_defaults`), vì store
-  của `mail` chỉ có id của `mt_note` và `mt_comment`.
-- Message `comment` mang subtype nội bộ khác (ví dụ subtype riêng của một app) rơi vào **Other**.
-- Tổng số các loại luôn bằng số message của bản ghi, nên không có message thất lạc.
+Nhờ trường này, admin dùng luật cũ trong bộ chọn domain như một điều kiện bình thường và kết hợp với điều kiện khác.
+(JavaScript không còn luật phân loại: file `message_patch.js` của bản 1.x đã bỏ.)
 
-Quy tắc được viết hai lần và phải giữ giống nhau: Python `MailMessage._dwo_category_domain` và JavaScript `dwoCategoryOf`
-(`static/src/message_patch.js`).
+## 5. Cách hoạt động
 
-## 4. Cách hoạt động
+- Model `dwo.chatter.filter` (`models/dwo_chatter_filter.py`): `name` (dịch được), `sequence`, `color`, `domain` (chuỗi),
+  `active`. Domain được kiểm khi lưu (cú pháp, trường tồn tại, thử một lần `search_count`) và đánh giá bằng `safe_eval`
+  với ngữ cảnh giới hạn (`uid`, `user`, `time`, `datetime`, `relativedelta`, `context_today`), như `ir.rule`.
+- RPC `mail.message.dwo_filter_chips(res_model, res_id)`: trả `{all, chips: [{id, name, color, count}]}` theo thứ tự; mỗi chip
+  đếm trong một savepoint, chip lỗi trả `count: null` và ghi log, không làm hỏng cả hàng.
+- `mail.message._message_fetch(..., dwo_filter_id=...)`: route `/mail/thread/messages` chuyển nguyên `fetch_params`. Chip đã
+  xoá/archive/lỗi thì không lọc gì.
+- Phía trình duyệt: `DwoMessageFilter` (`static/src/filter/`), patch `Thread` model (`thread_patch.js`) và `Chatter`
+  (`chatter_patch.xml`: chèn trước `SearchMessageResult` vì hai phần tử này là cặp `t-if`/`t-else` của core).
 
-- `mail.message._message_fetch(..., dwo_category=...)` (ghi đè): route `/mail/thread/messages` đã chuyển nguyên
-  `fetch_params` vào hàm này nên không cần route mới. Hàm thêm domain của loại vào domain gốc.
-- Điều kiện "có tracking" dùng subselect trên bảng `mail_tracking_value`, **không** dùng trường `tracking_value_ids`: trường
-  này chỉ dành cho nhóm quản trị, người dùng thường truy vấn sẽ bị `AccessError`.
-- `mail.message.dwo_filter_counts(res_model, res_id)`: trả `{all, tracking, email, activity, note, discussion, other}` bằng 7
-  `search_count` (index `(model, res_id)`).
-- JS: `Thread` (model) có thêm `dwoFilter`, `dwoCounts`; `fetchMessagesData` gửi thêm `dwo_category`. Đổi bộ lọc thì **bỏ
-  hết message đã tải** rồi tải lại từ đầu (`dwoSetFilter`), để khi quay về All không bị hổng danh sách giữa hai lần tải.
-  `Thread` (component) lọc `orderedMessages` theo `message.dwoCategory` cho các message đến qua bus.
-- Component `DwoMessageFilter` chèn bằng xpath vào `mail.Chatter`, trước nội dung. Khi đóng bản ghi hoặc đổi sang bản ghi
-  khác, `dwoReset()` trả bộ lọc về All và bỏ message đã tải, nên lần mở sau tải đủ.
+## 6. Dữ liệu và nâng cấp
 
-## 5. Kiểm thử
+- Sáu chip nằm trong `data/dwo_chatter_filter_data.xml` với `noupdate="1"` và `forcecreate="0"`: cài mới tạo đủ; cập nhật module
+  không ghi đè chỉnh sửa và **không tạo lại chip đã xoá**.
+- Nâng cấp từ 12.0.1.x: `migrations/12.0.2.0.0/post-migrate.py` nạp file data ở chế độ `init` để tạo sáu chip một lần,
+  người dùng cũ thấy đúng như trước.
 
-```
-odoo-bin -c <conf> -d <db_moi> -i dwo_chatter_filter --test-tags /dwo_chatter_filter --stop-after-init
-```
+## 7. Kiểm thử
 
-- `test_filter.py` (9 test): mỗi loại có đúng message của nó, các loại không giao nhau và phủ hết, email gửi từ compose là
-  email, tracking thắng subtype note, số đếm, phân trang trên danh sách đã lọc, không lọc thì như core, loại lạ bị từ chối,
-  portal không đếm được.
-- `test_filter_tour.py` + `filter_tour.js`: thấy badge ở đúng chỗ với số đúng, bấm từng loại thì danh sách chỉ còn loại
-  đó, quay về All thì đủ. Body của email nằm trong shadow DOM nên tour đọc qua `shadowRoot`.
-- Đã chạy chung với `dwo_mail_compose` và `dwo_mail_bcc`.
+`tests/test_filter.py` (loại, đếm, lọc theo chip, phân trang), `tests/test_chips.py` (quyền, kiểm domain, màu mặc định,
+thứ tự, chip hỏng, giới hạn 15), `tests/test_filter_tour.py` + `static/tests/tours/filter_tour.js` (lọc; admin tạo chip qua
+form; nhân viên không thấy Edit). Chạy: `--test-tags /dwo_chatter_filter`. Script thử tay trên trình duyệt thật:
+`odoo_appstore/_tools/ui_chips_check.py`.
 
-## 6. Giới hạn đã biết
+## Khác biệt ở bản 12
 
-- Chỉ chatter của bản ghi (form view), không áp cho Discuss hay Inbox.
-- Chọn một loại tại một thời điểm, không chọn nhiều.
-- Tìm kiếm (kính lúp) và bộ lọc không dùng chung: mở tìm kiếm thì badge ẩn và bộ lọc về All.
-- Chỉ bản 19. Mã chatter thay đổi nhiều giữa các phiên bản Odoo nên cần kiểm tra lại khi nâng version.
-
-## 7. Dữ liệu demo
-
-Module lab `.lab/dwo_chatter_filter_demo_data` (không đăng): một khách hàng có đủ năm loại message trải trong nhiều ngày.
-
-## Khác biệt ở bản 17
-
-- Không có `Domain`: dùng `expression.AND/OR` và toán tử `!`. Kiểm quyền: `check_access_rights` + `check_access_rule`. `_()` thay `self.env._`.
-- Route `/mail/thread/messages` chỉ nhận tham số tường minh, nên `controllers/thread.py` nhận thêm `dwo_category` và đặt vào context;
-  `_message_fetch` đọc từ context.
-- Cờ `dwo_is_activity` gửi qua `message_format()` (message đã có sẵn `is_note`, `is_discussion`).
-- JS kiểu service: `ThreadService.fetchMessages` được patch; `dwoSetFilter` / `dwoReset` nằm trên service `mail.thread`. Trạng thái
-  `dwoFilter` là thuộc tính thường gán trong `setup()` (không dùng `Record.attr` ở đây, nó thành object marker). Lọc phía trình duyệt
-  qua getter `Thread.nonEmptyMessages`. Loại `message.type` (không phải `message_type`).
-- Template chèn trước `<t t-if="props.hasMessageList">` (bản này không có `SearchMessageResult`).
-- Bootstrap 5.1 không có `text-bg-*`: `dwo_message_filter.scss` tự định nghĩa.
-- Tour: bản này mặc định **click** vào bước không có `run`, nên các bước chỉ kiểm tra phải có `run: () => {}`. Chrome tìm bằng
-  `_find_executable` (không có `ODOO_BROWSER_BIN`).
+- Giống bản 13 (widget jQuery `ThreadField` / `DocumentThread`) nhưng: không có `message_type = user_notification`; dùng `$.when` / `.fail` thay `Promise` / `guardedCatch`; không có bundle `web.assets_tests` (tour nằm trong bundle backend, chạy tay bằng `browser_js`); JS không dùng template literal (bundle bị minify và một regex làm hỏng chúng); test dùng `sudo(user)` thay `with_user`.
+- Chatter hiện message theo danh sách id (`message_ids`): máy chủ trả id của chip bằng `mail.message.dwo_filter_ids`; không có `controllers/`.
+- Không có `web_ribbon` (nhãn "Archived" trên form) và không có widget `color` (Odoo 12 không có `FieldColor`): ô màu là ô văn bản `#rrggbb`; màu mặc định vẫn do máy chủ sinh khi tạo chip mới. Cũng không có `optional="show"` trong list.

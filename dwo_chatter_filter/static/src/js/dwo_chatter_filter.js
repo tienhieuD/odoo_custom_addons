@@ -3,7 +3,7 @@ odoo.define('dwo_chatter_filter.filter', function (require) {
 
 /**
  * Odoo 12: the chatter shows the messages of a record by their ids (the field message_ids) and loads the
- * text of the newest ones. The badges keep the ids of one kind (the server finds them: dwo_filter_ids), so
+ * text of the newest ones. A chip keeps the ids of its messages (the server finds them: dwo_filter_ids), so
  * "Load more" keeps working on the filtered list.
  */
 
@@ -15,30 +15,37 @@ const session = require('web.session');
 const QWeb = core.qweb;
 const _t = core._t;
 
-// Each kind has its own colour (a Bootstrap contextual colour, and purple, defined in the stylesheet): outlined when off, filled when chosen.
-const KINDS = [
-    { id: 'discussion', label: _t('Discussions'), color: 'primary' },
-    { id: 'email', label: _t('Emails'), color: 'info' },
-    { id: 'activity', label: _t('Activities'), color: 'purple' },
-    { id: 'note', label: _t('Notes'), color: 'warning' },
-    { id: 'tracking', label: _t('Tracking'), color: 'success' },
-    { id: 'other', label: _t('Other'), color: 'danger' },
-];
+const ALL_COLOR = '#212529';
+
+/** Relative luminance (WCAG) of a colour given as #rrggbb. */
+function luminance(hex) {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+        const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** The text of a chip that is filled with that colour: white or black, whichever reads better. */
+function textColorOn(hex) {
+    const L = luminance(hex);
+    return 1.05 / (L + 0.05) >= (L + 0.05) / 0.05 ? '#ffffff' : '#000000';
+}
 
 DocumentThread.include({
     /**
-     * Show one kind of message (false: all of them).
+     * Show the messages of one chip (false: all of them).
      *
-     * @param {string|false} category
+     * @param {number|false} chipID
      */
-    dwoSetFilter: function (category) {
-        this._dwoFilter = category || false;
+    dwoSetFilter: function (chipID) {
+        this._dwoFilter = chipID || false;
         if (!this._dwoFilter) {
             this._dwoIDs = null;
         }
     },
     /**
-     * @returns {string|false}
+     * @returns {number|false}
      */
     dwoGetFilter: function () {
         return this._dwoFilter || false;
@@ -57,7 +64,7 @@ DocumentThread.include({
         if (this._dwoFilter && this._dwoIDs) {
             return _.filter(messages, (message) => _.contains(this._dwoIDs, message.getID()));
         }
-        // All: the filter may have loaded older messages of its kind. Only the messages without a hole (from the
+        // All: the filter may have loaded older messages of its chip. Only the messages without a hole (from the
         // newest one, no gap) are shown, so the history never has holes; "Load more" fills the gaps in order.
         const loaded = {};
         _.each(messages, (message) => { loaded[message.getID()] = true; });
@@ -73,7 +80,7 @@ DocumentThread.include({
         return _.filter(messages, (message) => visible[message.getID()] || !known[message.getID()]);
     },
     /**
-     * While a kind is chosen, the ids of that kind come from the server.
+     * While a chip is chosen, the ids of its messages come from the server.
      *
      * @override
      */
@@ -89,12 +96,16 @@ DocumentThread.include({
                 method: 'dwo_filter_ids',
                 args: [self.getDocumentModel(), self.getDocumentID(), self._dwoFilter],
             }).then(function (ids) {
-                self._dwoIDs = ids;
+                // false: the chip is gone, archived or broken: every message is shown
+                if (ids === false) {
+                    self._dwoFilter = false;
+                }
+                self._dwoIDs = ids || null;
             });
         });
     },
     /**
-     * With a kind chosen, the text of the messages is loaded for the ids of that kind.
+     * With a chip chosen, the text of the messages is loaded for the ids of that chip.
      *
      * @override
      */
@@ -104,6 +115,9 @@ DocumentThread.include({
         }
         const self = this;
         return this._fetchMessageIDs().then(function () {
+            if (!self._dwoFilter) {
+                return self._super.apply(self, [options]);
+            }
             const messageIDs = self._dwoIDs || [];
             const loadedIDs = _.map(self._messages, (message) => message.getID());
             const missing = _.difference(messageIDs, loadedIDs);
@@ -133,10 +147,10 @@ ThreadField.include({
     start: function () {
         const self = this;
         return this._super.apply(this, arguments).then(function () {
-            self._dwoCounts = null;
+            self._dwoData = null;
             self._$dwoFilter = $('<div class="o-dwo-messageFilter d-flex flex-wrap align-items-center px-3 py-2 d-print-none d-none"/>');
             // Under the planned activities and the files, above the messages. The chatter detaches and attaches
-            // the element of this widget as a whole: the badges live in the same element as the thread.
+            // the element of this widget as a whole: the chips live in the same element as the thread.
             const $thread = self._threadWidget.$el;
             const $wrap = $('<div class="o-dwo-threadWrap"/>');
             $wrap.insertBefore($thread);
@@ -144,11 +158,12 @@ ThreadField.include({
             self.setElement($wrap);
             // setElement removes every '.widget_events' handler of the old element, the ones of the thread widget too
             self._threadWidget._delegateEvents();
-            self._$dwoFilter.on('click', '.o-dwo-filterBadge', self._dwoOnClickBadge.bind(self));
+            self._$dwoFilter.on('click', '.o-dwo-filterBadge', self._dwoOnClickChip.bind(self));
+            self._$dwoFilter.on('click', '.o-dwo-filterEdit', self._dwoOnClickEdit.bind(self));
         });
     },
     /**
-     * Leaving this record: back to all the messages, the badges go.
+     * Leaving this record: back to all the messages, the chips go.
      *
      * @override
      */
@@ -163,7 +178,7 @@ ThreadField.include({
         this._super.apply(this, arguments);
     },
     /**
-     * The widget is kept when the record changes: the choice is forgotten, the numbers are asked again.
+     * The widget is kept when the record changes: the choice is forgotten, the chips are asked again.
      *
      * @override
      */
@@ -171,7 +186,7 @@ ThreadField.include({
         if (this._documentThread) {
             this._documentThread.dwoSetFilter(false);
         }
-        this._dwoCounts = null;
+        this._dwoData = null;
         this._super.apply(this, arguments);
     },
     /**
@@ -185,7 +200,7 @@ ThreadField.include({
         });
     },
     /**
-     * Numbers of the badges, asked again a moment after a change (a message arrived or was posted).
+     * The chips and their numbers, asked again a moment after a change (a message arrived or was posted).
      *
      * @private
      */
@@ -199,13 +214,19 @@ ThreadField.include({
             }
             self._rpc({
                 model: 'mail.message',
-                method: 'dwo_filter_counts',
+                method: 'dwo_filter_chips',
                 args: [self.model, self.res_id],
-            }).then(function (counts) {
-                self._dwoCounts = counts;
+            }).then(function (data) {
+                self._dwoData = data;
+                // the chip that is chosen was archived or deleted meanwhile: back to all the messages
+                const active = self._documentThread.dwoGetFilter();
+                if (active && !_.some(data.chips, (chip) => chip.id === active)) {
+                    self._documentThread.dwoSetFilter(false);
+                    self._fetchAndRenderThread();
+                }
                 self._dwoRender();
             }).fail(function () {
-                // the badges are a convenience: without numbers they stay hidden
+                // the chips are a convenience: without them the row stays hidden
             });
         }, 300);
     },
@@ -216,31 +237,48 @@ ThreadField.include({
         if (!this._$dwoFilter) {
             return;
         }
-        if (!this._dwoCounts || !this.res_id) {
+        if (!this._dwoData || !this.res_id) {
             this._$dwoFilter.addClass('d-none').empty();
             return;
         }
         const active = (this._documentThread && this._documentThread.dwoGetFilter()) || false;
-        const counts = this._dwoCounts;
-        const items = [{ id: false, label: _t('All'), color: 'dark', count: counts.all || 0, active: active === false }]
-            .concat(KINDS.map((kind) => ({
-                id: kind.id, label: kind.label, color: kind.color, count: counts[kind.id] || 0, active: active === kind.id,
-            })));
-        this._$dwoFilter.html(QWeb.render('dwo_chatter_filter.MessageFilter', { items: items })).removeClass('d-none');
+        const data = this._dwoData;
+        const make = (id, label, color, count) => ({
+            id: id,
+            label: label,
+            count: count,
+            active: active === id,
+            disabled: Boolean(id) && active !== id && !count,
+            style: '--dwo-chip: ' + color + '; --dwo-chip-text: ' + textColorOn(color),
+        });
+        const items = [make(false, _t('All'), ALL_COLOR, data.all)].concat(
+            _.map(data.chips, (chip) => make(chip.id, chip.name, chip.color, chip.count)));
+        this._$dwoFilter.html(QWeb.render('dwo_chatter_filter.MessageFilter', {
+            items: items,
+            isAdmin: Boolean(session.is_admin),
+        })).removeClass('d-none');
     },
     /**
      * @private
      * @param {Event} ev
      */
-    _dwoOnClickBadge: function (ev) {
+    _dwoOnClickChip: function (ev) {
         ev.preventDefault();
-        const kind = $(ev.currentTarget).data('kind');
+        const chip = $(ev.currentTarget).data('chip');
         if (!this._documentThread) {
             return;
         }
-        this._documentThread.dwoSetFilter(kind === 'all' ? false : kind);
+        this._documentThread.dwoSetFilter(chip === 'all' ? false : parseInt(chip, 10));
         this._dwoRender();
         this._fetchAndRenderThread();
+    },
+    /**
+     * @private
+     * @param {Event} ev
+     */
+    _dwoOnClickEdit: function (ev) {
+        ev.preventDefault();
+        this.do_action('dwo_chatter_filter.action_dwo_chatter_filter');
     },
 });
 

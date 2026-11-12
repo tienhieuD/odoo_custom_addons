@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_dwo_chatter_filter_list" model="ir.ui.view">
+        <field name="name">dwo.chatter.filter.list</field>
+        <field name="model">dwo.chatter.filter</field>
+        <field name="arch" type="xml">
+            <tree string="Chatter Quick Filter" default_order="sequence, id" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="color"/>
+                <field name="domain"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_dwo_chatter_filter_form" model="ir.ui.view">
+        <field name="name">dwo.chatter.filter.form</field>
+        <field name="model">dwo.chatter.filter</field>
+        <field name="arch" type="xml">
+            <form string="Chip">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Quotes"/></h1>
+                    </div>
+                    <group>
+                        <field name="active" widget="boolean_toggle"/>
+                        <field name="color"/>
+                    </group>
+                    <group string="Messages shown by this chip">
+                        <field name="message_model" invisible="1"/>
+                        <field name="domain" widget="domain" options="{'model': 'message_model'}" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_dwo_chatter_filter" model="ir.actions.act_window">
+        <field name="name">Chatter Quick Filter</field>
+        <field name="res_model">dwo.chatter.filter</field>
+        <field name="view_mode">tree,form</field>
+        <!-- archived chips are listed too, so the toggle of a line does not make it disappear -->
+        <field name="domain">[('active', 'in', [True, False])]</field>
+    </record>
+</odoo>

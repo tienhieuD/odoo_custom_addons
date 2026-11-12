@@ -6,7 +6,7 @@ from odoo.tests import HttpCase, tagged
 class TestMessageFilterTour(HttpCase):
 
     def setUp(self):
-        # Odoo 14: an HttpCase has no class-level environment, the data is made for each test
+        # an HttpCase has no class-level environment, the data is made for each test
         super().setUp()
         self.record = self.env["res.partner"].with_context(mail_create_nolog=True, mail_notrack=True).create(
             {"name": "Filter tour partner"})
@@ -26,12 +26,24 @@ class TestMessageFilterTour(HttpCase):
                             subtype_id=self.env.ref("mail.mt_activities").id))
         Message.create(dict(base, body="<p>Automatic message</p>", message_type="notification", subtype_id=mt_note.id))
 
-    def test_filter_tour(self):
+    def _run_tour(self, name, login):
         # Odoo 12 has no start_tour: the tour is started by hand and waited for
         tour = "odoo.__DEBUG__.services['web_tour.tour']"
         self.browser_js(
-            f"/web#model=res.partner&view_type=form&id={self.record.id}",
-            f"{tour}.run('dwo_chatter_filter')",
-            f"{tour}.tours.dwo_chatter_filter.ready",
-            login="admin",
+            "/web#model=res.partner&view_type=form&id=%s" % self.record.id,
+            "%s.run('%s')" % (tour, name),
+            "%s.tours.%s.ready" % (tour, name),
+            login=login,
         )
+
+    def test_filter_tour(self):
+        self._run_tour("dwo_chatter_filter", "admin")
+
+    def test_filter_edit_tour(self):
+        self._run_tour("dwo_chatter_filter_edit", "admin")
+
+    def test_filter_no_edit_for_an_employee_tour(self):
+        self.env["res.users"].with_context(no_reset_password=True).create({
+            "name": "Chip employee", "login": "chip_employee", "password": "chip_employee",
+            "groups_id": [(6, 0, [self.env.ref("base.group_user").id])]})
+        self._run_tour("dwo_chatter_filter_no_edit", "chip_employee")
