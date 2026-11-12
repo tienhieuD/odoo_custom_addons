@@ -563,7 +563,7 @@ PostgreSQL không tự tạo chỉ mục cho khóa ngoại; Odoo cũng không (t
 | sla_task | `index=True` trên `company_id` | `(company_id)` | Khóa ngoại và record rule đa công ty | `sla_task__company_id_index` |
 | sla_task | `index=True` trên `schedule_id` | `(schedule_id)` | Khóa ngoại (kiểm tra RESTRICT khi xóa calendar) | `sla_task__schedule_id_index` |
 | sla_event | `_task_dt_idx = models.Index` | `(task_id, event_dt)` | Xem nhật ký của một task theo thời gian | `sla_event_task_dt_idx` |
-| sla_event | (không có chỉ mục riêng cho `event_dt`) | — | Dọn nhật ký cũ (REQ-FUNC-035) chạy một lần mỗi ngày trong autovacuum, chấp nhận quét tuần tự; thêm `index=True` trên `event_dt` nếu `sla_event` đủ lớn để việc dọn chậm (đã đối chiếu code: chưa khai báo) | — |
+| sla_event | `event_dt` (`index=True`) | `(event_dt)` | Dọn nhật ký cũ (REQ-FUNC-035) chạy mỗi ngày trong autovacuum, lọc `event_dt < ngưỡng`; chỉ mục tránh quét tuần tự khi `sla_event` lớn (thêm 2026-11-12; được tạo khi cập nhật module) | `sla_event_event_dt_index` |
 | sla_event | `_error_unresolved_idx = models.Index` | `(company_id) WHERE event = 'error' AND is_resolved IS NOT TRUE` | Đếm nhanh event lỗi chưa xử lý (REQ-INT-022). Predicate dùng `IS NOT TRUE` vì ORM sinh `is_resolved IS NOT TRUE` cho điều kiện "bằng False"; PostgreSQL không chứng minh được `NOT is_resolved` từ `IS NOT TRUE` | `sla_event_error_unresolved_idx` |
 | sla_event | `index=True` trên `company_id` | `(company_id)` đầy đủ | Khóa ngoại và record rule trên danh sách event (bảng tăng nhanh nhất) | `sla_event__company_id_index` |
 | sla_event | `index=True` trên `definition_id` | `(definition_id)` | Khóa ngoại | `sla_event__definition_id_index` |
