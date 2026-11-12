@@ -5,7 +5,6 @@
             <link rel="stylesheet" type="text/scss" href="/dwo_chatter_filter/static/src/filter/dwo_message_filter.scss"/>
         </xpath>
         <xpath expr="//script[last()]" position="after">
-            <script type="text/javascript" src="/dwo_chatter_filter/static/src/models/message/message.js"/>
             <script type="text/javascript" src="/dwo_chatter_filter/static/src/models/chatter/chatter.js"/>
             <script type="text/javascript" src="/dwo_chatter_filter/static/src/models/thread_cache/thread_cache.js"/>
             <script type="text/javascript" src="/dwo_chatter_filter/static/src/components/dwo_message_filter/dwo_message_filter.js"/>

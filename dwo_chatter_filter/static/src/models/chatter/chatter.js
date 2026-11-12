@@ -7,26 +7,43 @@ const { attr } = require('mail/static/src/model/model_field.js');
 const NAME = 'dwo_chatter_filter/static/src/models/chatter/chatter.js';
 
 registerFieldPatchModel('mail.chatter', NAME, {
-    /** The kind of message shown, false for all of them. */
+    /** The id of the chip chosen (the messages it shows are the only ones loaded), false for all. */
     dwoFilter: attr({ default: false }),
 });
 
 registerInstancePatchModel('mail.chatter', NAME, {
     /**
-     * Show one kind of message (false: all of them). Odoo 14 keeps one cache of messages for each domain
-     * of the thread viewer: a domain with the leaf ("dwo_category", "=", kind) gives its own cache, loaded
-     * from the server, where the server turns the leaf into the real domain (see message_fetch).
+     * Show the messages of one chip (false: all of them). Odoo 14 keeps one cache of messages for each domain
+     * of the thread viewer: a domain with the leaf ("dwo_filter_id", "=", id) gives its own cache, loaded
+     * from the server, where the server turns the leaf into the domain of the chip (see message_fetch).
      *
-     * @param {string|false} category
+     * @param {number|false} chipId
      */
-    dwoSetFilter(category) {
-        category = category || false;
-        if (this.dwoFilter === category || !this.threadViewer) {
+    dwoSetFilter(chipId) {
+        chipId = chipId || false;
+        if (this.dwoFilter === chipId || !this.threadViewer) {
             return;
         }
-        this.update({ dwoFilter: category });
+        this.update({ dwoFilter: chipId });
         this.threadViewer.update({
-            stringifiedDomain: category ? JSON.stringify([['dwo_category', '=', category]]) : '[]',
+            stringifiedDomain: chipId ? JSON.stringify([['dwo_filter_id', '=', chipId]]) : '[]',
+        });
+    },
+
+    /**
+     * Load the messages of the chosen chip again (a message arrived: the server says if it belongs).
+     */
+    dwoReload() {
+        const cache = this.threadViewer && this.threadViewer.threadCache;
+        if (!this.dwoFilter || !cache) {
+            return;
+        }
+        cache.update({
+            fetchedMessages: [['unlink-all']],
+            isAllHistoryLoaded: false,
+            hasLoadingFailed: false,
+            isLoaded: false,
+            isCacheRefreshRequested: true,
         });
     },
 

@@ -4,8 +4,6 @@ from odoo.tests import HttpCase, tagged
 
 @tagged("post_install", "-at_install", "dwo_chatter_filter")
 class TestMessageFilterTour(HttpCase):
-    # Odoo 16 gives Chrome "1366x768" and a recent Chrome does not understand it: the window stays small
-    browser_size = "1366,768"
 
     def setUp(self):
         # Odoo 14: an HttpCase has no class-level environment, the data is made for each test
@@ -30,3 +28,13 @@ class TestMessageFilterTour(HttpCase):
 
     def test_filter_tour(self):
         self.start_tour(f"/web#model=res.partner&view_type=form&id={self.record.id}", "dwo_chatter_filter", login="admin")
+
+    def test_filter_edit_tour(self):
+        self.start_tour(f"/web#model=res.partner&view_type=form&id={self.record.id}", "dwo_chatter_filter_edit", login="admin")
+
+    def test_filter_no_edit_for_an_employee_tour(self):
+        self.env["res.users"].with_context(no_reset_password=True).create({
+            "name": "Chip employee", "login": "chip_employee", "password": "chip_employee",
+            "groups_id": [(6, 0, [self.env.ref("base.group_user").id])]})
+        self.start_tour(f"/web#model=res.partner&view_type=form&id={self.record.id}", "dwo_chatter_filter_no_edit",
+                        login="chip_employee")
