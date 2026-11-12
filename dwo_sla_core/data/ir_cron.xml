@@ -10,6 +10,8 @@
         <field name="code">model.process_due()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">minutes</field>
+        <!-- Odoo 17 and older: `numbercall` defaults to 1 (the cron would run once and stop); -1 = no limit -->
+        <field name="numbercall">-1</field>
         <field name="active" eval="True"/>
     </record>
 
@@ -23,6 +25,8 @@
         <field name="code">model._cron_run()</field>
         <field name="interval_number">5</field>
         <field name="interval_type">minutes</field>
+        <!-- Odoo 17 and older: `numbercall` defaults to 1 (the cron would run once and stop); -1 = no limit -->
+        <field name="numbercall">-1</field>
         <field name="active" eval="True"/>
     </record>
 </odoo>
