@@ -1,3 +1,7 @@
+from unittest.mock import patch
+
+import psycopg2.errors
+
 from odoo.tests import HttpCase, tagged
 
 from odoo.addons.dwo_website_auto_webp.models.ir_binary import WEBP_CACHE_PREFIX
@@ -5,10 +9,10 @@ from odoo.addons.dwo_website_auto_webp.models.ir_binary import WEBP_CACHE_PREFIX
 from .test_webp import ACCEPT_WEBP, make_image
 
 
-@tagged('post_install', '-at_install', 'dwo_website_auto_webp')
-class TestWebpHttp(HttpCase):
-    """End to end through /web/image: real request, Accept header, Content-Type."""
+class WebpHttpBase(HttpCase):
+    """Fixtures and helpers, no test."""
 
+    registry_readonly = False  # True: /web/image runs on a real read-only transaction (server with a replica)
     readonly_enabled = False  # Odoo 18: no read-only transaction for the readonly /web/image route (see setUpClass)
 
     @classmethod
@@ -17,7 +21,7 @@ class TestWebpHttp(HttpCase):
         # /web/image is a readonly route: in test mode it gets a real read-only transaction, whereas a production
         # server without a replica gives a read/write cursor. Test the usual production setup.
         if hasattr(cls, 'set_registry_readonly_mode'):  # Odoo 19+
-            cls.set_registry_readonly_mode(False)
+            cls.set_registry_readonly_mode(cls.registry_readonly)
         port = cls.http_port()
         # websites are told apart by the host of the request
         cls.site_a = cls.env['website'].create({'name': 'WebP HTTP A', 'domain': f'127.0.0.1:{port}'})
@@ -38,6 +42,11 @@ class TestWebpHttp(HttpCase):
         return self.env['ir.attachment'].sudo().search([
             ('name', '=like', f'{WEBP_CACHE_PREFIX}w{site.id}:%'),
             ('res_model', '=', 'ir.attachment'), ('res_id', '=', self.partner.id)])
+
+
+@tagged('post_install', '-at_install', 'dwo_website_auto_webp')
+class TestWebpHttp(WebpHttpBase):
+    """End to end through /web/image: real request, Accept header, Content-Type."""
 
     def test_webp_served_with_accept(self):
         resp = self.get(self.url_a)
@@ -91,3 +100,42 @@ class TestWebpHttp(HttpCase):
             'name': 'broken.png', 'raw': b'not an image', 'mimetype': 'image/png', 'public': True})
         resp = self.get(f'http://127.0.0.1:{self.http_port()}/web/image/{att.id}')
         self.assertLess(resp.status_code, 500)
+
+
+@tagged('post_install', '-at_install', 'dwo_website_auto_webp')
+class TestWebpHttpReadonly(WebpHttpBase):
+    """Server with a replica: /web/image (readonly=True) starts on a read-only cursor.
+
+    The cache INSERT fails there with ReadOnlySqlTransaction; the module must let it bubble up so that Odoo
+    retries the request with a read/write cursor, which then stores the cache.
+    """
+
+    registry_readonly = True
+    readonly_enabled = True
+
+    def test_cache_saved_after_retry_with_write_cursor(self):
+        resp = self.get(self.url_a)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.headers['Content-Type'].split(';')[0], 'image/webp')
+        self.assertEqual(len(self.caches(self.site_a)), 1)
+        # the cache is then served (no second entry)
+        again = self.get(self.url_a)
+        self.assertEqual(again.headers['Content-Type'].split(';')[0], 'image/webp')
+        self.assertEqual(len(self.caches(self.site_a)), 1)
+
+    def test_other_cache_error_does_not_break_response(self):
+        attach_cls = type(self.env['ir.attachment'])
+        with patch.object(attach_cls, 'create', side_effect=RuntimeError('disk full')):
+            resp = self.get(self.url_a)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.headers['Content-Type'].split(';')[0], 'image/webp')
+        self.assertEqual(resp.content[8:12], b'WEBP')
+        self.assertFalse(self.caches(self.site_a))
+
+    def test_database_error_on_cache_insert_does_not_break_response(self):
+        attach_cls = type(self.env['ir.attachment'])
+        with patch.object(attach_cls, 'create', side_effect=psycopg2.errors.UniqueViolation('dup')):
+            resp = self.get(self.url_a)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.headers['Content-Type'].split(';')[0], 'image/webp')
+        self.assertFalse(self.caches(self.site_a))
