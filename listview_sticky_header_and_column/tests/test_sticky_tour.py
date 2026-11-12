@@ -9,8 +9,11 @@ class TestStickyTour(HttpCase):
 
     browser_size = "1366,768"
 
-    def test_header_sticky_on_vertical_scroll(self):
+    def test_header_sticky_without_pinned_column(self):
         self.start_tour(PARTNER_LIST, 'lshc_header_sticky', login='admin')
+
+    def test_header_sticky_when_column_pinned(self):
+        self.start_tour(PARTNER_LIST, 'lshc_header_sticky_pinned', login='admin')
 
     def test_pin_buttons_added_once(self):
         self.start_tour(PARTNER_LIST, 'lshc_pin_buttons', login='admin')

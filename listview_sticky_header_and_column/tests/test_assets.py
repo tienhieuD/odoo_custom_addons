@@ -21,6 +21,7 @@ class TestAssets(TransactionCase):
         content = css.raw.decode()
         self.assertIn('.display-on-hover', content, "SCSS of the module is missing from the compiled CSS")
         self.assertIn('.o_list_view thead > tr > th:hover .display-on-hover', content)
+        self.assertIn('.table-responsive.lshc-sticky-head', content)
         self.assertNotIn('css_error_message', content)
 
     def test_manifest_matches_series(self):

@@ -37,6 +37,7 @@ import localStorage from 'web.local_storage';
             return this._super.apply(this, arguments).then(function (result) {
                 // the table is rebuilt on every render: remove the stale style and freeze again
                 self._lshcRemoveOldStyle();
+                self._lshcMarkStickyHead();
                 setTimeout(function () {
                     if (self.isDestroyed && self.isDestroyed()) {
                         return;
@@ -74,6 +75,15 @@ import localStorage from 'web.local_storage';
             var parent = this.getParent();
             var field = (parent && parent.attrs && parent.name) ? '__field_' + parent.name : '';
             return MODULE_KEY + '__model_' + (this.state && this.state.model) + field;
+        },
+
+        /** Always-sticky header (even with no pinned column): class read by main.scss. Not for an x2many list in a form. */
+        _lshcMarkStickyHead: function () {
+            var parent = this.getParent();
+            if (parent && parent.attrs && parent.name) {
+                return;
+            }
+            this._lshcGetWrapper().addClass('lshc-sticky-head');
         },
 
         _lshcGetColumnIndex: function () {
