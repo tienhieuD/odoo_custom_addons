@@ -43,7 +43,7 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
             this.lshcMarkStickyHead();
             this.lshcRemoveOldStyle();
             const columnIndex = this.lshcGetColumnIndex();
-            if (columnIndex) {
+            if (columnIndex !== null) {
                 await this.lshcFreezeColumnListView(columnIndex);
             }
             await this.lshcSleep(MOUNTED_SLEEP_DELAY);
@@ -147,8 +147,9 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
         const columnIndex = Array.prototype.indexOf.call(th.parentNode.children, th);
         const savedColumnIndex = this.lshcGetColumnIndex();
 
-        if (savedColumnIndex === columnIndex) {
-            this.lshcSaveColumnIndex(-1);
+        if (savedColumnIndex !== null && savedColumnIndex === columnIndex) {
+            // Unpin: forget the column (null = nothing pinned), never store a sentinel like -1
+            this.lshcClearColumnIndex();
             this.lshcRemoveOldStyle();
         } else {
             this.lshcSaveColumnIndex(columnIndex);
@@ -166,13 +167,29 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
     },
 
     /**
+     * Forget the pinned column (removes the localStorage key)
+     */
+    lshcClearColumnIndex() {
+        localStorage.removeItem(this.lshcConfig('viewKey'));
+    },
+
+    /**
      * Get saved column index from localStorage
-     * @returns {number}
+     * @returns {number|null} null when no column is pinned (0 is a valid index: first column)
      */
     lshcGetColumnIndex() {
         const key = this.lshcConfig('viewKey');
         const result = localStorage.getItem(key);
-        return Number(result);
+        if (result === null || result === '') {
+            return null;
+        }
+        const index = Number(result);
+        if (!Number.isInteger(index) || index < 0) {
+            // legacy "-1" left by older versions after an unpin, or garbage: nothing pinned
+            localStorage.removeItem(key);
+            return null;
+        }
+        return index;
     },
 
     /**
@@ -191,7 +208,8 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
         // List embedded in a form (x2many): it must keep its own scrollbar (overflow auto of
         // .table-responsive) because the form does not scroll horizontally for it.
         const isEmbedded = !!el.closest('.o_field_widget[name]');
-        const scope = `.o_content .table-responsive[data-lshc-id="${this.lshcUid}"]`;
+        // `.o_content` for list views / x2many in forms, `.modal-body` for lists in dialogs
+        const scope = `:is(.o_content, .modal-body) .table-responsive[data-lshc-id="${this.lshcUid}"]`;
 
         // Add preliminary styles
         const preStyles = `
