@@ -2,10 +2,10 @@
 
 ## Cho module `dwo_sla_core` (SLA generic cho Odoo 19)
 
-Version 0.2 (draft)
+Version 0.7 (draft)
 Prepared by hieudt
 DUO-TEK Software Vietnam
-2026-10-09
+2026-11-12
 
 ## Revision History
 
@@ -17,6 +17,7 @@ DUO-TEK Software Vietnam
 | hieudt | 2026-10-12 | Đối chiếu SRS với code và bộ test tự động: FUNC-012 AC5 theo FUNC-008; FUNC-012/029 ghi rõ chuỗi event khi reset (`cancel` hoặc `complete`, rồi `reset`); FUNC-014 AC2 viết lại theo cơ chế chỉ mục duy nhất; FUNC-023 làm rõ `percent` là số thực nhưng phải nguyên dương; FUNC-053 thêm AC3 và ví dụ (sửa/xóa mốc có hiệu lực ngay trên task đang chạy); FUNC-055/058 thêm tùy chọn `cancel_retry_on_stop` của mốc (mặc định bật); INT-023 thêm AC cho task đang chạy; INST-002/C-02 ghi `web` (D1); đóng O-01 với ngưỡng 5%; INT-011 nêu nhãn "Has Breached" khác "Currently Breaching"; OBS-003 nêu cơ chế thay giá trị field bằng `<redacted>` (AC2); SEC-001 ghi Settings dành cho quản trị hệ thống (AC5); FUNC-036/062 chuyển `active` (đã có `achieved_rate`, `breaching_count`); mục 4 cập nhật trạng thái. | 0.4 |
 | hieudt | 2026-11-07 | D12/D13 (xem `docs/TASKS.md`): gỡ bỏ cơ chế retry escalation (FUNC-027, 028, 056 đến 059 → Removed, số ID giữ nguyên không tái sử dụng; FUNC-026/054/055/029 sửa lại không còn nhắc retry), thêm FUNC-064 (loại hành động escalation: email mặc định/server action) và FUNC-065 (3 cách resolve người nhận email); INT-014 mở rộng với `sla_task_active_count`/`sla_task_breach_count` và quy định nút đỏ khi vi phạm (mixin vẫn opt-in, không kèm bridge module). Đổi theo yêu cầu người dùng "logic escalate có retry hơi thừa thãi... có thể tinh gọn được?" và "tư vấn... nên dùng gì?" cho smart button. | 0.5 |
 | hieudt | 2026-11-11 | Đợt cải thiện 01 (`docs/plan-improvement-sla-01*.md`, quyết định Q1–Q4): domain `[]` = chưa cấu hình (FUNC-003, 051); định nghĩa mới mặc định tắt, Enable/Disable (FUNC-066); timezone bắt buộc (FUNC-067); ngưỡng Sắp đến hạn theo định nghĩa (INT-012); hai nút đổi tên "Apply Current Settings"/"Re-check Conditions" và giới hạn phạm vi (INT-005, INT-020, FUNC-032); áp dụng thủ công cho record có sẵn (FUNC-068); bảo vệ khi sửa định nghĩa (FUNC-069); chip trạng thái SLA trên form (INT-024) | 0.6 |
+| hieudt | 2026-11-12 | Bổ sung REQ-ID cho phần đã hiện thực mà SRS chưa có: FUNC-070 (field phân loại type/vendor/service commitment/target), FUNC-071 (retroactive pause), FUNC-072 (`original_breach_time`, thời lượng giờ đồng hồ), INT-025 (nút Running Tasks), INT-026 (tab Escalation, nút Open Source Record), INT-027 (cột mặc định của list task), INT-028 (Duration live), INT-029 (tab Note, chuỗi không lỗi thời, ja_JP). Thêm Acceptance Criteria cho REQ cũ: FUNC-001 (AC4, AC5), FUNC-022 (AC5), FUNC-032 (AC4), FUNC-064 (AC3, AC4), FUNC-065 (AC4 đến AC6, `responsible` nhận x2many), FUNC-066 (AC4 đến AC6), FUNC-067 (AC4 đến AC7), FUNC-068 (AC4 đến AC10), FUNC-069 (AC3), INT-005 (AC5 đến AC7), INT-012 (AC5), INT-020 (AC4, AC5), INT-024 (AC5 đến AC8); FUNC-029 thêm hai loại event `recalculate`, `reevaluate`. Đổi tên field theo code (`planned_end_time`, `start_time`, `end_time`, `business_percent_used`, `duration`, `target_duration`). Ma trận mục 4 sinh lại từ `060` 0.3 (588 test case, 435 hàm test) | 0.7 |
 
 ---
 
@@ -42,14 +43,14 @@ Tài liệu này đặc tả hệ thống `dwo_sla_core` PHẢI LÀM GÌ, không
 
 | Term | Definition |
 |------|-----------|
-| Dấu vi phạm | Cờ của task, bật khi thời gian đã trôi chạm hoặc vượt `planned_end`; không bao giờ tắt lại. Khác với `stage = breached` (task đã kết thúc trong khi dấu vi phạm bật). |
+| Dấu vi phạm | Cờ của task, bật khi thời gian đã trôi chạm hoặc vượt `planned_end_time`; không bao giờ tắt lại. Khác với `stage = breached` (task đã kết thúc trong khi dấu vi phạm bật). |
 | Event lỗi chưa xử lý / đã xử lý | Trạng thái của event `error` (REQ-FUNC-040). |
 | Lô | Nhóm task được xử lý nền cùng lúc (REQ-REL-002). |
-| Mốc escalation / mốc bắt đầu | Mốc escalation là phần trăm của thời lượng mục tiêu kích hoạt một server action; mốc bắt đầu là thời điểm `start_dt` của task. Tài liệu này luôn viết đầy đủ để không nhầm. |
+| Mốc escalation / mốc bắt đầu | Mốc escalation là phần trăm của thời lượng mục tiêu kích hoạt một server action; mốc bắt đầu là thời điểm `start_time` của task. Tài liệu này luôn viết đầy đủ để không nhầm. |
 | Server action | Hành động cấu hình được của Odoo (`ir.actions.server`): gửi mail, tạo activity, chạy code, đổi field. |
 | Thời gian đã trôi | Số giờ làm việc đã dùng của task, cộng dồn qua pause và resume (REQ-FUNC-043). |
 | Attach | Gắn một SLA vào record, tạo ra một task SLA ở trạng thái `in_progress` hoặc `paused`. |
-| Breach | Vi phạm: thời gian làm việc đã trôi vượt `planned_end` của task SLA. Một khi đã breach thì không bao giờ trở lại trạng thái chưa breach. |
+| Breach | Vi phạm: thời gian làm việc đã trôi vượt `planned_end_time` của task SLA. Một khi đã breach thì không bao giờ trở lại trạng thái chưa breach. |
 | Business hours | Giờ làm việc, theo lịch `resource.calendar`. |
 | Calendar | Bản ghi `resource.calendar` của Odoo mô tả giờ làm việc và ngày nghỉ. |
 | Compute field có lưu | Field của Odoo có `compute` và `store=True`: giá trị tự tính và được lưu thành cột trong database. |
@@ -59,7 +60,7 @@ Tài liệu này đặc tả hệ thống `dwo_sla_core` PHẢI LÀM GÌ, không
 | Escalation | Hành động tự động tại một mốc phần trăm của thời lượng mục tiêu, chạy bằng server action. |
 | Evaluate | Đánh giá 6 điều kiện của các định nghĩa trên một record và áp dụng chuyển trạng thái tương ứng. |
 | Event | Một dòng nhật ký (`sla.event`) ghi lại một thay đổi trạng thái hoặc một lỗi. |
-| Milestone | Mốc escalation, tính theo phần trăm của `target_hours`. |
+| Milestone | Mốc escalation, tính theo phần trăm của thời lượng mục tiêu (`duration`). |
 | OLA | Operational Level Agreement. Ngoài phạm vi. |
 | Orphan task | Task SLA mà record gốc đã bị xóa. |
 | Pause / Resume | Tạm dừng và tiếp tục đồng hồ SLA. Thời gian ở trạng thái paused không tính vào thời gian đã trôi. |
@@ -154,7 +155,7 @@ Bên ngoài hệ thống, module tương tác với: `resource.calendar` (giờ 
 | `dwo_sla_core` (phiên bản 1) | Toàn bộ REQ trong tài liệu này. |
 | `dwo_sla_demo_ticket` (chỉ để test) | Không có REQ riêng; cung cấp model nguồn cho test end-to-end (nhóm TG-10) và demo giao diện. |
 | `dwo_sla_analysis` (giai đoạn sau, **defer**) | SLO và mục tiêu theo kỳ; dashboard SLO; chức năng "chốt" dữ liệu phân tích kèm chiều theo model; phát hiện tự động record thiếu SLA bằng cron quét. Ghi chú thiết kế ở R1. |
-| Defer khỏi mọi phiên bản hiện tại | Relative duration, nguồn múi giờ riêng, nguồn `target_hours` lấy từ field của record, OLA và Underpinning contract, `overrides`, retroactive pause. |
+| Defer khỏi mọi phiên bản hiện tại | Relative duration, nguồn múi giờ riêng, nguồn `duration` lấy từ field của record, OLA và Underpinning contract, `overrides`, retroactive pause. |
 
 ---
 
@@ -209,7 +210,7 @@ Mặc định cho mọi REQ trong tài liệu này (trừ khi ghi khác): **Stat
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Hệ thống PHẢI cung cấp danh sách task SLA và form xem chi tiết ở chế độ chỉ đọc, hiển thị tối thiểu: record gốc, định nghĩa, stage, `start_dt`, `planned_end`, `end_dt`, thời gian đã trôi, mục tiêu, dấu vi phạm.
+- **Statement:** Hệ thống PHẢI cung cấp danh sách task SLA và form xem chi tiết ở chế độ chỉ đọc, hiển thị tối thiểu: record gốc, định nghĩa, stage, `start_time`, `planned_end_time`, `end_time`, thời gian đã trôi, mục tiêu, dấu vi phạm.
 - **Rationale:** Người theo dõi cần thấy toàn bộ trạng thái của từng SLA.
 - **Acceptance Criteria:**
   - AC1: Given có task `in_progress` của định nghĩa D; When SLA User mở danh sách; Then thấy dòng của task với các trường nêu trên.
@@ -221,13 +222,16 @@ Mặc định cho mọi REQ trong tài liệu này (trừ khi ghi khác): **Stat
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** SLA Manager PHẢI có hành động "Apply Current Settings" (tên method vẫn là `action_recalculate`) trên task `in_progress` hoặc `paused`, ở form và ở `<header>` của list (nhiều task một lần, có hộp xác nhận): hệ thống xác định lại lịch và thời lượng mục tiêu theo cấu hình hiện hành của định nghĩa và record, giữ nguyên thời gian đã trôi, rồi xếp lại `planned_end`. Với task `paused`, `planned_end` được xếp lại khi task resume. Task đã kết thúc KHÔNG có hành động này. Mỗi task thực sự đổi PHẢI ghi một event `recalculate` (người bấm, giá trị cũ → mới của mục tiêu, lịch, `planned_end`), và hệ thống PHẢI báo "N cập nhật, M bỏ qua".
+- **Statement:** SLA Manager PHẢI có hành động "Apply Current Settings" (tên method vẫn là `action_recalculate`) trên task `in_progress` hoặc `paused`, ở form và ở `<header>` của list (nhiều task một lần, có hộp xác nhận): hệ thống xác định lại lịch và thời lượng mục tiêu theo cấu hình hiện hành của định nghĩa và record, giữ nguyên thời gian đã trôi, rồi xếp lại `planned_end_time`. Với task `paused`, `planned_end_time` được xếp lại khi task resume. Task đã kết thúc KHÔNG có hành động này. Mỗi task thực sự đổi PHẢI ghi một event `recalculate` (người bấm, giá trị cũ → mới của mục tiêu, lịch, `planned_end_time`), và hệ thống PHẢI báo "N cập nhật, M bỏ qua".
 - **Rationale:** Cho phép áp dụng thay đổi lịch hoặc mục tiêu lên task đang chạy theo quyết định có chủ đích (REQ-FUNC-021).
 - **Acceptance Criteria:**
-  - AC1: Given task `in_progress` đã chạy 3 giờ làm việc, mục tiêu 4 giờ, và lịch của record vừa đổi sang lịch khác; When bấm Apply Current Settings; Then thời gian đã trôi = 3 giờ, `planned_end` = thời điểm hiện tại cộng 1 giờ làm việc theo lịch mới.
-  - AC2: Given mục tiêu trên định nghĩa vừa sửa từ 4 thành 8 giờ; When bấm Apply Current Settings; Then mục tiêu của task = 8 và `planned_end` = hiện tại cộng 5 giờ làm việc.
+  - AC1: Given task `in_progress` đã chạy 3 giờ làm việc, mục tiêu 4 giờ, và lịch của record vừa đổi sang lịch khác; When bấm Apply Current Settings; Then thời gian đã trôi = 3 giờ, `planned_end_time` = thời điểm hiện tại cộng 1 giờ làm việc theo lịch mới.
+  - AC2: Given mục tiêu trên định nghĩa vừa sửa từ 4 thành 8 giờ; When bấm Apply Current Settings; Then mục tiêu của task = 8 và `planned_end_time` = hiện tại cộng 5 giờ làm việc.
   - AC3 (negative): Given task `achieved`; When mở form; Then không có nút Apply Current Settings.
   - AC4 (negative): Given người dùng thuộc `group_sla_user`; When xem task; Then không có nút Apply Current Settings.
+  - AC5: Given task đã vi phạm (`has_breached`); When bấm Apply Current Settings; Then mục tiêu cập nhật nhưng `planned_end_time` và `original_breach_time` giữ nguyên.
+  - AC6: Given task `in_progress` với mục tiêu 8 giờ đổi thành 4 giờ; When bấm; Then có đúng 1 event `recalculate` ghi người bấm và "8.00 h -> 4.00 h", thông báo "1 task(s) updated, 0 skipped"; bấm cho nhiều task thì mỗi task đổi có 1 event; task đã đóng bị bỏ qua và tính vào "skipped".
+  - AC7: Given task không có gì thay đổi; When bấm; Then không ghi event nhưng vẫn tính vào số "updated".
 - **Verification Method:** Test
 
 #### REQ-INT-006: Action "SLA" trên record gốc
@@ -262,13 +266,14 @@ Mặc định cho mọi REQ trong tài liệu này (trừ khi ghi khác): **Stat
 - **Status:** active
 - **Priority:** Medium
 - **Owner:** @hieudt
-- **Statement:** Danh sách task PHẢI có bộ lọc "Sắp đến hạn": task `in_progress`, chưa vi phạm, và `planned_end` nhỏ hơn hoặc bằng thời điểm hiện tại cộng X giờ. X PHẢI chỉnh được bởi SLA Manager tại màn hình cấu hình SLA (mục Settings của module), giá trị mặc định 4 giờ (đề xuất, xem O-04). Từ đợt 01, mỗi định nghĩa có thể đặt `due_soon_hours` riêng (phải không âm; trống hoặc 0 = dùng Settings); `is_due_soon`, bộ lọc và chip trạng thái (REQ-INT-024) dùng cùng quy tắc, và task của định nghĩa có ngưỡng riêng được tính theo ngưỡng đó.
+- **Statement:** Danh sách task PHẢI có bộ lọc "Sắp đến hạn": task `in_progress`, chưa vi phạm, và `planned_end_time` nhỏ hơn hoặc bằng thời điểm hiện tại cộng X giờ. X PHẢI chỉnh được bởi SLA Manager tại màn hình cấu hình SLA (mục Settings của module), giá trị mặc định 4 giờ (đề xuất, xem O-04). Từ đợt 01, mỗi định nghĩa có thể đặt `due_soon_hours` riêng (phải không âm; trống hoặc 0 = dùng Settings); `is_due_soon`, bộ lọc và chip trạng thái (REQ-INT-024) dùng cùng quy tắc, và task của định nghĩa có ngưỡng riêng được tính theo ngưỡng đó.
 - **Rationale:** Thấy các SLA có nguy cơ vi phạm.
 - **Acceptance Criteria:**
-  - AC1: Given X = 6 và 3 task `in_progress` chưa vi phạm có `planned_end` sau 1 giờ, 5 giờ, 3 ngày; When bật bộ lọc; Then trả đúng 2 task đầu.
-  - AC2 (negative): Given task `paused`, task `achieved`, task đã vi phạm, mỗi task có `planned_end` sau 1 giờ; When bật bộ lọc; Then không trả task nào trong ba task này.
-  - AC3: Given SLA Manager đổi X từ 6 thành 1; When bật bộ lọc; Then chỉ trả task có `planned_end` trong 1 giờ.
-  - AC4: Given hai định nghĩa `due_soon_hours` = 2 và trống (Settings = 6), mỗi định nghĩa một task có `planned_end` sau 4 giờ; When bật bộ lọc; Then chỉ task của định nghĩa trống được trả. Bộ lọc đúng với cả `=`, `!=`, `in`, `not in`.
+  - AC1: Given X = 6 và 3 task `in_progress` chưa vi phạm có `planned_end_time` sau 1 giờ, 5 giờ, 3 ngày; When bật bộ lọc; Then trả đúng 2 task đầu.
+  - AC2 (negative): Given task `paused`, task `achieved`, task đã vi phạm, mỗi task có `planned_end_time` sau 1 giờ; When bật bộ lọc; Then không trả task nào trong ba task này.
+  - AC3: Given SLA Manager đổi X từ 6 thành 1; When bật bộ lọc; Then chỉ trả task có `planned_end_time` trong 1 giờ.
+  - AC4: Given hai định nghĩa `due_soon_hours` = 2 và trống (Settings = 6), mỗi định nghĩa một task có `planned_end_time` sau 4 giờ; When bật bộ lọc; Then chỉ task của định nghĩa trống được trả. Bộ lọc đúng với cả `=`, `!=`, `in`, `not in`.
+  - AC5: Given Settings đổi sang 2 giờ; Then chỉ định nghĩa để trống bị ảnh hưởng, định nghĩa có ngưỡng riêng giữ nguyên. Given `due_soon_hours` âm; When lưu; Then bị CSDL từ chối.
 - **Verification Method:** Test
 
 #### REQ-INT-013: Nhóm, pivot và graph cho task SLA
@@ -307,6 +312,8 @@ Mặc định cho mọi REQ trong tài liệu này (trừ khi ghi khác): **Stat
   - AC1: Given điều kiện stop qua quan hệ đã khớp nhưng task chưa kết thúc (do giới hạn REQ-FUNC-042); When bấm Re-check Conditions; Then task kết thúc đúng.
   - AC2 (negative): Given người dùng thuộc `group_sla_user`; Then không có nút.
   - AC3: Given task đã `achieved`; When bấm Re-check Conditions; Then task không đổi (REQ-FUNC-031 AC3).
+  - AC4: Given hai định nghĩa A và B cùng có task cho một record và định nghĩa C chưa có task; When bấm cho task của B; Then task của A không đổi và không có task C mới; bấm cho nhiều task thuộc hai định nghĩa thì mỗi task đánh giá theo đúng định nghĩa của nó.
+  - AC5: Given bấm Re-check; Then mỗi task có 1 event `reevaluate` (thời điểm bấm, người bấm, "In Progress -> Achieved" hoặc "No change", định nghĩa) và thông báo "N task(s) checked, M changed" kèm làm mới màn hình.
 - **Verification Method:** Test
 
 #### REQ-INT-021: Danh sách sự kiện SLA
@@ -347,7 +354,7 @@ Mặc định cho mọi REQ trong tài liệu này (trừ khi ghi khác): **Stat
   - AC3: Given task `paused`; When xem hai lần cách nhau 2 giờ làm việc; Then phần trăm không đổi.
   - AC4 (đang chạy): Given mục tiêu 4 giờ (24x7), task `in_progress` gắn lúc 09:00 và chưa pause lần nào; When xem lúc 10:00 và lúc 14:00; Then hiển thị 25% rồi 125% (giá trị tính tại thời điểm xem, gồm đoạn đang chạy).
 - **Verification Method:** Test
-- **More Information:** Field `percent_used` không lưu trên DB, được tính lại mỗi lần đọc view; escalation dùng cùng cách tính nên số hiển thị khớp số quyết định bắn mốc.
+- **More Information:** Field `business_percent_used` không lưu trên DB, được tính lại mỗi lần đọc view; escalation dùng cùng cách tính nên số hiển thị khớp số quyết định bắn mốc.
 
 
 #### REQ-INT-024: Chip trạng thái SLA trên form record
@@ -362,7 +369,76 @@ Mặc định cho mọi REQ trong tài liệu này (trừ khi ghi khác): **Stat
   - AC2 (negative): Given model không có định nghĩa; When mở form; Then không có chip và không có RPC.
   - AC3: Given cờ tắt hoặc người dùng không thuộc `group_sla_user`; Then `dwo_sla_models` rỗng.
   - AC4: Given task trễ 250%; Then `percent` = 100 và `state` = `breached`.
+  - AC5: Given file style của widget `sla_progress` (`static/src/sla_progress/sla_progress_widget.scss`); Then chỉ có light mode, không có khối `prefers-color-scheme`.
+  - AC6: Given record có nhiều task; Then `state` lấy theo thứ tự `breached` > `due_soon` > paused > running trong các task đang hoạt động (đồng hạng lấy task dùng nhiều % nhất) và `late_count` đếm task đang `breached`. Given không có task đang hoạt động; Then `missed` nếu có task stage `breached`, ngược lại `met` nếu có task `achieved`, ngược lại `state` rỗng (kể cả khi chỉ có task `cancelled`, không có task, hoặc `res_id` rỗng). Task đang hoạt động luôn thắng task đã đóng.
+  - AC7 (negative): Given người dùng không thuộc `group_sla_user`; When gọi `get_record_sla_summary`; Then bị `AccessError` (RPC không dùng `sudo`). Given `group_sla_user`; Then đọc được.
+  - AC8: Given chưa có bản ghi tham số `dwo_sla_core.show_form_sla_status`; Then coi là bật (nâng cấp không bật lại cờ đã tắt). Given tắt qua Settings; Then tham số lưu chuỗi `'False'` tường minh và `dwo_sla_models` rỗng.
 - **Verification Method:** Test (HttpCase tour + unit)
+
+#### REQ-INT-025: Nút Running Tasks trên form định nghĩa
+
+- **Status:** active
+- **Priority:** Medium
+- **Owner:** @hieudt
+- **Statement:** Form định nghĩa PHẢI có nút thông minh (button box) "Running Tasks" hiển thị `running_task_count` (số task `in_progress` và `paused` của định nghĩa) và mở danh sách mọi task của đúng định nghĩa đó (không lọc theo trạng thái). Form dùng `js_class="sla_definition_form"` (hộp xác nhận khi lưu, REQ-FUNC-069).
+- **Rationale:** Từ cấu hình đi thẳng tới task đang bị ảnh hưởng.
+- **Acceptance Criteria:**
+  - AC1: Given định nghĩa có task `in_progress`, `paused`, `achieved`; Then `running_task_count` = 2; định nghĩa không có task thì 0.
+  - AC2: Given bấm nút; Then mở `sla.task` có domain theo định nghĩa đó, gồm cả task đã đóng, không có `context` lọc mặc định.
+  - AC3: Given arch form; Then có đúng một nút `action_view_tasks` trong button box và field `running_task_count`, `js_class` là `sla_definition_form`.
+- **Verification Method:** Test
+
+#### REQ-INT-026: Lịch sử escalation và nút Open Source Record trên form task
+
+- **Status:** active
+- **Priority:** Medium
+- **Owner:** @hieudt
+- **Statement:** Form task PHẢI có tab Escalation liệt kê các event `escalate` và `escalate_failed` của task (cột thời điểm, loại, ghi chú; mới nhất trước), và nút "Open Source Record" luôn hiện ở `<header>` (không có trong list) mở form của record gốc. Khi record gốc đã bị xóa hoặc model không còn, nút PHẢI báo `UserError` có nội dung "no longer exists" thay vì lỗi kỹ thuật.
+- **Rationale:** Điều tra nhanh một task mà không phải tìm record gốc bằng tay.
+- **Acceptance Criteria:**
+  - AC1: Given task có event `escalate`, `escalate_failed`, `pause`, `error`; Then tab Escalation chỉ có hai event đầu, event mới nhất trước; `event_ids` vẫn đủ 4.
+  - AC2: Given nút Open Source Record; Then trả action `ir.actions.act_window` form của đúng record gốc (`target` = `current`); nút nằm trong `<header>` và không có điều kiện ẩn.
+  - AC3 (negative): Given record gốc đã bị xóa hoặc `res_model` không còn trong registry; When bấm; Then `UserError` chứa "no longer exists".
+- **Verification Method:** Test
+
+#### REQ-INT-027: Cột mặc định của danh sách task
+
+- **Status:** active
+- **Priority:** Low
+- **Owner:** @hieudt
+- **Statement:** Danh sách task PHẢI tô đỏ dòng đã vi phạm (`decoration-danger` theo `has_breached`) và hiện mặc định các cột: định nghĩa, mục tiêu, lịch, stage, thời điểm bắt đầu, `planned_end_time`, Business Duration (live), Duration (live), phần trăm đã dùng (widget `progressbar` có `overflow_class`); các cột tên record, model và id là tùy chọn, ẩn mặc định.
+- **Rationale:** Đọc nhanh tình trạng mà không phải cấu hình cột.
+- **Acceptance Criteria:**
+  - AC1: Given arch list `sla.task`; Then đúng bộ cột mặc định trên, `business_percent_used` dùng `progressbar`, và `display_name`, `res_model`, `res_id` là `optional="hide"`.
+- **Verification Method:** Test
+
+#### REQ-INT-028: Duration (live) và Business Duration (live)
+
+- **Status:** active
+- **Priority:** Low
+- **Owner:** @hieudt
+- **Statement:** Task PHẢI có hai field tính không lưu `business_duration_live` (giờ làm việc) và `duration_live` (giờ đồng hồ) = giá trị đã chốt cộng đoạn đang chạy tới thời điểm xem, chỉ để hiển thị; cột lưu `business_duration` và `duration` không đổi. Danh sách task hiện hai field live mặc định và để hai cột lưu ở chế độ ẩn.
+- **Rationale:** Người xem thấy thời gian đã trôi thật của task đang chạy mà không cần hệ thống ghi liên tục.
+- **Acceptance Criteria:**
+  - AC1: Given task `in_progress` gắn lúc 09:00 (24x7); When xem lúc 10:30; Then cột lưu 0,0 và cả hai field live bằng 1,5.
+  - AC2: Given task `paused`; Then field live bằng giá trị đã lưu.
+  - AC3: Given task có lịch T2–T6 08:00–17:00; When xem sau 24 giờ; Then `duration_live` = 24,0 và `business_duration_live` lớn hơn 0 nhưng nhỏ hơn 24.
+  - AC4: Given arch list `sla.task`; Then hai field live `optional="show"`, hai cột lưu `optional="hide"`.
+- **Verification Method:** Test
+
+#### REQ-INT-029: Tab Note hướng dẫn trên form định nghĩa và task, chuỗi không lỗi thời
+
+- **Status:** active
+- **Priority:** Low
+- **Owner:** @hieudt
+- **Statement:** Form định nghĩa PHẢI có tab Note chia 9 nhóm và form task tab Note chia 4 nhóm kèm 3 kịch bản đánh số, giải thích: `[]` là chưa cấu hình (không phải "Match all records"), cách viết domain khớp mọi record, bản sao lịch theo timezone không tự đồng bộ ngày nghỉ, chip trạng thái cần tải lại trang với model mới, Re-check Conditions, Apply Current Settings, Original Breach Time, ngưỡng Sắp đến hạn và Disable. Chuỗi hiển thị (message registry, help của field, view) KHÔNG ĐƯỢC còn tên nút cũ "Recalculate" hoặc "Re-evaluate". Bản dịch `i18n/ja_JP.po` PHẢI có các chuỗi của đợt này.
+- **Rationale:** Giải thích hành vi đổi nghĩa của `[]` và hai nút đổi tên ngay tại nơi người dùng thao tác.
+- **Acceptance Criteria:**
+  - AC1: Given arch form `sla.definition`; Then `page[@name='note']` có đúng 9 thẻ `h4`.
+  - AC2: Given văn bản tab Note của định nghĩa; Then chứa các cụm "Match all records", `[('id', '!=', 0)]`, "not kept in sync", "public holidays", "reload the page", "Re-check Conditions", "equal to or longer than the Duration", "Disable".
+  - AC3: Given arch form `sla.task`; Then `page[@name='note']` có 4 `h4`, 3 `li` trong `ol`, và chứa "Apply Current Settings", "Re-check Conditions", "Original Breach Time", "from the moment you press the button", "creates a new one".
+  - AC4 (negative): Given `constants/message.py`, help của mọi field `sla.definition`, `sla.task`, `sla.escalation` và `views/sla_definition_views.xml`, `views/sla_task_views.xml`; Then không còn "Recalculate" hoặc "Re-evaluate" làm tên nút.
+- **Verification Method:** Test + Inspection (bản dịch ja_JP)
 
 #### 3.1.2 Hardware Interfaces
 
@@ -429,8 +505,8 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Statement:** Hệ thống PHẢI cho module khác thay đổi cách xác định thời lượng mục tiêu của task (nhận record, trả số giờ), mặc định là thời lượng trên định nghĩa.
 - **Rationale:** Ví dụ số giờ khác nhau theo hợp đồng (R1, câu 10).
 - **Acceptance Criteria:**
-  - AC1: Given module mẫu trả 3 cho record `priority = p1` và định nghĩa ghi 4; When attach record P1; Then `target_hours` của task = 3.
-  - AC2 (negative): Given không có module mẫu; When attach; Then `target_hours` = 4.
+  - AC1: Given module mẫu trả 3 cho record `priority = p1` và định nghĩa ghi 4; When attach record P1; Then `target_duration` của task = 3.
+  - AC2 (negative): Given không có module mẫu; When attach; Then `target_duration` = 4.
   - AC3 (negative): Given module mẫu trả giá trị âm; When attach; Then không tạo task và ghi event `error` (giá trị 0 được chấp nhận, REQ-FUNC-018 AC3).
 - **Verification Method:** Test
 
@@ -442,8 +518,8 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Statement:** Hệ thống PHẢI cho module khác thay đổi cách xác định mốc bắt đầu của task (nhận record và thời điểm hiện tại, trả datetime), mặc định là thời điểm hiện tại hoặc field retroactive.
 - **Rationale:** Mốc bắt đầu phức tạp hơn một field.
 - **Acceptance Criteria:**
-  - AC1: Given module mẫu trả mốc cách đây 2 giờ; When attach; Then `start_dt` = mốc đó.
-  - AC2 (negative): Given không có module mẫu và không bật retroactive; Then `start_dt` = thời điểm attach.
+  - AC1: Given module mẫu trả mốc cách đây 2 giờ; When attach; Then `start_time` = mốc đó.
+  - AC2 (negative): Given không có module mẫu và không bật retroactive; Then `start_time` = thời điểm attach.
 - **Verification Method:** Test
 
 #### REQ-INT-017: Điểm mở rộng: domain của điều kiện
@@ -498,6 +574,8 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
   - AC1 (happy path): Given một định nghĩa cho `res.partner` và một định nghĩa cho `demo.ticket` dùng cùng cấu hình điều kiện; When record của mỗi model thỏa start; Then cả hai được gắn SLA đúng, không có code riêng theo model.
   - AC2 (negative): Given định nghĩa thiếu model; When lưu; Then bị từ chối.
   - AC3 (negative): Given thời lượng mục tiêu âm; When lưu; Then bị từ chối (0 được chấp nhận).
+  - AC4 (negative): Given định nghĩa đang dùng một công ty hoặc một lịch cố định; When xóa công ty hoặc lịch đó; Then bị từ chối (ràng buộc RESTRICT của CSDL) và cả hai vẫn tồn tại.
+  - AC5: Given tạo hoặc đổi `model_id`; Then `model_name` (kỹ thuật, có lưu) có ngay giá trị tên model, không cần truyền tay, để widget domain dùng được ngay khi chọn model.
 - **Verification Method:** Test
 
 #### REQ-FUNC-002: Giới hạn model được gắn SLA
@@ -658,11 +736,11 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Khi stop khớp, hệ thống PHẢI chốt thời gian đã trôi và chuyển task sang `breached` nếu dấu vi phạm đã bật, ngược lại `achieved`. Với task đang `paused`, kết quả chỉ xét dấu vi phạm đã có, không so với `planned_end`. Hệ thống PHẢI ghi `end_dt` và event `complete`.
+- **Statement:** Khi stop khớp, hệ thống PHẢI chốt thời gian đã trôi và chuyển task sang `breached` nếu dấu vi phạm đã bật, ngược lại `achieved`. Với task đang `paused`, kết quả chỉ xét dấu vi phạm đã có, không so với `planned_end_time`. Hệ thống PHẢI ghi `end_time` và event `complete`.
 - **Rationale:** Quy tắc Complete của ServiceNow: stop khớp thì hoàn thành bất kể đã vi phạm hay chưa (R2).
 - **Acceptance Criteria:**
-  - AC1: Given task `in_progress` chưa quá `planned_end`; When stop khớp; Then `achieved`, `end_dt` = thời điểm stop, 1 event `complete`.
-  - AC2: Given task đã quá `planned_end` trong khi record được sửa (chưa tới lượt xử lý nền); When stop khớp; Then `breached`.
+  - AC1: Given task `in_progress` chưa quá `planned_end_time`; When stop khớp; Then `achieved`, `end_time` = thời điểm stop, 1 event `complete`.
+  - AC2: Given task đã quá `planned_end_time` trong khi record được sửa (chưa tới lượt xử lý nền); When stop khớp; Then `breached`.
   - AC3 (boundary): Given task `paused` 5 ngày làm việc khi mục tiêu còn dư 2 giờ; When stop khớp; Then `achieved`.
   - AC4 (negative): Given task đã `achieved`; When stop khớp lần nữa; Then task và event không đổi.
 - **Verification Method:** Test
@@ -672,7 +750,7 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Hệ thống PHẢI hỗ trợ ba chế độ cancel: `start_unmatched` (mặc định; hủy khi start không còn khớp), `condition` (hủy khi cancel khớp), `never` (không bao giờ hủy). Task bị hủy PHẢI có `stage = cancelled`, `end_dt` được ghi và event `cancel`.
+- **Statement:** Hệ thống PHẢI hỗ trợ ba chế độ cancel: `start_unmatched` (mặc định; hủy khi start không còn khớp), `condition` (hủy khi cancel khớp), `never` (không bao giờ hủy). Task bị hủy PHẢI có `stage = cancelled`, `end_time` được ghi và event `cancel`.
 - **Rationale:** Cấu hình "When to cancel" của ServiceNow (R3).
 - **Acceptance Criteria:**
   - AC1: Given chế độ `start_unmatched`, start hết khớp; Then `cancelled`.
@@ -770,7 +848,7 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Rationale:** Nhất quán với 5 điều kiện còn lại; dễ điều tra.
 - **Acceptance Criteria:**
   - AC1 (negative): Given điều kiện reset rỗng và có field theo dõi; When field đổi; Then không reset.
-  - AC2: Given điều kiện reset `[]` và field theo dõi `assignment_group`; When reset xảy ra; Then ghi chú của event `reset` chứa `assignment_group`.
+  - AC2: Given điều kiện reset `[('id', '!=', 0)]` (domain luôn đúng) và field theo dõi `assignment_group`; When reset xảy ra; Then ghi chú của event `reset` chứa `assignment_group`.
 - **Verification Method:** Test
 
 #### REQ-FUNC-014: Nhiều SLA song song và tính duy nhất
@@ -817,12 +895,12 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** Medium
 - **Owner:** @hieudt
-- **Statement:** Khi định nghĩa bật retroactive start, hệ thống PHẢI lấy `start_dt` từ field ngày giờ đã chọn và tính `planned_end` từ mốc đó; nếu mốc đã quá hạn thì task PHẢI breach ngay lúc attach. Nếu field mốc trống, hệ thống PHẢI dùng thời điểm hiện tại và ghi ghi chú vào event `attach`. Thời gian record đã paused trước khi attach KHÔNG được trừ (retroactive pause ngoài phạm vi).
+- **Statement:** Khi định nghĩa bật retroactive start, hệ thống PHẢI lấy `start_time` từ field ngày giờ đã chọn và tính `planned_end_time` từ mốc đó; nếu mốc đã quá hạn thì task PHẢI breach ngay lúc attach. Nếu field mốc trống, hệ thống PHẢI dùng thời điểm hiện tại và ghi ghi chú vào event `attach`. Thời gian record đã paused trước khi attach KHÔNG được trừ (retroactive pause ngoài phạm vi).
 - **Rationale:** Đo SLA từ lúc sự việc xảy ra thay vì lúc hệ thống phát hiện (R3).
 - **Acceptance Criteria:**
-  - AC1: Given lịch 24x7, mục tiêu 4 giờ, mốc cách đây 1 giờ; When attach; Then `start_dt` = mốc, `planned_end` = mốc + 4 giờ, dấu vi phạm tắt.
+  - AC1: Given lịch 24x7, mục tiêu 4 giờ, mốc cách đây 1 giờ; When attach; Then `start_time` = mốc, `planned_end_time` = mốc + 4 giờ, dấu vi phạm tắt.
   - AC2: Given mục tiêu 4 giờ, mốc cách đây 6 giờ; When attach; Then dấu vi phạm bật ngay và có event `breach`.
-  - AC3 (negative): Given field mốc trống; When attach; Then `start_dt` = thời điểm attach và ghi chú của event `attach` nêu việc dùng thời điểm hiện tại.
+  - AC3 (negative): Given field mốc trống; When attach; Then `start_time` = thời điểm attach và ghi chú của event `attach` nêu việc dùng thời điểm hiện tại.
 - **Verification Method:** Test
 
 #### 3.2.4 Thời gian và lịch
@@ -832,14 +910,14 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Hệ thống PHẢI tính `planned_end` bằng cách cộng thời lượng mục tiêu tính theo giờ làm việc của lịch được dùng kể từ mốc bắt đầu, có trừ ngày nghỉ (leave) của lịch; khi task không có lịch thì cộng thẳng theo 24x7.
+- **Statement:** Hệ thống PHẢI tính `planned_end_time` bằng cách cộng thời lượng mục tiêu tính theo giờ làm việc của lịch được dùng kể từ mốc bắt đầu, có trừ ngày nghỉ (leave) của lịch; khi task không có lịch thì cộng thẳng theo 24x7.
 - **Rationale:** Cam kết SLA tính theo giờ làm việc.
 - **Acceptance Criteria:**
-  - AC1: Given lịch T2–T6 08:00–17:00, mục tiêu 8 giờ, start thứ Sáu 16:00; Then `planned_end` = thứ Hai 15:00 (1 giờ thứ Sáu + 7 giờ thứ Hai).
-  - AC2: Given thứ Hai là ngày nghỉ global leave; Then `planned_end` = thứ Ba 15:00.
-  - AC3 (boundary): Given mục tiêu 0 giờ; Then `planned_end` = mốc bắt đầu. Given mốc bắt đầu đúng 17:00 thứ Sáu, mục tiêu 1 giờ; Then `planned_end` = thứ Hai 09:00.
-  - AC4: Given lịch có múi giờ `Asia/Ho_Chi_Minh`, start 2026-03-02 09:00 giờ địa phương, mục tiêu 2 giờ; Then `planned_end` = 11:00 giờ địa phương (04:00 UTC).
-  - AC5: Given không có lịch, mục tiêu 4 giờ; Then `planned_end` = start + 4 giờ.
+  - AC1: Given lịch T2–T6 08:00–17:00, mục tiêu 8 giờ, start thứ Sáu 16:00; Then `planned_end_time` = thứ Hai 15:00 (1 giờ thứ Sáu + 7 giờ thứ Hai).
+  - AC2: Given thứ Hai là ngày nghỉ global leave; Then `planned_end_time` = thứ Ba 15:00.
+  - AC3 (boundary): Given mục tiêu 0 giờ; Then `planned_end_time` = mốc bắt đầu. Given mốc bắt đầu đúng 17:00 thứ Sáu, mục tiêu 1 giờ; Then `planned_end_time` = thứ Hai 09:00.
+  - AC4: Given lịch có múi giờ `Asia/Ho_Chi_Minh`, start 2026-03-02 09:00 giờ địa phương, mục tiêu 2 giờ; Then `planned_end_time` = 11:00 giờ địa phương (04:00 UTC).
+  - AC5: Given không có lịch, mục tiêu 4 giờ; Then `planned_end_time` = start + 4 giờ.
   - AC6 (negative): Given lịch ngày nghỉ phủ kín 100 cửa sổ 14 ngày liên tiếp (không xếp được hạn); When attach; Then không tạo task và ghi event `error` (REQ-FUNC-030).
 - **Verification Method:** Test
 - **More Information:** Cross-ref A-02. Giá trị AC được xác nhận ở spike.
@@ -863,11 +941,11 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Khi task resume, nếu dấu vi phạm chưa bật thì hệ thống PHẢI xếp lại `planned_end` bằng thời điểm resume cộng phần thời lượng còn lại (mục tiêu trừ thời gian đã trôi, tối thiểu 0); nếu dấu vi phạm đã bật thì `planned_end` giữ nguyên.
+- **Statement:** Khi task resume, nếu dấu vi phạm chưa bật thì hệ thống PHẢI xếp lại `planned_end_time` bằng thời điểm resume cộng phần thời lượng còn lại (mục tiêu trừ thời gian đã trôi, tối thiểu 0); nếu dấu vi phạm đã bật thì `planned_end_time` giữ nguyên.
 - **Rationale:** Thời gian paused không làm dời cam kết ngoài thời gian còn lại.
 - **Acceptance Criteria:**
-  - AC1: Given lịch 24x7, mục tiêu 4 giờ, đã trôi 1 giờ, pause rồi resume lúc 14:00; Then `planned_end` = 17:00.
-  - AC2 (negative): Given dấu vi phạm đã bật, `planned_end` = 13:00; When resume lúc 14:00; Then `planned_end` vẫn = 13:00.
+  - AC1: Given lịch 24x7, mục tiêu 4 giờ, đã trôi 1 giờ, pause rồi resume lúc 14:00; Then `planned_end_time` = 17:00.
+  - AC2 (negative): Given dấu vi phạm đã bật, `planned_end_time` = 13:00; When resume lúc 14:00; Then `planned_end_time` vẫn = 13:00.
 - **Verification Method:** Test
 
 #### REQ-FUNC-019: Ba nguồn lịch
@@ -905,7 +983,7 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Statement:** Lúc attach, hệ thống PHẢI sao chép thời lượng mục tiêu và lịch vào task. Sửa thời lượng mục tiêu hoặc lịch trên định nghĩa sau đó KHÔNG ĐƯỢC ảnh hưởng task đang chạy cho tới khi SLA Manager bấm "Apply Current Settings" (REQ-INT-005).
 - **Rationale:** Cam kết đã đo không đổi giữa chừng.
 - **Acceptance Criteria:**
-  - AC1 (negative: task không đổi): Given task đang chạy với mục tiêu 4 giờ; When sửa định nghĩa thành 8 giờ; Then task vẫn mục tiêu 4 giờ và `planned_end` không đổi.
+  - AC1 (negative: task không đổi): Given task đang chạy với mục tiêu 4 giờ; When sửa định nghĩa thành 8 giờ; Then task vẫn mục tiêu 4 giờ và `planned_end_time` không đổi.
   - AC2: Given task đang chạy với lịch L1; When sửa lịch của định nghĩa thành L2; Then task vẫn dùng L1.
   - AC3: Given record gắn task mới sau khi sửa; Then task mới dùng giá trị mới.
 - **Verification Method:** Test
@@ -941,13 +1019,14 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Khi thời gian đã trôi chạm hoặc vượt `planned_end`, hệ thống PHẢI bật dấu vi phạm của task và ghi event `breach` đúng một lần, bất kể phát hiện lúc record được cập nhật hay lúc xử lý theo thời gian. Task vi phạm vẫn ở `in_progress` cho tới khi stop. Event `breach` PHẢI được ghi trước khi xử lý các mốc escalation từ 100% trở lên.
+- **Statement:** Khi thời gian đã trôi chạm hoặc vượt `planned_end_time`, hệ thống PHẢI bật dấu vi phạm của task và ghi event `breach` đúng một lần, bất kể phát hiện lúc record được cập nhật hay lúc xử lý theo thời gian. Task vi phạm vẫn ở `in_progress` cho tới khi stop. Event `breach` PHẢI được ghi trước khi xử lý các mốc escalation từ 100% trở lên.
 - **Rationale:** Kết quả `breached` phải nhất quán dù record có được sửa hay không.
 - **Acceptance Criteria:**
   - AC1: Given lịch 24x7, start 09:00, mục tiêu 4 giờ, không ai sửa record; When xử lý nền chạy lúc 13:01; Then dấu vi phạm bật và có đúng 1 event `breach`, stage vẫn `in_progress`.
   - AC2: Given như AC1 nhưng người dùng pause record lúc 14:00 trước khi xử lý nền chạy; Then dấu vi phạm bật ngay lúc pause (event `breach` ghi lúc 14:00), rồi task `paused`.
   - AC3: Given mốc 100% đến hạn cùng lúc vi phạm; Then trong nhật ký event `breach` có thời điểm không muộn hơn event `escalate` của mốc 100%.
-  - AC4 (negative): Given task chưa tới `planned_end`; Then không có event `breach`.
+  - AC4 (negative): Given task chưa tới `planned_end_time`; Then không có event `breach`.
+  - AC5 (negative): Given task `paused` và thời điểm hiện tại đã quá `planned_end_time`; When xử lý nền chạy; Then dấu vi phạm không bật (task `paused` không được so với `planned_end_time`).
 - **Verification Method:** Test
 
 #### REQ-FUNC-046: Dấu vi phạm không tắt và mức vượt được giữ
@@ -1056,6 +1135,8 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Acceptance Criteria:**
   - AC1: Given mốc `action_type=email` tới hạn; When xử lý nền chạy; Then 1 `mail.mail` được tạo với `email_to` đúng người nhận resolve được, và mốc đánh dấu xử lý xong.
   - AC2: Given mốc `action_type=server_action`; Then hành vi giống hệt trước khi có REQ này (không regress).
+  - AC3: Given mốc `action_type=email` không chọn mẫu email (`email_template_id` rỗng); When xử lý nền chạy; Then vẫn gửi 1 email với tiêu đề chứa tên định nghĩa và nội dung mặc định đơn giản.
+  - AC4 (negative): Given `email_template_id` là mẫu của model khác `sla.task`; When lưu mốc; Then bị từ chối.
 - **Verification Method:** Test
 
 #### REQ-FUNC-065: Resolve người nhận email escalation
@@ -1063,12 +1144,15 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Mốc kiểu `email` PHẢI có `email_recipient_type` ∈ {`fixed`, `field`, `responsible`}. `fixed` dùng địa chỉ cố định (`email_fixed_address`). `field` đọc một field Char trên model của định nghĩa (`email_field_id`) làm địa chỉ email trực tiếp. `responsible` đọc một field Many2one tới `res.users` hoặc `res.partner` trên model của định nghĩa rồi lấy `.email` của record đó. Lưu mốc PHẢI từ chối cấu hình thiếu trường bắt buộc theo loại đã chọn, hoặc field sai model/sai kiểu. Không resolve được người nhận lúc chạy (ví dụ field rỗng) PHẢI ghi `escalate_failed`, không raise lỗi ra ngoài tiến trình nền.
+- **Statement:** Mốc kiểu `email` PHẢI có `email_recipient_type` ∈ {`fixed`, `field`, `responsible`}. `fixed` dùng địa chỉ cố định (`email_fixed_address`). `field` đọc một field Char trên model của định nghĩa (`email_field_id`) làm địa chỉ email trực tiếp. `responsible` đọc một field Many2one, One2many hoặc Many2many tới `res.users` hoặc `res.partner` trên model của định nghĩa rồi lấy `.email` của (các) record đó; nhiều người nhận vẫn gửi trong một email. Lưu mốc PHẢI từ chối cấu hình thiếu trường bắt buộc theo loại đã chọn, hoặc field sai model/sai kiểu. Không resolve được người nhận lúc chạy (ví dụ field rỗng) PHẢI ghi `escalate_failed`, không raise lỗi ra ngoài tiến trình nền.
 - **Rationale:** 3 cách phủ hầu hết nhu cầu thực tế mà không cần viết code: địa chỉ team cố định, field email có sẵn trên record, hoặc người phụ trách động theo từng record.
 - **Acceptance Criteria:**
   - AC1: Given `email_recipient_type=fixed`, `email_fixed_address` rỗng; When lưu; Then bị từ chối.
   - AC2: Given `email_recipient_type=responsible`, `email_field_id` trỏ field không phải Many2one tới res.users/res.partner; When lưu; Then bị từ chối.
   - AC3 (negative): Given `email_recipient_type=field`, field rỗng trên record cụ thể; When xử lý nền chạy; Then ghi `escalate_failed`, không raise ra ngoài.
+  - AC4: Given `email_recipient_type=field` trỏ `email` và record có email; When mốc tới hạn; Then 1 email tới đúng địa chỉ đó.
+  - AC5: Given `email_recipient_type=responsible` trỏ Many2one `user_id` đã gán; When mốc tới hạn; Then 1 email tới email của user đó.
+  - AC6: Given `responsible` trỏ field x2many có hai liên hệ; When mốc tới hạn; Then đúng 1 email có hai người nhận.
 - **Verification Method:** Test
 
 #### 3.2.6 Nhật ký, lỗi và vận hành
@@ -1084,6 +1168,9 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
   - AC1: Given tạo định nghĩa không truyền `active`; Then `active = False` và record mới của model không có task.
   - AC2: Given bấm Enable; When record mới thỏa start; Then có task. Given bấm Disable; Then record mới không có task, task cũ vẫn chạy.
   - AC3 (negative): Given Enable với start `[]`; Then vẫn bật được và có cảnh báo.
+  - AC4: Given định nghĩa vừa bị tắt nhưng còn task `in_progress` hoặc `paused`; Then model gốc vẫn được patch hook và record đổi vẫn được đánh giá (task kết thúc khi stop khớp); khi hết task đang hoạt động thì gỡ patch.
+  - AC5: Given định nghĩa tắt và không còn task đang hoạt động; When đánh giá một record; Then engine không so khớp điều kiện của định nghĩa đó và không gắn task.
+  - AC6: Given list định nghĩa; Then định nghĩa tắt hiện mờ, nút Enable/Disable có hộp xác nhận, cột mặc định là tên, model, loại, thời lượng, nguồn lịch, timezone; action không nhóm sẵn theo model và hiện cả bản ghi tắt.
 - **Verification Method:** Test
 
 #### REQ-FUNC-067: Timezone của SLA bắt buộc và luôn thắng
@@ -1095,8 +1182,12 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Rationale:** Một nguồn sự thật cho timezone; tránh phụ thuộc timezone của lịch dùng chung.
 - **Acceptance Criteria:**
   - AC1 (negative): Given không có timezone; When lưu qua giao diện; Then bị từ chối.
-  - AC2: Given lịch tz A và SLA tz B; When tính `planned_end`; Then tính theo B. Đổi tz của SLA không đổi `planned_end` của task đang chạy.
+  - AC2: Given lịch tz A và SLA tz B; When tính `planned_end_time`; Then tính theo B. Đổi tz của SLA không đổi `planned_end_time` của task đang chạy.
   - AC3: Given nâng cấp DB có định nghĩa cũ; Then mọi định nghĩa có timezone (tz của lịch, nếu không thì `UTC`).
+  - AC4: Given nhiều định nghĩa dùng cùng lịch gốc và cùng timezone khác timezone của lịch; Then chỉ có một bản sao lịch được tạo (tìm hoặc tạo, tham chiếu qua `sla_tz_override_source_id`), lịch gốc không bị đổi `tz`, bản sao có cùng số dòng giờ làm với lịch gốc.
+  - AC5: Given timezone của SLA trùng timezone của lịch (mặc định khi nguồn là `definition`); Then không tạo bản sao.
+  - AC6: Given tạo định nghĩa không truyền timezone; Then điền timezone của lịch cố định (nguồn `definition`), nếu không thì timezone người dùng hoặc `UTC`; giá trị truyền tường minh được giữ. Trên form, chọn nguồn `definition` và lịch thì timezone theo lịch (bản ghi mới luôn theo lịch; bản ghi đã lưu chỉ điền khi trống); nguồn khác `definition` thì không lấy từ lịch.
+  - AC7: Given lịch gốc có ngày nghỉ chung; When tạo bản sao theo timezone; Then bản sao có cùng ngày nghỉ chung (tên và ngày giờ).
 - **Verification Method:** Test
 
 #### REQ-FUNC-068: Áp dụng thủ công cho record có sẵn
@@ -1109,7 +1200,14 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Acceptance Criteria:**
   - AC1: Given 10 record khớp start trước khi bật; When chạy; Then đủ 10 task; chạy lại không tạo trùng.
   - AC2: Given tổng vượt `batch_size`; Then phần còn lại do cron xử lý, tiến độ cập nhật mỗi lô, chạy lại sau khi ngắt không xử lý trùng.
-  - AC3 (negative): Given job đang `running`; When tạo lần chạy mới; Then bị từ chối.
+  - AC3 (negative): Given job đang `running` hoặc `queued`; When tạo lần chạy mới; Then bị từ chối.
+  - AC4: Given ô domain lọc thu hẹp còn 3 record; Then chỉ 3 record được xử lý. Given ô lọc chứa cả record không khớp start; Then record đó không được gắn (lọc không mở rộng điều kiện start).
+  - AC5 (negative): Given điều kiện start chưa cấu hình (`[]`); Then job xong với 0 record. Given định nghĩa đang tắt; When áp dụng; Then bị từ chối.
+  - AC6: Given job đang chạy; When SLA Manager bấm Cancel; Then job `cancelled` có thời điểm kết thúc, cron không xử lý tiếp, và có thể tạo job mới.
+  - AC7 (negative): Given lô gặp lỗi toàn lô (ví dụ domain lọc sai field); Then job `failed` và có ghi chú.
+  - AC8: Given job đã kết thúc quá `event_retention_days`; When dọn tự động; Then bị xóa; job `queued`, `running` và job mới giữ nguyên.
+  - AC9: Given định nghĩa `retroactive` và record có mốc cách đây 250% mục tiêu cùng mốc escalation 50%, 100%, 300%; When áp dụng; Then task vi phạm, mốc 50% và 100% đã đánh dấu xong, mốc 300% chưa, và xử lý nền không bắn hồi tố mốc đã vượt.
+  - AC10 (negative): Given `group_sla_user`; Then không tạo được wizard và không đọc được job; SLA Manager đọc được job nhưng không ghi trực tiếp được.
 - **Verification Method:** Test
 
 #### REQ-FUNC-069: Bảo vệ khi sửa định nghĩa
@@ -1122,14 +1220,56 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Acceptance Criteria:**
   - AC1 (negative): Given định nghĩa có task; When đổi `model_id`; Then bị từ chối.
   - AC2: Given 1 task đang chạy; When sửa điều kiện cancel rồi lưu trên form; Then hiện hộp xác nhận nêu số task; Hủy thì giữ nguyên bản sửa chưa lưu.
+  - AC3: Given sửa thời lượng hoặc một điều kiện; Then chatter ghi vết (tracking) trường đã đổi; form định nghĩa có chatter.
 - **Verification Method:** Test (tour trình duyệt cho phần xác nhận)
+
+#### REQ-FUNC-070: Field phân loại của định nghĩa (type, vendor, service commitment, target)
+
+- **Status:** active
+- **Priority:** Low
+- **Owner:** @hieudt
+- **Statement:** Định nghĩa PHẢI có bốn field chỉ để phân loại và báo cáo, KHÔNG ảnh hưởng hành vi engine: `type` ∈ {`sla`, `ola`} (mặc định `sla`, ràng buộc CHECK ở CSDL, không bắt buộc ở tầng CSDL để các INSERT SQL thô không vỡ), `vendor_id` (Many2one `res.partner`, mặc định rỗng), `service_commitment` (Boolean, mặc định `False`) và `target` ∈ {`response`, `resolution`} (mặc định rỗng).
+- **Rationale:** Cho phép lọc và nhóm báo cáo theo loại cam kết (SLA nội bộ hay OLA, theo nhà cung cấp) mà không thêm đường xử lý.
+- **Acceptance Criteria:**
+  - AC1: Given tạo định nghĩa không truyền `type`; Then `type` = `sla`. Given `type='ola'`; Then lưu và đọc lại `ola`.
+  - AC2: Given chọn một partner làm `vendor_id`; Then lưu đúng; không chọn thì rỗng.
+  - AC3: Given không truyền `service_commitment`; Then `False`; truyền `True` thì lưu `True`.
+  - AC4: Given không chọn `target`; Then rỗng; chọn `response` hoặc `resolution` thì lưu đúng.
+  - AC5 (negative: không đổi hành vi): Given định nghĩa `type='ola'`, `service_commitment=True`, `target='response'`; When record thỏa start; Then task được gắn và ở `in_progress` như định nghĩa thường.
+- **Verification Method:** Test
+
+#### REQ-FUNC-071: Retroactive pause
+
+- **Status:** active
+- **Priority:** Medium
+- **Owner:** @hieudt
+- **Statement:** Khi bật `retroactive` (REQ-FUNC-017) và mốc start nằm trong quá khứ, định nghĩa có `retroactive_pause` (Boolean, mặc định bật) PHẢI trừ khỏi thời gian đã trôi các đoạn trong khoảng quá khứ đó mà điều kiện pause đã đúng, dựng lại từ lịch sử `mail.tracking.value` của các field trong `pause_domain`, và dời `planned_end_time` tương ứng; thời gian trừ ghi vào `business_pause_duration` và `pause_duration`. Tính năng chỉ có hiệu lực khi model có `mail.thread` và mọi field trong `pause_domain` có `tracking=True`; nếu không thì hành vi như khi tắt (đếm toàn bộ khoảng quá khứ là đang chạy). Form PHẢI hiện cảnh báo (`retroactive_pause_warning`) khi tính năng bật nhưng không thể có hiệu lực (nêu tên model hoặc field), nhưng KHÔNG ĐƯỢC chặn lưu.
+- **Rationale:** Record bị giữ (pause) trước khi định nghĩa gắn task không nên bị tính thời gian đó vào SLA.
+- **Acceptance Criteria:**
+  - AC1: Given model không có `mail.thread`; When bật `retroactive_pause`; Then lưu được và cảnh báo chứa "not change-tracked" cùng tên model. Given field `ref` trong `pause_domain` không tracking; Then cảnh báo nêu `ref`. Given mọi field pause đều tracking, hoặc tính năng tắt; Then không cảnh báo. Đổi `pause_domain` thì cảnh báo tính lại.
+  - AC2: Given mốc retroactive 08:00, field pause tracking đổi sang đúng lúc 09:00 và còn đúng lúc attach 11:00; Then `business_duration` = `duration` = 1 giờ, `business_pause_duration` = `pause_duration` = 2 giờ, `planned_end_time` = 08:00 + 6 giờ (4 giờ mục tiêu + 2 giờ pause), `original_breach_time` = `planned_end_time`, chưa vi phạm.
+  - AC3 (negative): Given cùng lịch sử nhưng `retroactive_pause` tắt, hoặc không có thay đổi tracking nào trong khoảng; Then không trừ gì và `planned_end_time` = mốc + 4 giờ.
+  - AC4 (negative): Given `pause_domain` dùng field không tracking và tính năng bật; Then không trừ gì (như khi tắt).
+- **Verification Method:** Test
+
+#### REQ-FUNC-072: Hạn chót ban đầu và thời lượng giờ đồng hồ
+
+- **Status:** active
+- **Priority:** Medium
+- **Owner:** @hieudt
+- **Statement:** Task PHẢI có `original_breach_time` (hạn chót hứa lúc attach, đặt đúng một lần khi attach, không đổi khi resume hay khi Apply Current Settings) bên cạnh `planned_end_time` (có thể dời). Task PHẢI có `duration` và `pause_duration` là thời gian chạy và thời gian tạm dừng theo giờ đồng hồ (không theo lịch), song song với `business_duration` và `business_pause_duration` theo giờ làm việc; khi không có lịch (24x7) hai bản bằng nhau.
+- **Rationale:** Báo cáo cần cả hạn đã cam kết ban đầu lẫn thời gian thực tế theo đồng hồ, tách khỏi giờ làm việc.
+- **Acceptance Criteria:**
+  - AC1: Given task attach lúc T0, mục tiêu 4 giờ, lịch 24x7; When pause lúc T0+1h rồi resume lúc T0+3h; Then `original_breach_time` = T0 + 4h không đổi, `planned_end_time` = T0 + 6h. Given Apply Current Settings; Then `original_breach_time` không đổi.
+  - AC2: Given lịch 24x7, pause 3 giờ, tổng 9 giờ; Then `business_duration` = `duration` = 6 và `business_pause_duration` = `pause_duration` = 3. Given lịch T2–T6 08:00–17:00 và pause từ thứ Sáu 17:00 tới thứ Hai 08:00; Then `business_pause_duration` = 0 và `pause_duration` = 63.
+- **Verification Method:** Test
 
 #### REQ-FUNC-029: Nhật ký sự kiện
 
 - **Status:** active
 - **Priority:** High
 - **Owner:** @hieudt
-- **Statement:** Hệ thống PHẢI ghi một event cho mỗi thay đổi trạng thái của task và mỗi hành động escalation, gồm thời điểm, task và loại sự kiện thuộc: `attach`, `pause`, `resume`, `complete`, `reset`, `cancel`, `breach`, `escalate`, `escalate_failed`, `error`. Ghi chú PHẢI có với event `attach` khi dùng lịch dự phòng hoặc mốc thay thế (REQ-FUNC-017, REQ-FUNC-020), event `reset` (field đã đổi), và event `escalate_failed`, `error` (thông báo lỗi).
+- **Statement:** Hệ thống PHẢI ghi một event cho mỗi thay đổi trạng thái của task và mỗi hành động escalation, gồm thời điểm, task và loại sự kiện thuộc: `attach`, `pause`, `resume`, `complete`, `reset`, `cancel`, `breach`, `escalate`, `escalate_failed`, `error`, `recalculate` (nút Apply Current Settings, REQ-INT-005), `reevaluate` (nút Re-check Conditions, REQ-INT-020). Ghi chú PHẢI có với event `attach` khi dùng lịch dự phòng hoặc mốc thay thế (REQ-FUNC-017, REQ-FUNC-020), event `reset` (field đã đổi), và event `escalate_failed`, `error` (thông báo lỗi).
 - **Rationale:** Giải thích vì sao SLA ra kết quả như vậy và phát hiện bất thường.
 - **Acceptance Criteria:**
   - AC1: Given vòng đời attach, pause, resume, stop; Then có đúng 4 event `attach`, `pause`, `resume`, `complete` theo thứ tự thời gian.
@@ -1191,6 +1331,7 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
   - AC1: Given start `[('partner_id.country_id','=',VN)]` và country của partner vừa đổi sang VN; When đánh giá lại; Then task được gắn.
   - AC2 (negative): Given đánh giá lại hai lần liên tiếp; Then lần hai không thay đổi gì (REQ-FUNC-015).
   - AC3 (negative): Given người dùng thuộc `group_sla_user`; Then không thực hiện được.
+  - AC4: Given `Engine.evaluate(records, definitions=A)`; Then chỉ định nghĩa A được xét (kể cả khi A đã tắt), định nghĩa khác của cùng record không bị gắn; không truyền `definitions` thì xét mọi định nghĩa như trước.
 - **Verification Method:** Test
 
 #### REQ-FUNC-033: Không gắn SLA mới sau khi archive
@@ -1214,7 +1355,7 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Rationale:** SLA là cam kết với khách; hủy giữa chừng làm số liệu thiếu.
 - **Acceptance Criteria:**
   - AC1: Given 30 task `in_progress` của D; When archive D rồi stop khớp trên một record; Then task của record đó kết thúc đúng.
-  - AC2: Given D archive, task quá `planned_end`; When xử lý nền chạy; Then có event `breach` và escalation vẫn bắn.
+  - AC2: Given D archive, task quá `planned_end_time`; When xử lý nền chạy; Then có event `breach` và escalation vẫn bắn.
   - AC3 (negative): Given D đã archive; When record mới thỏa start; Then không có task (REQ-FUNC-033).
   - AC4: Given task `in_progress` của D đã archive; When cancel khớp (chế độ `condition`); Then task `cancelled`.
   - AC5: Given task `in_progress` của D đã archive; When pause khớp rồi resume khớp; Then `paused` rồi `in_progress`.
@@ -1263,12 +1404,12 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Status:** active
 - **Priority:** Medium
 - **Owner:** @hieudt
-- **Statement:** Hệ thống PHẢI cung cấp tỷ lệ đạt theo định nghĩa và theo kỳ của `end_dt` (trên báo cáo pivot và graph của task), bằng số task `achieved` chia tổng số task `achieved` và `breached`. Task `cancelled` KHÔNG ĐƯỢC tính vào tỷ lệ.
+- **Statement:** Hệ thống PHẢI cung cấp tỷ lệ đạt theo định nghĩa và theo kỳ của `end_time` (trên báo cáo pivot và graph của task), bằng số task `achieved` chia tổng số task `achieved` và `breached`. Task `cancelled` KHÔNG ĐƯỢC tính vào tỷ lệ.
 - **Rationale:** Số đo cơ bản (SLI) làm cơ sở cho dashboard SLO ở giai đoạn sau.
 - **Acceptance Criteria:**
   - AC1: Given 8 `achieved`, 2 `breached`, 5 `cancelled` trong cùng định nghĩa và kỳ; Then tỷ lệ đạt = 80%.
   - AC2 (negative): Given kỳ không có task kết thúc; Then tỷ lệ hiển thị "không xác định" (không chia cho 0).
-  - AC3: Given task kết thúc cuối tháng 9 và task kết thúc đầu tháng 10; Then mỗi task thuộc kỳ của `end_dt`.
+  - AC3: Given task kết thúc cuối tháng 9 và task kết thúc đầu tháng 10; Then mỗi task thuộc kỳ của `end_time`.
 - **Verification Method:** Test
 
 #### REQ-FUNC-062: Số SLA đang vi phạm
@@ -1622,75 +1763,82 @@ N/A — module không có thành phần AI/ML.
 
 Status `Implemented` nghĩa là đã có code và test tự động theo `060` (các ca còn kiểm thủ công hoặc Inspection được liệt kê ở `docs/TASKS.md` T13). Cột Test/Artifact Link trỏ tới nhóm test (TG-xx), đặc tả trong `050_Test-Design-Specification.md` và các ca trong `060_Test-Case-Specification.md`.
 
-**Nhóm test:** TG-01 Gắn và kết thúc · TG-02 Pause và resume · TG-03 Stop quanh hạn · TG-04 Cancel và reset · TG-05 Ba cấu hình dễ sai · TG-06 Giờ làm việc · TG-07 Retroactive · TG-08 Escalation · TG-09 Nhiều SLA · TG-10 Tính generic · TG-11 Đổi cấu hình khi đang chạy · TG-12 Lỗi và đồng thời · TG-13 Field compute có lưu · TG-14 Hạ tầng · TG-15 Nguồn lịch · TG-16 Phân quyền và đa công ty · TG-17 Giao diện và báo cáo · TG-18 Hiệu năng · TG-19 Điểm mở rộng · TG-25 Điều kiện `[]` và timezone · TG-26 UX định nghĩa/list/form task · TG-27 Re-check Conditions · TG-28 Apply Current Settings · TG-29 Áp dụng cho record có sẵn · TG-30 Chip trạng thái SLA · TG-31 Tab Note và chuỗi lỗi thời.
+**Nhóm test:** TG-01 Gắn và kết thúc · TG-02 Pause và resume · TG-03 Stop quanh hạn · TG-04 Cancel và reset · TG-05 Ba cấu hình dễ sai · TG-06 Giờ làm việc · TG-07 Retroactive · TG-08 Escalation · TG-09 Nhiều SLA · TG-10 Tính generic · TG-11 Đổi cấu hình khi đang chạy · TG-12 Lỗi và đồng thời · TG-13 Field compute có lưu · TG-14 Hạ tầng · TG-15 Nguồn lịch · TG-16 Phân quyền và đa công ty · TG-17 Giao diện và báo cáo · TG-18 Hiệu năng · TG-19 Điểm mở rộng · TG-20 Đồng thời (hai cursor; ca thuộc TG-08, TG-09, TG-12) · TG-21 Field phân loại · TG-22 Retroactive pause · TG-23 Timezone override · TG-24 Hạn chót ban đầu và thời lượng đồng hồ · TG-25 Bật/tắt, điều kiện `[]` và timezone · TG-26 UX định nghĩa/list/form task · TG-27 Re-check Conditions · TG-28 Apply Current Settings · TG-29 Áp dụng cho record có sẵn · TG-30 Chip trạng thái SLA · TG-31 Tab Note và chuỗi lỗi thời · TG-32 Duration (live).
+
+Truy vết đầy đủ REQ-ID ↔ test condition (`050`) ↔ test case (`060`) ↔ hàm test (`060` Phụ lục C). Cột Test/Artifact Link được sinh từ các test case còn hiệu lực của `060` (không tính test case Đã gỡ D12). Status `Implemented` kèm ghi chú ở cột Evidence nghĩa là phần kiểm chứng còn lại nằm ngoài `tests/` (CI, kiểm tay); `Draft` là yêu cầu chưa triển khai đủ.
 
 | Requirement ID | Verification Method | Test/Artifact Link | Status | Evidence |
 |----------------|--------------------|--------------------|--------|----------|
-| REQ-INT-001 | Test + Demonstration | TG-17 | Implemented | |
+| REQ-INT-001 | Test + Demonstration | TG-17, TG-25 | Implemented |  |
 | REQ-INT-002 | Inspection + Demonstration | TG-17 | Implemented | |
 | REQ-INT-003 | Test + Demonstration | TG-17 | Implemented | |
 | REQ-INT-004 | Test + Demonstration | TG-17 | Implemented | |
-| REQ-INT-005 | Test | TG-11, TG-17 | Implemented | |
-| REQ-INT-006 | Test + Demonstration | TG-17, TG-11 | Implemented | |
+| REQ-INT-005 | Test | TG-11, TG-28, TG-31 | Implemented |  |
+| REQ-INT-006 | Test + Demonstration | TG-17 | Implemented |  |
 | REQ-INT-011 | Test | TG-17 | Implemented | |
-| REQ-INT-012 | Test | TG-17 | Implemented | |
+| REQ-INT-012 | Test | TG-17, TG-26, TG-30 | Implemented |  |
 | REQ-INT-013 | Test + Demonstration | TG-17 | Implemented | |
-| REQ-INT-014 | Test | TG-17 | Implemented | |
-| REQ-INT-020 | Test | TG-17, TG-13 | Implemented | |
-| REQ-INT-021 | Test | TG-17, TG-12 | Implemented | |
-| REQ-INT-022 | Test + Demonstration | TG-12, TG-17 | Implemented | |
-| REQ-INT-023 | Test | TG-03, TG-17 | Implemented | |
-| REQ-INT-024 | Test | TG-30 | Implemented | |
-| REQ-INT-007 | Test | TG-19, TG-15 | Implemented | |
+| REQ-INT-014 | Test | TG-17 | Implemented | Chưa có hàm test tự động: TC-UIX-029, TC-UIX-031 (ngoài `tests/`, 060 Phụ lục D); TC-UIX-030 manual |
+| REQ-INT-020 | Test | TG-17, TG-27, TG-31 | Implemented |  |
+| REQ-INT-021 | Test | TG-17 | Implemented |  |
+| REQ-INT-022 | Test + Demonstration | TG-12 | Implemented |  |
+| REQ-INT-023 | Test | TG-03, TG-18 | Implemented |  |
+| REQ-INT-024 | Test | TG-26, TG-30, TG-31 | Implemented |  |
+| REQ-INT-025 | Test | TG-26 | Implemented | |
+| REQ-INT-026 | Test | TG-26 | Implemented | |
+| REQ-INT-027 | Test | TG-26 | Implemented | |
+| REQ-INT-028 | Test | TG-32 | Implemented | |
+| REQ-INT-029 | Test + Inspection | TG-31 | Implemented | |
+| REQ-INT-007 | Test | TG-19 | Implemented |  |
 | REQ-INT-008 | Test | TG-08 | Implemented | |
 | REQ-INT-009 | Test | TG-15 | Implemented | |
-| REQ-INT-010 | Test | TG-14 | Implemented | |
+| REQ-INT-010 | Test | TG-14, TG-29 | Implemented |  |
 | REQ-INT-015 | Test | TG-19 | Implemented | |
 | REQ-INT-016 | Test | TG-19 | Implemented | |
 | REQ-INT-017 | Test | TG-19 | Implemented | |
 | REQ-INT-018 | Test | TG-19 | Implemented | |
-| REQ-INT-019 | Test | TG-08, TG-16 | Implemented | |
-| REQ-FUNC-001 | Test | TG-10 | Implemented | |
+| REQ-INT-019 | Test | TG-08 | Implemented |  |
+| REQ-FUNC-001 | Test | TG-10, TG-14, TG-25 | Implemented |  |
 | REQ-FUNC-002 | Test | TG-14 | Implemented | |
-| REQ-FUNC-003 | Test | TG-01, TG-14 | Implemented | |
+| REQ-FUNC-003 | Test | TG-01, TG-25, TG-29, TG-31 | Implemented |  |
 | REQ-FUNC-038 | Test | TG-08 | Implemented | |
 | REQ-FUNC-039 | Test | TG-15 | Implemented | |
-| REQ-FUNC-041 | Test | TG-07, TG-14 | Implemented | |
-| REQ-FUNC-004 | Test | TG-01, TG-14 | Implemented | |
-| REQ-FUNC-005 | Test | TG-13 | Implemented | |
-| REQ-FUNC-042 | Test + Inspection | TG-13, TG-17 | Implemented | |
+| REQ-FUNC-041 | Test | TG-07 | Implemented |  |
+| REQ-FUNC-004 | Test | TG-01, TG-18 | Implemented |  |
+| REQ-FUNC-005 | Test | TG-13, TG-18 | Implemented |  |
+| REQ-FUNC-042 | Test + Inspection | TG-13 | Implemented |  |
 | REQ-FUNC-006 | Test | TG-01 | Implemented | |
-| REQ-FUNC-007 | Test | TG-01, TG-04 | Implemented | |
+| REQ-FUNC-007 | Test | TG-01, TG-04, TG-09 | Implemented |  |
 | REQ-FUNC-008 | Test | TG-04, TG-05 | Implemented | |
-| REQ-FUNC-009 | Test | TG-01, TG-03 | Implemented | |
+| REQ-FUNC-009 | Test | TG-01, TG-03, TG-04 | Implemented |  |
 | REQ-FUNC-010 | Test | TG-04 | Implemented | |
 | REQ-FUNC-011 | Test | TG-02 | Implemented | |
 | REQ-FUNC-037 | Test | TG-02 | Implemented | |
 | REQ-FUNC-048 | Test | TG-02 | Implemented | |
 | REQ-FUNC-012 | Test | TG-04 | Implemented | |
-| REQ-FUNC-013 | Test | TG-04, TG-13 | Implemented | |
+| REQ-FUNC-013 | Test | TG-04, TG-25 | Implemented |  |
 | REQ-FUNC-050 | Test | TG-04 | Implemented | |
-| REQ-FUNC-051 | Test | TG-04 | Implemented | |
-| REQ-FUNC-014 | Test | TG-09, TG-12 | Implemented | |
+| REQ-FUNC-051 | Test | TG-04, TG-25 | Implemented |  |
+| REQ-FUNC-014 | Test | TG-09 | Implemented |  |
 | REQ-FUNC-015 | Test | TG-01 | Implemented | |
 | REQ-FUNC-016 | Test | TG-05 | Implemented | |
 | REQ-FUNC-017 | Test | TG-07 | Implemented | |
-| REQ-FUNC-018 | Test | TG-06 | Implemented | |
-| REQ-FUNC-043 | Test | TG-06, TG-02 | Implemented | |
-| REQ-FUNC-044 | Test | TG-02, TG-03 | Implemented | |
+| REQ-FUNC-018 | Test | TG-06, TG-07 | Implemented |  |
+| REQ-FUNC-043 | Test | TG-06 | Implemented |  |
+| REQ-FUNC-044 | Test | TG-02 | Implemented |  |
 | REQ-FUNC-019 | Test | TG-15 | Implemented | |
 | REQ-FUNC-020 | Test | TG-15 | Implemented | |
-| REQ-FUNC-021 | Test | TG-11 | Implemented | |
-| REQ-FUNC-052 | Test | TG-15, TG-11 | Implemented | |
-| REQ-FUNC-053 | Test | TG-11, TG-08 | Implemented | |
+| REQ-FUNC-021 | Test | TG-11, TG-25 | Implemented |  |
+| REQ-FUNC-052 | Test | TG-11 | Implemented |  |
+| REQ-FUNC-053 | Test | TG-08, TG-11, TG-29 | Implemented |  |
 | REQ-FUNC-022 | Test | TG-03, TG-08 | Implemented | |
 | REQ-FUNC-046 | Test | TG-03 | Implemented | |
 | REQ-FUNC-023 | Test | TG-08 | Implemented | |
 | REQ-FUNC-024 | Test | TG-08 | Implemented | |
 | REQ-FUNC-025 | Test | TG-08 | Implemented | |
 | REQ-FUNC-054 | Test | TG-08 | Implemented | |
-| REQ-FUNC-055 | Test | TG-08, TG-02 | Implemented | |
-| REQ-FUNC-026 | Test | TG-08 | Implemented | |
+| REQ-FUNC-055 | Test | TG-08 | Implemented |  |
+| REQ-FUNC-026 | Test | TG-08, TG-12 | Implemented |  |
 | REQ-FUNC-027 | N/A | N/A | Removed (D12) | |
 | REQ-FUNC-056 | N/A | N/A | Removed (D12) | |
 | REQ-FUNC-057 | N/A | N/A | Removed (D12) | |
@@ -1699,40 +1847,43 @@ Status `Implemented` nghĩa là đã có code và test tự động theo `060` (
 | REQ-FUNC-028 | N/A | N/A | Removed (D12) | |
 | REQ-FUNC-064 | Test | TG-08 | Implemented | |
 | REQ-FUNC-065 | Test | TG-08 | Implemented | |
-| REQ-FUNC-066 | Test | TG-26, TG-27 | Implemented | |
-| REQ-FUNC-067 | Test | TG-23, TG-25 | Implemented | |
+| REQ-FUNC-066 | Test | TG-25, TG-26 | Implemented |  |
+| REQ-FUNC-067 | Test | TG-23, TG-25, TG-31 | Implemented |  |
 | REQ-FUNC-068 | Test | TG-29 | Implemented | |
 | REQ-FUNC-069 | Test | TG-26 | Implemented | |
-| REQ-FUNC-029 | Test | TG-01, TG-02, TG-04, TG-08 | Implemented | |
-| REQ-FUNC-030 | Test | TG-12 | Implemented | |
+| REQ-FUNC-070 | Test | TG-21 | Implemented | |
+| REQ-FUNC-071 | Test | TG-22 | Implemented | |
+| REQ-FUNC-072 | Test | TG-24 | Implemented | |
+| REQ-FUNC-029 | Test | TG-01, TG-02, TG-03 | Implemented |  |
+| REQ-FUNC-030 | Test | TG-09, TG-12 | Implemented |  |
 | REQ-FUNC-040 | Test | TG-12 | Implemented | |
-| REQ-FUNC-031 | Test | TG-12, TG-17 | Implemented | |
-| REQ-FUNC-032 | Test | TG-13, TG-01 | Implemented | |
+| REQ-FUNC-031 | Test | TG-12 | Implemented |  |
+| REQ-FUNC-032 | Test | TG-13, TG-27 | Implemented |  |
 | REQ-FUNC-033 | Test | TG-11 | Implemented | |
-| REQ-FUNC-060 | Test | TG-11 | Implemented | |
-| REQ-FUNC-061 | Test | TG-11, TG-14 | Implemented | |
+| REQ-FUNC-060 | Test | TG-11, TG-25 | Implemented |  |
+| REQ-FUNC-061 | Test | TG-11 | Implemented |  |
 | REQ-FUNC-034 | Test | TG-14 | Implemented | |
 | REQ-FUNC-035 | Test | TG-14 | Implemented | |
 | REQ-FUNC-036 | Test | TG-17 | Implemented | |
 | REQ-FUNC-062 | Test | TG-17 | Implemented | |
-| REQ-PERF-001 | Test | TG-18 | Implemented | |
-| REQ-PERF-002 | Test | TG-18 | Implemented | |
-| REQ-PERF-003 | Test | TG-18 | Implemented | |
-| REQ-SEC-001 | Test | TG-16 | Implemented | |
-| REQ-SEC-002 | Test | TG-16 | Implemented | |
+| REQ-PERF-001 | Test | TG-18, TG-25 | Implemented |  |
+| REQ-PERF-002 | Test | TG-03, TG-18 | Implemented |  |
+| REQ-PERF-003 | Test | TG-14, TG-18 | Implemented |  |
+| REQ-SEC-001 | Test | TG-16, TG-29 | Implemented |  |
+| REQ-SEC-002 | Test | TG-16, TG-30 | Implemented |  |
 | REQ-SEC-003 | Test | TG-16 | Implemented | |
-| REQ-SEC-004 | Test + Inspection | TG-16, TG-08 | Implemented | |
-| REQ-SEC-005 | Test | TG-16, TG-15 | Implemented | |
+| REQ-SEC-004 | Test + Inspection | TG-16 | Implemented |  |
+| REQ-SEC-005 | Test | TG-16 | Implemented |  |
 | REQ-SEC-006 | Test | TG-16 | Implemented | |
 | REQ-REL-001 | Test | TG-12 | Implemented | |
-| REQ-REL-002 | Test | TG-08, TG-12 | Implemented | |
+| REQ-REL-002 | Test | TG-08, TG-12, TG-18, TG-29 | Implemented |  |
 | REQ-OBS-001 | Test | TG-12 | Implemented | |
 | REQ-OBS-002 | Test | TG-12 | Implemented | |
 | REQ-OBS-003 | Test + Inspection | TG-12 | Implemented | |
-| REQ-INST-001 | Test | TG-14 | Implemented | |
-| REQ-INST-002 | Inspection | TG-14 | Implemented | |
+| REQ-INST-001 | Test | TG-14 | Implemented | Cài, nâng cấp, gỡ (TC-INF-023 đến 026, 035) chạy ngoài `tests/`; nâng cấp 19.0.1.0.0 sang 1.1.0 kiểm tay (030 mục 8b) |
+| REQ-INST-002 | Inspection | INS | Implemented |  |
 | REQ-INST-003 | Test | TG-14 | Implemented | |
-| REQ-INST-004 | Test | TG-14 | Implemented | |
+| REQ-INST-004 | Test | TG-14 | Draft | Module demo `dwo_sla_demo_ticket` chưa tạo; TC-INF-030 đến 032 ngoài `tests/` (060 Phụ lục D) |
 | REQ-BUILD-001 | Test (CI lint) | CI pipeline | Implemented | |
 | REQ-MAINT-001 | Inspection | Code review checklist | Implemented | |
 | REQ-MAINT-002 | Test (CI) | CI pipeline | Implemented | |

@@ -1,20 +1,21 @@
 # Test Case Specification
 
 **Document ID:** TCS-SLACORE-001
-**Version:** 0.2 | **Date:** 2026-10-12 | **Status:** Draft
-**Project:** `dwo_sla_core` phiên bản 1 | **Test Level:** Integration và System
+**Version:** 0.3 | **Date:** 2026-11-12 | **Status:** Draft
+**Project:** `dwo_sla_core` 19.0.1.1.0 | **Test Level:** Integration và System (theo ISO/IEC/IEEE 29119-3:2021, mục Test Case Specification)
 **Prepared by:** hieudt | **Reviewed by:** chưa có
 **Related Test Plan:** TP-SLACORE-001 (`040_Test-Plan.md`)
 **Related TDS:** TDS-SLACORE-001 (`050_Test-Design-Specification.md`)
 
-> **Ghi chú 2026-11-12 (19.0.1.1.0):** các nhóm **tg25 đến tg32** (bật/tắt, `[]` là chưa cấu hình, timezone bắt buộc, giao diện định nghĩa, Re-check, Apply Current Settings, Apply to Existing Records, chip trạng thái, Note và ja_JP, Duration live) chưa được viết thành test case chi tiết ở tài liệu này: xem docstring của từng test trong `tests/test_tg25_*.py` đến `tests/test_tg32_*.py` (435 test tự động trong tổng số). Mục tiêu và nhóm: `040_Test-Plan.md`, FT-20 đến FT-27.
+> **Ghi chú 2026-11-12 (19.0.1.1.0):** bản 0.3 mô tả đủ 435 hàm test trong `tests/`, gồm các nhóm TG-21 đến TG-32 (field phân loại, retroactive pause, timezone override, thời lượng đồng hồ, bật/tắt, `[]` là chưa cấu hình, timezone bắt buộc, giao diện định nghĩa, Re-check, Apply Current Settings, Apply to Existing Records, chip trạng thái, Note, Duration live). Các test case mới nằm ở cuối tài liệu (trước Phụ lục A); ánh xạ hàm test sang test case ở Phụ lục C; test case không có hàm test (đã gỡ, manual, ngoài `tests/`) ở Phụ lục D. Mỗi test case mới có các phần tử của ISO/IEC/IEEE 29119-3: ID duy nhất, mục tiêu (tiêu đề), truy vết (REQ-ID, test condition), mức ưu tiên, loại, precondition, bước kèm kết quả mong đợi (đầu vào nằm trong bước), tiêu chí Pass/Fail, và cách tự động hóa (hàm test).
 
 ## Revision History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-10-09 | hieudt | Khởi tạo: 429 test case cho 106 REQ-ID |
-| 0.2 | 2026-10-12 | hieudt | Sửa theo review độc lập (099, Phụ lục B và mục 3) và theo code đã hiện thực: đồng bộ tên hàm thật (`process_due()` không nhận `now`, `_process_task(task, now)`, `evaluate`, `action_reevaluate`, `action_reevaluate_batch`, `action_mark_resolved`, `action_recalculate`, điểm mở rộng của `sla.definition`, `sla.mixin`), định nghĩa `process_due`/`_process_task` một lần ở "Ký hiệu chung"; viết lại TC-ERR-005, 026, 027, 029, TC-ESC-053 đến 055, TC-PRF-006 đến 008, TC-CAN-016; loại phụ thuộc giữa 9 TC (F-M5); sửa TC-INF-010 (`sla.escalation.retry`); thay 17 kết quả "Thành công" bằng kết quả đo được; chuyển TC-CHG-014 sang TC-SEC-024; thêm TC-ESC-059 (REL-002 AC5), TC-CHG-028 (INT-005 AC4), TC-ATT-027 (patch hook tự phục hồi), TC-BRE-023 (CHECK chéo), TC-CAN-032 (flush khi reset), TC-INF-035 (gỡ module có model gắn SLA), TC-PRF-010 (patch động); cập nhật Phụ lục A với cột Trạng thái (ĐÃ CHỐT hoặc CÒN MỞ). Cập nhật tiếp cùng ngày theo các quyết định đã chốt và code đã sửa (TASKS T13): đổi mã mục Phụ lục A từ `A-xx` sang `TA-xx` để không trùng `A-xx` của SRS/TAD; TC-INS-001 chấp nhận `web` (D1); TA-03 (reset ghi `cancel`/`complete` rồi `reset`), TA-20 (AC2 FUNC-014 viết lại), TA-22 (`percent_used` không lưu, gồm đoạn đang chạy; thêm ví dụ chạy trực tiếp ở TC-BRE-015), TA-24/30/33/34 đã sửa code, TA-26 (AC5 FUNC-012 đang viết lại), TA-32 (sửa số TC Settings), O-01 đóng ở 5%; TA-08: thêm cờ `cancel_retry_on_stop` (TC-ESC-016, 030..032 ghi cờ mặc định True) và thêm TC-ESC-060 (cờ False); TC-PRF-010 đổi tham chiếu sang REQ-FUNC-004/005; TC-INF-013..016 dùng `event_dt`; thêm mục "Ghi chú đối chiếu" ở Phụ lục A. Tổng 437 test case. |
+| 0.2 | 2026-10-12 | hieudt | Sửa theo review độc lập (099, Phụ lục B và mục 3) và theo code đã hiện thực: đồng bộ tên hàm thật (`process_due()` không nhận `now`, `_process_task(task, now)`, `evaluate`, `action_reevaluate`, `action_reevaluate_batch`, `action_mark_resolved`, `action_recalculate`, điểm mở rộng của `sla.definition`, `sla.mixin`), định nghĩa `process_due`/`_process_task` một lần ở "Ký hiệu chung"; viết lại TC-ERR-005, 026, 027, 029, TC-ESC-053 đến 055, TC-PRF-006 đến 008, TC-CAN-016; loại phụ thuộc giữa 9 TC (F-M5); sửa TC-INF-010 (`sla.escalation.retry`); thay 17 kết quả "Thành công" bằng kết quả đo được; chuyển TC-CHG-014 sang TC-SEC-024; thêm TC-ESC-059 (REL-002 AC5), TC-CHG-028 (INT-005 AC4), TC-ATT-027 (patch hook tự phục hồi), TC-BRE-023 (CHECK chéo), TC-CAN-032 (flush khi reset), TC-INF-035 (gỡ module có model gắn SLA), TC-PRF-010 (patch động); cập nhật Phụ lục A với cột Trạng thái (ĐÃ CHỐT hoặc CÒN MỞ). Cập nhật tiếp cùng ngày theo các quyết định đã chốt và code đã sửa (TASKS T13): đổi mã mục Phụ lục A từ `A-xx` sang `TA-xx` để không trùng `A-xx` của SRS/TAD; TC-INS-001 chấp nhận `web` (D1); TA-03 (reset ghi `cancel`/`complete` rồi `reset`), TA-20 (AC2 FUNC-014 viết lại), TA-22 (`business_percent_used` không lưu, gồm đoạn đang chạy; thêm ví dụ chạy trực tiếp ở TC-BRE-015), TA-24/30/33/34 đã sửa code, TA-26 (AC5 FUNC-012 đang viết lại), TA-32 (sửa số TC Settings), O-01 đóng ở 5%; TA-08: thêm cờ `cancel_retry_on_stop` (TC-ESC-016, 030..032 ghi cờ mặc định True) và thêm TC-ESC-060 (cờ False); TC-PRF-010 đổi tham chiếu sang REQ-FUNC-004/005; TC-INF-013..016 dùng `event_dt`; thêm mục "Ghi chú đối chiếu" ở Phụ lục A. Tổng 437 test case. |
+| 0.3 | 2026-11-12 | hieudt | Đợt 1.1.0: thêm 151 test case (TG-21 đến TG-32 và bổ sung TG-03, 08, 12, 13, 14, 16, 18) cho đủ 435 hàm test; đánh dấu 27 test case thử lại là Đã gỡ (D12); đổi tên field theo code (`duration`, `target_duration`, `schedule_source`, `schedule_id`, `start_time`, `end_time`, `planned_end_time`, `business_duration`, `business_percent_used`, `pause_time`) và tên nút (Apply Current Settings, Re-check Conditions); sửa các ca về `[]` (chưa cấu hình, không còn khớp mọi record: TC-ATT-001, 002, 008 đến 010, 016, TC-CAN-020, 029, 030, TC-PAU-007, TC-ESC-024); thêm Phụ lục C (ánh xạ 435 hàm test) và Phụ lục D (test case không có hàm test) |
 
 ## Cách đọc tài liệu
 
@@ -28,9 +29,9 @@
 
 ## Ký hiệu chung
 
-> **Ký hiệu dùng trong TC-ATT, TC-PAU, TC-BRE.** `T0` = 2026-03-02 09:00 giờ VN (02:00 UTC, thứ Hai); `T0 + 3h` = 12:00 VN; giờ trần (ví dụ 13:01) là 2026-03-02 giờ VN, UTC = VN trừ 7 giờ. Lịch 24x7 nghĩa là nguồn lịch `none`. `evaluate(R, now, changed)` là `Engine.evaluate` (TAD 5.1); "Ghi `ref`=X; `evaluate(...)`" nghĩa là ghi giá trị lên record rồi gọi Engine với `now` đã chỉ định (Hook dùng `fields.Datetime.now()` nên test điều khiển `now` qua Engine hoặc patch `odoo.fields.Datetime.now`). **Xử lý nền tại now=X** = với mỗi task `in_progress` của ca, gọi `env['sla.processor']._process_task(task, X)` (xử lý đúng một task tại thời điểm X: ghi `breach` nếu `X >= planned_end`, rồi chạy từng mốc escalation/lượt thử lại đến hạn theo thứ tự `sequence`, rồi tính lại `next_due_at`; không khóa dòng, không báo tiến độ, không dùng `sleep`). **`process_due()`** = `env['sla.processor'].process_due()`, hàm của cron, KHÔNG nhận `now`: mỗi vòng lấy `fields.Datetime.now()`, chọn task `in_progress` có `next_due_at <= now` theo `next_due_at`, khóa đúng một task (`try_lock_for_update(limit=1)`), xử lý trong savepoint bằng `_process_task`, rồi gọi `ir.cron._commit_progress(1, remaining=R)` (R = số task còn đến hạn); dừng khi hết task đến hạn, khi đã xử lý `dwo_sla_core.batch_size` task (mặc định 50, chỉ là trần mỗi lần gọi) hoặc khi `_commit_progress` trả thời gian còn lại <= 0. Ca nào cần điều khiển thời gian qua `process_due()` thì patch `odoo.fields.Datetime.now` (`unittest.mock.patch`) và thay `ir.cron._commit_progress` bằng `fake_progress` (ghi lại tham số, trả thời gian còn lại giả lập). Các barrier đồng bộ trong ca nhiều cursor (ERR-005, ERR-027, ERR-029, ESC-059) chỉ kích hoạt trên đúng cursor đích (điều kiện `self.env.cr is C2`), vì `mock.patch` có hiệu lực toàn tiến trình. Hook (`create`/`write`/`_compute_field_value`) gọi `evaluate(records, now=None, changed)` nên dùng `fields.Datetime.now()`; ca đi qua hook phải patch `odoo.fields.Datetime.now`, ca thuần Engine truyền `now`. Đánh giá lại: `sla.task.action_reevaluate()`, `sla.event.action_reevaluate_batch()`, `sla.event.action_mark_resolved()`; tính lại: `sla.task.action_recalculate()` (cần `group_sla_manager`, ném `AccessError` nếu không). Hàm thời gian: `sla.time.resolve_calendar/plan/settle/next_due_at`. Thông báo `ValidationError`/`note` bằng tiếng Anh từ `constants/message.py`; TC chỉ kiểm từ khóa hoặc loại lỗi. Events luôn sắp theo `id` tăng dần. FX-DEF-STD, FX-DEF-VN, FX-ESC-STD, FX-DEMO, FX-CAL-VN theo Test Plan 11.2.
+> **Ký hiệu dùng trong TC-ATT, TC-PAU, TC-BRE.** `T0` = 2026-03-02 09:00 giờ VN (02:00 UTC, thứ Hai); `T0 + 3h` = 12:00 VN; giờ trần (ví dụ 13:01) là 2026-03-02 giờ VN, UTC = VN trừ 7 giờ. Lịch 24x7 nghĩa là nguồn lịch `none`. `evaluate(R, now, changed)` là `Engine.evaluate` (TAD 5.1); "Ghi `ref`=X; `evaluate(...)`" nghĩa là ghi giá trị lên record rồi gọi Engine với `now` đã chỉ định (Hook dùng `fields.Datetime.now()` nên test điều khiển `now` qua Engine hoặc patch `odoo.fields.Datetime.now`). **Xử lý nền tại now=X** = với mỗi task `in_progress` của ca, gọi `env['sla.processor']._process_task(task, X)` (xử lý đúng một task tại thời điểm X: ghi `breach` nếu `X >= planned_end_time`, rồi chạy từng mốc escalation/lượt thử lại đến hạn theo thứ tự `sequence`, rồi tính lại `next_due_at`; không khóa dòng, không báo tiến độ, không dùng `sleep`). **`process_due()`** = `env['sla.processor'].process_due()`, hàm của cron, KHÔNG nhận `now`: mỗi vòng lấy `fields.Datetime.now()`, chọn task `in_progress` có `next_due_at <= now` theo `next_due_at`, khóa đúng một task (`try_lock_for_update(limit=1)`), xử lý trong savepoint bằng `_process_task`, rồi gọi `ir.cron._commit_progress(1, remaining=R)` (R = số task còn đến hạn); dừng khi hết task đến hạn, khi đã xử lý `dwo_sla_core.batch_size` task (mặc định 50, chỉ là trần mỗi lần gọi) hoặc khi `_commit_progress` trả thời gian còn lại <= 0. Ca nào cần điều khiển thời gian qua `process_due()` thì patch `odoo.fields.Datetime.now` (`unittest.mock.patch`) và thay `ir.cron._commit_progress` bằng `fake_progress` (ghi lại tham số, trả thời gian còn lại giả lập). Các barrier đồng bộ trong ca nhiều cursor (ERR-005, ERR-027, ERR-029, ESC-059) chỉ kích hoạt trên đúng cursor đích (điều kiện `self.env.cr is C2`), vì `mock.patch` có hiệu lực toàn tiến trình. Hook (`create`/`write`/`_compute_field_value`) gọi `evaluate(records, now=None, changed)` nên dùng `fields.Datetime.now()`; ca đi qua hook phải patch `odoo.fields.Datetime.now`, ca thuần Engine truyền `now`. Đánh giá lại: `sla.task.action_reevaluate()`, `sla.event.action_reevaluate_batch()`, `sla.event.action_mark_resolved()`; tính lại: `sla.task.action_recalculate()` (cần `group_sla_manager`, ném `AccessError` nếu không). Hàm thời gian: `sla.time.resolve_calendar/plan/settle/next_due_at`. Thông báo `ValidationError`/`note` bằng tiếng Anh từ `constants/message.py`; TC chỉ kiểm từ khóa hoặc loại lỗi. Events luôn sắp theo `id` tăng dần. FX-DEF-STD, FX-DEF-VN, FX-ESC-STD, FX-DEMO, FX-CAL-VN theo Test Plan 11.2.
 
-> Quy ước chung của phần A2: `T0` = FX-T0 = 2026-03-02 09:00 ICT (02:00 UTC, thứ Hai); giờ ghi theo ICT trừ khi nêu UTC. `P-01`, `P-02` là `res.partner`; `ref` là trạng thái theo FX-PARTNER-MARK. FX-DEF-STD viết tắt: start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none (24x7); cancel_mode=start_unmatched; resume_mode=condition; không retroactive; không escalation. Dòng "đổi:" ghi phần khác với FX-DEF-STD.
+> Quy ước chung của phần A2: `T0` = FX-T0 = 2026-03-02 09:00 ICT (02:00 UTC, thứ Hai); giờ ghi theo ICT trừ khi nêu UTC. `P-01`, `P-02` là `res.partner`; `ref` là trạng thái theo FX-PARTNER-MARK. FX-DEF-STD viết tắt: start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none (24x7); cancel_mode=start_unmatched; resume_mode=condition; không retroactive; không escalation. Dòng "đổi:" ghi phần khác với FX-DEF-STD.
 > G1: để điều khiển `now`, test ghi giá trị field không qua hook (ví dụ ghi bằng SQL/tắt hook của test rồi invalidate cache) rồi gọi `evaluate(records, now, changed)` với `changed` tường minh; không dùng sleep.
 
 ## Fixture bổ sung (ngoài Test Plan mục 11.2)
@@ -49,29 +50,50 @@ Các nhóm test dùng thêm fixture sau, khai báo đầy đủ trong Preconditi
 
 ## Số lượng test case
 
-| Nhóm | Số TC | Automated | Manual |
-|------|-------|-----------|--------|
-| TG-01 — Gắn, kết thúc, điều kiện, kích hoạt đánh giá | 27 | 27 | 0 |
-| TG-02 — Pause và resume | 11 | 11 | 0 |
-| TG-03 — Vi phạm và quanh hạn | 23 | 23 | 0 |
-| TG-04 — Cancel và reset (kể cả reset theo field) | 32 | 32 | 0 |
-| TG-05 — Ba cấu hình dễ sai | 8 | 8 | 0 |
-| TG-06 — Giờ làm việc | 11 | 11 | 0 |
-| TG-07 — Retroactive start | 12 | 12 | 0 |
-| TG-08 — Escalation, thử lại, xử lý nền | 60 | 60 | 0 |
-| TG-09 — Nhiều SLA song song | 8 | 8 | 0 |
-| TG-10 — Tính generic | 5 | 5 | 0 |
-| TG-11 — Đổi cấu hình khi đang chạy và archive | 27 | 27 | 0 |
-| TG-12 — Lỗi engine và đồng thời | 29 | 27 | 2 |
-| TG-13 — Field compute có lưu | 16 | 15 | 1 |
-| TG-14 — Hạ tầng: cài, nâng cấp, gỡ, dọn dẹp, tham số | 35 | 35 | 0 |
-| TG-15 — Nguồn lịch | 15 | 15 | 0 |
-| TG-16 — Phân quyền và đa công ty | 24 | 23 | 1 |
-| TG-17 — Giao diện và báo cáo | 44 | 34 | 10 |
-| TG-18 — Hiệu năng | 10 | 10 | 0 |
-| TG-19 — Điểm mở rộng | 23 | 22 | 1 |
-| INS — Inspection và kiểm tra CI (BUILD, MAINT, CM, INST-002) | 17 | 5 | 12 |
-| **Tổng** | **437** | | |
+Bản 0.3 (19.0.1.1.0) mô tả đủ mọi hàm test trong `tests/`. Có hai con số cần phân biệt: **hàm test** (một `def test_` là một đơn vị thực thi) và **test case (ID)** (một mục `TC-xxx-nnn` trong tài liệu này). Một hàm test có thể phủ nhiều test case (ví dụ `test_inf_001_to_006_forbidden_models` phủ TC-INF-001 đến TC-INF-006), nên số test case lớn hơn số hàm test. Quan hệ đầy đủ ở Phụ lục C.
+
+- **Hàm test:** 435, đếm bằng `grep -h "def test_" tests/test_*.py | wc -l` (kết quả 435; 3 hàm trong `test_tg18_performance.py` chỉ chạy khi đặt `SLA_PERF=1`, nên bộ test thường chạy 432 hàm và bỏ qua 3).
+- **Test case (ID):** 588 = 437 ID của bản 0.2 + 151 ID mới của 0.3 (TG-21 đến TG-32 và bổ sung cho TG-03, 08, 12, 13, 14, 16, 18).
+- **Phân loại 588 ID:** 521 có hàm test tự động; 19 Manual (Inspection hoặc Demonstration); 21 phủ bằng CI hoặc benchmark ngoài `tests/` (hoặc chưa tự động hóa, xem Phụ lục D); 27 đã gỡ ở D12 (cơ chế thử lại) và không còn hiệu lực.
+- **Kiểm tra tự động:** Phụ lục C có đúng 435 dòng, mỗi hàm test xuất hiện đúng một lần; mọi ID trong cột "Test case" tồn tại ở tài liệu này; mọi test case còn hiệu lực truy vết được tới ít nhất một REQ-ID còn hiệu lực của `010` (không test case nào trỏ tới REQ-ID đã gỡ), và mọi REQ-ID `active` có ít nhất một test case còn hiệu lực.
+
+| Nhóm | Test case (ID) | Có hàm test tự động | Manual | CI hoặc benchmark ngoài `tests/` | Đã gỡ (D12) |
+|---|---|---|---|---|---|
+| TG-01 — Gắn, kết thúc, điều kiện, kích hoạt đánh giá | 27 | 27 | 0 | 0 | 0 |
+| TG-02 — Pause và resume | 11 | 11 | 0 | 0 | 0 |
+| TG-03 — Vi phạm và quanh hạn | 26 | 26 | 0 | 0 | 0 |
+| TG-04 — Cancel và reset | 32 | 32 | 0 | 0 | 0 |
+| TG-05 — Ba cấu hình dễ sai | 8 | 8 | 0 | 0 | 0 |
+| TG-06 — Giờ làm việc | 11 | 11 | 0 | 0 | 0 |
+| TG-07 — Retroactive start | 12 | 12 | 0 | 0 | 0 |
+| TG-08 — Escalation (email, server action), xử lý nền | 70 | 44 | 0 | 0 | 26 |
+| TG-09 — Nhiều SLA song song | 8 | 8 | 0 | 0 | 0 |
+| TG-10 — Tính generic | 5 | 5 | 0 | 0 | 0 |
+| TG-11 — Đổi cấu hình khi đang chạy và archive | 27 | 27 | 0 | 0 | 0 |
+| TG-12 — Lỗi engine và đồng thời | 30 | 27 | 2 | 1 | 0 |
+| TG-13 — Field compute có lưu | 17 | 17 | 0 | 0 | 0 |
+| TG-14 — Hạ tầng | 37 | 26 | 0 | 11 | 0 |
+| TG-15 — Nguồn lịch | 15 | 15 | 0 | 0 | 0 |
+| TG-16 — Phân quyền và đa công ty | 25 | 24 | 0 | 0 | 1 |
+| TG-17 — Giao diện và báo cáo | 44 | 34 | 8 | 2 | 0 |
+| TG-18 — Hiệu năng | 13 | 11 | 0 | 2 | 0 |
+| TG-19 — Điểm mở rộng | 23 | 21 | 1 | 1 | 0 |
+| TG-21 — Field phân loại | 10 | 10 | 0 | 0 | 0 |
+| TG-22 — Retroactive pause | 9 | 9 | 0 | 0 | 0 |
+| TG-23 — Timezone override | 5 | 5 | 0 | 0 | 0 |
+| TG-24 — Hạn chót ban đầu và thời lượng đồng hồ | 4 | 4 | 0 | 0 | 0 |
+| TG-25 — Bật/tắt, `[]` chưa cấu hình, timezone bắt buộc | 23 | 23 | 0 | 0 | 0 |
+| TG-26 — Giao diện định nghĩa và task | 27 | 27 | 0 | 0 | 0 |
+| TG-27 — Re-check Conditions | 6 | 6 | 0 | 0 | 0 |
+| TG-28 — Apply Current Settings | 6 | 6 | 0 | 0 | 0 |
+| TG-29 — Apply to Existing Records | 12 | 12 | 0 | 0 | 0 |
+| TG-30 — Chip trạng thái | 20 | 20 | 0 | 0 | 0 |
+| TG-31 — Tab Note, chuỗi | 4 | 4 | 0 | 0 | 0 |
+| TG-32 — Duration (live) | 4 | 4 | 0 | 0 | 0 |
+| INS — Inspection và kiểm tra CI | 17 | 5 | 8 | 4 | 0 |
+| **Tổng** | **588** | **521** | **19** | **21** | **27** |
+
+Nhóm TG-20 (đồng thời, hai cursor) không có ID riêng: các ca của nó là TC-ESC-009, TC-ESC-059, TC-ERR-005, 026, 027, 029 và TC-MUL-007, đã tính ở TG-08, TG-09 và TG-12.
 
 ## Traceability
 
@@ -167,7 +189,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | REQ-INT-018 | TCOND-19-05 | CI-4 | TC-EXT-020 | Planned |
 | REQ-INT-019 | TCOND-08-17 | CI-1 | TC-ESC-050 | Planned |
 | REQ-INT-019 | TCOND-08-17 | CI-2 | TC-ESC-051 | Planned |
-| REQ-INT-019 | TCOND-08-17 | CI-3 | TC-ESC-052 | Planned |
+| REQ-INT-019 | TCOND-08-17 | CI-3 | TC-ESC-052 | Removed (D12) |
 | REQ-FUNC-001 | TCOND-10-01 | CI-1 | TC-GEN-001 | Planned |
 | REQ-FUNC-001 | TCOND-10-02 | CI-1 | TC-GEN-002 | Planned |
 | REQ-FUNC-001 | TCOND-10-03 | CI-1 | TC-GEN-003 | Planned |
@@ -352,35 +374,35 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | REQ-FUNC-054 | TCOND-08-05 | CI-3 | TC-ESC-013 | Planned |
 | REQ-FUNC-054 | TCOND-08-05 | CI-4 | TC-ESC-014 | Planned |
 | REQ-FUNC-055 | TCOND-08-06 | CI-1 | TC-ESC-015 | Planned |
-| REQ-FUNC-055 | TCOND-08-06 | CI-2 | TC-ESC-016 | Planned |
+| REQ-FUNC-055 | TCOND-08-06 | CI-2 | TC-ESC-016 | Removed (D12) |
 | REQ-FUNC-055 | TCOND-08-06 | CI-3 | TC-ESC-017 | Planned |
 | REQ-FUNC-026 | TCOND-08-07 | CI-1 | TC-ESC-018 | Planned |
 | REQ-FUNC-026 | TCOND-08-07 | CI-2 | TC-ESC-019 | Planned |
-| REQ-FUNC-027 | TCOND-08-08 | CI-1 | TC-ESC-020 | Planned |
-| REQ-FUNC-027 | TCOND-08-08 | CI-2 | TC-ESC-021 | Planned |
-| REQ-FUNC-027 | TCOND-08-08 | CI-3 | TC-ESC-022 | Planned |
-| REQ-FUNC-027 | TCOND-08-08 | CI-4 | TC-ESC-023 | Planned |
-| REQ-FUNC-027 | TCOND-08-08 | CI-5 | TC-ESC-024 | Planned |
-| REQ-FUNC-056 | TCOND-08-09 | CI-1 | TC-ESC-025 | Planned |
-| REQ-FUNC-056 | TCOND-08-09 | CI-2 | TC-ESC-026 | Planned |
-| REQ-FUNC-057 | TCOND-08-10 | CI-1 | TC-ESC-027 | Planned |
-| REQ-FUNC-057 | TCOND-08-10 | CI-2 | TC-ESC-028 | Planned |
-| REQ-FUNC-057 | TCOND-08-10 | CI-3 | TC-ESC-029 | Planned |
-| REQ-FUNC-058 | TCOND-08-11 | CI-1 | TC-ESC-030 | Planned |
-| REQ-FUNC-058 | TCOND-08-11 | CI-2 | TC-ESC-031 | Planned |
-| REQ-FUNC-058 | TCOND-08-11 | CI-3 | TC-ESC-032 | Planned |
-| REQ-FUNC-058 | TCOND-08-11 | CI-4 | TC-ESC-060 | Planned |
-| REQ-FUNC-059 | TCOND-08-12 | CI-1 | TC-ESC-033 | Planned |
-| REQ-FUNC-059 | TCOND-08-12 | CI-2 | TC-ESC-034 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-1 | TC-ESC-035 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-2 | TC-ESC-036 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-3 | TC-ESC-037 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-4 | TC-ESC-038 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-5 | TC-ESC-039 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-6 | TC-ESC-040 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-7 | TC-ESC-041 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-8 | TC-ESC-042 | Planned |
-| REQ-FUNC-028 | TCOND-08-13 | CI-9 | TC-ESC-043 | Planned |
+| REQ-FUNC-027 | TCOND-08-08 | CI-1 | TC-ESC-020 | Removed (D12) |
+| REQ-FUNC-027 | TCOND-08-08 | CI-2 | TC-ESC-021 | Removed (D12) |
+| REQ-FUNC-027 | TCOND-08-08 | CI-3 | TC-ESC-022 | Removed (D12) |
+| REQ-FUNC-027 | TCOND-08-08 | CI-4 | TC-ESC-023 | Removed (D12) |
+| REQ-FUNC-026 | TCOND-08-07 | CI-3 | TC-ESC-024 | Planned |
+| REQ-FUNC-056 | TCOND-08-09 | CI-1 | TC-ESC-025 | Removed (D12) |
+| REQ-FUNC-056 | TCOND-08-09 | CI-2 | TC-ESC-026 | Removed (D12) |
+| REQ-FUNC-057 | TCOND-08-10 | CI-1 | TC-ESC-027 | Removed (D12) |
+| REQ-FUNC-057 | TCOND-08-10 | CI-2 | TC-ESC-028 | Removed (D12) |
+| REQ-FUNC-057 | TCOND-08-10 | CI-3 | TC-ESC-029 | Removed (D12) |
+| REQ-FUNC-058 | TCOND-08-11 | CI-1 | TC-ESC-030 | Removed (D12) |
+| REQ-FUNC-058 | TCOND-08-11 | CI-2 | TC-ESC-031 | Removed (D12) |
+| REQ-FUNC-058 | TCOND-08-11 | CI-3 | TC-ESC-032 | Removed (D12) |
+| REQ-FUNC-058 | TCOND-08-11 | CI-4 | TC-ESC-060 | Removed (D12) |
+| REQ-FUNC-059 | TCOND-08-12 | CI-1 | TC-ESC-033 | Removed (D12) |
+| REQ-FUNC-059 | TCOND-08-12 | CI-2 | TC-ESC-034 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-1 | TC-ESC-035 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-2 | TC-ESC-036 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-3 | TC-ESC-037 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-4 | TC-ESC-038 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-5 | TC-ESC-039 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-6 | TC-ESC-040 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-7 | TC-ESC-041 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-8 | TC-ESC-042 | Removed (D12) |
+| REQ-FUNC-028 | TCOND-08-13 | CI-9 | TC-ESC-043 | Removed (D12) |
 | REQ-FUNC-029 | TCOND-01-08 | CI-1 | TC-ATT-025 | Planned |
 | REQ-FUNC-029 | TCOND-01-08 | CI-2 | TC-ATT-026 | Planned |
 | REQ-FUNC-029 | TCOND-02-05 | CI-1 | TC-PAU-011 | Planned |
@@ -458,7 +480,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | REQ-SEC-003 | TCOND-16-03 | CI-4 | TC-SEC-011 | Planned |
 | REQ-SEC-003 | TCOND-16-03 | CI-5 | TC-SEC-012 | Planned |
 | REQ-SEC-004 | TCOND-16-04 | CI-1 | TC-SEC-013 | Planned |
-| REQ-SEC-004 | TCOND-16-04 | CI-2 | TC-SEC-014 | Planned |
+| REQ-SEC-004 | TCOND-16-04 | CI-2 | TC-SEC-014 | Removed (D12) |
 | REQ-SEC-004 | TCOND-16-04 | CI-3 | TC-SEC-015 | Planned |
 | REQ-SEC-005 | TCOND-16-05 | CI-1 | TC-SEC-016 | Planned |
 | REQ-SEC-005 | TCOND-16-05 | CI-2 | TC-SEC-017 | Planned |
@@ -523,6 +545,197 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ---
 
+### Traceability bổ sung 19.0.1.1.0
+
+Các dòng dưới đây nối tiếp bảng trên cho 151 test case mới (ID mới của TG-21 đến TG-32 và bổ sung). Test condition và coverage item định nghĩa ở `050` mục 7.
+
+| REQ-ID | Test Condition | Coverage Item | Test Case | Status |
+|---|---|---|---|---|
+| REQ-FUNC-001 | TCOND-14-36 | CI-1 | TC-INF-036 | Planned |
+| REQ-FUNC-001 | TCOND-20-02 | CI-1 | TC-ENB-002 | Planned |
+| REQ-FUNC-003 | TCOND-20-06 | CI-1 | TC-CND-001 | Planned |
+| REQ-FUNC-003 | TCOND-20-06 | CI-2 | TC-CND-002 | Planned |
+| REQ-FUNC-003 | TCOND-20-06 | CI-3 | TC-CND-003 | Planned |
+| REQ-FUNC-003 | TCOND-20-06 | CI-4 | TC-CND-004 | Planned |
+| REQ-FUNC-003 | TCOND-20-07 | CI-1 | TC-CND-005 | Planned |
+| REQ-FUNC-003 | TCOND-24-03 | CI-1 | TC-APX-004 | Planned |
+| REQ-FUNC-003 | TCOND-26-01 | CI-2 | TC-NOT-002 | Planned |
+| REQ-FUNC-005 | TCOND-13-17 | CI-1 | TC-CMP-017 | Planned |
+| REQ-FUNC-013 | TCOND-20-07 | CI-2 | TC-CND-006 | Planned |
+| REQ-FUNC-021 | TCOND-20-12 | CI-1 | TC-TZR-009 | Planned |
+| REQ-FUNC-022 | TCOND-03-24 | CI-1 | TC-BRE-024 | Planned |
+| REQ-FUNC-022 | TCOND-08-70 | CI-1 | TC-PRC-001 | Planned |
+| REQ-FUNC-022 | TCOND-08-70 | CI-2 | TC-PRC-002 | Planned |
+| REQ-FUNC-026 | TCOND-08-73 | CI-1 | TC-EML-005 | Planned |
+| REQ-FUNC-026 | TCOND-12-30 | CI-1 | TC-ERR-030 | Planned |
+| REQ-FUNC-032 | TCOND-22-01 | CI-1 | TC-RCK-001 | Planned |
+| REQ-FUNC-032 | TCOND-22-04 | CI-1 | TC-RCK-005 | Planned |
+| REQ-FUNC-032 | TCOND-22-05 | CI-1 | TC-RCK-006 | Planned |
+| REQ-FUNC-042 | TCOND-13-17 | CI-1 | TC-CMP-017 | Planned |
+| REQ-FUNC-051 | TCOND-20-07 | CI-2 | TC-CND-006 | Planned |
+| REQ-FUNC-053 | TCOND-24-07 | CI-1 | TC-APX-011 | Planned |
+| REQ-FUNC-060 | TCOND-20-05 | CI-3 | TC-ENB-008 | Planned |
+| REQ-FUNC-064 | TCOND-08-72 | CI-1 | TC-EML-001 | Planned |
+| REQ-FUNC-064 | TCOND-08-74 | CI-1 | TC-EML-006 | Planned |
+| REQ-FUNC-064 | TCOND-08-74 | CI-2 | TC-EML-007 | Planned |
+| REQ-FUNC-065 | TCOND-08-72 | CI-2 | TC-EML-002 | Planned |
+| REQ-FUNC-065 | TCOND-08-72 | CI-3 | TC-EML-003 | Planned |
+| REQ-FUNC-065 | TCOND-08-72 | CI-4 | TC-EML-004 | Planned |
+| REQ-FUNC-065 | TCOND-08-73 | CI-1 | TC-EML-005 | Planned |
+| REQ-FUNC-066 | TCOND-20-01 | CI-1 | TC-ENB-001 | Planned |
+| REQ-FUNC-066 | TCOND-20-03 | CI-1 | TC-ENB-003 | Planned |
+| REQ-FUNC-066 | TCOND-20-03 | CI-2 | TC-ENB-004 | Planned |
+| REQ-FUNC-066 | TCOND-20-04 | CI-1 | TC-ENB-005 | Planned |
+| REQ-FUNC-066 | TCOND-20-05 | CI-1 | TC-ENB-006 | Planned |
+| REQ-FUNC-066 | TCOND-20-05 | CI-2 | TC-ENB-007 | Planned |
+| REQ-FUNC-066 | TCOND-20-05 | CI-3 | TC-ENB-008 | Planned |
+| REQ-FUNC-066 | TCOND-21-08 | CI-1 | TC-DLV-001 | Planned |
+| REQ-FUNC-066 | TCOND-21-08 | CI-2 | TC-DLV-002 | Planned |
+| REQ-FUNC-067 | TCOND-20-08 | CI-1 | TC-TZR-001 | Planned |
+| REQ-FUNC-067 | TCOND-20-08 | CI-2 | TC-TZR-002 | Planned |
+| REQ-FUNC-067 | TCOND-20-08 | CI-3 | TC-TZR-003 | Planned |
+| REQ-FUNC-067 | TCOND-20-09 | CI-1 | TC-TZR-004 | Planned |
+| REQ-FUNC-067 | TCOND-20-09 | CI-2 | TC-TZR-005 | Planned |
+| REQ-FUNC-067 | TCOND-20-09 | CI-3 | TC-TZR-006 | Planned |
+| REQ-FUNC-067 | TCOND-20-10 | CI-1 | TC-TZR-007 | Planned |
+| REQ-FUNC-067 | TCOND-20-11 | CI-1 | TC-TZR-008 | Planned |
+| REQ-FUNC-067 | TCOND-20-12 | CI-1 | TC-TZR-009 | Planned |
+| REQ-FUNC-067 | TCOND-26-01 | CI-2 | TC-NOT-002 | Planned |
+| REQ-FUNC-067 | TCOND-30-01 | CI-1 | TC-TZO-001 | Planned |
+| REQ-FUNC-067 | TCOND-30-02 | CI-1 | TC-TZO-002 | Planned |
+| REQ-FUNC-067 | TCOND-30-02 | CI-2 | TC-TZO-003 | Planned |
+| REQ-FUNC-067 | TCOND-30-02 | CI-3 | TC-TZO-004 | Planned |
+| REQ-FUNC-067 | TCOND-30-03 | CI-1 | TC-TZO-005 | Planned |
+| REQ-FUNC-068 | TCOND-24-01 | CI-1 | TC-APX-001 | Planned |
+| REQ-FUNC-068 | TCOND-24-02 | CI-1 | TC-APX-002 | Planned |
+| REQ-FUNC-068 | TCOND-24-02 | CI-2 | TC-APX-003 | Planned |
+| REQ-FUNC-068 | TCOND-24-03 | CI-1 | TC-APX-004 | Planned |
+| REQ-FUNC-068 | TCOND-24-03 | CI-2 | TC-APX-005 | Planned |
+| REQ-FUNC-068 | TCOND-24-04 | CI-1 | TC-APX-006 | Planned |
+| REQ-FUNC-068 | TCOND-24-04 | CI-2 | TC-APX-007 | Planned |
+| REQ-FUNC-068 | TCOND-24-05 | CI-1 | TC-APX-008 | Planned |
+| REQ-FUNC-068 | TCOND-24-05 | CI-2 | TC-APX-009 | Planned |
+| REQ-FUNC-068 | TCOND-24-06 | CI-1 | TC-APX-010 | Planned |
+| REQ-FUNC-068 | TCOND-24-07 | CI-1 | TC-APX-011 | Planned |
+| REQ-FUNC-068 | TCOND-24-08 | CI-1 | TC-APX-012 | Planned |
+| REQ-FUNC-069 | TCOND-21-04 | CI-1 | TC-LCK-001 | Planned |
+| REQ-FUNC-069 | TCOND-21-04 | CI-2 | TC-LCK-002 | Planned |
+| REQ-FUNC-069 | TCOND-21-04 | CI-3 | TC-LCK-003 | Planned |
+| REQ-FUNC-069 | TCOND-21-05 | CI-1 | TC-AUD-001 | Planned |
+| REQ-FUNC-069 | TCOND-21-05 | CI-2 | TC-AUD-002 | Planned |
+| REQ-FUNC-069 | TCOND-21-05 | CI-3 | TC-AUD-003 | Planned |
+| REQ-FUNC-069 | TCOND-21-07 | CI-2 | TC-SBT-004 | Planned |
+| REQ-FUNC-069 | TCOND-21-13 | CI-1 | TC-TOUR-001 | Planned |
+| REQ-FUNC-070 | TCOND-28-01 | CI-1 | TC-MDF-001 | Planned |
+| REQ-FUNC-070 | TCOND-28-01 | CI-2 | TC-MDF-002 | Planned |
+| REQ-FUNC-070 | TCOND-28-02 | CI-1 | TC-MDF-003 | Planned |
+| REQ-FUNC-070 | TCOND-28-02 | CI-2 | TC-MDF-004 | Planned |
+| REQ-FUNC-070 | TCOND-28-03 | CI-1 | TC-MDF-005 | Planned |
+| REQ-FUNC-070 | TCOND-28-03 | CI-2 | TC-MDF-006 | Planned |
+| REQ-FUNC-070 | TCOND-28-04 | CI-1 | TC-MDF-007 | Planned |
+| REQ-FUNC-070 | TCOND-28-04 | CI-2 | TC-MDF-008 | Planned |
+| REQ-FUNC-070 | TCOND-28-04 | CI-3 | TC-MDF-009 | Planned |
+| REQ-FUNC-070 | TCOND-28-05 | CI-1 | TC-MDF-010 | Planned |
+| REQ-FUNC-071 | TCOND-29-01 | CI-1 | TC-RPS-001 | Planned |
+| REQ-FUNC-071 | TCOND-29-01 | CI-2 | TC-RPS-002 | Planned |
+| REQ-FUNC-071 | TCOND-29-01 | CI-3 | TC-RPS-003 | Planned |
+| REQ-FUNC-071 | TCOND-29-01 | CI-4 | TC-RPS-004 | Planned |
+| REQ-FUNC-071 | TCOND-29-01 | CI-5 | TC-RPS-005 | Planned |
+| REQ-FUNC-071 | TCOND-29-02 | CI-1 | TC-RPS-006 | Planned |
+| REQ-FUNC-071 | TCOND-29-03 | CI-1 | TC-RPS-007 | Planned |
+| REQ-FUNC-071 | TCOND-29-03 | CI-2 | TC-RPS-008 | Planned |
+| REQ-FUNC-071 | TCOND-29-04 | CI-1 | TC-RPS-009 | Planned |
+| REQ-FUNC-072 | TCOND-31-01 | CI-1 | TC-CLK-001 | Planned |
+| REQ-FUNC-072 | TCOND-31-01 | CI-2 | TC-CLK-002 | Planned |
+| REQ-FUNC-072 | TCOND-31-02 | CI-1 | TC-CLK-003 | Planned |
+| REQ-FUNC-072 | TCOND-31-02 | CI-2 | TC-CLK-004 | Planned |
+| REQ-INT-001 | TCOND-20-02 | CI-1 | TC-ENB-002 | Planned |
+| REQ-INT-005 | TCOND-23-01 | CI-1 | TC-APS-001 | Planned |
+| REQ-INT-005 | TCOND-23-02 | CI-1 | TC-APS-002 | Planned |
+| REQ-INT-005 | TCOND-23-03 | CI-1 | TC-APS-003 | Planned |
+| REQ-INT-005 | TCOND-23-04 | CI-1 | TC-APS-004 | Planned |
+| REQ-INT-005 | TCOND-23-05 | CI-1 | TC-APS-005 | Planned |
+| REQ-INT-005 | TCOND-23-06 | CI-1 | TC-APS-006 | Planned |
+| REQ-INT-005 | TCOND-26-03 | CI-1 | TC-NOT-004 | Planned |
+| REQ-INT-010 | TCOND-24-06 | CI-1 | TC-APX-010 | Planned |
+| REQ-INT-012 | TCOND-21-01 | CI-1 | TC-DUE-001 | Planned |
+| REQ-INT-012 | TCOND-21-01 | CI-2 | TC-DUE-002 | Planned |
+| REQ-INT-012 | TCOND-21-02 | CI-1 | TC-DUE-003 | Planned |
+| REQ-INT-012 | TCOND-21-02 | CI-2 | TC-DUE-004 | Planned |
+| REQ-INT-012 | TCOND-21-03 | CI-1 | TC-DUE-005 | Planned |
+| REQ-INT-012 | TCOND-25-02 | CI-2 | TC-FST-004 | Planned |
+| REQ-INT-020 | TCOND-22-01 | CI-1 | TC-RCK-001 | Planned |
+| REQ-INT-020 | TCOND-22-02 | CI-1 | TC-RCK-002 | Planned |
+| REQ-INT-020 | TCOND-22-02 | CI-2 | TC-RCK-003 | Planned |
+| REQ-INT-020 | TCOND-22-03 | CI-1 | TC-RCK-004 | Planned |
+| REQ-INT-020 | TCOND-22-04 | CI-1 | TC-RCK-005 | Planned |
+| REQ-INT-020 | TCOND-26-03 | CI-1 | TC-NOT-004 | Planned |
+| REQ-INT-023 | TCOND-03-25 | CI-1 | TC-BRE-025 | Planned |
+| REQ-INT-023 | TCOND-03-26 | CI-1 | TC-BRE-026 | Planned |
+| REQ-INT-023 | TCOND-18-12 | CI-1 | TC-PRF-012 | Planned |
+| REQ-INT-023 | TCOND-18-12 | CI-2 | TC-PRF-013 | Planned |
+| REQ-INT-024 | TCOND-21-12 | CI-1 | TC-LGT-001 | Planned |
+| REQ-INT-024 | TCOND-25-01 | CI-1 | TC-FST-001 | Planned |
+| REQ-INT-024 | TCOND-25-01 | CI-2 | TC-FST-002 | Planned |
+| REQ-INT-024 | TCOND-25-01 | CI-3 | TC-FST-009 | Planned |
+| REQ-INT-024 | TCOND-25-02 | CI-1 | TC-FST-003 | Planned |
+| REQ-INT-024 | TCOND-25-02 | CI-2 | TC-FST-004 | Planned |
+| REQ-INT-024 | TCOND-25-02 | CI-3 | TC-FST-005 | Planned |
+| REQ-INT-024 | TCOND-25-02 | CI-4 | TC-FST-007 | Planned |
+| REQ-INT-024 | TCOND-25-02 | CI-5 | TC-FST-008 | Planned |
+| REQ-INT-024 | TCOND-25-03 | CI-1 | TC-FST-006 | Planned |
+| REQ-INT-024 | TCOND-25-04 | CI-1 | TC-FST-010 | Planned |
+| REQ-INT-024 | TCOND-25-04 | CI-2 | TC-FST-011 | Planned |
+| REQ-INT-024 | TCOND-25-05 | CI-1 | TC-FST-012 | Planned |
+| REQ-INT-024 | TCOND-25-05 | CI-2 | TC-FST-013 | Planned |
+| REQ-INT-024 | TCOND-25-06 | CI-1 | TC-FST-014 | Planned |
+| REQ-INT-024 | TCOND-25-06 | CI-2 | TC-FST-015 | Planned |
+| REQ-INT-024 | TCOND-25-07 | CI-1 | TC-FST-016 | Planned |
+| REQ-INT-024 | TCOND-25-07 | CI-2 | TC-FST-017 | Planned |
+| REQ-INT-024 | TCOND-25-07 | CI-3 | TC-FST-018 | Planned |
+| REQ-INT-024 | TCOND-25-08 | CI-1 | TC-FST-019 | Planned |
+| REQ-INT-024 | TCOND-25-08 | CI-2 | TC-FST-020 | Planned |
+| REQ-INT-024 | TCOND-26-01 | CI-2 | TC-NOT-002 | Planned |
+| REQ-INT-025 | TCOND-21-06 | CI-1 | TC-SBT-001 | Planned |
+| REQ-INT-025 | TCOND-21-06 | CI-2 | TC-SBT-002 | Planned |
+| REQ-INT-025 | TCOND-21-07 | CI-1 | TC-SBT-003 | Planned |
+| REQ-INT-025 | TCOND-21-07 | CI-2 | TC-SBT-004 | Planned |
+| REQ-INT-026 | TCOND-21-09 | CI-1 | TC-EHS-001 | Planned |
+| REQ-INT-026 | TCOND-21-09 | CI-2 | TC-EHS-002 | Planned |
+| REQ-INT-026 | TCOND-21-09 | CI-3 | TC-EHS-003 | Planned |
+| REQ-INT-026 | TCOND-21-10 | CI-1 | TC-OSR-001 | Planned |
+| REQ-INT-026 | TCOND-21-10 | CI-2 | TC-OSR-002 | Planned |
+| REQ-INT-026 | TCOND-21-10 | CI-3 | TC-OSR-003 | Planned |
+| REQ-INT-026 | TCOND-21-10 | CI-4 | TC-OSR-004 | Planned |
+| REQ-INT-027 | TCOND-21-11 | CI-1 | TC-TLV-001 | Planned |
+| REQ-INT-028 | TCOND-27-01 | CI-1 | TC-DUR-001 | Planned |
+| REQ-INT-028 | TCOND-27-02 | CI-1 | TC-DUR-002 | Planned |
+| REQ-INT-028 | TCOND-27-03 | CI-1 | TC-DUR-003 | Planned |
+| REQ-INT-028 | TCOND-27-04 | CI-1 | TC-DUR-004 | Planned |
+| REQ-INT-029 | TCOND-26-01 | CI-1 | TC-NOT-001 | Planned |
+| REQ-INT-029 | TCOND-26-01 | CI-2 | TC-NOT-002 | Planned |
+| REQ-INT-029 | TCOND-26-02 | CI-1 | TC-NOT-003 | Planned |
+| REQ-INT-029 | TCOND-26-03 | CI-1 | TC-NOT-004 | Planned |
+| REQ-OBS-003 | TCOND-12-30 | CI-1 | TC-ERR-030 | Planned |
+| REQ-PERF-001 | TCOND-18-11 | CI-1 | TC-PRF-011 | Planned |
+| REQ-PERF-001 | TCOND-20-05 | CI-2 | TC-ENB-007 | Planned |
+| REQ-PERF-001 | TCOND-20-07 | CI-1 | TC-CND-005 | Planned |
+| REQ-PERF-002 | TCOND-03-26 | CI-1 | TC-BRE-026 | Planned |
+| REQ-PERF-002 | TCOND-18-11 | CI-1 | TC-PRF-011 | Planned |
+| REQ-PERF-002 | TCOND-18-12 | CI-1 | TC-PRF-012 | Planned |
+| REQ-PERF-002 | TCOND-18-12 | CI-2 | TC-PRF-013 | Planned |
+| REQ-PERF-003 | TCOND-14-37 | CI-1 | TC-INF-037 | Planned |
+| REQ-REL-002 | TCOND-08-70 | CI-1 | TC-PRC-001 | Planned |
+| REQ-REL-002 | TCOND-08-70 | CI-2 | TC-PRC-002 | Planned |
+| REQ-REL-002 | TCOND-08-71 | CI-1 | TC-PRC-003 | Planned |
+| REQ-REL-002 | TCOND-18-11 | CI-1 | TC-PRF-011 | Planned |
+| REQ-REL-002 | TCOND-24-04 | CI-1 | TC-APX-006 | Planned |
+| REQ-SEC-001 | TCOND-16-25 | CI-1 | TC-SEC-025 | Planned |
+| REQ-SEC-001 | TCOND-24-08 | CI-1 | TC-APX-012 | Planned |
+| REQ-SEC-002 | TCOND-25-05 | CI-1 | TC-FST-012 | Planned |
+
+---
+
 ## TG-01 — Gắn, kết thúc, điều kiện, kích hoạt đánh giá
 
 ### TC-ATT-001: Đánh giá record khi stop để rỗng: stop không khớp dù `ref`=DONE, task vẫn `in_progress`
@@ -537,7 +750,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `stop_domain` rỗng (chưa cấu hình), `start_domain` = `[]`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `stop_domain` rỗng (chưa cấu hình), `start_domain` = `[('id', '!=', 0)]` (khớp mọi record).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -550,26 +763,26 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo partner P với `ref`='DONE'; gọi Engine `evaluate(P, now=T0, changed=None)`. | Có đúng 1 task `in_progress` (start `[]` khớp, stop rỗng không khớp, cancel không khớp); 1 event `attach`. |
+| 1 | Tạo partner P với `ref`='DONE'; gọi Engine `evaluate(P, now=T0, changed=None)`. | Có đúng 1 task `in_progress` (start `[('id', '!=', 0)]` khớp, stop rỗng không khớp, cancel không khớp); 1 event `attach`. |
 | 2 | Gọi `evaluate(P, now=T0 + 1h, changed={'ref'})`. | Task vẫn `in_progress`; số event `complete` = 0; tổng event = 1. |
 
 **Pass/Fail Criteria:** ✅ Pass: Task `in_progress`, không có event `complete`. ❌ Fail: Task `achieved` hoặc có event `complete`.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ATT-002: Đánh giá ba record có giá trị khác nhau khi start=`[]`: start khớp mọi record
+### TC-ATT-002: Đánh giá ba record có giá trị khác nhau khi start=`[('id', '!=', 0)]`: start khớp mọi record
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-01-01 |
-| Coverage Item | CI-2 (Lớp: start = `[]`) |
+| Coverage Item | CI-2 (Lớp: start = `[('id', '!=', 0)]`) |
 | Requirement Ref | REQ-FUNC-003 (AC2) |
 | Priority | P2-High |
 | Test Type | Positive |
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `start_domain` = `[]`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `start_domain` = `[('id', '!=', 0)]` (khớp mọi record).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -613,7 +826,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` với `start_domain` như trên (`target_hours`=4). | Ném lỗi kiểm tra (`ValidationError`); thông báo chứa chuỗi `x_khong_ton_tai`. |
+| 1 | Tạo `sla.definition` với `start_domain` như trên (`duration`=4). | Ném lỗi kiểm tra (`ValidationError`); thông báo chứa chuỗi `x_khong_ton_tai`. |
 | 2 | Đếm lại `sla.definition`. | Số bản ghi = n0 (không lưu). |
 
 **Pass/Fail Criteria:** ✅ Pass: Có lỗi, thông báo chứa tên field, không có bản ghi mới. ❌ Fail: Lưu thành công hoặc thông báo không nêu tên field.
@@ -701,7 +914,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` (`target_hours`=4) với hai domain trên. | Lưu thành công, không lỗi. |
+| 1 | Tạo `sla.definition` (`duration`=4) với hai domain trên. | Lưu thành công, không lỗi. |
 | 2 | Đọc lại `start_domain` và `stop_domain`. | Chuỗi domain đọc lại tương đương giá trị đã nhập. |
 
 **Pass/Fail Criteria:** ✅ Pass: Lưu thành công, giá trị được giữ. ❌ Fail: Bị từ chối hoặc giá trị bị đổi.
@@ -720,7 +933,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -732,7 +945,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo partner P `ref`='NEW'; gọi `evaluate(P, now=T0, changed=None)`. | Có đúng 1 `sla.task`: `stage`='in_progress', `start_dt`=2026-03-02 02:00 UTC, `planned_end`=2026-03-02 06:00 UTC (13:00 VN), `target_hours`=4, `business_elapsed`=0, `has_breached`=False, `end_dt` rỗng. |
+| 1 | Tạo partner P `ref`='NEW'; gọi `evaluate(P, now=T0, changed=None)`. | Có đúng 1 `sla.task`: `stage`='in_progress', `start_time`=2026-03-02 02:00 UTC, `planned_end_time`=2026-03-02 06:00 UTC (13:00 VN), `target_duration`=4, `business_duration`=0, `has_breached`=False, `end_time` rỗng. |
 | 2 | Đọc `sla.event` của task. | Đúng 1 event, `event`='attach', `event_dt`=T0. |
 
 **Pass/Fail Criteria:** ✅ Pass: Giá trị khớp từng field nêu ở các bước. ❌ Fail: Số task khác 1, stage khác `in_progress` hoặc số event khác 1.
@@ -751,7 +964,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -763,7 +976,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo partner P `ref`='HOLD'; gọi `evaluate(P, now=T0, changed=None)`. | Có đúng 1 task, `stage`='paused', `paused_since`=T0, `next_due_at` rỗng, `business_elapsed`=0. |
+| 1 | Tạo partner P `ref`='HOLD'; gọi `evaluate(P, now=T0, changed=None)`. | Có đúng 1 task, `stage`='paused', `pause_time`=T0, `next_due_at` rỗng, `business_duration`=0. |
 | 2 | Đếm event `attach` của task. | Đúng 1 event `attach` và 0 event `pause` (D2/TA-04: attach thẳng vào `paused` chỉ ghi đúng 1 event `attach`). |
 
 **Pass/Fail Criteria:** ✅ Pass: Task `paused`, đúng 1 event `attach`, 0 event `pause`. ❌ Fail: Task `in_progress` hoặc không có task.
@@ -782,13 +995,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `start_domain` = `[]`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `start_domain` = `[('id', '!=', 0)]` (khớp mọi record).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| Partner | `ref`='DONE' | start (`[]`) và stop cùng khớp |
+| Partner | `ref`='DONE' | start (`[('id', '!=', 0)]`) và stop cùng khớp |
 | now | T0 |  |
 
 **Steps & Expected Results:**
@@ -812,13 +1025,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `start_domain` = `[]`, cancel_mode `condition`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: `start_domain` = `[('id', '!=', 0)]`, cancel_mode `condition`.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| Partner | `ref`='CANCEL' | start (`[]`) và cancel cùng khớp |
+| Partner | `ref`='CANCEL' | start (`[('id', '!=', 0)]`) và cancel cùng khớp |
 | now | T0 |  |
 
 **Steps & Expected Results:**
@@ -844,7 +1057,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -874,7 +1087,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -905,14 +1118,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Partner | `ref` NEW → DONE → NEW |  |
-| Mốc | T0; T0 + 5h (14:00); T0 + 6h | Stop sau planned_end 13:00 |
+| Mốc | T0; T0 + 5h (14:00); T0 + 6h | Stop sau planned_end_time 13:00 |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
@@ -936,7 +1149,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD biến thể: `start_domain` = `[]`, `reset_domain` = `[('ref','=','RESET')]`, reset_action `cancel`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD biến thể: `start_domain` = `[('id', '!=', 0)]`, `reset_domain` = `[('ref','=','RESET')]`, reset_action `cancel`.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -967,7 +1180,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -980,7 +1193,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='NEW'; `evaluate(P, T0, None)`. Ghi `ref`='CANCEL'; `evaluate(P, T0 + 1h, {'ref'})`. | Task A `cancelled` (start không còn khớp), events [attach, cancel]. |
-| 2 | Ghi `ref`='NEW'; `evaluate(P, T0 + 2h, {'ref'})`. | Tổng 2 task: A vẫn `cancelled`; task B `in_progress`, `start_dt`=T0 + 2h (04:00 UTC), `planned_end`=15:00 VN (08:00 UTC); thêm 1 event `attach` cho B. |
+| 2 | Ghi `ref`='NEW'; `evaluate(P, T0 + 2h, {'ref'})`. | Tổng 2 task: A vẫn `cancelled`; task B `in_progress`, `start_time`=T0 + 2h (04:00 UTC), `planned_end_time`=15:00 VN (08:00 UTC); thêm 1 event `attach` cho B. |
 
 **Pass/Fail Criteria:** ✅ Pass: Task B `in_progress` với giá trị nêu trên. ❌ Fail: Không có task B hoặc A đổi stage.
 
@@ -998,7 +1211,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD biến thể: `start_domain` = `[]`, cancel_mode `condition`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD biến thể: `start_domain` = `[('id', '!=', 0)]`, cancel_mode `condition`.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1011,13 +1224,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='NEW'; `evaluate(P, T0, None)`. Ghi `ref`='CANCEL'; `evaluate(P, T0 + 1h, {'ref'})`. | Task A `cancelled`. |
-| 2 | Ghi `ref`='DONE' (start `[]` khớp, stop khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Vẫn 1 task (A `cancelled`); không event mới. |
+| 2 | Ghi `ref`='DONE' (start `[('id', '!=', 0)]` khớp, stop khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Vẫn 1 task (A `cancelled`); không event mới. |
 
 **Pass/Fail Criteria:** ✅ Pass: 1 task `cancelled`, không event mới. ❌ Fail: Có task mới.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ATT-017: Stop khớp khi task chưa quá hạn: `achieved`, `end_dt` = thời điểm stop, 1 event `complete`
+### TC-ATT-017: Stop khớp khi task chưa quá hạn: `achieved`, `end_time` = thời điểm stop, 1 event `complete`
 
 | Field | Giá trị |
 |---|---|
@@ -1029,22 +1242,22 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Partner | `ref` NEW → DONE |  |
-| Mốc | T0; T0 + 1h (10:00 VN) | planned_end = 13:00 VN |
+| Mốc | T0; T0 + 1h (10:00 VN) | planned_end_time = 13:00 VN |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='NEW'; `evaluate(P, T0, None)`. | Task `in_progress`. |
-| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 1h, {'ref'})`. | `stage`='achieved'; `end_dt`=2026-03-02 03:00 UTC (10:00 VN); `business_elapsed`=1.0; `has_breached`=False; đúng 1 event `complete` (`event_dt`=03:00 UTC); events [attach, complete]. |
+| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 1h, {'ref'})`. | `stage`='achieved'; `end_time`=2026-03-02 03:00 UTC (10:00 VN); `business_duration`=1.0; `has_breached`=False; đúng 1 event `complete` (`event_dt`=03:00 UTC); events [attach, complete]. |
 
-**Pass/Fail Criteria:** ✅ Pass: `achieved`, `end_dt` 03:00 UTC, 1 `complete`. ❌ Fail: Stage khác `achieved`, `end_dt` lệch, hoặc số `complete` ≠ 1.
+**Pass/Fail Criteria:** ✅ Pass: `achieved`, `end_time` 03:00 UTC, 1 `complete`. ❌ Fail: Stage khác `achieved`, `end_time` lệch, hoặc số `complete` ≠ 1.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -1060,7 +1273,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1072,10 +1285,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P `ref`='NEW', attach tại T0; ghi `ref`='DONE', `evaluate(P, T0 + 1h, {'ref'})`. | Task `achieved`, `end_dt`=03:00 UTC; 2 event. |
-| 2 | Ghi lại `ref`='DONE' (stop vẫn khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Task vẫn `achieved`, `end_dt`=03:00 UTC (không đổi), `business_elapsed`=1.0; tổng event = 2; số task = 1. |
+| 1 | Tạo P `ref`='NEW', attach tại T0; ghi `ref`='DONE', `evaluate(P, T0 + 1h, {'ref'})`. | Task `achieved`, `end_time`=03:00 UTC; 2 event. |
+| 2 | Ghi lại `ref`='DONE' (stop vẫn khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Task vẫn `achieved`, `end_time`=03:00 UTC (không đổi), `business_duration`=1.0; tổng event = 2; số task = 1. |
 
-**Pass/Fail Criteria:** ✅ Pass: Không đổi gì ở bước 2. ❌ Fail: `end_dt` đổi hoặc có event mới.
+**Pass/Fail Criteria:** ✅ Pass: Không đổi gì ở bước 2. ❌ Fail: `end_time` đổi hoặc có event mới.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -1091,7 +1304,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1121,7 +1334,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1151,7 +1364,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1164,7 +1377,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. | Task `in_progress`. |
-| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 30m, {'ref'})`. | Task `achieved`, `end_dt`=02:30 UTC, `business_elapsed`=0.5. |
+| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 30m, {'ref'})`. | Task `achieved`, `end_time`=02:30 UTC, `business_duration`=0.5. |
 
 **Pass/Fail Criteria:** ✅ Pass: Task `achieved` sau bước 2. ❌ Fail: Task còn `in_progress`.
 
@@ -1182,7 +1395,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1195,7 +1408,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. Ghi nhận ảnh chụp task (stage, planned_end, business_elapsed, running_since, next_due_at) và số event. | 1 task `in_progress`, 1 event `attach`. |
+| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. Ghi nhận ảnh chụp task (stage, planned_end_time, business_duration, running_since, next_due_at) và số event. | 1 task `in_progress`, 1 event `attach`. |
 | 2 | Ghi `comment`='ghi chú nội bộ'; `evaluate(P, T0 + 30m, {'comment'})`. | Vẫn 1 task, 1 event; ảnh chụp task không đổi. |
 
 **Pass/Fail Criteria:** ✅ Pass: Số task, số event và ảnh chụp task không đổi. ❌ Fail: Bất kỳ giá trị nào đổi.
@@ -1214,7 +1427,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1245,7 +1458,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1258,7 +1471,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='HOLD'; `evaluate(P, T0, None)`. Ghi ảnh chụp task và số event. | 1 task `paused`, 1 event. |
-| 2 | Gọi `evaluate(P, T0 + 1h, None)` với dữ liệu không đổi. | Số task, số event và ảnh chụp task không đổi (`paused_since`=T0). |
+| 2 | Gọi `evaluate(P, T0 + 1h, None)` với dữ liệu không đổi. | Số task, số event và ảnh chụp task không đổi (`pause_time`=T0). |
 
 **Pass/Fail Criteria:** ✅ Pass: Không đổi gì. ❌ Fail: Có event mới hoặc giá trị đổi.
 
@@ -1276,7 +1489,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1289,7 +1502,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='NEW'; `evaluate(P, T0, None)`. | 1 task `in_progress`, 1 event `attach`. |
-| 2 | Ghi `ref`='WORK'; `evaluate(P, T0 + 1h, {'ref'})`. | Task vẫn `in_progress`; `business_elapsed` và `planned_end` (06:00 UTC) không đổi; tổng event = 1. |
+| 2 | Ghi `ref`='WORK'; `evaluate(P, T0 + 1h, {'ref'})`. | Task vẫn `in_progress`; `business_duration` và `planned_end_time` (06:00 UTC) không đổi; tổng event = 1. |
 
 **Pass/Fail Criteria:** ✅ Pass: Không event mới. ❌ Fail: Có event mới.
 
@@ -1307,7 +1520,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1354,7 +1567,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | 2 | Tạo partner P-1 `ref`='NEW' (hook mất nên chưa có task) | 0 task cho P-1 |
 | 3 | Gọi `sla.processor.process_due()` (đầu hàm gọi `_ensure_hook_registered`) | Có log cảnh báo mức WARNING nêu `res.partner` bị mất patch; `create` của `res.partner` có lại `sla_patch` |
 | 4 | Tạo partner P-2 `ref`='NEW' | P-2 có đúng 1 task `in_progress` và 1 event `attach` (hook hoạt động lại) |
-| 5 | Gọi `sla.engine.evaluate(P-1, now = FX-T0)` (tương đương "Đánh giá lại" thủ công, REQ-FUNC-032) | P-1 có đúng 1 task `in_progress` (bù cho lần mất patch) |
+| 5 | Gọi `sla.engine.evaluate(P-1, now = FX-T0)` (tương đương đánh giá lại thủ công qua engine, REQ-FUNC-032) | P-1 có đúng 1 task `in_progress` (bù cho lần mất patch) |
 
 **Pass/Fail Criteria:** ✅ Pass: patch được đăng ký lại tự động và record tạo sau đó có task; ❌ Fail: patch không phục hồi, hoặc P-2 không có task
 
@@ -1376,7 +1589,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1389,7 +1602,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. | Task `in_progress`. |
-| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})`. | `stage`='paused'; `business_elapsed`=1.0; `paused_since`=03:00 UTC; `next_due_at` rỗng; `has_breached`=False; đúng 1 event `pause` (`event_dt`=03:00 UTC); events [attach, pause]. |
+| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})`. | `stage`='paused'; `business_duration`=1.0; `pause_time`=03:00 UTC; `next_due_at` rỗng; `has_breached`=False; đúng 1 event `pause` (`event_dt`=03:00 UTC); events [attach, pause]. |
 
 **Pass/Fail Criteria:** ✅ Pass: Các giá trị nêu ở bước 2 đúng. ❌ Fail: Stage khác `paused`, elapsed ≠ 1.0 hoặc số `pause` ≠ 1.
 
@@ -1407,7 +1620,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1420,9 +1633,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='WORK', attach; ghi `ref`='HOLD', `evaluate(P, T0 + 1h, {'ref'})`. | Task `paused`; 2 event. |
-| 2 | Ghi lại `ref`='HOLD'; `evaluate(P, T0 + 2h, {'ref'})`. | Vẫn `paused`; `paused_since`=03:00 UTC; `business_elapsed`=1.0; tổng event = 2. |
+| 2 | Ghi lại `ref`='HOLD'; `evaluate(P, T0 + 2h, {'ref'})`. | Vẫn `paused`; `pause_time`=03:00 UTC; `business_duration`=1.0; tổng event = 2. |
 
-**Pass/Fail Criteria:** ✅ Pass: Không event mới, không đổi giá trị. ❌ Fail: Có event mới hoặc `paused_since` đổi.
+**Pass/Fail Criteria:** ✅ Pass: Không event mới, không đổi giá trị. ❌ Fail: Có event mới hoặc `pause_time` đổi.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -1438,7 +1651,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1450,8 +1663,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P `ref`='NEW', attach; ghi `ref`='DONE'; `evaluate(P, T0 + 1h, {'ref'})`. | Task `achieved`, `end_dt`=03:00 UTC; 2 event. |
-| 2 | Ghi `ref`='HOLD' (pause và start khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Task vẫn `achieved`, `end_dt`=03:00 UTC; số task = 1; tổng event = 2. |
+| 1 | Tạo P `ref`='NEW', attach; ghi `ref`='DONE'; `evaluate(P, T0 + 1h, {'ref'})`. | Task `achieved`, `end_time`=03:00 UTC; 2 event. |
+| 2 | Ghi `ref`='HOLD' (pause và start khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Task vẫn `achieved`, `end_time`=03:00 UTC; số task = 1; tổng event = 2. |
 
 **Pass/Fail Criteria:** ✅ Pass: Task không đổi. ❌ Fail: Task đổi stage hoặc có event `pause`.
 
@@ -1469,7 +1682,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). resume_mode `condition`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). resume_mode `condition`.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1482,7 +1695,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='WORK', attach; ghi `ref`='HOLD', `evaluate(P, T0 + 1h, {'ref'})`. | Task `paused`. |
-| 2 | Ghi `ref`='WORK' (resume khớp); `evaluate(P, T0 + 3h, {'ref'})`. | `stage`='in_progress'; `paused_since` rỗng; `running_since`=05:00 UTC; `business_elapsed`=1.0; đúng 1 event `resume` (`event_dt`=05:00 UTC). |
+| 2 | Ghi `ref`='WORK' (resume khớp); `evaluate(P, T0 + 3h, {'ref'})`. | `stage`='in_progress'; `pause_time` rỗng; `running_since`=05:00 UTC; `business_duration`=1.0; đúng 1 event `resume` (`event_dt`=05:00 UTC). |
 
 **Pass/Fail Criteria:** ✅ Pass: `in_progress`, 1 event `resume`. ❌ Fail: Còn `paused` hoặc số `resume` ≠ 1.
 
@@ -1500,7 +1713,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). resume_mode `condition`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). resume_mode `condition`.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1531,7 +1744,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: resume_mode `pause_unmatched`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: resume_mode `pause_unmatched`.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1562,7 +1775,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: resume_mode `pause_unmatched`, `resume_domain` = `[]` (luôn khớp).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: resume_mode `pause_unmatched`, `resume_domain` = `[]` (luôn khớp).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1575,7 +1788,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P `ref`='WORK', attach; ghi `ref`='HOLD', `evaluate(P, T0 + 1h, {'ref'})`. | Task `paused`. |
-| 2 | Ghi lại `ref`='HOLD' (pause khớp, resume `[]` khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Task vẫn `paused`; số event `resume` = 0; tổng event = 2. |
+| 2 | Ghi lại `ref`='HOLD' (pause khớp, resume `[('id', '!=', 0)]` khớp); `evaluate(P, T0 + 2h, {'ref'})`. | Task vẫn `paused`; số event `resume` = 0; tổng event = 2. |
 
 **Pass/Fail Criteria:** ✅ Pass: Vẫn `paused`. ❌ Fail: Task về `in_progress`.
 
@@ -1594,7 +1807,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Module `dwo_sla_core` và `dwo_sla_demo_ticket` đã cài (FX-DEMO).
-2. Định nghĩa trên `demo.ticket`: start `[('priority','=','p1')]`; pause `[('stage','in',['waiting_customer','resolved'])]`; resume_mode `pause_unmatched`; stop `[('stage','=','closed')]`; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`. (Phụ thuộc: TA-15, module demo `dwo_sla_demo_ticket` chưa hiện thực: `demo.ticket` phải có `priority` chứa `p1` và `stage` chứa các giá trị trên theo AC của SRS)
+2. Định nghĩa trên `demo.ticket`: start `[('priority','=','p1')]`; pause `[('stage','in',['waiting_customer','resolved'])]`; resume_mode `pause_unmatched`; stop `[('stage','=','closed')]`; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`. (Phụ thuộc: TA-15, module demo `dwo_sla_demo_ticket` chưa hiện thực: `demo.ticket` phải có `priority` chứa `p1` và `stage` chứa các giá trị trên theo AC của SRS)
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -1609,13 +1822,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | 2 | Ghi `stage`='waiting_customer'; `evaluate(K, T0 + 1h, {'stage'})`. | Task `paused`; events [attach, pause]. |
 | 3 | Ghi `stage`='resolved'; `evaluate(K, T0 + 2h, {'stage'})`. | Vẫn `paused`; số event vẫn 2 (pause vẫn khớp). |
 | 4 | Ghi `stage`='in_progress'; `evaluate(K, T0 + 3h, {'stage'})`. | Task `in_progress`; 3 event, event cuối `resume`. |
-| 5 | Ghi `stage`='closed'; `evaluate(K, T0 + 3.5h, {'stage'})`. | Task `achieved`, `end_dt`=05:30 UTC (12:30 VN), `business_elapsed`=1.5; tổng 1 task; đúng 4 event theo thứ tự [attach, pause, resume, complete]. |
+| 5 | Ghi `stage`='closed'; `evaluate(K, T0 + 3.5h, {'stage'})`. | Task `achieved`, `end_time`=05:30 UTC (12:30 VN), `business_duration`=1.5; tổng 1 task; đúng 4 event theo thứ tự [attach, pause, resume, complete]. |
 
 **Pass/Fail Criteria:** ✅ Pass: 1 task, đúng 4 event đúng thứ tự, `achieved`. ❌ Fail: Số event ≠ 4, sai thứ tự hoặc có task thứ hai.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-PAU-009: Resume khi chưa vi phạm: `planned_end` = thời điểm resume + phần còn lại (17:00)
+### TC-PAU-009: Resume khi chưa vi phạm: `planned_end_time` = thời điểm resume + phần còn lại (17:00)
 
 | Field | Giá trị |
 |---|---|
@@ -1627,7 +1840,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). `target_hours`=4, lịch 24x7.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). `duration`=4, lịch 24x7.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1639,15 +1852,15 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. | `planned_end`=06:00 UTC (13:00 VN). |
-| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})`. | `paused`, `business_elapsed`=1.0, `has_breached`=False. |
-| 3 | Ghi `ref`='WORK'; `evaluate(P, T0 + 5h, {'ref'})`. | `in_progress`; `planned_end`=2026-03-02 10:00 UTC (17:00 VN = 14:00 + 3h); `has_breached`=False. |
+| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. | `planned_end_time`=06:00 UTC (13:00 VN). |
+| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})`. | `paused`, `business_duration`=1.0, `has_breached`=False. |
+| 3 | Ghi `ref`='WORK'; `evaluate(P, T0 + 5h, {'ref'})`. | `in_progress`; `planned_end_time`=2026-03-02 10:00 UTC (17:00 VN = 14:00 + 3h); `has_breached`=False. |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` = 10:00 UTC. ❌ Fail: `planned_end` ≠ 10:00 UTC.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` = 10:00 UTC. ❌ Fail: `planned_end_time` ≠ 10:00 UTC.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-PAU-010: Resume khi dấu vi phạm đã bật: `planned_end` giữ nguyên 13:00
+### TC-PAU-010: Resume khi dấu vi phạm đã bật: `planned_end_time` giữ nguyên 13:00
 
 | Field | Giá trị |
 |---|---|
@@ -1659,7 +1872,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). `target_hours`=4, lịch 24x7.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). `duration`=4, lịch 24x7.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1671,11 +1884,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. Xử lý nền tại now=T0 + 4h01m (13:01). | `has_breached`=True; `planned_end`=06:00 UTC (13:00 VN). |
-| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `paused`; `business_elapsed`=4.5. |
-| 3 | Ghi `ref`='WORK'; `evaluate(P, T0 + 5h, {'ref'})`. | `in_progress`; `planned_end` vẫn 06:00 UTC (13:00 VN); `has_breached`=True. |
+| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. Xử lý nền tại now=T0 + 4h01m (13:01). | `has_breached`=True; `planned_end_time`=06:00 UTC (13:00 VN). |
+| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `paused`; `business_duration`=4.5. |
+| 3 | Ghi `ref`='WORK'; `evaluate(P, T0 + 5h, {'ref'})`. | `in_progress`; `planned_end_time` vẫn 06:00 UTC (13:00 VN); `has_breached`=True. |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` không đổi. ❌ Fail: `planned_end` bị dời.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` không đổi. ❌ Fail: `planned_end_time` bị dời.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -1691,7 +1904,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1706,7 +1919,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | 1 | Tạo P `ref`='NEW'; `evaluate(P, T0, None)`. | Event: attach. |
 | 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})`. | Thêm: pause. |
 | 3 | Ghi `ref`='WORK'; `evaluate(P, T0 + 2h, {'ref'})`. | Thêm: resume. |
-| 4 | Ghi `ref`='DONE'; `evaluate(P, T0 + 3h, {'ref'})`. | Thêm: complete; task `achieved`, `business_elapsed`=2.0. |
+| 4 | Ghi `ref`='DONE'; `evaluate(P, T0 + 3h, {'ref'})`. | Thêm: complete; task `achieved`, `business_duration`=2.0. |
 | 5 | Đọc `sla.event` của task sắp theo `event_dt`, `id`. | Đúng 4 event [attach 02:00, pause 03:00, resume 04:00, complete 05:00 UTC]. |
 
 **Pass/Fail Criteria:** ✅ Pass: Danh sách event đúng 4 phần tử đúng thứ tự. ❌ Fail: Thiếu, thừa hoặc sai thứ tự event.
@@ -1715,7 +1928,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ## TG-03 — Vi phạm và quanh hạn
 
-### TC-BRE-001: Xử lý nền tại 12:59 (trước `planned_end` 13:00): không vi phạm
+### TC-BRE-001: Xử lý nền tại 12:59 (trước `planned_end_time` 13:00): không vi phạm
 
 | Field | Giá trị |
 |---|---|
@@ -1727,14 +1940,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Partner | `ref`='WORK' |  |
-| now attach | T0 | planned_end = 13:00 VN (06:00 UTC) |
+| now attach | T0 | planned_end_time = 13:00 VN (06:00 UTC) |
 | now xử lý nền | T0 + 3h59m (12:59) |  |
 
 **Steps & Expected Results:**
@@ -1746,7 +1959,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-BRE-002: Xử lý nền đúng 13:00 (chạm `planned_end`): bật dấu vi phạm, 1 event `breach`
+### TC-BRE-002: Xử lý nền đúng 13:00 (chạm `planned_end_time`): bật dấu vi phạm, 1 event `breach`
 
 | Field | Giá trị |
 |---|---|
@@ -1758,7 +1971,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1788,7 +2001,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1800,7 +2013,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; `evaluate(P, T0, None)`. Gọi xử lý nền với now=13:01. | `has_breached`=True; đúng 1 event `breach` với `event_dt` = 06:01 UTC (= `now` lúc xử lý, D3/TA-05 đã chốt); `stage`='in_progress'; `end_dt` rỗng. |
+| 1 | Tạo P; `evaluate(P, T0, None)`. Gọi xử lý nền với now=13:01. | `has_breached`=True; đúng 1 event `breach` với `event_dt` = 06:01 UTC (= `now` lúc xử lý, D3/TA-05 đã chốt); `stage`='in_progress'; `end_time` rỗng. |
 
 **Pass/Fail Criteria:** ✅ Pass: Như bước 1. ❌ Fail: Sai bất kỳ giá trị.
 
@@ -1818,7 +2031,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1842,27 +2055,27 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-03-02 |
-| Coverage Item | CI-1 (Pause sau `planned_end` (14:00), chưa có xử lý nền) |
+| Coverage Item | CI-1 (Pause sau `planned_end_time` (14:00), chưa có xử lý nền) |
 | Requirement Ref | REQ-FUNC-022 (AC2) |
 | Priority | P1-Critical |
 | Test Type | Positive |
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Partner | `ref` WORK → HOLD |  |
-| Mốc | T0; T0 + 5h (14:00) | planned_end 13:00, chưa chạy xử lý nền |
+| Mốc | T0; T0 + 5h (14:00) | planned_end_time 13:00, chưa chạy xử lý nền |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P; `evaluate(P, T0, None)`. Không chạy xử lý nền. | Task `in_progress`, `has_breached`=False. |
-| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 5h, {'ref'})`. | `has_breached`=True; `stage`='paused'; `business_elapsed`=5.0; events theo `id`: [attach, breach (`event_dt`=07:00 UTC), pause (`event_dt`=07:00 UTC)]. |
+| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 5h, {'ref'})`. | `has_breached`=True; `stage`='paused'; `business_duration`=5.0; events theo `id`: [attach, breach (`event_dt`=07:00 UTC), pause (`event_dt`=07:00 UTC)]. |
 
 **Pass/Fail Criteria:** ✅ Pass: Có `breach` trước `pause`, cả hai lúc 07:00 UTC. ❌ Fail: Không có `breach` hoặc sai thứ tự.
 
@@ -1873,14 +2086,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-03-02 |
-| Coverage Item | CI-2 (Pause đúng `planned_end` (13:00), đã trôi = mục tiêu) |
+| Coverage Item | CI-2 (Pause đúng `planned_end_time` (13:00), đã trôi = mục tiêu) |
 | Requirement Ref | REQ-FUNC-022 (AC2 (biên)) |
 | Priority | P2-High |
 | Test Type | Boundary |
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1892,7 +2105,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; `evaluate(P, T0, None)`. Ghi `ref`='HOLD'; `evaluate(P, T0 + 4h, {'ref'})`. | `has_breached`=True; `stage`='paused'; `business_elapsed`=4.0; events [attach, breach, pause], `breach.id` < `pause.id`. |
+| 1 | Tạo P; `evaluate(P, T0, None)`. Ghi `ref`='HOLD'; `evaluate(P, T0 + 4h, {'ref'})`. | `has_breached`=True; `stage`='paused'; `business_duration`=4.0; events [attach, breach, pause], `breach.id` < `pause.id`. |
 
 **Pass/Fail Criteria:** ✅ Pass: Dấu bật, đúng thứ tự. ❌ Fail: Dấu không bật.
 
@@ -1910,7 +2123,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). FX-ESC-STD biến thể: chỉ một mốc `percent`=100, server action ghi chú vào chatter của partner.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). FX-ESC-STD biến thể: chỉ một mốc `percent`=100, server action ghi chú vào chatter của partner.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -1941,14 +2154,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: một mốc `percent`=120 (đến hạn 13:48), server action ghi chú vào chatter.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: một mốc `percent`=120 (đến hạn 13:48), server action ghi chú vào chatter.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Partner | `ref`='WORK' |  |
-| now xử lý nền | T0 + 4h50m (13:50) | Cả `planned_end` (13:00) và mốc 120% (13:48) đã đến hạn |
+| now xử lý nền | T0 + 4h50m (13:50) | Cả `planned_end_time` (13:00) và mốc 120% (13:48) đã đến hạn |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
@@ -1959,7 +2172,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-BRE-009: Stop khi đã quá `planned_end` nhưng xử lý nền chưa chạy: `breached`
+### TC-BRE-009: Stop khi đã quá `planned_end_time` nhưng xử lý nền chưa chạy: `breached`
 
 | Field | Giá trị |
 |---|---|
@@ -1971,20 +2184,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Partner | `ref` NEW → DONE |  |
-| Mốc | T0; T0 + 4.5h (13:30) | planned_end 13:00, không chạy xử lý nền |
+| Mốc | T0; T0 + 4.5h (13:30) | planned_end_time 13:00, không chạy xử lý nền |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P; `evaluate(P, T0, None)`. | Task `in_progress`. |
-| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `stage`='breached'; `end_dt`=06:30 UTC; `has_breached`=True; `business_elapsed`=4.5; events theo `id`: [attach, breach, complete]. |
+| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `stage`='breached'; `end_time`=06:30 UTC; `has_breached`=True; `business_duration`=4.5; events theo `id`: [attach, breach, complete]. |
 
 **Pass/Fail Criteria:** ✅ Pass: `breached`, đủ 3 event. ❌ Fail: `achieved`.
 
@@ -2002,7 +2215,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-VN (FX-DEF-STD với lịch FX-CAL-VN, `target_hours`=4).
+1. Module `dwo_sla_core` đã cài; FX-DEF-VN (FX-DEF-STD với lịch FX-CAL-VN, `duration`=4).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2014,9 +2227,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. | `planned_end`=2026-03-02 06:00 UTC (13:00 VN). |
-| 2 | Ghi `ref`='HOLD'; `evaluate(P, 2026-03-02 11:00 VN, {'ref'})`. | `paused`; `business_elapsed`=2.0; `has_breached`=False. |
-| 3 | Ghi `ref`='DONE'; `evaluate(P, 2026-03-09 11:00 VN, {'ref'})`. | `stage`='achieved'; `has_breached`=False; `business_elapsed`=2.0 (không tăng khi paused); `end_dt`=2026-03-09 04:00 UTC; đúng 1 event `complete`. |
+| 1 | Tạo P `ref`='WORK'; `evaluate(P, T0, None)`. | `planned_end_time`=2026-03-02 06:00 UTC (13:00 VN). |
+| 2 | Ghi `ref`='HOLD'; `evaluate(P, 2026-03-02 11:00 VN, {'ref'})`. | `paused`; `business_duration`=2.0; `has_breached`=False. |
+| 3 | Ghi `ref`='DONE'; `evaluate(P, 2026-03-09 11:00 VN, {'ref'})`. | `stage`='achieved'; `has_breached`=False; `business_duration`=2.0 (không tăng khi paused); `end_time`=2026-03-09 04:00 UTC; đúng 1 event `complete`. |
 
 **Pass/Fail Criteria:** ✅ Pass: `achieved`, elapsed 2.0. ❌ Fail: `breached` hoặc elapsed tăng.
 
@@ -2034,7 +2247,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2047,8 +2260,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P; `evaluate(P, T0, None)`; xử lý nền now=13:01. | `has_breached`=True. |
-| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `paused`; `business_elapsed`=4.5. |
-| 3 | Ghi `ref`='DONE'; `evaluate(P, T0 + 6h, {'ref'})`. | `stage`='breached'; `end_dt`=08:00 UTC; `business_elapsed`=4.5; 1 event `complete`. |
+| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `paused`; `business_duration`=4.5. |
+| 3 | Ghi `ref`='DONE'; `evaluate(P, T0 + 6h, {'ref'})`. | `stage`='breached'; `end_time`=08:00 UTC; `business_duration`=4.5; 1 event `complete`. |
 
 **Pass/Fail Criteria:** ✅ Pass: `breached`. ❌ Fail: `achieved`.
 
@@ -2066,7 +2279,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2079,7 +2292,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P; `evaluate(P, T0, None)`; xử lý nền now=13:01. | 1 event `breach`. |
-| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `stage`='breached'; `end_dt`=06:30 UTC; số `breach` = 1; số `complete` = 1; tổng event = 3. |
+| 2 | Ghi `ref`='DONE'; `evaluate(P, T0 + 4.5h, {'ref'})`. | `stage`='breached'; `end_time`=06:30 UTC; số `breach` = 1; số `complete` = 1; tổng event = 3. |
 
 **Pass/Fail Criteria:** ✅ Pass: `breached`, 1 `breach`, 1 `complete`. ❌ Fail: Số `breach` > 1.
 
@@ -2097,7 +2310,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2128,7 +2341,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: một mốc `percent`=120, server action ghi chú vào chatter.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Biến thể: một mốc `percent`=120, server action ghi chú vào chatter.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2140,7 +2353,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; `evaluate(P, T0, None)`. Ghi `ref`='HOLD'; `evaluate(P, T0 + 4h24m, {'ref'})`. | `paused`; `business_elapsed`=4.4; `has_breached`=True; 0 event `escalate`. |
+| 1 | Tạo P; `evaluate(P, T0, None)`. Ghi `ref`='HOLD'; `evaluate(P, T0 + 4h24m, {'ref'})`. | `paused`; `business_duration`=4.4; `has_breached`=True; 0 event `escalate`. |
 | 2 | Ghi `ref`='WORK'; `evaluate(P, T0 + 6h, {'ref'})` (15:00). | `in_progress`; `next_due_at`=2026-03-02 08:24 UTC (15:24 VN). |
 | 3 | Xử lý nền với now=15:23. | Số event `escalate` = 0. |
 | 4 | Xử lý nền với now=15:24. | Số event `escalate` = 1 (tổng đã trôi 4,4 + 0,4 = 4,8 giờ). |
@@ -2161,7 +2374,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2174,10 +2387,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P; `evaluate(P, T0, None)`. | Task `in_progress`. |
-| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})` để chốt đã trôi; đọc `percent_used` của task. | `stage`='paused'; `business_elapsed`=1.0; `percent_used` = 25. |
-| 3 | Ví dụ chạy trực tiếp (không pause): partner P2 mới (`ref`='WORK'), `evaluate(P2, T0, None)`; patch `odoo.fields.Datetime.now` lần lượt T0 + 1h rồi T0 + 5h, invalidate cache và đọc `percent_used`, `business_elapsed` của task. | Task `in_progress`; `percent_used` = 25 tại T0 + 1h và = 125 tại T0 + 5h (gồm đoạn đang chạy từ `running_since`); `business_elapsed` vẫn = 0.0 (chưa chốt). Khớp `tests/test_tg03_more.py::test_bre_017b_running_percent_live`. |
+| 2 | Ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})` để chốt đã trôi; đọc `business_percent_used` của task. | `stage`='paused'; `business_duration`=1.0; `business_percent_used` = 25. |
+| 3 | Ví dụ chạy trực tiếp (không pause): partner P2 mới (`ref`='WORK'), `evaluate(P2, T0, None)`; patch `odoo.fields.Datetime.now` lần lượt T0 + 1h rồi T0 + 5h, invalidate cache và đọc `business_percent_used`, `business_duration` của task. | Task `in_progress`; `business_percent_used` = 25 tại T0 + 1h và = 125 tại T0 + 5h (gồm đoạn đang chạy từ `running_since`); `business_duration` vẫn = 0.0 (chưa chốt). Khớp `tests/test_tg03_more.py::test_bre_017b_running_percent_live`. |
 
-**Ghi chú:** `percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_elapsed` và `target_hours`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
+**Ghi chú:** `business_percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_duration` và `target_duration`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
 
 **Pass/Fail Criteria:** ✅ Pass: Giá trị = 25. ❌ Fail: Giá trị khác 25.
 
@@ -2195,7 +2408,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2207,11 +2420,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; `evaluate(P, T0, None)`. Ghi `ref`='HOLD'; `evaluate(P, T0 + 5h, {'ref'})`; đọc `percent_used`. | `business_elapsed`=5.0; `percent_used` = 125 (không bị cắt ở 100). |
+| 1 | Tạo P; `evaluate(P, T0, None)`. Ghi `ref`='HOLD'; `evaluate(P, T0 + 5h, {'ref'})`; đọc `business_percent_used`. | `business_duration`=5.0; `business_percent_used` = 125 (không bị cắt ở 100). |
 
-**Ghi chú:** `percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_elapsed` và `target_hours`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
+**Ghi chú:** `business_percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_duration` và `target_duration`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
 
-**Pass/Fail Criteria:** ✅ Pass: `percent_used` = 125. ❌ Fail: `percent_used` ≠ 125.
+**Pass/Fail Criteria:** ✅ Pass: `business_percent_used` = 125. ❌ Fail: `business_percent_used` ≠ 125.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -2227,7 +2440,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-VN (FX-DEF-STD với lịch FX-CAL-VN, `target_hours`=4).
+1. Module `dwo_sla_core` đã cài; FX-DEF-VN (FX-DEF-STD với lịch FX-CAL-VN, `duration`=4).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2239,11 +2452,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; attach T0; ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})`. | `paused`; `business_elapsed`=1.0. |
-| 2 | Với patch `odoo.fields.Datetime.now` trả 11:00: `invalidate_recordset()` rồi đọc `percent_used`. | 25. |
-| 3 | Patch `odoo.fields.Datetime.now` trả 13:00 (cách 2 giờ làm việc); `invalidate_recordset()` rồi đọc `percent_used` và `business_elapsed`. | `percent_used` = 25 (không đổi); `business_elapsed` = 1.0. |
+| 1 | Tạo P; attach T0; ghi `ref`='HOLD'; `evaluate(P, T0 + 1h, {'ref'})`. | `paused`; `business_duration`=1.0. |
+| 2 | Với patch `odoo.fields.Datetime.now` trả 11:00: `invalidate_recordset()` rồi đọc `business_percent_used`. | 25. |
+| 3 | Patch `odoo.fields.Datetime.now` trả 13:00 (cách 2 giờ làm việc); `invalidate_recordset()` rồi đọc `business_percent_used` và `business_duration`. | `business_percent_used` = 25 (không đổi); `business_duration` = 1.0. |
 
-**Pass/Fail Criteria:** ✅ Pass: hai lần đọc đều `percent_used` = 25 và `business_elapsed` = 1.0. ❌ Fail: giá trị lần hai ≠ 25.
+**Pass/Fail Criteria:** ✅ Pass: hai lần đọc đều `business_percent_used` = 25 và `business_duration` = 1.0. ❌ Fail: giá trị lần hai ≠ 25.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -2259,7 +2472,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2271,11 +2484,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; attach T0. Ghi `ref`='HOLD'; `evaluate(P, now=10:59, {'ref'})`; đọc `percent_used`. | `stage`='paused'; `percent_used` = 49. |
+| 1 | Tạo P; attach T0. Ghi `ref`='HOLD'; `evaluate(P, now=10:59, {'ref'})`; đọc `business_percent_used`. | `stage`='paused'; `business_percent_used` = 49. |
 
-**Ghi chú:** `percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_elapsed` và `target_hours`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
+**Ghi chú:** `business_percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_duration` và `target_duration`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
 
-**Pass/Fail Criteria:** ✅ Pass: `percent_used` = 49. ❌ Fail: `percent_used` = 50.
+**Pass/Fail Criteria:** ✅ Pass: `business_percent_used` = 49. ❌ Fail: `business_percent_used` = 50.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -2291,7 +2504,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2303,11 +2516,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; attach T0. Ghi `ref`='HOLD'; `evaluate(P, now=12:59, {'ref'})`; đọc `percent_used`. | `stage`='paused'; `percent_used` = 99. |
+| 1 | Tạo P; attach T0. Ghi `ref`='HOLD'; `evaluate(P, now=12:59, {'ref'})`; đọc `business_percent_used`. | `stage`='paused'; `business_percent_used` = 99. |
 
-**Ghi chú:** `percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_elapsed` và `target_hours`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
+**Ghi chú:** `business_percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_duration` và `target_duration`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
 
-**Pass/Fail Criteria:** ✅ Pass: `percent_used` = 99. ❌ Fail: `percent_used` ≠ 99.
+**Pass/Fail Criteria:** ✅ Pass: `business_percent_used` = 99. ❌ Fail: `business_percent_used` ≠ 99.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -2323,7 +2536,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2335,11 +2548,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; attach T0. Ghi `ref`='HOLD'; `evaluate(P, now=13:00, {'ref'})`; đọc `percent_used`. | `stage`='paused'; `percent_used` = 100. |
+| 1 | Tạo P; attach T0. Ghi `ref`='HOLD'; `evaluate(P, now=13:00, {'ref'})`; đọc `business_percent_used`. | `stage`='paused'; `business_percent_used` = 100. |
 
-**Ghi chú:** `percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_elapsed` và `target_hours`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
+**Ghi chú:** `business_percent_used` KHÔNG lưu: giá trị tính khi đọc từ `business_duration` và `target_duration`, và với task `in_progress` còn cộng đoạn đang chạy từ `running_since` tới thời điểm xem (TA-22 ĐÃ CHỐT; code đổi 2026-10-12, `sla.time.settle_batch`). Ca vẫn pause trước để có số cố định, vì đoạn đang chạy phụ thuộc đồng hồ lúc đọc.
 
-**Pass/Fail Criteria:** ✅ Pass: `percent_used` = 100. ❌ Fail: `percent_used` ≠ 100.
+**Pass/Fail Criteria:** ✅ Pass: `business_percent_used` = 100. ❌ Fail: `business_percent_used` ≠ 100.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -2355,7 +2568,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation).
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2367,9 +2580,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo P; attach T0. Đọc `percent_used` ngay sau attach (task `in_progress`, `business_elapsed`=0). | `percent_used` = 0. |
+| 1 | Tạo P; attach T0. Đọc `business_percent_used` ngay sau attach (task `in_progress`, `business_duration`=0). | `business_percent_used` = 0. |
 
-**Pass/Fail Criteria:** ✅ Pass: `percent_used` = 0. ❌ Fail: `percent_used` ≠ 0.
+**Pass/Fail Criteria:** ✅ Pass: `business_percent_used` = 0. ❌ Fail: `business_percent_used` ≠ 0.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -2385,7 +2598,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `target_hours`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Một mốc `percent`=100, `retry`=False, server action chạy `raise UserError('boom: gateway down')`.
+1. Module `dwo_sla_core` đã cài; FX-DEF-STD đang active trên `res.partner` (start `ref`∈{NEW,WORK,HOLD}; pause `ref`=HOLD; resume `ref`=WORK; stop `ref`=DONE; cancel `ref`=CANCEL; reset rỗng; `duration`=4; lịch 24x7; cancel_mode `start_unmatched`; resume_mode `condition`; không escalation). Một mốc `percent`=100, `retry`=False, server action chạy `raise UserError('boom: gateway down')`.
 2. Chưa có `sla.task` và `sla.event` nào cho partner thử (partner tạo mới trong ca).
 
 **Test Data:**
@@ -2405,7 +2618,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-BRE-023: Ràng buộc CSDL chéo trên task: `breached` kéo theo dấu vi phạm, `achieved` không có dấu vi phạm, `end_dt` và `next_due_at` theo stage
+### TC-BRE-023: Ràng buộc CSDL chéo trên task: `breached` kéo theo dấu vi phạm, `achieved` không có dấu vi phạm, `end_time` và `next_due_at` theo stage
 
 | Field | Giá trị |
 |---|---|
@@ -2429,9 +2642,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Savepoint: `UPDATE sla_task SET stage='breached', end_dt=now(), running_since=NULL, next_due_at=NULL WHERE id = T1` (không bật `has_breached`) | Bị từ chối bởi `sla_task_breached_check` (CheckViolation/IntegrityError) |
-| 2 | Savepoint: `UPDATE sla_task SET stage='achieved', has_breached=true, end_dt=now(), running_since=NULL, next_due_at=NULL WHERE id = T1` | Bị từ chối bởi `sla_task_achieved_check` |
-| 3 | Savepoint: `UPDATE sla_task SET stage='cancelled', running_since=NULL, next_due_at=NULL WHERE id = T1` (thiếu `end_dt`) | Bị từ chối bởi `sla_task_end_dt_check` |
+| 1 | Savepoint: `UPDATE sla_task SET stage='breached', end_time=now(), running_since=NULL, next_due_at=NULL WHERE id = T1` (không bật `has_breached`) | Bị từ chối bởi `sla_task_breached_check` (CheckViolation/IntegrityError) |
+| 2 | Savepoint: `UPDATE sla_task SET stage='achieved', has_breached=true, end_time=now(), running_since=NULL, next_due_at=NULL WHERE id = T1` | Bị từ chối bởi `sla_task_achieved_check` |
+| 3 | Savepoint: `UPDATE sla_task SET stage='cancelled', running_since=NULL, next_due_at=NULL WHERE id = T1` (thiếu `end_time`) | Bị từ chối bởi `sla_task_end_dt_check` |
 | 4 | Savepoint: `UPDATE sla_task SET next_due_at=now() WHERE id = T2` (task `paused` có mốc xử lý nền) | Bị từ chối bởi `sla_task_next_due_at_check` |
 | 5 | Đọc lại T1 và T2 sau các bước | T1 `in_progress`, `has_breached` = False; T2 `paused`; không đổi |
 
@@ -2455,7 +2668,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: pause = `[('ref','in',['HOLD','DONE'])]`; start = `ref ∈ {NEW,WORK,HOLD,DONE}`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: pause = `[('ref','in',['HOLD','DONE'])]`; start = `ref ∈ {NEW,WORK,HOLD,DONE}`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào; task `in_progress` được gắn bằng bước 1
 
 **Test Data:**
@@ -2469,8 +2682,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `start_dt`=09:00, 1 event `attach` |
-| 2 | Đặt `ref`='DONE' (không qua hook, G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='achieved', `end_dt`=2026-03-02 10:00 ICT |
+| 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `start_time`=09:00, 1 event `attach` |
+| 2 | Đặt `ref`='DONE' (không qua hook, G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='achieved', `end_time`=2026-03-02 10:00 ICT |
 | 3 | Đếm event của task theo loại | `complete`=1, `pause`=0, tổng event = 2 (`attach`,`complete`) |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Task `achieved` và không có event `pause`. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -2491,7 +2704,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','in',['CANCEL','DONE'])]`; start = `ref ∈ {NEW,WORK,HOLD,DONE}`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','in',['CANCEL','DONE'])]`; start = `ref ∈ {NEW,WORK,HOLD,DONE}`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2527,7 +2740,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','HOLD')]` (cùng giá trị với pause)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','HOLD')]` (cùng giá trị với pause)
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2542,7 +2755,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Đặt `ref`='HOLD' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='cancelled', `end_dt`=10:00 |
+| 2 | Đặt `ref`='HOLD' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='cancelled', `end_time`=10:00 |
 | 3 | Đếm event theo loại | `cancel`=1, `pause`=0 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Task `cancelled`, không có event `pause`. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -2563,7 +2776,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; pause = `ref ∈ {HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; pause = `ref ∈ {HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2600,7 +2813,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2636,7 +2849,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','RESET')]`; reset = `[('ref','=','RESET')]`; start = `ref ∈ {NEW,WORK,HOLD,RESET}`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','RESET')]`; reset = `[('ref','=','RESET')]`; start = `ref ∈ {NEW,WORK,HOLD,RESET}`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2672,7 +2885,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (cancel_mode=`start_unmatched`)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (cancel_mode=`start_unmatched`)
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2688,9 +2901,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
 | 2 | Đặt `ref`='OTHER' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='cancelled' |
-| 3 | Đọc `end_dt` và đếm event `cancel` | `end_dt`=2026-03-02 10:00 ICT (03:00 UTC), `cancel`=1 |
+| 3 | Đọc `end_time` và đếm event `cancel` | `end_time`=2026-03-02 10:00 ICT (03:00 UTC), `cancel`=1 |
 
-**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Task `cancelled`, `end_dt` có giá trị, đúng 1 event `cancel`. ❌ Fail: bất kỳ Expected Result nào sai.
+**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Task `cancelled`, `end_time` có giá trị, đúng 1 event `cancel`. ❌ Fail: bất kỳ Expected Result nào sai.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -2708,7 +2921,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','WORK')]`; pause = `[('ref','=','HOLD')]`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','WORK')]`; pause = `[('ref','=','HOLD')]`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2723,7 +2936,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Đặt `ref`='WORK' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='cancelled', `end_dt`=10:00 |
+| 2 | Đặt `ref`='WORK' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='cancelled', `end_time`=10:00 |
 | 3 | Đếm event `cancel` | 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Task `cancelled` dù start vẫn khớp. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -2744,7 +2957,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`never`; cancel = `[('ref','=','CANCEL')]`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`never`; cancel = `[('ref','=','CANCEL')]`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2760,7 +2973,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
 | 2 | Đặt `ref`='CANCEL' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='in_progress' |
-| 3 | Đọc `end_dt` và đếm event `cancel` | `end_dt` rỗng, `cancel`=0 |
+| 3 | Đọc `end_time` và đếm event `cancel` | `end_time` rỗng, `cancel`=0 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Task vẫn `in_progress`, không event `cancel`. ❌ Fail: bất kỳ Expected Result nào sai.
 
@@ -2780,7 +2993,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2816,7 +3029,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel = `[('ref','=','WORK')]` (start vẫn gồm WORK); cancel_mode=`start_unmatched`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: cancel = `[('ref','=','WORK')]` (start vẫn gồm WORK); cancel_mode=`start_unmatched`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2852,7 +3065,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2866,9 +3079,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` (T-old), `planned_end`=13:00 |
-| 2 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='cancelled', `end_dt`=10:00 |
-| 3 | Đọc task mới T-new | `stage`='in_progress', `start_dt`=10:00, `planned_end`=14:00 |
+| 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` (T-old), `planned_end_time`=13:00 |
+| 2 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='cancelled', `end_time`=10:00 |
+| 3 | Đọc task mới T-new | `stage`='in_progress', `start_time`=10:00, `planned_end_time`=14:00 |
 | 4 | Đọc event của T-old theo thứ tự id | Đúng 1 event `reset`, đứng sau event `cancel` (code ghi `cancel` rồi `reset`; TA-03 ĐÃ CHỐT); T-old không có event `pause` |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; T-old `cancelled`, T-new `in_progress`, 1 event `reset`. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -2889,7 +3102,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`complete`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`complete`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2897,15 +3110,15 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | ref (bước 2) | RESET |  |
-| now bước 2 | T0+1h = 10:00 (trước `planned_end`=13:00) |  |
+| now bước 2 | T0+1h = 10:00 (trước `planned_end_time`=13:00) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` (T-old) |
-| 2 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='achieved', `end_dt`=10:00; event của T-old theo thứ tự id có `complete` rồi `reset` (TA-03 ĐÃ CHỐT) |
-| 3 | Đọc task mới | `stage`='in_progress', `start_dt`=10:00 |
+| 2 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='achieved', `end_time`=10:00; event của T-old theo thứ tự id có `complete` rồi `reset` (TA-03 ĐÃ CHỐT) |
+| 3 | Đọc task mới | `stage`='in_progress', `start_time`=10:00 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; T-old `achieved`, task mới `in_progress`. ❌ Fail: bất kỳ Expected Result nào sai.
 
@@ -2925,7 +3138,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; pause = `ref ∈ {HOLD,RESET}`; reset_action=`complete`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; pause = `ref ∈ {HOLD,RESET}`; reset_action=`complete`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -2961,7 +3174,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào; sau bước 1 task `in_progress` rồi kết thúc `achieved` ở bước 2
 
 **Test Data:**
@@ -2977,7 +3190,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Đặt `ref`='DONE' (G1) (start gồm DONE do stop thắng ở mục 1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `achieved`, `end_dt`=10:00; 2 event (`attach`,`complete`) |
+| 2 | Đặt `ref`='DONE' (G1) (start gồm DONE do stop thắng ở mục 1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `achieved`, `end_time`=10:00; 2 event (`attach`,`complete`) |
 | 3 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+2h (11:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Không ngoại lệ |
 | 4 | Đọc tất cả task và event của `P-01` | Số task = 1, `stage`='achieved', số event vẫn = 2, `reset`=0 |
 
@@ -3012,7 +3225,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`) | 1 task `in_progress` (T-old), 1 event `attach` |
-| 2 | Đặt `ref`='RESET' (G1); gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} | Không ném lỗi; T-old vẫn `stage`='in_progress', `end_dt` rỗng |
+| 2 | Đặt `ref`='RESET' (G1); gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} | Không ném lỗi; T-old vẫn `stage`='in_progress', `end_time` rỗng |
 | 3 | Đếm task và event của `P-01` | Tổng số task = 1; số event vẫn = 1 (`attach`); `reset`=0, `cancel`=0 |
 
 **Pass/Fail Criteria:** ✅ Pass: T-old giữ `in_progress`, không có task mới, không có event `reset` hay `cancel`; ❌ Fail: T-old bị đóng hoặc có task mới
@@ -3033,7 +3246,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`cancel`
 2. Partner `P-01` tạo với `ref`='HOLD' tại FX-T0 (task đầu gắn ở `paused`)
 
 **Test Data:**
@@ -3049,7 +3262,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `paused` (T-old) |
 | 2 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='cancelled' |
-| 3 | Đọc task mới | `stage`='in_progress', `start_dt`=10:00 |
+| 3 | Đọc task mới | `stage`='in_progress', `start_time`=10:00 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Reset hoạt động trên task `paused`. ❌ Fail: bất kỳ Expected Result nào sai.
 
@@ -3057,7 +3270,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ---
 
-### TC-CAN-018: Reset kết thúc task cũ breached khi reset_action là complete và đã quá planned_end
+### TC-CAN-018: Reset kết thúc task cũ breached khi reset_action là complete và đã quá planned_end_time
 
 | Field | Giá trị |
 |---|---|
@@ -3069,23 +3282,23 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`complete`
-2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào (task gắn ở T0, `planned_end`=13:00)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; reset_action=`complete`
+2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào (task gắn ở T0, `planned_end_time`=13:00)
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | ref (bước 2) | RESET |  |
-| now bước 2 | T0+5h = 14:00 (quá `planned_end` 1 giờ, chưa có xử lý nền) |  |
+| now bước 2 | T0+5h = 14:00 (quá `planned_end_time` 1 giờ, chưa có xử lý nền) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `planned_end`=13:00 |
-| 2 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+5h (14:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='breached', `end_dt`=14:00; event của T-old theo thứ tự id có `complete` rồi `reset` (TA-03 ĐÃ CHỐT) |
-| 3 | Đọc task mới | `stage`='in_progress', `start_dt`=14:00, `planned_end`=18:00 |
+| 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `planned_end_time`=13:00 |
+| 2 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+5h (14:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='breached', `end_time`=14:00; event của T-old theo thứ tự id có `complete` rồi `reset` (TA-03 ĐÃ CHỐT) |
+| 3 | Đọc task mới | `stage`='in_progress', `start_time`=14:00, `planned_end_time`=18:00 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; T-old `breached`, task mới `in_progress`. ❌ Fail: bất kỳ Expected Result nào sai.
 
@@ -3105,7 +3318,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`; start gồm cả CANCEL; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[('ref','=','RESET')]`; cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`; start gồm cả CANCEL; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -3122,7 +3335,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` (T1) |
 | 2 | Đặt `ref`='CANCEL' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | T1 `stage`='cancelled' |
-| 3 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+2h (11:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Có task mới T2 `in_progress`, `start_dt`=11:00 |
+| 3 | Đặt `ref`='RESET' (G1); Gọi Engine đánh giá `P-01` với now = T0+2h (11:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Có task mới T2 `in_progress`, `start_time`=11:00 |
 | 4 | Đếm event theo loại trên cả hai task | `reset`=0; `attach`=2 (1 cho mỗi task) |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; T2 được gắn bằng attach; không có event `reset`. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -3131,7 +3344,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ---
 
-### TC-CAN-020: Reset khi field theo dõi user_id đổi sang giá trị khác và reset là []
+### TC-CAN-020: Reset khi field theo dõi user_id đổi sang giá trị khác và reset là domain luôn đúng `[('id', '!=', 0)]`
 
 | Field | Giá trị |
 |---|---|
@@ -3143,7 +3356,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng)
 
 **Test Data:**
@@ -3158,7 +3371,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` (T-old) |
-| 2 | Ghi `user_id`=`U-MGR` (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {user_id} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='cancelled'; task mới `in_progress`, `start_dt`=10:00 |
+| 2 | Ghi `user_id`=`U-MGR` (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {user_id} (`evaluate(records, now, changed)`, TAD 5.1) | T-old `stage`='cancelled'; task mới `in_progress`, `start_time`=10:00 |
 | 3 | Đếm event `reset` của T-old | 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Có reset đúng 1 lần. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -3179,7 +3392,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id, comment}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id, comment}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng) và `comment`='A'
 
 **Test Data:**
@@ -3215,7 +3428,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {complete_name}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {complete_name}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng); `complete_name`='P-01' (compute có lưu phụ thuộc `name`)
 
 **Test Data:**
@@ -3251,7 +3464,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: reset = `[('ref','=','RESET')]`; reset_on_field_ids = {user_id}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: reset = `[('ref','=','RESET')]`; reset_field_ids = {user_id}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng)
 
 **Test Data:**
@@ -3287,7 +3500,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id, comment}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id, comment}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng) và `comment`='A'
 
 **Test Data:**
@@ -3323,7 +3536,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id` rỗng (giá trị cũ = rỗng)
 
 **Test Data:**
@@ -3359,7 +3572,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng)
 
 **Test Data:**
@@ -3395,21 +3608,21 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng); người thực hiện `U-MGR`
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| now | T0+1h = 10:00 | hành động Đánh giá lại dùng changed rỗng (TAD: changed rỗng) |
+| now | T0+1h = 10:00 | đánh giá lại thủ công qua engine dùng changed rỗng (TAD: changed rỗng) |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` (T1) |
-| 2 | Với quyền `U-MGR`, thực hiện hành động Đánh giá lại trên `P-01` (đường gọi: Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = ∅ (`evaluate(records, now, changed)`, TAD 5.1)) | Không ngoại lệ |
+| 2 | Với quyền `U-MGR`, thực hiện đánh giá lại thủ công (hàm `Engine.evaluate`, không phải nút trên task vì `P-01` chưa có task) trên `P-01` (đường gọi: Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = ∅ (`evaluate(records, now, changed)`, TAD 5.1)) | Không ngoại lệ |
 | 3 | Đọc task và event | Số task = 1, T1 `in_progress` (cùng `id`), `reset`=0, tổng event = 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Không reset. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -3430,7 +3643,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng)
 
 **Test Data:**
@@ -3465,7 +3678,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: reset_domain rỗng (chưa cấu hình); reset_on_field_ids = {user_id}
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: reset_domain rỗng (chưa cấu hình); reset_field_ids = {user_id}
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng)
 
 **Test Data:**
@@ -3494,14 +3707,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-04-06 |
-| Coverage Item | CI-2 (reset [] + field theo dõi đổi -> ghi chú event reset chứa tên field) |
+| Coverage Item | CI-2 (reset domain luôn đúng + field theo dõi đổi -> ghi chú event reset chứa tên field) |
 | Requirement Ref | REQ-FUNC-051 (AC2) |
 | Priority | P3-Medium |
 | Test Type | Positive |
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng)
 
 **Test Data:**
@@ -3537,7 +3750,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_on_field_ids = {user_id, comment}; reset_action=`cancel`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `ref ∈ {NEW,WORK,HOLD,RESET}`; reset = `[]`; reset_field_ids = {user_id, comment}; reset_action=`cancel`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào với `user_id`=`U-USR` (field giá trị ban đầu khác rỗng) và `comment`='A'
 
 **Test Data:**
@@ -3612,7 +3825,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; stop = `[('ref','in',['NEW','WORK','DONE'])]` (start là tập con của stop); cancel_mode=`start_unmatched`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; stop = `[('ref','in',['NEW','WORK','DONE'])]` (start là tập con của stop); cancel_mode=`start_unmatched`
 2. Partner `P-01` tạo với `ref`='NEW' tại FX-T0, chưa có task
 
 **Test Data:**
@@ -3647,7 +3860,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; stop = `[('ref','in',['NEW','WORK','DONE'])]` (start là tập con của stop); cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; stop = `[('ref','in',['NEW','WORK','DONE'])]` (start là tập con của stop); cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`
 2. Partner `P-01` tạo với `ref`='NEW' tại FX-T0, chưa có task
 
 **Test Data:**
@@ -3682,7 +3895,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; stop = `[('ref','in',['NEW','WORK','DONE'])]` (start là tập con của stop); cancel_mode=`never`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; stop = `[('ref','in',['NEW','WORK','DONE'])]` (start là tập con của stop); cancel_mode=`never`
 2. Partner `P-01` tạo với `ref`='NEW' tại FX-T0, chưa có task
 
 **Test Data:**
@@ -3717,7 +3930,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','=','HOLD')]`; pause = `[('ref','=','HOLD')]` (pause ⊂ start); cancel_mode=`start_unmatched`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','=','HOLD')]`; pause = `[('ref','=','HOLD')]` (pause ⊂ start); cancel_mode=`start_unmatched`
 2. Partner `P-01` tạo với `ref`='HOLD' tại FX-T0, chưa có task
 
 **Test Data:**
@@ -3752,7 +3965,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','=','HOLD')]`; pause = `[('ref','=','HOLD')]` (pause ⊂ start); cancel_mode=`start_unmatched`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','=','HOLD')]`; pause = `[('ref','=','HOLD')]` (pause ⊂ start); cancel_mode=`start_unmatched`
 2. Partner `P-01` tạo với `ref`='HOLD' tại FX-T0; task `paused` được gắn ở bước 1
 
 **Test Data:**
@@ -3767,7 +3980,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `paused` |
-| 2 | Đặt `ref`='CLOSED' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='cancelled', `end_dt`=10:00 |
+| 2 | Đặt `ref`='CLOSED' (G1); Gọi Engine đánh giá `P-01` với now = T0+1h (10:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Task `stage`='cancelled', `end_time`=10:00 |
 | 3 | Đếm event `cancel` | 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Task chuyển `paused` -> `cancelled`. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -3788,7 +4001,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; pause = `[('ref','=','HOLD')]` (start và pause loại trừ nhau); cancel_mode=`start_unmatched`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; pause = `[('ref','=','HOLD')]` (start và pause loại trừ nhau); cancel_mode=`start_unmatched`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -3824,7 +4037,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; pause = `[('ref','=','HOLD')]` (start và pause loại trừ nhau); cancel_mode=`never`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; pause = `[('ref','=','HOLD')]` (start và pause loại trừ nhau); cancel_mode=`never`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -3860,7 +4073,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; pause = `[('ref','=','HOLD')]` (start và pause loại trừ nhau); cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: start = `[('ref','in',['NEW','WORK'])]`; pause = `[('ref','=','HOLD')]` (start và pause loại trừ nhau); cancel_mode=`condition`; cancel = `[('ref','=','CANCEL')]`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -3886,7 +4099,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ## TG-06 — Giờ làm việc
 
-### TC-TIM-001: Tính planned_end khi mục tiêu 8 giờ bắt đầu thứ Sáu 16:00 trên lịch T2-T6 (qua cuối tuần)
+### TC-TIM-001: Tính planned_end_time khi mục tiêu 8 giờ bắt đầu thứ Sáu 16:00 trên lịch T2-T6 (qua cuối tuần)
 
 | Field | Giá trị |
 |---|---|
@@ -3901,28 +4114,28 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. FX-CAL-VN: `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa.
 3. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-4. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 8, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+4. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 8, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | P.ref | `NEW` | khớp start |
-| target_hours | 8 | giờ |
-| now (start) | 2026-03-06 16:00 giờ địa phương (09:00 UTC) | start_dt = now vì không retroactive |
+| duration | 8 | giờ |
+| now (start) | 2026-03-06 16:00 giờ địa phương (09:00 UTC) | start_time = now vì không retroactive |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 16:00 giờ địa phương (09:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_dt` = 2026-03-06 09:00 UTC |
-| 2 | Đọc `planned_end` của task | `planned_end` = thứ Hai 2026-03-09 15:00 giờ địa phương = 2026-03-09 08:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 16:00 giờ địa phương (09:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_time` = 2026-03-06 09:00 UTC |
+| 2 | Đọc `planned_end_time` của task | `planned_end_time` = thứ Hai 2026-03-09 15:00 giờ địa phương = 2026-03-09 08:00 UTC |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` đúng bằng 2026-03-09 08:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` đúng bằng 2026-03-09 08:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-TIM-002: Tính planned_end khi thứ Hai là global leave của lịch (dời sang thứ Ba)
+### TC-TIM-002: Tính planned_end_time khi thứ Hai là global leave của lịch (dời sang thứ Ba)
 
 | Field | Giá trị |
 |---|---|
@@ -3938,28 +4151,28 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. FX-CAL-VN: `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa.
 3. Global leave của FX-CAL-VN (`resource.calendar.leaves`, không gắn `resource_id`): từ 2026-03-09 00:00 đến 23:59 giờ địa phương (2026-03-08 17:00 UTC đến 2026-03-09 16:59 UTC).
 4. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-5. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 8, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 8, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | P.ref | `NEW` | khớp start |
-| target_hours | 8 | giờ |
-| now (start) | 2026-03-06 16:00 giờ địa phương (09:00 UTC) | start_dt = now vì không retroactive |
+| duration | 8 | giờ |
+| now (start) | 2026-03-06 16:00 giờ địa phương (09:00 UTC) | start_time = now vì không retroactive |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 16:00 giờ địa phương (09:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_dt` = 2026-03-06 09:00 UTC |
-| 2 | Đọc `planned_end` của task | `planned_end` = thứ Ba 2026-03-10 15:00 giờ địa phương = 2026-03-10 08:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 16:00 giờ địa phương (09:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_time` = 2026-03-06 09:00 UTC |
+| 2 | Đọc `planned_end_time` của task | `planned_end_time` = thứ Ba 2026-03-10 15:00 giờ địa phương = 2026-03-10 08:00 UTC |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` đúng bằng 2026-03-10 08:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` đúng bằng 2026-03-10 08:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-TIM-003: Tính planned_end bằng mốc bắt đầu khi mục tiêu bằng 0 giờ
+### TC-TIM-003: Tính planned_end_time bằng mốc bắt đầu khi mục tiêu bằng 0 giờ
 
 | Field | Giá trị |
 |---|---|
@@ -3974,28 +4187,28 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. FX-CAL-VN: `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa.
 3. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-4. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 0, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+4. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 0, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | P.ref | `NEW` | khớp start |
-| target_hours | 0 | giờ |
-| now (start) | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) | start_dt = now vì không retroactive |
+| duration | 0 | giờ |
+| now (start) | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) | start_time = now vì không retroactive |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_dt` = 2026-03-02 02:00 UTC |
-| 2 | Đọc `planned_end` của task | `planned_end` = 2026-03-02 09:00 giờ địa phương = 2026-03-02 02:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_time` = 2026-03-02 02:00 UTC |
+| 2 | Đọc `planned_end_time` của task | `planned_end_time` = 2026-03-02 09:00 giờ địa phương = 2026-03-02 02:00 UTC |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` đúng bằng 2026-03-02 02:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` đúng bằng 2026-03-02 02:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-TIM-004: Tính planned_end sang thứ Hai 09:00 khi mốc bắt đầu đúng 17:00 thứ Sáu và mục tiêu 1 giờ
+### TC-TIM-004: Tính planned_end_time sang thứ Hai 09:00 khi mốc bắt đầu đúng 17:00 thứ Sáu và mục tiêu 1 giờ
 
 | Field | Giá trị |
 |---|---|
@@ -4010,30 +4223,30 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. FX-CAL-VN: `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa.
 3. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-4. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 1, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+4. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 1, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | P.ref | `NEW` | khớp start |
-| target_hours | 1 | giờ |
-| now (start) | 2026-03-06 17:00 giờ địa phương (10:00 UTC) | start_dt = now vì không retroactive |
+| duration | 1 | giờ |
+| now (start) | 2026-03-06 17:00 giờ địa phương (10:00 UTC) | start_time = now vì không retroactive |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 17:00 giờ địa phương (10:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_dt` = 2026-03-06 10:00 UTC |
-| 2 | Đọc `planned_end` của task | `planned_end` = thứ Hai 2026-03-09 09:00 giờ địa phương = 2026-03-09 02:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 17:00 giờ địa phương (10:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_time` = 2026-03-06 10:00 UTC |
+| 2 | Đọc `planned_end_time` của task | `planned_end_time` = thứ Hai 2026-03-09 09:00 giờ địa phương = 2026-03-09 02:00 UTC |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` đúng bằng 2026-03-09 02:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` đúng bằng 2026-03-09 02:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Ghi chú:** Mốc bắt đầu trùng đúng giờ đóng cửa: không có giờ làm nào còn lại trong ngày Thứ Sáu nên cả 1 giờ nằm ở thứ Hai (08:00-09:00).
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-TIM-005: Tính planned_end 11:00 giờ địa phương (04:00 UTC) với lịch múi giờ Asia/Ho_Chi_Minh
+### TC-TIM-005: Tính planned_end_time 11:00 giờ địa phương (04:00 UTC) với lịch múi giờ Asia/Ho_Chi_Minh
 
 | Field | Giá trị |
 |---|---|
@@ -4048,28 +4261,28 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. FX-CAL-VN: `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa.
 3. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-4. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 2, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+4. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 2, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | P.ref | `NEW` | khớp start |
-| target_hours | 2 | giờ |
-| now (start) | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) | start_dt = now vì không retroactive |
+| duration | 2 | giờ |
+| now (start) | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) | start_time = now vì không retroactive |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_dt` = 2026-03-02 02:00 UTC |
-| 2 | Đọc `planned_end` của task | `planned_end` = 2026-03-02 11:00 giờ địa phương = 2026-03-02 04:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có đúng 1 task của (định nghĩa, P); `stage` = `in_progress`; `start_time` = 2026-03-02 02:00 UTC |
+| 2 | Đọc `planned_end_time` của task | `planned_end_time` = 2026-03-02 11:00 giờ địa phương = 2026-03-02 04:00 UTC |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` đúng bằng 2026-03-02 04:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` đúng bằng 2026-03-02 04:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-TIM-006: Tính planned_end bằng start cộng thẳng 4 giờ khi task không có lịch (24x7)
+### TC-TIM-006: Tính planned_end_time bằng start cộng thẳng 4 giờ khi task không có lịch (24x7)
 
 | Field | Giá trị |
 |---|---|
@@ -4083,24 +4296,24 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | P.ref | `NEW` | khớp start |
-| target_hours | 4 | giờ |
+| duration | 4 | giờ |
 | now | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `calendar_id` rỗng; `start_dt` = 2026-03-02 02:00 UTC |
-| 2 | Đọc `planned_end` | `planned_end` = 2026-03-02 06:00 UTC (13:00 giờ địa phương) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `schedule_id` rỗng; `start_time` = 2026-03-02 02:00 UTC |
+| 2 | Đọc `planned_end_time` | `planned_end_time` = 2026-03-02 06:00 UTC (13:00 giờ địa phương) |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` = 2026-03-02 06:00 UTC và `calendar_id` rỗng; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` = 2026-03-02 06:00 UTC và `schedule_id` rỗng; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -4119,14 +4332,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. FX-CAL-VN có global leave liên tục từ 2026-03-02 00:00 đến 2030-12-31 23:59 giờ địa phương (dài hơn 1400 ngày, tức hơn 100 cửa sổ 14 ngày liên tiếp).
 3. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-4. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 4, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+4. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 4, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | P.ref | `NEW` | khớp start |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | now | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) |  |
 
 **Steps & Expected Results:**
@@ -4157,7 +4370,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`, resume khi `ref` = `WORK`, stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`, resume khi `ref` = `WORK`, stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -4170,12 +4383,12 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`, `business_elapsed` = 0 |
-| 2 | Ghi `ref` = `HOLD` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `paused`; `business_elapsed` = 1.0 |
-| 3 | Ghi `ref` = `WORK` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 9h (18:00 giờ địa phương), changed = {ref})` | `stage` = `in_progress`; `business_elapsed` = 1.0 (8 giờ pause không tính) |
-| 4 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 11h (20:00 giờ địa phương), changed = {ref})` | `stage` = `achieved`; `business_elapsed` = 3.0 (1 + 2) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`, `business_duration` = 0 |
+| 2 | Ghi `ref` = `HOLD` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `paused`; `business_duration` = 1.0 |
+| 3 | Ghi `ref` = `WORK` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 9h (18:00 giờ địa phương), changed = {ref})` | `stage` = `in_progress`; `business_duration` = 1.0 (8 giờ pause không tính) |
+| 4 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 11h (20:00 giờ địa phương), changed = {ref})` | `stage` = `achieved`; `business_duration` = 3.0 (1 + 2) |
 
-**Pass/Fail Criteria:** ✅ Pass: `business_elapsed` = 3.0 ở bước 4 (sai số tuyệt đối <= 0.001); ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `business_duration` = 3.0 ở bước 4 (sai số tuyệt đối <= 0.001); ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Ghi chú:** Cần quy ước ghi `ref` bằng `_write` để tránh hook chạy với giờ thật; xem Vấn đề SRS 3.
 
@@ -4195,7 +4408,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 4, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 4, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -4208,10 +4421,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 16:00 giờ địa phương (09:00 UTC))` | Task `in_progress`; `planned_end` = 2026-03-09 04:00 UTC (thứ Hai 11:00 giờ địa phương) |
-| 2 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = 2026-03-09 10:00 giờ địa phương (03:00 UTC), changed = {ref})` | `stage` = `achieved`; `business_elapsed` = 3.0 (1 giờ thứ Sáu + 2 giờ thứ Hai, 63 giờ ngoài giờ làm việc không được tính) |
+| 1 | Gọi Engine `evaluate(P, now = 2026-03-06 16:00 giờ địa phương (09:00 UTC))` | Task `in_progress`; `planned_end_time` = 2026-03-09 04:00 UTC (thứ Hai 11:00 giờ địa phương) |
+| 2 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = 2026-03-09 10:00 giờ địa phương (03:00 UTC), changed = {ref})` | `stage` = `achieved`; `business_duration` = 3.0 (1 giờ thứ Sáu + 2 giờ thứ Hai, 63 giờ ngoài giờ làm việc không được tính) |
 
-**Pass/Fail Criteria:** ✅ Pass: `business_elapsed` = 3.0 và `stage` = `achieved`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `business_duration` = 3.0 và `stage` = `achieved`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -4229,7 +4442,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 8, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; pause khi `ref` = `HOLD`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 8, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; pause khi `ref` = `HOLD`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -4243,10 +4456,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress` |
-| 2 | Ghi `ref` = `HOLD` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `paused`; `business_elapsed` = 1.0 |
-| 3 | Gọi Engine `evaluate(P, now = T0 + 7h (16:00 giờ địa phương; 6 giờ làm việc sau lúc pause))` | `stage` vẫn `paused`; `business_elapsed` vẫn = 1.0 |
+| 2 | Ghi `ref` = `HOLD` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `paused`; `business_duration` = 1.0 |
+| 3 | Gọi Engine `evaluate(P, now = T0 + 7h (16:00 giờ địa phương; 6 giờ làm việc sau lúc pause))` | `stage` vẫn `paused`; `business_duration` vẫn = 1.0 |
 
-**Pass/Fail Criteria:** ✅ Pass: `business_elapsed` = 1.0 ở bước 3 như ở bước 2; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `business_duration` = 1.0 ở bước 3 như ở bước 2; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -4264,29 +4477,29 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| target_hours | 4 |  |
+| duration | 4 |  |
 | Mốc stop | T0 + 5h (14:00 giờ địa phương) | Xử lý nền chưa chạy |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end` = 2026-03-02 06:00 UTC |
-| 2 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 5h (14:00 giờ địa phương), changed = {ref})` | `stage` = `breached` (REQ-FUNC-009 AC2); `business_elapsed` = 5.0; `target_hours` = 4.0 |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end_time` = 2026-03-02 06:00 UTC |
+| 2 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 5h (14:00 giờ địa phương), changed = {ref})` | `stage` = `breached` (REQ-FUNC-009 AC2); `business_duration` = 5.0; `duration` = 4.0 |
 
-**Pass/Fail Criteria:** ✅ Pass: `business_elapsed` = 5.0 (không phải 4.0); ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `business_duration` = 5.0 (không phải 4.0); ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
 ## TG-07 — Retroactive start
 
-### TC-RET-001: Lấy start_dt từ mốc retroactive và tính planned_end = mốc + 4 giờ, chưa vi phạm
+### TC-RET-001: Lấy start_time từ mốc retroactive và tính planned_end_time = mốc + 4 giờ, chưa vi phạm
 
 | Field | Giá trị |
 |---|---|
@@ -4298,7 +4511,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
 2. Partner `P-01` tạo với `ref`='NEW' và `RETRO-DT`=2026-03-02 08:00 ICT (T0-1h)
 
 **Test Data:**
@@ -4313,7 +4526,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Đọc `start_dt`, `planned_end`, `has_breached` | `start_dt`=08:00; `planned_end`=12:00; `has_breached`=false |
+| 2 | Đọc `start_time`, `planned_end_time`, `has_breached` | `start_time`=08:00; `planned_end_time`=12:00; `has_breached`=false |
 | 3 | Đếm event `breach` | 0 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Giá trị đúng như bước 2. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -4334,7 +4547,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
 2. Partner `P-01` tạo với `ref`='NEW' và `RETRO-DT`=2026-03-02 03:00 ICT (T0-6h)
 
 **Test Data:**
@@ -4349,7 +4562,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task được gắn |
-| 2 | Đọc `start_dt`, `planned_end`, `has_breached` | `start_dt`=03:00; `planned_end`=07:00; `has_breached`=true |
+| 2 | Đọc `start_time`, `planned_end_time`, `has_breached` | `start_time`=03:00; `planned_end_time`=07:00; `has_breached`=true |
 | 3 | Đếm event `breach` | 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `has_breached`=true và đúng 1 event `breach`. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -4358,7 +4571,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ---
 
-### TC-RET-003: Dùng thời điểm hiện tại làm start_dt và ghi chú vào event attach khi field mốc trống
+### TC-RET-003: Dùng thời điểm hiện tại làm start_time và ghi chú vào event attach khi field mốc trống
 
 | Field | Giá trị |
 |---|---|
@@ -4370,7 +4583,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
 2. Partner `P-01` tạo với `ref`='NEW' và `RETRO-DT` rỗng
 
 **Test Data:**
@@ -4385,35 +4598,35 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Đọc `start_dt` và `planned_end` | `start_dt`=09:00; `planned_end`=13:00 |
+| 2 | Đọc `start_time` và `planned_end_time` | `start_time`=09:00; `planned_end_time`=13:00 |
 | 3 | Đọc `note` của event `attach` | Không rỗng, nêu việc dùng thời điểm hiện tại do mốc trống (G10: từ khóa cụ thể do SRS chưa quy định) |
 
-**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `start_dt`=now và `note` của `attach` giải thích. ❌ Fail: bất kỳ Expected Result nào sai.
+**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `start_time`=now và `note` của `attach` giải thích. ❌ Fail: bất kỳ Expected Result nào sai.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
 ---
 
-### TC-RET-004: Bật dấu vi phạm khi planned_end bằng đúng thời điểm attach
+### TC-RET-004: Bật dấu vi phạm khi planned_end_time bằng đúng thời điểm attach
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-07-01 |
-| Coverage Item | CI-4 (biên: mốc đúng 4h trước (planned_end = now) -> breach) |
+| Coverage Item | CI-4 (biên: mốc đúng 4h trước (planned_end_time = now) -> breach) |
 | Requirement Ref | REQ-FUNC-017 (Statement: quá hạn); thuật ngữ Dấu vi phạm: chạm hoặc vượt [G11] |
 | Priority | P2-High |
 | Test Type | Boundary |
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
 2. Partner `P-01` tạo với `ref`='NEW' và `RETRO-DT`=2026-03-02 05:00 ICT (T0-4h)
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| RETRO-DT | 2026-03-02 05:00 ICT | planned_end = 09:00 = now |
+| RETRO-DT | 2026-03-02 05:00 ICT | planned_end_time = 09:00 = now |
 | now | T0 (09:00) |  |
 
 **Steps & Expected Results:**
@@ -4421,7 +4634,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task được gắn |
-| 2 | Đọc `planned_end` và `has_breached` | `planned_end`=09:00; `has_breached`=true |
+| 2 | Đọc `planned_end_time` và `has_breached` | `planned_end_time`=09:00; `has_breached`=true |
 | 3 | Đếm event `breach` | 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Chạm đúng hạn thì breach (theo định nghĩa Dấu vi phạm). ❌ Fail: bất kỳ Expected Result nào sai.
@@ -4430,7 +4643,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ---
 
-### TC-RET-005: Không bật dấu vi phạm khi planned_end còn 1 phút so với thời điểm attach
+### TC-RET-005: Không bật dấu vi phạm khi planned_end_time còn 1 phút so với thời điểm attach
 
 | Field | Giá trị |
 |---|---|
@@ -4442,14 +4655,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9)
 2. Partner `P-01` tạo với `ref`='NEW' và `RETRO-DT`=2026-03-02 05:01 ICT (T0-3h59m)
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| RETRO-DT | 2026-03-02 05:01 ICT | planned_end = 09:01 |
+| RETRO-DT | 2026-03-02 05:01 ICT | planned_end_time = 09:01 |
 | now | T0 (09:00) |  |
 
 **Steps & Expected Results:**
@@ -4457,7 +4670,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Đọc `planned_end` và `has_breached` | `planned_end`=09:01; `has_breached`=false |
+| 2 | Đọc `planned_end_time` và `has_breached` | `planned_end_time`=09:01; `has_breached`=false |
 | 3 | Đếm event `breach` | 0 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Chưa breach. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -4466,7 +4679,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ---
 
-### TC-RET-006: Không trừ thời gian đã paused trước attach khi tính planned_end retroactive
+### TC-RET-006: Không trừ thời gian đã paused trước attach khi tính planned_end_time retroactive
 
 | Field | Giá trị |
 |---|---|
@@ -4478,7 +4691,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9); pause = `[('ref','=','HOLD')]` (đã sẵn trong FX-DEF-STD)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: retroactive_start=true; retroactive_field_id = `RETRO-DT` (field Datetime ghi được của `res.partner`, G9); pause = `[('ref','=','HOLD')]` (đã sẵn trong FX-DEF-STD)
 2. Partner `P-01` tạo với `ref`='HOLD' và `RETRO-DT`=2026-03-02 06:00 ICT (T0-3h); record đã ở HOLD từ trước mốc (không có dữ liệu pause quá khứ được dùng)
 
 **Test Data:**
@@ -4493,27 +4706,27 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `stage`='paused' (pause khớp lúc attach) |
-| 2 | Đọc `start_dt` và `planned_end` | `start_dt`=06:00; `planned_end`=10:00 (= mốc + 4h, không cộng thêm thời gian paused trước đó) |
+| 2 | Đọc `start_time` và `planned_end_time` | `start_time`=06:00; `planned_end_time`=10:00 (= mốc + 4h, không cộng thêm thời gian paused trước đó) |
 
-**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `planned_end` đúng bằng mốc + mục tiêu. ❌ Fail: bất kỳ Expected Result nào sai.
+**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `planned_end_time` đúng bằng mốc + mục tiêu. ❌ Fail: bất kỳ Expected Result nào sai.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
 ---
 
-### TC-RET-007: Tính planned_end theo lịch FX-CAL-VN từ mốc retroactive trước cuối tuần
+### TC-RET-007: Tính planned_end_time theo lịch FX-CAL-VN từ mốc retroactive trước cuối tuần
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-07-01 |
 | Coverage Item | CI-7 (retroactive với lịch giờ làm việc) |
-| Requirement Ref | REQ-FUNC-017 (Statement: tính planned_end từ mốc); REQ-FUNC-018 |
+| Requirement Ref | REQ-FUNC-017 (Statement: tính planned_end_time từ mốc); REQ-FUNC-018 |
 | Priority | P2-High |
 | Test Type | Positive |
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: calendar_source=`definition`, calendar_id=FX-CAL-VN (T2–T6 08:00–17:00); retroactive_start=true; retroactive_field_id=`RETRO-DT`
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition); đổi: schedule_source=`definition`, schedule_id=FX-CAL-VN (T2–T6 08:00–17:00); retroactive_start=true; retroactive_field_id=`RETRO-DT`
 2. Partner `P-01` tạo với `ref`='NEW' và `RETRO-DT`=2026-02-27 16:00 ICT (thứ Sáu)
 
 **Test Data:**
@@ -4528,10 +4741,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Đọc `start_dt` và `planned_end` | `start_dt`=2026-02-27 16:00; `planned_end`=2026-03-02 11:00 (1 giờ thứ Sáu + 3 giờ thứ Hai) |
+| 2 | Đọc `start_time` và `planned_end_time` | `start_time`=2026-02-27 16:00; `planned_end_time`=2026-03-02 11:00 (1 giờ thứ Sáu + 3 giờ thứ Hai) |
 | 3 | Đọc `has_breached` | false (đã trôi 1h thứ Sáu + 1h thứ Hai = 2h < 4h) |
 
-**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `planned_end`=2026-03-02 11:00 ICT, chưa breach. ❌ Fail: bất kỳ Expected Result nào sai.
+**Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `planned_end_time`=2026-03-02 11:00 ICT, chưa breach. ❌ Fail: bất kỳ Expected Result nào sai.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -4549,7 +4762,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Định nghĩa `D-1` trên model `res.partner`, target_hours=4, chưa lưu
+1. Định nghĩa `D-1` trên model `res.partner`, duration=4, chưa lưu
 
 **Test Data:**
 
@@ -4583,7 +4796,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Định nghĩa `D-1` trên model `res.partner`, target_hours=4, chưa lưu
+1. Định nghĩa `D-1` trên model `res.partner`, duration=4, chưa lưu
 2. Có field Datetime `res.users.login_date` (model `res.users`)
 
 **Test Data:**
@@ -4617,19 +4830,19 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Định nghĩa `D-1` trên model `res.partner`, target_hours=4, chưa lưu; reset = `[]`
+1. Định nghĩa `D-1` trên model `res.partner`, duration=4, chưa lưu; reset = `[]`
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| reset_on_field_ids | {`res.users.login`} (model khác) |  |
+| reset_field_ids | {`res.users.login`} (model khác) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gán reset_on_field_ids = {`login` của `res.users`} và lưu `D-1` | Lưu bị từ chối |
+| 1 | Gán reset_field_ids = {`login` của `res.users`} và lưu `D-1` | Lưu bị từ chối |
 | 2 | Đếm bản ghi `D-1` | 0 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Định nghĩa không được lưu. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -4650,7 +4863,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Định nghĩa `D-1` trên model `res.partner`, target_hours=4, chưa lưu
+1. Định nghĩa `D-1` trên model `res.partner`, duration=4, chưa lưu
 
 **Test Data:**
 
@@ -4683,20 +4896,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Định nghĩa `D-1` trên model `res.partner`, target_hours=4, chưa lưu; reset = `[]`
+1. Định nghĩa `D-1` trên model `res.partner`, duration=4, chưa lưu; reset = `[]`
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| reset_on_field_ids | {`res.partner.user_id`} |  |
+| reset_field_ids | {`res.partner.user_id`} |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gán reset_on_field_ids = {`user_id`} và lưu `D-1` | Lưu thành công |
-| 2 | Đọc lại reset_on_field_ids | = {`user_id`} |
+| 1 | Gán reset_field_ids = {`user_id`} và lưu `D-1` | Lưu thành công |
+| 2 | Đọc lại reset_field_ids | = {`user_id`} |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Định nghĩa được lưu. ❌ Fail: bất kỳ Expected Result nào sai.
 
@@ -4719,7 +4932,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Ba mốc: Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false). Mốc escalation 100% (`percent` = 100, `action_id` = SA-N100, `retry` = false). Mốc escalation 120% (`percent` = 120, `action_id` = SA-N120, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`. Server action SA-N100 (model `res.partner`): code `record.message_post(body='N100')`. Server action SA-N120 (model `res.partner`): code `record.message_post(body='N120')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -4735,7 +4948,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P-1, now = FX-T0, changed = ∅)` với `P-1.ref` = 'NEW' (hàm `evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `start_dt` = 09:00, `planned_end` = 13:00; chưa có event `escalate` |
+| 1 | Gọi Engine `evaluate(P-1, now = FX-T0, changed = ∅)` với `P-1.ref` = 'NEW' (hàm `evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `start_time` = 09:00, `planned_end_time` = 13:00; chưa có event `escalate` |
 | 2 | Xử lý nền tại now = FX-T0 + 3h (12:00) | `call_count` SA-N75 = 1, SA-N100 = 0, SA-N120 = 0; số event `escalate` của task = 1; chatter của P-1 có 1 ghi chú 'N75' |
 | 3 | Xử lý nền tại now = FX-T0 + 4h (13:00) | `call_count` SA-N100 = 1; số event `escalate` = 2; chatter có thêm ghi chú 'N100' (event `breach` nếu có không tính vào số này) |
 | 4 | Xử lý nền tại now = FX-T0 + 4h48 (13:48) | `call_count` SA-N120 = 1; số event `escalate` = 3; chatter có thêm ghi chú 'N120' |
@@ -4758,7 +4971,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -4791,7 +5004,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -4824,7 +5037,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -4857,7 +5070,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -4890,7 +5103,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -4925,7 +5138,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -4960,7 +5173,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -4996,7 +5209,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5034,7 +5247,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5070,7 +5283,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false). Mốc escalation 100% (`percent` = 100, `action_id` = SA-N100, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`. Server action SA-N100 (model `res.partner`): code `record.message_post(body='N100')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5086,7 +5299,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine `evaluate(P-1, now = FX-T0, changed = ∅)` với `P-1.ref` = 'NEW' (hàm `evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress` |
-| 2 | Ghi `ref` = 'HOLD' và gọi `evaluate(P-1, now = 10:00, changed = {ref})` | `stage` = `paused`; `business_elapsed` = 1h |
+| 2 | Ghi `ref` = 'HOLD' và gọi `evaluate(P-1, now = 10:00, changed = {ref})` | `stage` = `paused`; `business_duration` = 1h |
 | 3 | Xử lý nền tại now = 19:00 (10 giờ sau FX-T0) | `call_count` SA-N75 = 0 và SA-N100 = 0; số event `escalate` = 0; `next_due_at` = NULL (không còn mốc cho xử lý nền) |
 
 **Pass/Fail Criteria:** ✅ Pass: không có event `escalate` nào cho task ở stage `paused`; ❌ Fail: có action chạy hoặc có event `escalate`
@@ -5106,7 +5319,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false). Mốc escalation 100% (`percent` = 100, `action_id` = SA-N100, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`. Server action SA-N100 (model `res.partner`): code `record.message_post(body='N100')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5142,7 +5355,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false). Mốc escalation 100% (`percent` = 100, `action_id` = SA-N100, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`. Server action SA-N100 (model `res.partner`): code `record.message_post(body='N100')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5157,8 +5370,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P-1, now = FX-T0, changed = ∅)` với `P-1.ref` = 'NEW' (hàm `evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `planned_end` = 13:00 |
-| 2 | Ghi `ref` = 'DONE' và gọi `evaluate(P-1, now = 14:00, changed = {ref})` (đã quá `planned_end`) | `stage` = `breached`; `has_breached` = true |
+| 1 | Gọi Engine `evaluate(P-1, now = FX-T0, changed = ∅)` với `P-1.ref` = 'NEW' (hàm `evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `planned_end_time` = 13:00 |
+| 2 | Ghi `ref` = 'DONE' và gọi `evaluate(P-1, now = 14:00, changed = {ref})` (đã quá `planned_end_time`) | `stage` = `breached`; `has_breached` = true |
 | 3 | Xử lý nền tại now = 14:30 | `call_count` SA-N75 = 0 và SA-N100 = 0; số event `escalate` = 0; `next_due_at` = NULL (không còn mốc cho xử lý nền) |
 
 **Pass/Fail Criteria:** ✅ Pass: không có event `escalate` nào cho task ở stage `breached`; ❌ Fail: có action chạy hoặc có event `escalate`
@@ -5178,7 +5391,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false). Mốc escalation 100% (`percent` = 100, `action_id` = SA-N100, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`. Server action SA-N100 (model `res.partner`): code `record.message_post(body='N100')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5214,7 +5427,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5230,8 +5443,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P-1, now = 07:00, changed = ∅)` với `P-1.ref` = 'NEW' (hàm `evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `start_dt` = 07:00 |
-| 2 | Ghi `ref` = 'HOLD', `evaluate(P-1, now = 08:00, changed = {ref})` | `stage` = `paused`; `business_elapsed` = 1.0 |
+| 1 | Gọi Engine `evaluate(P-1, now = 07:00, changed = ∅)` với `P-1.ref` = 'NEW' (hàm `evaluate(records, now, changed)`, TAD 5.1) | 1 task `in_progress`, `start_time` = 07:00 |
+| 2 | Ghi `ref` = 'HOLD', `evaluate(P-1, now = 08:00, changed = {ref})` | `stage` = `paused`; `business_duration` = 1.0 |
 | 3 | Ghi `ref` = 'WORK', `evaluate(P-1, now = 14:00, changed = {ref})` | `stage` = `in_progress`; `next_due_at` = 16:00 (còn 2 giờ để đủ 3 giờ) |
 | 4 | Xử lý nền tại now = 15:59 | `call_count` SA-N75 = 0; không event `escalate` |
 | 5 | Xử lý nền tại now = 16:00 | `call_count` SA-N75 = 1; 1 event `escalate` |
@@ -5240,7 +5453,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-016: Tính lại mốc đang chờ thử lại như mốc chưa xử lý khi resume
+### TC-ESC-016: Tính lại mốc đang chờ thử lại như mốc chưa xử lý khi resume [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5253,7 +5466,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-F1, `retry` = true, `retry_pattern` = '[10]').
 4. Server action SA-FLAKY(1) tên SA-F1: lần gọi đầu ném `UserError('SA-FAIL: boom')`, các lần sau thành công (đếm bằng `call_count`).
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5296,7 +5509,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5333,7 +5546,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper `ir.actions.server.run` ném `UserError('SA-FAIL: boom')` khi record là P-A, gọi bình thường với P-B; Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5373,7 +5586,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-FAIL, `retry` = false).
 4. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5397,7 +5610,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-020: Ghi escalate_retry nêu giờ thử kế tiếp 10:01 khi action lỗi lúc 10:00
+### TC-ESC-020: Ghi escalate_retry nêu giờ thử kế tiếp 10:01 khi action lỗi lúc 10:00 [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5410,7 +5623,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% với `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL (luôn lỗi); Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5435,7 +5648,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-021: Không thử lại sớm hơn giờ thử kế tiếp (10:00:59 < 10:01:00)
+### TC-ESC-021: Không thử lại sớm hơn giờ thử kế tiếp (10:00:59 < 10:01:00) [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5448,7 +5661,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% với `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL (luôn lỗi); Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5471,7 +5684,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-022: Thử lại chạy khi now đúng bằng giờ thử kế tiếp 10:01:00
+### TC-ESC-022: Thử lại chạy khi now đúng bằng giờ thử kế tiếp 10:01:00 [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5484,7 +5697,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% với `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL (luôn lỗi); Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5507,7 +5720,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-023: Lần thử lại chạy trong khoảng 10:01 đến 10:03 với tick cron lệch 30 giây
+### TC-ESC-023: Lần thử lại chạy trong khoảng 10:01 đến 10:03 với tick cron lệch 30 giây [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5520,7 +5733,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% với `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL (luôn lỗi); Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5544,20 +5757,22 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-024: Không ghi escalate_retry khi mốc không bật thử lại
+### TC-ESC-024: Action của mốc lỗi: ghi escalate_failed một lần, mốc coi là đã xong, không thử lại (D12)
+
+> **Cập nhật 19.0.1.1.0:** sau D12 không còn cơ chế thử lại; ca này kiểm hành vi duy nhất còn lại khi action lỗi (hàm test `test_esc_024_failed_action_marks_done_no_retry`). Các bước dưới đây giữ nguyên từ bản trước; chỗ nhắc `retry`, `retry_pattern` và dòng retry chỉ để đối chiếu và luôn bằng "không có".
 
 | Field | Giá trị |
 |---|---|
-| Test Condition Ref | TCOND-08-08 |
-| Coverage Item | CI-5 (AC2: mốc không bật thử lại, action lỗi) |
-| Requirement Ref | REQ-FUNC-027 AC2 |
+| Test Condition Ref | TCOND-08-07 |
+| Coverage Item | CI-1 (action lỗi: một `escalate_failed`, không thử lại) |
+| Requirement Ref | REQ-FUNC-026 (AC1) |
 | Priority | P2-High |
 | Test Type | Negative |
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% với `retry` = false, `retry_pattern` rỗng, action SA-FAIL. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5579,7 +5794,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-025: Ghi escalate_retry rồi escalate khi action lỗi một lần rồi thành công
+### TC-ESC-025: Ghi escalate_retry rồi escalate khi action lỗi một lần rồi thành công [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5592,7 +5807,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', action SA-FLAKY(1)
 4. Server action SA-FLAKY(k) (model `res.partner`): k lần gọi đầu ném `UserError('SA-FAIL: boom')`, sau đó gọi `record.message_post(body='OK')` (đếm bằng `call_count`).
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5618,7 +5833,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-026: Không chạy lại action sau khi thử lại đã thành công
+### TC-ESC-026: Không chạy lại action sau khi thử lại đã thành công [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5631,7 +5846,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', action SA-FLAKY(1)
 4. Server action SA-FLAKY(k) (model `res.partner`): k lần gọi đầu ném `UserError('SA-FAIL: boom')`, sau đó gọi `record.message_post(body='OK')` (đếm bằng `call_count`).
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -5654,7 +5869,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-027: Ghi 2 escalate_retry rồi escalate_failed khi mẫu [1, 10] và action luôn lỗi
+### TC-ESC-027: Ghi 2 escalate_retry rồi escalate_failed khi mẫu [1, 10] và action luôn lỗi [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5667,7 +5882,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 4. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
 5. Task attach lúc 07:00; mốc 75% đến hạn 10:00
@@ -5692,7 +5907,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-028: Chỉ thử lại đúng 1 lần với mẫu một phần tử [5]
+### TC-ESC-028: Chỉ thử lại đúng 1 lần với mẫu một phần tử [5] [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5705,7 +5920,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 4. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
 5. Task attach lúc 07:00; mốc 75% đến hạn 10:00
@@ -5729,7 +5944,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-029: Không ghi escalate_failed khi lần thử lại cuối cùng thành công
+### TC-ESC-029: Không ghi escalate_failed khi lần thử lại cuối cùng thành công [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5742,7 +5957,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 4. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
 5. Task attach lúc 07:00; mốc 75% đến hạn 10:00
@@ -5765,7 +5980,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-030: Hủy lượt thử lại đang chờ khi task bị stop
+### TC-ESC-030: Hủy lượt thử lại đang chờ khi task bị stop [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5778,7 +5993,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5805,7 +6020,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-031: Hủy lượt thử lại đang chờ khi task bị cancel
+### TC-ESC-031: Hủy lượt thử lại đang chờ khi task bị cancel [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5818,7 +6033,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5845,7 +6060,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-032: Hủy lượt thử lại đang chờ khi task chuyển paused
+### TC-ESC-032: Hủy lượt thử lại đang chờ khi task chuyển paused [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5858,7 +6073,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5885,7 +6100,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-033: Giữ nguyên giờ thử 10:01 của lượt chờ khi sửa mẫu sang [1, 30]
+### TC-ESC-033: Giữ nguyên giờ thử 10:01 của lượt chờ khi sửa mẫu sang [1, 30] [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5898,7 +6113,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5922,7 +6137,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-034: Tính giờ thử kế tiếp 10:31 theo mẫu mới [1, 30] khi lần thử 10:01 lại lỗi
+### TC-ESC-034: Tính giờ thử kế tiếp 10:31 theo mẫu mới [1, 30] khi lần thử 10:01 lại lỗi [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5935,7 +6150,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', action SA-FAIL. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
 5. Partner P-1 (`ref` = 'NEW') tạo xong, chưa có task SLA.
@@ -5959,7 +6174,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-035: Từ chối mẫu thử lại rỗng khi bật thử lại
+### TC-ESC-035: Từ chối mẫu thử lại rỗng khi bật thử lại [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -5972,7 +6187,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -5994,7 +6209,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-036: Từ chối mẫu thử lại chứa số 0
+### TC-ESC-036: Từ chối mẫu thử lại chứa số 0 [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6007,7 +6222,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6027,7 +6242,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-037: Từ chối mẫu thử lại có số âm
+### TC-ESC-037: Từ chối mẫu thử lại có số âm [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6040,7 +6255,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6060,7 +6275,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-038: Từ chối mẫu thử lại có số không nguyên
+### TC-ESC-038: Từ chối mẫu thử lại có số không nguyên [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6073,7 +6288,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6093,7 +6308,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-039: Từ chối mẫu thử lại không phải danh sách ('abc')
+### TC-ESC-039: Từ chối mẫu thử lại không phải danh sách ('abc') [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6106,7 +6321,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6126,7 +6341,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-040: Từ chối mẫu thử lại 11 phần tử (vượt biên trên 10)
+### TC-ESC-040: Từ chối mẫu thử lại 11 phần tử (vượt biên trên 10) [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6139,7 +6354,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6159,7 +6374,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-041: Chấp nhận mẫu thử lại hợp lệ [1, 10, 20, 60]
+### TC-ESC-041: Chấp nhận mẫu thử lại hợp lệ [1, 10, 20, 60] [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6172,7 +6387,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6192,7 +6407,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-042: Chấp nhận mẫu thử lại 10 phần tử (biên trên)
+### TC-ESC-042: Chấp nhận mẫu thử lại 10 phần tử (biên trên) [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6205,7 +6420,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6225,7 +6440,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-043: Không kiểm tra mẫu khi tắt thử lại (retry = false)
+### TC-ESC-043: Không kiểm tra mẫu khi tắt thử lại (retry = false) [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6238,7 +6453,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 4. Chưa có mốc escalation nào trên FX-DEF-STD
 
@@ -6271,7 +6486,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-USER thuộc model `res.users` (code: `pass`)
 
 **Test Data:**
@@ -6304,7 +6519,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 
 **Test Data:**
@@ -6337,7 +6552,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc ban đầu duy nhất: Mốc escalation 100% (`percent` = 100, `action_id` = SA-N100, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`. Server action SA-N90 (model `res.partner`): code `record.message_post(body='N90')`. Server action SA-N100 (model `res.partner`): code `record.message_post(body='N100')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -6376,7 +6591,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc ban đầu duy nhất: Mốc escalation 100% (`percent` = 100, `action_id` = SA-N100, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`. Server action SA-N90 (model `res.partner`): code `record.message_post(body='N90')`. Server action SA-N100 (model `res.partner`): code `record.message_post(body='N100')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -6416,7 +6631,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-CTX, `retry` = false).
 4. Server action SA-CTX (model `res.partner`): code lưu `(env.context.get('active_model'), env.context.get('active_id'), env.context.get('active_ids'))` vào danh sách `ctx_log` rồi `env[env.context['active_model']].browse(env.context['active_id']).message_post(body='ESC-%s' % env.context['active_id'])`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -6452,7 +6667,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-CTX, `retry` = false).
 4. Server action SA-CTX (model `res.partner`): code lưu `(env.context.get('active_model'), env.context.get('active_id'), env.context.get('active_ids'))` vào danh sách `ctx_log` rồi `env[env.context['active_model']].browse(env.context['active_id']).message_post(body='ESC-%s' % env.context['active_id'])`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -6489,7 +6704,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7). `company_id` của định nghĩa = NULL (mọi công ty).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7). `company_id` của định nghĩa = NULL (mọi công ty).
 3. FX-CO: công ty CO-A và CO-B
 4. Partner P-B (`ref` = 'NEW') tạo xong, chưa có task SLA. thuộc CO-B (`company_id` = CO-B).
 5. Task của P-B attach lúc FX-T0, `company_id` của task = CO-B
@@ -6529,7 +6744,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7). `company_id` của định nghĩa = NULL (mọi công ty).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7). `company_id` của định nghĩa = NULL (mọi công ty).
 3. FX-CO: công ty CO-A và CO-B
 4. Partner P-B (`ref` = 'NEW') tạo xong, chưa có task SLA. thuộc CO-B (`company_id` = CO-B).
 5. Task của P-B attach lúc FX-T0, `company_id` của task = CO-B
@@ -6558,7 +6773,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-ESC-052: Ghi escalate_retry thay cho escalate_failed ở lần lỗi quyền đầu tiên khi mốc bật thử lại
+### TC-ESC-052: Ghi escalate_retry thay cho escalate_failed ở lần lỗi quyền đầu tiên khi mốc bật thử lại [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6571,7 +6786,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7). `company_id` của định nghĩa = NULL (mọi công ty).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7). `company_id` của định nghĩa = NULL (mọi công ty).
 3. FX-CO: công ty CO-A và CO-B
 4. Partner P-B (`ref` = 'NEW') tạo xong, chưa có task SLA. thuộc CO-B (`company_id` = CO-B).
 5. Task của P-B attach lúc FX-T0, `company_id` của task = CO-B
@@ -6610,7 +6825,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -6650,7 +6865,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -6689,7 +6904,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -6818,7 +7033,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-SLOW, `retry` = false); stop khi `ref` = 'DONE'.
 4. Server action SA-SLOW: khi được gọi thì chặn lại tại điểm đồng bộ của test (giữ giao dịch của C1 mở, mô phỏng chạy 30 giây) mà không dùng `sleep`.
 5. Hai partner P-1, P-2 (`ref` = 'NEW') đã commit, mỗi partner có 1 task (T1, T2) attach lúc FX-T0; `next_due_at` của T1 sớm hơn của T2 (T1 đến hạn 12:00, T2 đến hạn 12:01) để C1 xử lý T1 trước.
@@ -6843,7 +7058,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Dữ liệu đã commit bởi các cursor: dọn trong `tearDown`.
 
-### TC-ESC-060: Giữ lượt thử lại đang chờ và vẫn chạy khi cờ `cancel_retry_on_stop` = False (pause, stop, cancel, reset)
+### TC-ESC-060: Giữ lượt thử lại đang chờ và vẫn chạy khi cờ `cancel_retry_on_stop` = False (pause, stop, cancel, reset) [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -6856,7 +7071,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7). Với biến thể reset: `start` gồm `ref` in ('NEW', 'RESET') và `reset` là `ref` = 'RESET' (reset_action mặc định `cancel`).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7). Với biến thể reset: `start` gồm `ref` in ('NEW', 'RESET') và `reset` là `ref` = 'RESET' (reset_action mặc định `cancel`).
 3. Mốc 75% `retry` = true, `retry_pattern` = '[1, 10]', `cancel_retry_on_stop` = False, action SA-FAIL. Server action SA-FAIL (model `res.partner`): luôn ném `UserError('SA-FAIL: boom')`.
 4. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`.
 5. Với mỗi biến thể dưới đây dựng lại partner P-1 (`ref` = 'NEW') và task mới, task attach 07:00; mốc 75% lỗi lúc 10:00 nên đang chờ thử lại (`retry_at` = 10:01).
@@ -6897,7 +7112,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Hai định nghĩa trên `res.partner`: `D-RESP` (mục tiêu 1 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='RESPONDED'`) và `D-RES` (mục tiêu 4 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='DONE'`); cả hai calendar_source=none, cancel_mode=`start_unmatched`
+1. Hai định nghĩa trên `res.partner`: `D-RESP` (mục tiêu 1 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='RESPONDED'`) và `D-RES` (mục tiêu 4 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='DONE'`); cả hai schedule_source=none, cancel_mode=`start_unmatched`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -6912,7 +7127,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Không ngoại lệ |
-| 2 | Đọc task của `P-01` theo định nghĩa | 2 task: `D-RESP` `in_progress` (`planned_end`=10:00) và `D-RES` `in_progress` (`planned_end`=13:00) |
+| 2 | Đọc task của `P-01` theo định nghĩa | 2 task: `D-RESP` `in_progress` (`planned_end_time`=10:00) và `D-RES` `in_progress` (`planned_end_time`=13:00) |
 | 3 | Đếm event `attach` theo task | Mỗi task đúng 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; Hai task độc lập, mỗi định nghĩa đúng một. ❌ Fail: bất kỳ Expected Result nào sai.
@@ -6933,7 +7148,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Hai định nghĩa trên `res.partner`: `D-RESP` (mục tiêu 1 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='RESPONDED'`) và `D-RES` (mục tiêu 4 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='DONE'`); cả hai calendar_source=none, cancel_mode=`start_unmatched`
+1. Hai định nghĩa trên `res.partner`: `D-RESP` (mục tiêu 1 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='RESPONDED'`) và `D-RES` (mục tiêu 4 giờ; start `ref ∈ {NEW,WORK,HOLD,DONE}`; stop `ref='DONE'`); cả hai schedule_source=none, cancel_mode=`start_unmatched`
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -6949,8 +7164,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine đánh giá `P-01` với now = T0 (2026-03-02 09:00), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | 2 task `in_progress`; ghi lại số event của task `D-RESP` (=1) và `write_date` |
 | 2 | Đặt `ref`='DONE' (G1); Gọi Engine đánh giá `P-01` với now = T0+30m (09:30), changed = {ref} (`evaluate(records, now, changed)`, TAD 5.1) | Không ngoại lệ |
-| 3 | Đọc task `D-RES` | `stage`='achieved', `end_dt`=09:30 |
-| 4 | Đọc task `D-RESP` | `stage`='in_progress', `end_dt` rỗng, số event vẫn = 1 |
+| 3 | Đọc task `D-RES` | `stage`='achieved', `end_time`=09:30 |
+| 4 | Đọc task `D-RESP` | `stage`='in_progress', `end_time` rỗng, số event vẫn = 1 |
 
 **Pass/Fail Criteria:** ✅ Pass: mọi Expected Result đúng; `D-RES` achieved; `D-RESP` không đổi. ❌ Fail: bất kỳ Expected Result nào sai.
 
@@ -6970,7 +7185,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
 2. Hai partner `P-01`, `P-02` tạo với `ref`='NEW' tại FX-T0
 
 **Test Data:**
@@ -7006,14 +7221,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
 2. Partner `P-01` `ref`='HOLD' đã được gắn task `paused` (T-1) bằng bước 1
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| task thứ hai | `sla.task` create: definition=FX-DEF-STD, res_model=`res.partner`, res_id=`P-01`, stage=`in_progress`, start_dt=T0 |  |
+| task thứ hai | `sla.task` create: definition=FX-DEF-STD, res_model=`res.partner`, res_id=`P-01`, stage=`in_progress`, start_time=T0 |  |
 
 **Steps & Expected Results:**
 
@@ -7041,7 +7256,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
 2. Partner `P-01` tạo mới với `ref`='NEW' tại FX-T0, chưa có task nào
 
 **Test Data:**
@@ -7077,7 +7292,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase + hai cursor riêng, tự dọn dữ liệu) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
 2. Dữ liệu nền được commit bằng cursor riêng: partner `P-01` với `ref`='NEW' tạo TRƯỚC khi định nghĩa FX-DEF-STD tồn tại (nên chưa có task); hai cursor `cr-A`, `cr-B` mở trên cùng registry, mức REPEATABLE READ (G6)
 
 **Test Data:**
@@ -7114,7 +7329,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase + hai cursor riêng, tự dọn dữ liệu) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
 2. Dữ liệu nền được commit bằng cursor riêng: partner `P-01` với `ref`='NEW' tạo TRƯỚC khi định nghĩa FX-DEF-STD tồn tại (nên chưa có task); hai cursor `cr-A`, `cr-B` mở trên cùng registry, mức REPEATABLE READ (G6)
 
 **Test Data:**
@@ -7152,7 +7367,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase + hai cursor riêng, tự dọn dữ liệu) |
 
 **Preconditions:**
-1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
+1. FX-DEF-STD trên `res.partner` (start ref∈{NEW,WORK,HOLD}; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; reset rỗng; mục tiêu 4 giờ; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition) (không đổi)
 2. Dữ liệu nền được commit bằng cursor riêng: partner `P-01` với `ref`='NEW' tạo TRƯỚC khi định nghĩa FX-DEF-STD tồn tại (nên chưa có task); hai cursor `cr-A`, `cr-B` mở trên cùng registry, mức REPEATABLE READ (G6)
 
 **Test Data:**
@@ -7209,7 +7424,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Tạo P và K, gọi Engine đánh giá {P, K} với now = T0 (`evaluate(records, now, changed)`). | Không lỗi. |
-| 2 | Đọc `sla.task` theo (`res_model`,`res_id`). | P có đúng 1 task của FX-DEF-STD; K có đúng 1 task của D2; cả hai `stage` = `in_progress`, `start_dt` = T0, `target_hours` = 4, `planned_end` = 2026-03-02 13:00 (UTC+7). |
+| 2 | Đọc `sla.task` theo (`res_model`,`res_id`). | P có đúng 1 task của FX-DEF-STD; K có đúng 1 task của D2; cả hai `stage` = `in_progress`, `start_time` = T0, `target_duration` = 4, `planned_end_time` = 2026-03-02 13:00 (UTC+7). |
 | 3 | Đếm event `attach`. | Có 2 event `attach` (mỗi task 1). |
 
 **Pass/Fail Criteria:** ✅ Pass: Cả hai record có task `in_progress` đúng giá trị; không cần code riêng theo model. ❌ Fail: Thiếu task ở một model, hoặc giá trị sai.
@@ -7236,11 +7451,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | `res.partner` |  |
-| target_hours | 6 |  |
-| calendar_source / calendar_id | `definition` / FX-CAL-VN |  |
+| duration | 6 |  |
+| schedule_source / schedule_id | `definition` / FX-CAL-VN |  |
 | 6 domain | start `[('ref','=','NEW')]`, cancel `[('ref','=','CANCEL')]`, pause `[('ref','=','HOLD')]`, resume `[('ref','=','WORK')]`, stop `[('ref','=','DONE')]`, reset `[('ref','=','RESET')]` |  |
 | cancel_mode / resume_mode / reset_action | `start_unmatched` / `condition` / `cancel` | `reset_action` có hai giá trị `cancel`, `complete` (030 bảng `sla_definition`) |
-| reset_on_field_ids | field `ref` |  |
+| reset_field_ids | field `ref` |  |
 | retroactive_start / retroactive_field_id | bật / `create_date` |  |
 | escalation | mốc 75% và 100% (FX-ESC-STD) |  |
 | company_id / active / sequence | CO-A / True / 5 |  |
@@ -7275,7 +7490,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | (rỗng) |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[('ref','=','NEW')]` |  |
 
 **Steps & Expected Results:**
@@ -7294,7 +7509,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-10-03 |
-| Coverage Item | CI-2 (`target_hours` = -1 (âm)) |
+| Coverage Item | CI-2 (`duration` = -1 (âm)) |
 | Requirement Ref | REQ-FUNC-001 AC3 |
 | Priority | P2-High |
 | Test Type | Negative |
@@ -7308,14 +7523,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | `res.partner` |  |
-| target_hours | -1 | Giá trị âm gần biên nhất |
+| duration | -1 | Giá trị âm gần biên nhất |
 | start | `[('ref','=','NEW')]` |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo định nghĩa với `target_hours` = -1, lưu. | Bị từ chối kèm thông báo nêu thời lượng không được âm. |
+| 1 | Tạo định nghĩa với `duration` = -1, lưu. | Bị từ chối kèm thông báo nêu thời lượng không được âm. |
 | 2 | Đếm `sla.definition` của `res.partner`. | = 0. |
 
 **Pass/Fail Criteria:** ✅ Pass: Từ chối, không có bản ghi. ❌ Fail: Lưu thành công.
@@ -7327,7 +7542,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-10-03 |
-| Coverage Item | CI-3 (`target_hours` = 0 (biên hợp lệ)) |
+| Coverage Item | CI-3 (`duration` = 0 (biên hợp lệ)) |
 | Requirement Ref | REQ-FUNC-001 AC3 (boundary) |
 | Priority | P2-High |
 | Test Type | Boundary |
@@ -7341,23 +7556,23 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | `res.partner` |  |
-| target_hours | 0 | Biên: 0 được chấp nhận |
+| duration | 0 | Biên: 0 được chấp nhận |
 | start | `[('ref','=','NEW')]` |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo định nghĩa với `target_hours` = 0, lưu. | Lưu thành công. |
-| 2 | Đọc lại `target_hours`. | = 0. |
+| 1 | Tạo định nghĩa với `duration` = 0, lưu. | Lưu thành công. |
+| 2 | Đọc lại `duration`. | = 0. |
 
-**Pass/Fail Criteria:** ✅ Pass: Lưu thành công, `target_hours` = 0. ❌ Fail: Bị từ chối.
+**Pass/Fail Criteria:** ✅ Pass: Lưu thành công, `duration` = 0. ❌ Fail: Bị từ chối.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
 ## TG-11 — Đổi cấu hình khi đang chạy và archive
 
-### TC-CHG-001: Giữ nguyên mục tiêu 4 giờ và planned_end của task đang chạy khi định nghĩa sửa thành 8 giờ
+### TC-CHG-001: Giữ nguyên mục tiêu 4 giờ và planned_end_time của task đang chạy khi định nghĩa sửa thành 8 giờ
 
 | Field | Giá trị |
 |---|---|
@@ -7371,25 +7586,25 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| target_hours ban đầu | 4 |  |
-| target_hours sau khi sửa | 8 | sửa trên định nghĩa |
+| duration ban đầu | 4 |  |
+| duration sau khi sửa | 8 | sửa trên định nghĩa |
 | now | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `target_hours` = 4.0; `planned_end` = 2026-03-02 06:00 UTC |
-| 2 | U-MGR sửa `target_hours` của định nghĩa thành 8 | Lưu thành công |
-| 3 | Gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương))` | Task vẫn `in_progress`; `target_hours` = 4.0; `planned_end` = 2026-03-02 06:00 UTC (không đổi) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `target_duration` = 4.0; `planned_end_time` = 2026-03-02 06:00 UTC |
+| 2 | U-MGR sửa `duration` của định nghĩa thành 8 | Lưu thành công |
+| 3 | Gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương))` | Task vẫn `in_progress`; `target_duration` = 4.0; `planned_end_time` = 2026-03-02 06:00 UTC (không đổi) |
 
-**Pass/Fail Criteria:** ✅ Pass: `target_hours` = 4.0 và `planned_end` = 06:00 UTC sau khi sửa; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `target_duration` = 4.0 và `planned_end_time` = 06:00 UTC sau khi sửa; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -7407,7 +7622,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 4, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 4, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
 4. FX-CAL-VN-PM (fixture bổ sung): `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 13:00-18:00 (5 giờ/ngày).
 
 **Test Data:**
@@ -7421,11 +7636,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `calendar_id` = FX-CAL-VN; `planned_end` = 2026-03-02 06:00 UTC (13:00 giờ địa phương) |
-| 2 | U-MGR đổi `calendar_id` của định nghĩa thành FX-CAL-VN-PM | Lưu thành công |
-| 3 | Gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương))` | `calendar_id` của task vẫn = FX-CAL-VN; `planned_end` = 2026-03-02 06:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `schedule_id` = FX-CAL-VN; `planned_end_time` = 2026-03-02 06:00 UTC (13:00 giờ địa phương) |
+| 2 | U-MGR đổi `schedule_id` của định nghĩa thành FX-CAL-VN-PM | Lưu thành công |
+| 3 | Gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương))` | `schedule_id` của task vẫn = FX-CAL-VN; `planned_end_time` = 2026-03-02 06:00 UTC |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` của task = FX-CAL-VN và `planned_end` không đổi; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` của task = FX-CAL-VN và `planned_end_time` không đổi; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -7444,14 +7659,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. FX-CAL-VN-PM (fixture bổ sung): `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 13:00-18:00 (5 giờ/ngày).
 3. Partner P2 có `ref` = `NEW`, tạo TRƯỚC định nghĩa; chưa có task nào.
-4. Định nghĩa FX-DEF-VN trên `res.partner` với `target_hours` = 4, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
-5. U-MGR sửa định nghĩa: `target_hours` = 8, `calendar_id` = FX-CAL-VN-PM (trước khi attach P2).
+4. Định nghĩa FX-DEF-VN trên `res.partner` với `duration` = 4, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN; là định nghĩa duy nhất đang bật của `res.partner`.
+5. U-MGR sửa định nghĩa: `duration` = 8, `schedule_id` = FX-CAL-VN-PM (trước khi attach P2).
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| target_hours | 8 |  |
+| duration | 8 |  |
 | Lịch | FX-CAL-VN-PM |  |
 | now | T0 + 1h (10:00 giờ địa phương = 03:00 UTC) |  |
 
@@ -7459,10 +7674,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P2, now = T0 + 1h)` | Task mới `in_progress`; `target_hours` = 8.0; `calendar_id` = FX-CAL-VN-PM |
-| 2 | Đọc `planned_end` | = 2026-03-03 09:00 UTC (thứ Ba 16:00 giờ địa phương: 5 giờ thứ Hai 13:00-18:00 + 3 giờ thứ Ba 13:00-16:00) |
+| 1 | Gọi Engine `evaluate(P2, now = T0 + 1h)` | Task mới `in_progress`; `target_duration` = 8.0; `schedule_id` = FX-CAL-VN-PM |
+| 2 | Đọc `planned_end_time` | = 2026-03-03 09:00 UTC (thứ Ba 16:00 giờ địa phương: 5 giờ thứ Hai 13:00-18:00 + 3 giờ thứ Ba 13:00-16:00) |
 
-**Pass/Fail Criteria:** ✅ Pass: `target_hours` = 8.0, `calendar_id` = FX-CAL-VN-PM, `planned_end` = 2026-03-03 09:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `target_duration` = 8.0, `schedule_id` = FX-CAL-VN-PM, `planned_end_time` = 2026-03-03 09:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -7482,7 +7697,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 3. FX-CAL-VN-PM (fixture bổ sung): `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 13:00-18:00 (5 giờ/ngày).
 4. Partner Q (công ty mẹ) có `x_calendar_id` = FX-CAL-VN; partner P có `parent_id` = Q, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7495,20 +7710,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `calendar_id` = FX-CAL-VN; `planned_end` = 2026-03-02 06:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `schedule_id` = FX-CAL-VN; `planned_end_time` = 2026-03-02 06:00 UTC |
 | 2 | Đặt `Q.x_calendar_id` = FX-CAL-VN-PM | Ghi thành công |
-| 3 | Gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương))` | `calendar_id` của task vẫn = FX-CAL-VN; `planned_end` = 2026-03-02 06:00 UTC |
+| 3 | Gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương))` | `schedule_id` của task vẫn = FX-CAL-VN; `planned_end_time` = 2026-03-02 06:00 UTC |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN và `planned_end` không đổi; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN và `planned_end_time` không đổi; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-005: Dùng lịch L2 sau khi SLA Manager bấm Tính lại, khi lịch công ty mẹ đã đổi
+### TC-CHG-005: Dùng lịch L2 sau khi SLA Manager bấm Apply Current Settings, khi lịch công ty mẹ đã đổi
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-11-02 |
-| Coverage Item | CI-2 (Bấm Tính lại sau khi đổi) |
+| Coverage Item | CI-2 (Bấm Apply Current Settings sau khi đổi) |
 | Requirement Ref | REQ-FUNC-052 (AC2) |
 | Priority | P2-High |
 | Test Type | Positive |
@@ -7519,28 +7734,28 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 3. FX-CAL-VN-PM (fixture bổ sung): `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 13:00-18:00 (5 giờ/ngày).
 4. Partner Q (công ty mẹ) có `x_calendar_id` = FX-CAL-VN; partner P có `parent_id` = Q, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Lịch L1 -> L2 | FX-CAL-VN -> FX-CAL-VN-PM | đổi ở Q |
-| Mốc Tính lại | T0 + 1h (10:00 giờ địa phương) |  |
+| Mốc Apply Current Settings | T0 + 1h (10:00 giờ địa phương) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `calendar_id` = FX-CAL-VN |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `schedule_id` = FX-CAL-VN |
 | 2 | Đặt `Q.x_calendar_id` = FX-CAL-VN-PM | Ghi thành công |
-| 3 | U-MGR thực hiện hành động Tính lại trên task của P với now = T0 + 1h (10:00 giờ địa phương) | `calendar_id` của task = FX-CAL-VN-PM; `business_elapsed` = 1.0; `planned_end` = 2026-03-02 09:00 UTC (16:00 giờ địa phương: còn 3 giờ tính từ 13:00 theo lịch mới) |
+| 3 | U-MGR thực hiện hành động Apply Current Settings trên task của P với now = T0 + 1h (10:00 giờ địa phương) | `schedule_id` của task = FX-CAL-VN-PM; `business_duration` = 1.0; `planned_end_time` = 2026-03-02 09:00 UTC (16:00 giờ địa phương: còn 3 giờ tính từ 13:00 theo lịch mới) |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN-PM và `planned_end` = 09:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN-PM và `planned_end_time` = 09:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-006: Tính lại giữ 3 giờ đã trôi và xếp planned_end = hiện tại + 1 giờ làm việc theo lịch mới
+### TC-CHG-006: Apply Current Settings giữ 3 giờ đã trôi và xếp planned_end_time = hiện tại + 1 giờ làm việc theo lịch mới
 
 | Field | Giá trị |
 |---|---|
@@ -7556,7 +7771,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 3. FX-CAL-VN-PM (fixture bổ sung): `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 13:00-18:00 (5 giờ/ngày).
 4. Partner Q (công ty mẹ) có `x_calendar_id` = FX-CAL-VN; partner P có `parent_id` = Q, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7564,24 +7779,24 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | Mục tiêu | 4 |  |
 | Lịch mới | FX-CAL-VN-PM | đổi ở Q sau khi attach |
-| Mốc Tính lại | T0 + 3h (12:00 giờ địa phương = 05:00 UTC) |  |
+| Mốc Apply Current Settings | T0 + 3h (12:00 giờ địa phương = 05:00 UTC) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `calendar_id` = FX-CAL-VN; `planned_end` = 2026-03-02 06:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `schedule_id` = FX-CAL-VN; `planned_end_time` = 2026-03-02 06:00 UTC |
 | 2 | Đặt `Q.x_calendar_id` = FX-CAL-VN-PM | Ghi thành công |
-| 3 | U-MGR thực hiện hành động Tính lại trên task của P với now = T0 + 3h | `business_elapsed` = 3.0; `calendar_id` = FX-CAL-VN-PM; `target_hours` = 4.0; `planned_end` = 2026-03-02 07:00 UTC (14:00 giờ địa phương: 12:00 ngoài giờ làm của lịch mới nên giờ thứ 1 bắt đầu 13:00) |
+| 3 | U-MGR thực hiện hành động Apply Current Settings trên task của P với now = T0 + 3h | `business_duration` = 3.0; `schedule_id` = FX-CAL-VN-PM; `target_duration` = 4.0; `planned_end_time` = 2026-03-02 07:00 UTC (14:00 giờ địa phương: 12:00 ngoài giờ làm của lịch mới nên giờ thứ 1 bắt đầu 13:00) |
 | 4 | Đếm task của (định nghĩa, P) | 1 task, vẫn `in_progress` |
 
-**Pass/Fail Criteria:** ✅ Pass: `business_elapsed` = 3.0 và `planned_end` = 07:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `business_duration` = 3.0 và `planned_end_time` = 07:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
-**Ghi chú:** `planned_end` = `sla.time.plan(lịch mới, now, mục tiêu - business_elapsed)`, tức `resource.calendar.plan_hours` từ `now`; 12:00 nằm ngoài giờ làm của lịch mới nên giờ thứ nhất bắt đầu 13:00.
+**Ghi chú:** `planned_end_time` = `sla.time.plan(lịch mới, now, mục tiêu - business_duration)`, tức `resource.calendar.plan_hours` từ `now`; 12:00 nằm ngoài giờ làm của lịch mới nên giờ thứ nhất bắt đầu 13:00.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-007: Tính lại áp mục tiêu 8 giờ mới và xếp planned_end = hiện tại + 5 giờ làm việc
+### TC-CHG-007: Apply Current Settings áp mục tiêu 8 giờ mới và xếp planned_end_time = hiện tại + 5 giờ làm việc
 
 | Field | Giá trị |
 |---|---|
@@ -7595,30 +7810,30 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Mục tiêu | 4 -> 8 | sửa trên định nghĩa |
-| Mốc Tính lại | T0 + 3h (12:00 giờ địa phương) |  |
+| Mốc Apply Current Settings | T0 + 3h (12:00 giờ địa phương) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `target_hours` = 4.0 |
-| 2 | U-MGR sửa `target_hours` của định nghĩa thành 8 | Task vẫn `target_hours` = 4.0 |
-| 3 | U-MGR thực hiện hành động Tính lại trên task của P với now = T0 + 3h | `target_hours` = 8.0; `business_elapsed` = 3.0; `planned_end` = 2026-03-02 10:00 UTC (17:00 giờ địa phương = 12:00 + 5 giờ, 24x7) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `target_duration` = 4.0 |
+| 2 | U-MGR sửa `duration` của định nghĩa thành 8 | Task vẫn `target_duration` = 4.0 |
+| 3 | U-MGR thực hiện hành động Apply Current Settings trên task của P với now = T0 + 3h | `target_duration` = 8.0; `business_duration` = 3.0; `planned_end_time` = 2026-03-02 10:00 UTC (17:00 giờ địa phương = 12:00 + 5 giờ, 24x7) |
 
-**Pass/Fail Criteria:** ✅ Pass: `target_hours` = 8.0 và `planned_end` = 10:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `target_duration` = 8.0 và `planned_end_time` = 10:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Ghi chú:** Thời gian đã trôi 3 giờ lấy như AC1 vì AC2 không nêu.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-008: Tính lại không khả dụng trên task đã achieved: nút bị ẩn theo stage và gọi hàm không đổi task
+### TC-CHG-008: Apply Current Settings không khả dụng trên task đã achieved: nút bị ẩn theo stage và gọi hàm không đổi task
 
 | Field | Giá trị |
 |---|---|
@@ -7632,7 +7847,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7645,11 +7860,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end` = 2026-03-02 06:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end_time` = 2026-03-02 06:00 UTC |
 | 2 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `achieved` |
 | 3 | Đọc arch của view form/list `sla.task` (`views/sla_task_views.xml`) bằng `get_view` | Nút `action_recalculate` có `groups="dwo_sla_core.group_sla_manager"` và `invisible="stage not in ('in_progress', 'paused')"`, nên không hiển thị cho stage `achieved` |
 | 4 | U-MGR gọi trực tiếp `action_recalculate()` trên task của P | Không ném lỗi và không đổi task (hàm chỉ áp dụng cho task `in_progress` hoặc `paused`) |
-| 5 | Đọc lại task | `stage` = `achieved`; `planned_end` = 2026-03-02 06:00 UTC; `business_elapsed` không đổi so với bước trước |
+| 5 | Đọc lại task | `stage` = `achieved`; `planned_end_time` = 2026-03-02 06:00 UTC; `business_duration` không đổi so với bước trước |
 
 **Pass/Fail Criteria:** ✅ Pass: nút bị ẩn ở stage này theo arch view, gọi trực tiếp không làm đổi task; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
@@ -7658,7 +7873,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-009: Tính lại không khả dụng trên task đã breached: nút bị ẩn theo stage và gọi hàm không đổi task
+### TC-CHG-009: Apply Current Settings không khả dụng trên task đã breached: nút bị ẩn theo stage và gọi hàm không đổi task
 
 | Field | Giá trị |
 |---|---|
@@ -7672,7 +7887,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7685,11 +7900,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end` = 2026-03-02 06:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end_time` = 2026-03-02 06:00 UTC |
 | 2 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 5h (14:00 giờ địa phương), changed = {ref})` | `stage` = `breached` |
 | 3 | Đọc arch của view form/list `sla.task` (`views/sla_task_views.xml`) bằng `get_view` | Nút `action_recalculate` có `groups="dwo_sla_core.group_sla_manager"` và `invisible="stage not in ('in_progress', 'paused')"`, nên không hiển thị cho stage `breached` |
 | 4 | U-MGR gọi trực tiếp `action_recalculate()` trên task của P | Không ném lỗi và không đổi task (hàm chỉ áp dụng cho task `in_progress` hoặc `paused`) |
-| 5 | Đọc lại task | `stage` = `breached`; `planned_end` = 2026-03-02 06:00 UTC; `business_elapsed` không đổi so với bước trước |
+| 5 | Đọc lại task | `stage` = `breached`; `planned_end_time` = 2026-03-02 06:00 UTC; `business_duration` không đổi so với bước trước |
 
 **Pass/Fail Criteria:** ✅ Pass: nút bị ẩn ở stage này theo arch view, gọi trực tiếp không làm đổi task; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
@@ -7698,7 +7913,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-010: Tính lại không khả dụng trên task đã cancelled: nút bị ẩn theo stage và gọi hàm không đổi task
+### TC-CHG-010: Apply Current Settings không khả dụng trên task đã cancelled: nút bị ẩn theo stage và gọi hàm không đổi task
 
 | Field | Giá trị |
 |---|---|
@@ -7712,7 +7927,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7729,7 +7944,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | 2 | Ghi `ref` = `CANCEL` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `cancelled` |
 | 3 | Đọc arch của view form/list `sla.task` (`views/sla_task_views.xml`) bằng `get_view` | Nút `action_recalculate` có `groups="dwo_sla_core.group_sla_manager"` và `invisible="stage not in ('in_progress', 'paused')"`, nên không hiển thị cho stage `cancelled` |
 | 4 | U-MGR gọi trực tiếp `action_recalculate()` trên task của P | Không ném lỗi và không đổi task (hàm chỉ áp dụng cho task `in_progress` hoặc `paused`) |
-| 5 | Đọc lại task | `stage` = `cancelled`; `planned_end` = 2026-03-02 06:00 UTC |
+| 5 | Đọc lại task | `stage` = `cancelled`; `planned_end_time` = 2026-03-02 06:00 UTC |
 
 **Pass/Fail Criteria:** ✅ Pass: nút bị ẩn ở stage này theo arch view, gọi trực tiếp không làm đổi task; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
@@ -7738,7 +7953,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-011: Tính lại task paused: đổi mục tiêu ngay, xếp lại planned_end khi resume
+### TC-CHG-011: Apply Current Settings task paused: đổi mục tiêu ngay, xếp lại planned_end_time khi resume
 
 | Field | Giá trị |
 |---|---|
@@ -7752,28 +7967,28 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`, resume khi `ref` = `WORK`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`, resume khi `ref` = `WORK`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Mục tiêu | 4 -> 8 |  |
-| Mốc | pause T0+1h, Tính lại T0+2h, resume T0+3h | 10:00, 11:00, 12:00 giờ địa phương |
+| Mốc | pause T0+1h, Apply Current Settings T0+2h, resume T0+3h | 10:00, 11:00, 12:00 giờ địa phương |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end` = 2026-03-02 06:00 UTC |
-| 2 | Ghi `ref` = `HOLD` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h, changed = {ref})` | `stage` = `paused`; `business_elapsed` = 1.0 |
-| 3 | U-MGR sửa `target_hours` của định nghĩa thành 8 | Lưu thành công |
-| 4 | U-MGR thực hiện hành động Tính lại trên task của P với now = T0 + 2h | `stage` vẫn `paused`; `target_hours` = 8.0; `business_elapsed` = 1.0; `planned_end` = 2026-03-02 06:00 UTC (chưa xếp lại) |
-| 5 | Ghi `ref` = `WORK` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 3h (12:00 giờ địa phương), changed = {ref})` | `stage` = `in_progress`; `planned_end` = 2026-03-02 12:00 UTC (19:00 giờ địa phương = 12:00 + (8 - 1) giờ) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end_time` = 2026-03-02 06:00 UTC |
+| 2 | Ghi `ref` = `HOLD` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h, changed = {ref})` | `stage` = `paused`; `business_duration` = 1.0 |
+| 3 | U-MGR sửa `duration` của định nghĩa thành 8 | Lưu thành công |
+| 4 | U-MGR thực hiện hành động Apply Current Settings trên task của P với now = T0 + 2h | `stage` vẫn `paused`; `target_duration` = 8.0; `business_duration` = 1.0; `planned_end_time` = 2026-03-02 06:00 UTC (chưa xếp lại) |
+| 5 | Ghi `ref` = `WORK` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 3h (12:00 giờ địa phương), changed = {ref})` | `stage` = `in_progress`; `planned_end_time` = 2026-03-02 12:00 UTC (19:00 giờ địa phương = 12:00 + (8 - 1) giờ) |
 
-**Pass/Fail Criteria:** ✅ Pass: `planned_end` = 12:00 UTC chỉ sau khi resume; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `planned_end_time` = 12:00 UTC chỉ sau khi resume; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
-**Ghi chú:** Theo code (`sla_task.action_recalculate`) và Statement REQ-INT-005, `planned_end` của task `paused` giữ giá trị cũ cho tới khi resume.
+**Ghi chú:** Theo code (`sla_task.action_recalculate`) và Statement REQ-INT-005, `planned_end_time` của task `paused` giữ giá trị cũ cho tới khi resume.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -7791,7 +8006,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); một mốc escalation 100% với server action ghi ghi chú `SLA-100` vào chatter của partner; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); một mốc escalation 100% với server action ghi ghi chú `SLA-100` vào chatter của partner; là định nghĩa duy nhất đang bật của `res.partner`.
 4. Mốc 100% là mốc duy nhất lúc đầu (FX-ESC-STD rút gọn).
 
 **Test Data:**
@@ -7805,7 +8020,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `business_elapsed` = 0 |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `business_duration` = 0 |
 | 2 | Xử lý nền tại now = T0 + 3.2h (12:12 giờ địa phương) | 0 event `escalate`; chatter của P không có ghi chú `SLA-100` |
 | 3 | Với patch `odoo.fields.Datetime.now` trả T0 + 3.2h (12:12 giờ VN): U-MGR thêm mốc 75% (server action ghi `SLA-75`) vào định nghĩa | Lưu thành công; mốc 75% nằm trong `done_escalation_ids` của task và KHÔNG có event nào được ghi (D4/FUNC-053: mốc đã vượt chèn vào tập đã xử lý, không bắn bù) |
 | 4 | Xử lý nền tại now = T0 + 3.2h (12:12 giờ địa phương) | 0 event `escalate`; chatter không có `SLA-75` |
@@ -7829,7 +8044,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); một mốc escalation 100% với server action ghi ghi chú `SLA-100` vào chatter của partner; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); một mốc escalation 100% với server action ghi ghi chú `SLA-100` vào chatter của partner; là định nghĩa duy nhất đang bật của `res.partner`.
 4. Mốc 100% là mốc duy nhất lúc đầu (FX-ESC-STD rút gọn).
 
 **Test Data:**
@@ -7868,7 +8083,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
-2. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); đã archive (`active` = False); là định nghĩa duy nhất đang bật của `res.partner`.
+2. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); đã archive (`active` = False); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7903,7 +8118,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7938,7 +8153,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
-2. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); đã archive rồi bỏ archive; là định nghĩa duy nhất đang bật của `res.partner`.
+2. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); đã archive rồi bỏ archive; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -7971,7 +8186,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. 30 partner P01..P30 có `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là một trong hai định nghĩa đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là một trong hai định nghĩa đang bật của `res.partner`.
 4. Định nghĩa D-OTHER thứ hai trên `res.partner` với start `[('ref', '=', 'ZZZ')]` (không bao giờ khớp), đang bật.
 
 **Test Data:**
@@ -7987,19 +8202,19 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi `evaluate(P01..P30, now = T0)` | 30 task `in_progress` |
 | 2 | U-MGR archive FX-DEF-STD | `active` = False; vẫn 30 task `in_progress` |
-| 3 | Ghi `ref` = `DONE` trên P01 (qua `_write`) rồi `evaluate(P01, now = T0 + 1h, changed = {ref})` | Task của P01 `stage` = `achieved`, `end_dt` = 2026-03-02 03:00 UTC; có 1 event `complete` |
+| 3 | Ghi `ref` = `DONE` trên P01 (qua `_write`) rồi `evaluate(P01, now = T0 + 1h, changed = {ref})` | Task của P01 `stage` = `achieved`, `end_time` = 2026-03-02 03:00 UTC; có 1 event `complete` |
 | 4 | Đếm task còn `in_progress` | 29 |
 
 **Pass/Fail Criteria:** ✅ Pass: Task P01 `achieved` và 29 task còn lại `in_progress`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-019: Ghi event breach và bắn escalation cho task quá planned_end của định nghĩa đã archive
+### TC-CHG-019: Ghi event breach và bắn escalation cho task quá planned_end_time của định nghĩa đã archive
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-11-06 |
-| Coverage Item | CI-2 (Task quá `planned_end`, xử lý nền chạy) |
+| Coverage Item | CI-2 (Task quá `planned_end_time`, xử lý nền chạy) |
 | Requirement Ref | REQ-FUNC-060 (AC2) |
 | Priority | P1-Critical |
 | Test Type | Positive |
@@ -8008,20 +8223,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); mốc 75% (ghi `SLA-75`) và 100% (ghi `SLA-100`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); mốc 75% (ghi `SLA-75`) và 100% (ghi `SLA-100`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| Mốc xử lý nền | T0 + 5h (14:00 giờ địa phương) | quá `planned_end` 13:00 |
+| Mốc xử lý nền | T0 + 5h (14:00 giờ địa phương) | quá `planned_end_time` 13:00 |
 | Escalation | 75% và 100% |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end` = 2026-03-02 06:00 UTC |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress`; `planned_end_time` = 2026-03-02 06:00 UTC |
 | 2 | U-MGR archive định nghĩa | `active` = False |
 | 3 | Xử lý nền tại now = T0 + 5h | `has_breached` = True; đúng 1 event `breach`; đúng 2 event `escalate`; chatter của P có `SLA-75` và `SLA-100` mỗi loại 1 ghi chú |
 
@@ -8043,7 +8258,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P01 có `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); archive sau khi P01 có task; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); archive sau khi P01 có task; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8078,7 +8293,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); `cancel_mode` = `condition`, cancel domain `[('ref', '=', 'CANCEL')]`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); `cancel_mode` = `condition`, cancel domain `[('ref', '=', 'CANCEL')]`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8093,7 +8308,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress` |
 | 2 | U-MGR archive định nghĩa | `active` = False |
-| 3 | Ghi `ref` = `CANCEL` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `cancelled`; `end_dt` = 2026-03-02 03:00 UTC; 1 event `cancel` |
+| 3 | Ghi `ref` = `CANCEL` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `cancelled`; `end_time` = 2026-03-02 03:00 UTC; 1 event `cancel` |
 
 **Pass/Fail Criteria:** ✅ Pass: `stage` = `cancelled`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
@@ -8113,7 +8328,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`, resume khi `ref` = `WORK`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); pause khi `ref` = `HOLD`, resume khi `ref` = `WORK`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8149,7 +8364,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8164,7 +8379,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Task `in_progress` |
 | 2 | U-MGR archive định nghĩa; xác nhận không còn định nghĩa `active` nào của `res.partner` | 0 định nghĩa đang bật |
-| 3 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `achieved`; `end_dt` = 2026-03-02 03:00 UTC |
+| 3 | Ghi `ref` = `DONE` trên P (qua `_write`, bỏ qua hook) rồi gọi Engine `evaluate(P, now = T0 + 1h (10:00 giờ địa phương), changed = {ref})` | `stage` = `achieved`; `end_time` = 2026-03-02 03:00 UTC |
 | 4 | Đếm task `in_progress` hoặc `paused` của P | 0 (không kẹt) |
 
 **Pass/Fail Criteria:** ✅ Pass: Task `achieved`, không còn task hoạt động; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
@@ -8187,7 +8402,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); stop khi `ref` = `DONE`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8221,7 +8436,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
-2. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+2. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8255,7 +8470,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8289,7 +8504,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P được tạo TRƯỚC định nghĩa với `ref` = `NEW` (nên chưa có task nào); ca dựng record trước, định nghĩa sau.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -8311,12 +8526,12 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CHG-028: Người dùng chỉ thuộc `group_sla_user` không có nút Tính lại trên task và không gọi được hành động Tính lại
+### TC-CHG-028: Người dùng chỉ thuộc `group_sla_user` không có nút Apply Current Settings trên task và không gọi được hành động Apply Current Settings
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-11-03 |
-| Coverage Item | CI-7 (AC4 negative: SLA User không có nút Tính lại) |
+| Coverage Item | CI-7 (AC4 negative: SLA User không có nút Apply Current Settings) |
 | Requirement Ref | REQ-INT-005 (AC4) |
 | Priority | P1-Critical |
 | Test Type | Negative |
@@ -8324,8 +8539,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. FX-USERS: U-MGR (`group_sla_manager`), U-USR (chỉ `group_sla_user`), U-BIZ (chỉ quyền sửa `res.partner`), U-NONE (không quyền SLA); công ty hiện tại CO-A.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, nguồn lịch `none`); partner P (`ref` = `NEW`) tạo trước định nghĩa.
-3. Task T của P attach lúc T0 (2026-03-02 09:00 giờ VN) bằng `evaluate(P, now = T0)`; T `in_progress`, `planned_end` = 06:00 UTC.
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, nguồn lịch `none`); partner P (`ref` = `NEW`) tạo trước định nghĩa.
+3. Task T của P attach lúc T0 (2026-03-02 09:00 giờ VN) bằng `evaluate(P, now = T0)`; T `in_progress`, `planned_end_time` = 06:00 UTC.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -8339,7 +8554,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | 1 | Với env U-USR, `sla.task.get_view(view_type='form')` và `'list'` rồi tìm nút `action_recalculate` trong arch | Không có nút `action_recalculate` trong arch của cả hai view (nút khai báo `groups="dwo_sla_core.group_sla_manager"`) |
 | 2 | Với env U-MGR, cùng thao tác bước 1 | Arch có nút `action_recalculate` (đối chứng, bảo đảm bước 1 không đạt vì lý do khác) |
 | 3 | Với env U-USR, gọi trực tiếp `T.action_recalculate()` | Ném `AccessError` có nội dung chứa "SLA Manager" (ACC_001); T không đổi |
-| 4 | Đọc lại T (sudo) | `planned_end` = 06:00 UTC; `target_hours` = 4.0; `stage` = `in_progress` |
+| 4 | Đọc lại T (sudo) | `planned_end_time` = 06:00 UTC; `target_duration` = 4.0; `stage` = `in_progress` |
 
 **Pass/Fail Criteria:** ✅ Pass: U-USR không thấy nút ở cả hai view và bị `AccessError` khi gọi hàm, U-MGR thấy nút; ❌ Fail: U-USR thấy nút hoặc gọi hàm được
 
@@ -8466,7 +8681,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Hai partner R1, R2 có `ref` = 'NEW', chưa có task
 4. Mock Time Service `plan` ném `ValueError('plan failed')` khi xử lý R1 và hoạt động bình thường với R2 (mock `sla.time.plan` kiểm theo record đang xử lý nên chỉ R1 lỗi)
 
@@ -8481,7 +8696,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Gọi Engine `evaluate(R1 \| R2, now = FX-T0, changed = ∅)` | Không ném ngoại lệ ra ngoài |
 | 2 | Đọc task và event của R1 | 0 task; 1 event `error` của R1; 0 event `attach` của R1 |
-| 3 | Đọc task và event của R2 | 1 task `in_progress` (`start_dt` = 09:00, `planned_end` = 13:00); 1 event `attach`; 0 event `error` |
+| 3 | Đọc task và event của R2 | 1 task `in_progress` (`start_time` = 09:00, `planned_end_time` = 13:00); 1 event `attach`; 0 event `error` |
 
 **Pass/Fail Criteria:** ✅ Pass: R1 có event `error` và không có task; R2 có task và event `attach`; ❌ Fail: R2 không được xử lý hoặc R1 để lại dữ liệu dở dang
 
@@ -8500,7 +8715,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Partner P-1 (`ref` = 'NEW', khớp start) đã commit, chưa có task. Hai cursor C1 và C2 độc lập (REPEATABLE READ); C1 và C2 KHÔNG ghi P-1, chỉ gọi `sla.engine.evaluate(P-1, now)`, nên không có tranh chấp khóa dòng P-1.
 4. Thứ tự điều khiển bằng mã test: `sla.engine._attach` trong C2 được bọc để dừng tại `threading.Event` ngay trước lệnh tạo task (sau khi đã đọc 'chưa có task hoạt động').
 
@@ -8707,7 +8922,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
 2. Đồng hồ cố định: patch `odoo.fields.Datetime.now` trả FX-T0 (2026-03-02 09:00) cho đường hook (hook gọi `evaluate(now=None)` nên dùng `fields.Datetime.now()`; TA-01 đã chốt).
-3. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+3. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 4. Bắt log bằng `assertLogs(level='ERROR')` trên logger của module (logger `odoo.addons.dwo_sla_core.models.sla_event`, định dạng "SLA engine error: model=%s id=%s definition=%s message=%s").
 5. Partner P-1 với `ref` = 'SECRET-123'
 6. Mock Time Service `plan` ném `ValueError('cannot plan for SECRET-123')` (giá trị field lọt vào thông báo gốc)
@@ -8821,7 +9036,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Sửa nguyên nhân: ghi `start_domain` hợp lệ của FX-DEF-STD | Lưu thành công |
-| 2 | Với patch `odoo.fields.Datetime.now` trả FX-T0 + 1h, U-MGR gọi `E1.action_reevaluate_batch()` | Không ném lỗi; P-1 có đúng 1 task `in_progress` với `start_dt` = FX-T0 + 1h (10:00) |
+| 2 | Với patch `odoo.fields.Datetime.now` trả FX-T0 + 1h, U-MGR gọi `E1.action_reevaluate_batch()` | Không ném lỗi; P-1 có đúng 1 task `in_progress` với `start_time` = FX-T0 + 1h (10:00) |
 | 3 | Đọc E1 | `is_resolved` = true |
 | 4 | Đếm event `error` chưa xử lý | = 0 |
 
@@ -8890,7 +9105,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Với patch `odoo.fields.Datetime.now` trả FX-T0 + 1h, U-MGR gọi `action_reevaluate_batch()` trên recordset {E1, E2, E3} | Không ném lỗi; không có event `error` mới |
-| 2 | Đếm `sla.task` `in_progress` của P-1, P-2, P-3 | Mỗi partner 1 task (tổng 3), `start_dt` = 10:00 |
+| 2 | Đếm `sla.task` `in_progress` của P-1, P-2, P-3 | Mỗi partner 1 task (tổng 3), `start_time` = 10:00 |
 | 3 | Đọc E1, E2, E3 | Cả ba `is_resolved` = true |
 
 **Pass/Fail Criteria:** ✅ Pass: 3 task được tạo và 3 event đã xử lý; ❌ Fail: thiếu task, event còn chưa xử lý, hoặc record khác bị đánh giá
@@ -8911,20 +9126,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
 2. Đồng hồ cố định: patch `odoo.fields.Datetime.now` trả FX-T0 (2026-03-02 09:00) cho đường hook (hook gọi `evaluate(now=None)` nên dùng `fields.Datetime.now()`; TA-01 đã chốt).
-3. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7). (domain hợp lệ)
-4. Partner P-1: attach lúc FX-T0 rồi stop lúc 10:00 (ref 'DONE') → 1 task `achieved`, `end_dt` = 10:00
+3. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7). (domain hợp lệ)
+4. Partner P-1: attach lúc FX-T0 rồi stop lúc 10:00 (ref 'DONE') → 1 task `achieved`, `end_time` = 10:00
 5. Event `error` E1 cho (FX-DEF-STD, P-1) tạo qua ORM bằng quyền hệ thống (mô phỏng lỗi cũ chưa xử lý)
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| Task | achieved, end_dt 10:00 |  |
+| Task | achieved, end_time 10:00 |  |
 | now | FX-T0 + 2h (11:00) |  |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Chụp trạng thái task (id, stage, start_dt, end_dt, business_elapsed) và số event của task | stage = `achieved` |
+| 1 | Chụp trạng thái task (id, stage, start_time, end_time, business_duration) và số event của task | stage = `achieved` |
 | 2 | Với patch `odoo.fields.Datetime.now` trả 11:00, U-MGR gọi `E1.action_reevaluate_batch()` | Không ném lỗi |
 | 3 | So sánh trạng thái task và số event | Giống hệt ảnh chụp; không có task mới cho P-1 (tổng 1 task) |
 | 4 | Đọc E1 | `is_resolved` = true (đánh giá lại hoàn tất không lỗi) |
@@ -8947,7 +9162,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
 2. Đồng hồ cố định: patch `odoo.fields.Datetime.now` trả FX-T0 (2026-03-02 09:00) cho đường hook (hook gọi `evaluate(now=None)` nên dùng `fields.Datetime.now()`; TA-01 đã chốt).
-3. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7). (domain hợp lệ)
+3. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7). (domain hợp lệ)
 4. Partner P-1 đã attach → event `attach` EV-A; Partner P-2 có event `error` E1 chưa xử lý (tạo qua ORM hệ thống)
 5. Spy bọc Engine `evaluate` ghi lại các record được đánh giá
 
@@ -9027,9 +9242,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Patch `odoo.fields.Datetime.now` trả 14:00; U-MGR gọi `E1.action_reevaluate_batch()` | Không ném lỗi; `E1.is_resolved` = True |
-| 2 | Đọc task của P-1 | 1 task `in_progress`; `start_dt` = 14:00 (không phải 09:00); `planned_end` = 18:00 |
+| 2 | Đọc task của P-1 | 1 task `in_progress`; `start_time` = 14:00 (không phải 09:00); `planned_end_time` = 18:00 |
 
-**Pass/Fail Criteria:** ✅ Pass: `start_dt` = 14:00 và `planned_end` = 18:00; ❌ Fail: `start_dt` = 09:00 hoặc giá trị khác
+**Pass/Fail Criteria:** ✅ Pass: `start_time` = 14:00 và `planned_end_time` = 18:00; ❌ Fail: `start_time` = 09:00 hoặc giá trị khác
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -9061,9 +9276,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Patch `odoo.fields.Datetime.now` trả 10:00; U-MGR gọi `E1.action_reevaluate_batch()` | Không ném lỗi; `E1.is_resolved` = True |
-| 2 | Đọc task của P-1 | 1 task `in_progress`; `start_dt` = 09:00 (từ `create_date`); `planned_end` = 13:00 |
+| 2 | Đọc task của P-1 | 1 task `in_progress`; `start_time` = 09:00 (từ `create_date`); `planned_end_time` = 13:00 |
 
-**Pass/Fail Criteria:** ✅ Pass: `start_dt` = 09:00 theo field retroactive; ❌ Fail: `start_dt` = 10:00
+**Pass/Fail Criteria:** ✅ Pass: `start_time` = 09:00 theo field retroactive; ❌ Fail: `start_time` = 10:00
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -9209,7 +9424,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -9250,7 +9465,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -9291,7 +9506,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-SLOW, `retry` = false).
 4. Server action SA-SLOW: khi được gọi thì chặn lại tại điểm đồng bộ của test (giữ giao dịch C1 mở, mô phỏng 30 giây) mà không `sleep`
 5. Hai partner P-SLOW (task đến hạn 12:00) và P-OTHER (task attach FX-T0, chưa đến hạn); cả hai đã commit
@@ -9329,7 +9544,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
-2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none` tức 24x7).
+2. Định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none` tức 24x7).
 3. Mốc escalation 75% (`percent` = 75, `action_id` = SA-N75, `retry` = false).
 4. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 5. Wrapper đếm lời gọi `ir.actions.server.run` theo (server action, record id) gọi là `call_count`; server action thành công mặc định chỉ gọi `record.message_post`.
@@ -9386,7 +9601,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Tạo K {stage: 'new'} lúc 09:00 | 1 task `in_progress`; `is_resolved` = false |
 | 2 | Đặt đồng hồ 10:00; ghi K {stage: 'resolved'} | `is_resolved` = true (đã lưu) |
-| 3 | Đọc task và event của K | Task `stage` = `achieved`, `end_dt` = 10:00; đúng 1 event `complete`; tổng event = 2 (`attach`, `complete`) |
+| 3 | Đọc task và event của K | Task `stage` = `achieved`, `end_time` = 10:00; đúng 1 event `complete`; tổng event = 2 (`attach`, `complete`) |
 
 **Pass/Fail Criteria:** ✅ Pass: đúng 1 event `complete` và task `achieved`; ❌ Fail: 0 event `complete` (bỏ sót) hoặc ≥ 2 event `complete`
 
@@ -9529,7 +9744,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CMP-006: Gắn task khi bấm Đánh giá lại sau khi country của partner liên quan đổi sang VN
+### TC-CMP-006: Gắn task khi đánh giá lại thủ công qua engine sau khi country của partner liên quan đổi sang VN
 
 | Field | Giá trị |
 |---|---|
@@ -9558,9 +9773,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Ghi PX {country_id: VN} | Lưu thành công; K vẫn có thể chưa có task (không yêu cầu tự đánh giá) |
 | 2 | U-MGR: Gọi `sla.engine.evaluate(K, now=None, changed=set())` với patch `odoo.fields.Datetime.now` trả 10:00 (lõi của hành động đánh giá lại thủ công: `action_reevaluate` gom record gốc rồi gọi hàm này) | Không ném lỗi; 0 event `error` của K |
-| 3 | Đọc task và event của K | 1 task `in_progress`, `start_dt` = 10:00; 1 event `attach` |
+| 3 | Đọc task và event của K | 1 task `in_progress`, `start_time` = 10:00; 1 event `attach` |
 
-**Pass/Fail Criteria:** ✅ Pass: sau Đánh giá lại có đúng 1 task `in_progress` cho K; ❌ Fail: không có task hoặc có task trùng
+**Pass/Fail Criteria:** ✅ Pass: sau đánh giá lại thủ công qua engine có đúng 1 task `in_progress` cho K; ❌ Fail: không có task hoặc có task trùng
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -9598,7 +9813,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-CMP-008: Gắn task theo dữ liệu hiện tại khi Đánh giá lại với điều kiện dùng field compute không lưu
+### TC-CMP-008: Gắn task theo dữ liệu hiện tại khi đánh giá lại thủ công qua engine với điều kiện dùng field compute không lưu
 
 | Field | Giá trị |
 |---|---|
@@ -9628,7 +9843,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | 2 | Đọc task của K | Đúng 1 task `in_progress` (không trùng dù hệ thống đã tự gắn trước đó) |
 | 3 | U-MGR: gọi lại đúng lệnh bước 1 lần nữa | Không ném lỗi; số task và số event của K không đổi so với sau bước 1 |
 
-**Pass/Fail Criteria:** ✅ Pass: đúng 1 task sau Đánh giá lại và lần hai không đổi; ❌ Fail: không có task hoặc có 2 task
+**Pass/Fail Criteria:** ✅ Pass: đúng 1 task sau đánh giá lại thủ công qua engine và lần hai không đổi; ❌ Fail: không có task hoặc có 2 task
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -9652,7 +9867,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Số điều kiện cần kiểm | 6 | start, cancel, pause, resume, stop, reset |
-| Nội dung phải có | Nêu field compute không lưu và điều kiện qua quan hệ có thể không tự đánh giá; dùng 'Đánh giá lại' để bù |  |
+| Nội dung phải có | Nêu field compute không lưu và điều kiện qua quan hệ có thể không tự đánh giá; dùng 'Re-check Conditions' (hoặc đánh giá lại thủ công qua engine) để bù |  |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
@@ -9693,7 +9908,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | U-MGR: Gọi `sla.engine.evaluate(K, now=None, changed=set())` với patch `odoo.fields.Datetime.now` trả 10:00 (lõi của hành động đánh giá lại thủ công: `action_reevaluate` gom record gốc rồi gọi hàm này) | Không ném lỗi; 0 event `error` của K |
-| 2 | Đọc task và event của K | 1 task `in_progress`; `start_dt` = 10:00; 1 event `attach` |
+| 2 | Đọc task và event của K | 1 task `in_progress`; `start_time` = 10:00; 1 event `attach` |
 
 **Pass/Fail Criteria:** ✅ Pass: đúng 1 task `in_progress`; ❌ Fail: không có task
 
@@ -9761,7 +9976,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đặt đồng hồ 10:00; U-MGR đánh giá lại K lần 1 | 1 task `in_progress`; 1 event `attach` |
-| 2 | Chụp (id, stage, start_dt, planned_end, business_elapsed) của task và số event |  |
+| 2 | Chụp (id, stage, start_time, planned_end_time, business_duration) của task và số event |  |
 | 3 | U-MGR đánh giá lại K lần 2 (now = 10:00) | Không lỗi |
 | 4 | So sánh với ảnh chụp | Giống hệt; số task = 1; số event = 1 |
 
@@ -9818,7 +10033,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. Database `sla_test` đã cài `dwo_sla_core`; ca chạy với user U-MGR (FX-USERS) trừ khi ghi khác; giờ ghi theo Asia/Ho_Chi_Minh (UTC+7), FX-T0 = 2026-03-02 09:00.
 2. Đồng hồ cố định: patch `odoo.fields.Datetime.now` theo từng bước (đường hook dùng `fields.Datetime.now()`, TA-01).
 3. FX-CMP (model kiểm thử `x.sla.cmp.ticket`, khai báo trong module test): `name` Char; `stage` Selection (`new`, `work`, `resolved`); `is_resolved` Boolean compute `store=True` phụ thuộc `stage` (true khi `stage` = 'resolved'); `weight` Integer; `lvl` Integer compute `store=True` phụ thuộc `weight` (= weight // 10); `is_big` Boolean compute KHÔNG lưu phụ thuộc `weight` (true khi weight ≥ 100); `partner_id` Many2one `res.partner`; `parent_id` Many2one cùng model, `child_ids` One2many; `children_done` Boolean compute `store=True` phụ thuộc `child_ids.stage` (true khi có con và mọi con `resolved`). (ghi chú fixture: dựng model kiểm thử vì `res.partner` không có field compute có lưu phù hợp)
-4. Định nghĩa DEF-RST trên `x.sla.cmp.ticket`: mục tiêu 4 giờ, 24x7, start `[('stage', 'in', ['new', 'work'])]`, `reset_domain` = `[]` (khớp mọi record), `reset_on_field_ids` = {`weight`}, `reset_action` = `cancel`
+4. Định nghĩa DEF-RST trên `x.sla.cmp.ticket`: mục tiêu 4 giờ, 24x7, start `[('stage', 'in', ['new', 'work'])]`, `reset_domain` = `[('id', '!=', 0)]` (khớp mọi record), `reset_field_ids` = {`weight`}, `reset_action` = `cancel`
 5. Ticket K (`weight` = 10, `stage` = 'new') tạo lúc FX-T0 → task T1 `in_progress`
 6. Đổi `weight` thành 99 bằng SQL trực tiếp (bỏ qua hook) để hệ thống không thấy thay đổi
 
@@ -9867,9 +10082,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | U-MGR: Gọi `sla.engine.evaluate(K, now=None, changed=set())` với patch `odoo.fields.Datetime.now` trả 14:00 (lõi của hành động đánh giá lại thủ công: `action_reevaluate` gom record gốc rồi gọi hàm này) | Không ném lỗi; 0 event `error` của K |
-| 2 | Đọc task của K | `start_dt` = 14:00 (không phải 09:00); `planned_end` = 18:00 |
+| 2 | Đọc task của K | `start_time` = 14:00 (không phải 09:00); `planned_end_time` = 18:00 |
 
-**Pass/Fail Criteria:** ✅ Pass: `start_dt` = 14:00 và `planned_end` = 18:00; ❌ Fail: `start_dt` = 09:00
+**Pass/Fail Criteria:** ✅ Pass: `start_time` = 14:00 và `planned_end_time` = 18:00; ❌ Fail: `start_time` = 09:00
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -9900,7 +10115,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Với patch `odoo.fields.Datetime.now` trả 10:00, U-MGR gọi `action_reevaluate()` trên task của K | Không ném lỗi; 0 event `error` của K |
-| 2 | Đọc task của K và event | Task `stage` = `achieved`, `end_dt` = 10:00; 1 event `complete`; 0 event `cancel` |
+| 2 | Đọc task của K và event | Task `stage` = `achieved`, `end_time` = 10:00; 1 event `complete`; 0 event `cancel` |
 
 **Pass/Fail Criteria:** ✅ Pass: task `achieved` với 1 event `complete`, không `cancel`; ❌ Fail: task `cancelled` hoặc có cả hai event
 
@@ -9927,7 +10142,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | ir.attachment |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[]` |  |
 
 **Steps & Expected Results:**
@@ -9961,7 +10176,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | sla.task |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[]` |  |
 
 **Steps & Expected Results:**
@@ -9995,7 +10210,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | base.language.install |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[]` |  |
 
 **Steps & Expected Results:**
@@ -10029,7 +10244,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | image.mixin |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[]` |  |
 
 **Steps & Expected Results:**
@@ -10064,7 +10279,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | x_test.sqlview |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[]` |  |
 
 **Steps & Expected Results:**
@@ -10098,7 +10313,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | mail.message |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[]` |  |
 
 **Steps & Expected Results:**
@@ -10132,7 +10347,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | `res.partner` |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[('ref','=','NEW')]` |  |
 
 **Steps & Expected Results:**
@@ -10166,14 +10381,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | model | `demo.ticket` |  |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | start | `[('priority','=','p1')]` | `demo.ticket` có field `priority` (phụ thuộc module demo, TA-15) |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` {name: 'D-DEMO', model_id: `demo.ticket`, target_hours: 4, start_domain: `[('priority','=','p1')]`, calendar_source: 'none', cancel_mode: 'start_unmatched', resume_mode: 'condition'; stop, pause, resume, cancel, reset để rỗng}, lưu. | Không ném lỗi; bản ghi được tạo (id > 0) với `model_name` = 'demo.ticket' và `active` = True. |
+| 1 | Tạo `sla.definition` {name: 'D-DEMO', model_id: `demo.ticket`, duration: 4, start_domain: `[('priority','=','p1')]`, schedule_source: 'none', cancel_mode: 'start_unmatched', resume_mode: 'condition'; stop, pause, resume, cancel, reset để rỗng}, lưu. | Không ném lỗi; bản ghi được tạo (id > 0) với `model_name` = 'demo.ticket' và `active` = True. |
 
 **Pass/Fail Criteria:** ✅ Pass: bản ghi được tạo với `model_name` = 'demo.ticket'. ❌ Fail: bị từ chối.
 
@@ -11088,15 +11303,15 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | `definition` |  |
-| calendar_id | FX-CAL-EMPTY |  |
+| schedule_source | `definition` |  |
+| schedule_id | FX-CAL-EMPTY |  |
 | model | `res.partner` |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` tên `CAL-001` (model `res.partner`, `calendar_source` = `definition`, `calendar_id` = FX-CAL-EMPTY, `target_hours` = 4) bằng U-MGR | Ném `ValidationError`; thông báo nêu calendar không có giờ làm việc |
+| 1 | Tạo `sla.definition` tên `CAL-001` (model `res.partner`, `schedule_source` = `definition`, `schedule_id` = FX-CAL-EMPTY, `duration` = 4) bằng U-MGR | Ném `ValidationError`; thông báo nêu calendar không có giờ làm việc |
 | 2 | Tìm `sla.definition` tên `CAL-001` (kể cả archive) | Không có bản ghi nào |
 
 **Pass/Fail Criteria:** ✅ Pass: Lưu bị từ chối và không có bản ghi `CAL-001`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
@@ -11122,18 +11337,18 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | `definition` |  |
-| calendar_id | FX-CAL-VN |  |
-| target_hours | 4 |  |
+| schedule_source | `definition` |  |
+| schedule_id | FX-CAL-VN |  |
+| duration | 4 |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` tên `CAL-002` (model `res.partner`, `calendar_source` = `definition`, `calendar_id` = FX-CAL-VN, `target_hours` = 4) bằng U-MGR | Lưu thành công, không có lỗi |
-| 2 | Đọc lại `calendar_id` của `CAL-002` | = FX-CAL-VN |
+| 1 | Tạo `sla.definition` tên `CAL-002` (model `res.partner`, `schedule_source` = `definition`, `schedule_id` = FX-CAL-VN, `duration` = 4) bằng U-MGR | Lưu thành công, không có lỗi |
+| 2 | Đọc lại `schedule_id` của `CAL-002` | = FX-CAL-VN |
 
-**Pass/Fail Criteria:** ✅ Pass: Bản ghi được tạo với `calendar_id` = FX-CAL-VN; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: Bản ghi được tạo với `schedule_id` = FX-CAL-VN; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11156,14 +11371,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | `definition` |  |
-| calendar_id | FX-CAL-FLEX |  |
+| schedule_source | `definition` |  |
+| schedule_id | FX-CAL-FLEX |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` tên `CAL-003` (model `res.partner`, `calendar_source` = `definition`, `calendar_id` = FX-CAL-FLEX, `target_hours` = 4) bằng U-MGR | Ném `ValidationError`; thông báo nêu calendar không phải `fully_fixed` |
+| 1 | Tạo `sla.definition` tên `CAL-003` (model `res.partner`, `schedule_source` = `definition`, `schedule_id` = FX-CAL-FLEX, `duration` = 4) bằng U-MGR | Ném `ValidationError`; thông báo nêu calendar không phải `fully_fixed` |
 | 2 | Tìm `sla.definition` tên `CAL-003` | Không có bản ghi nào |
 
 **Pass/Fail Criteria:** ✅ Pass: Lưu bị từ chối; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
@@ -11186,13 +11401,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Công ty CO-A có `resource_calendar_id` = FX-CAL-VN; công ty CO-B có `resource_calendar_id` = FX-CAL-VN-PM; cả hai thuộc FX-CO.
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. Partner Q có `x_calendar_id` = FX-CAL-FLEX (`flexible`); partner P có `parent_id` = Q, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_path | `parent_id.x_calendar_id` |  |
+| schedule_path | `parent_id.x_calendar_id` |  |
 | Calendar tại cuối đường dẫn | FX-CAL-FLEX | không dùng được |
 | Lịch mặc định CO-A | FX-CAL-VN | dùng được |
 
@@ -11200,10 +11415,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `calendar_id` = FX-CAL-VN |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `schedule_id` = FX-CAL-VN |
 | 2 | Đọc `note` của event `attach` của task | `note` không rỗng, nêu calendar FX-CAL-FLEX không dùng được vì loại `flexible` |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN và `note` của event `attach` nêu lý do dự phòng; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN và `note` của event `attach` nêu lý do dự phòng; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Ghi chú:** nội dung `note` không được SRS quy định; kiểm bằng việc chứa tên calendar và từ `flexible` (NOTE_002 trong `constants/message.py`: "Calendar '%s' cannot be used (flexible type or no working hours).").
 
@@ -11226,25 +11441,25 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. FX-CAL-VN-PM (fixture bổ sung): `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 13:00-18:00 (5 giờ/ngày).
 5. Partner Q có `x_calendar_id` = FX-CAL-VN-PM; partner P có `parent_id` = Q, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-6. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 2, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+6. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 2, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_path | `parent_id.x_calendar_id` | 2 bước |
-| target_hours | 2 |  |
+| schedule_path | `parent_id.x_calendar_id` | 2 bước |
+| duration | 2 |  |
 | now | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `calendar_id` = FX-CAL-VN-PM (không phải lịch công ty FX-CAL-VN) |
-| 2 | Đọc `planned_end` | = 2026-03-02 08:00 UTC (15:00 giờ địa phương: giờ làm bắt đầu 13:00, cộng 2 giờ) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `schedule_id` = FX-CAL-VN-PM (không phải lịch công ty FX-CAL-VN) |
+| 2 | Đọc `planned_end_time` | = 2026-03-02 08:00 UTC (15:00 giờ địa phương: giờ làm bắt đầu 13:00, cộng 2 giờ) |
 | 3 | Đếm event `attach` của task | 1 event |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN-PM và `planned_end` = 08:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN-PM và `planned_end_time` = 08:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11267,14 +11482,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | `record` |  |
-| calendar_path | `child_ids.x_calendar_id` | `child_ids` là One2many |
+| schedule_source | `record` |  |
+| schedule_path | `child_ids.x_calendar_id` | `child_ids` là One2many |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` tên `CAL-004` (model `res.partner`, `calendar_source` = `record`, `calendar_path` = `child_ids.x_calendar_id`) bằng U-MGR | Ném `ValidationError`; thông báo nêu bước `child_ids` không phải Many2one |
+| 1 | Tạo `sla.definition` tên `CAL-004` (model `res.partner`, `schedule_source` = `record`, `schedule_path` = `child_ids.x_calendar_id`) bằng U-MGR | Ném `ValidationError`; thông báo nêu bước `child_ids` không phải Many2one |
 | 2 | Tìm `sla.definition` tên `CAL-004` | Không có bản ghi nào |
 
 **Pass/Fail Criteria:** ✅ Pass: Lưu bị từ chối; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
@@ -11299,14 +11514,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | `record` |  |
-| calendar_path | `parent_id.company_id` | bước cuối là Many2one tới `res.company` |
+| schedule_source | `record` |  |
+| schedule_path | `parent_id.company_id` | bước cuối là Many2one tới `res.company` |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Tạo `sla.definition` tên `CAL-005` (model `res.partner`, `calendar_source` = `record`, `calendar_path` = `parent_id.company_id`) bằng U-MGR | Ném `ValidationError`; thông báo nêu bước cuối phải trỏ tới `resource.calendar` |
+| 1 | Tạo `sla.definition` tên `CAL-005` (model `res.partner`, `schedule_source` = `record`, `schedule_path` = `parent_id.company_id`) bằng U-MGR | Ném `ValidationError`; thông báo nêu bước cuối phải trỏ tới `resource.calendar` |
 | 2 | Tìm `sla.definition` tên `CAL-005` | Không có bản ghi nào |
 
 **Pass/Fail Criteria:** ✅ Pass: Lưu bị từ chối; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
@@ -11327,24 +11542,24 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. CSDL `sla_test` đã cài `dwo_sla_core`; công ty hiện tại là CO-A; thao tác cấu hình do user U-MGR (FX-USERS) thực hiện.
 2. Partner P có `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-3. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
+3. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4 (nguồn lịch `none`); là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | `none` (mặc định) |  |
-| target_hours | 4 |  |
+| schedule_source | `none` (mặc định) |  |
+| duration | 4 |  |
 | now | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `calendar_id` rỗng |
-| 2 | Đọc `planned_end` | = 2026-03-02 06:00 UTC (start + 4 giờ, 24x7) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `schedule_id` rỗng |
+| 2 | Đọc `planned_end_time` | = 2026-03-02 06:00 UTC (start + 4 giờ, 24x7) |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` rỗng và `planned_end` = 06:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` rỗng và `planned_end_time` = 06:00 UTC; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11365,22 +11580,22 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. FX-CAL-VN-PM (fixture bổ sung): `fully_fixed`, `Asia/Ho_Chi_Minh`, T2-T6 13:00-18:00 (5 giờ/ngày).
 5. Partner P có `x_calendar_id` = FX-CAL-VN-PM, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-6. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+6. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_path | `x_calendar_id` | 1 bước, biên độ dài đường dẫn |
+| schedule_path | `x_calendar_id` | 1 bước, biên độ dài đường dẫn |
 | now | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `calendar_id` = FX-CAL-VN-PM |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `schedule_id` = FX-CAL-VN-PM |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN-PM; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN-PM; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11400,7 +11615,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Công ty CO-A có `resource_calendar_id` = FX-CAL-VN; công ty CO-B có `resource_calendar_id` = FX-CAL-VN-PM; cả hai thuộc FX-CO.
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. Partner P có `parent_id` rỗng, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa; công ty hiện tại của env là CO-B (để phân biệt công ty của record với công ty hiện tại).
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -11414,10 +11629,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `calendar_id` = FX-CAL-VN |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `schedule_id` = FX-CAL-VN |
 | 2 | Đọc `note` của event `attach` | `note` không rỗng và chứa `parent_id` (bước trống) |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN và `note` nêu bước trống `parent_id`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN và `note` nêu bước trống `parent_id`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Ghi chú:** code ghi NOTE_001 chứa toàn bộ đường dẫn (`parent_id.x_calendar_id`), không tách riêng bước trống; ca kiểm `note` chứa `parent_id`.
 
@@ -11439,7 +11654,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Công ty CO-A có `resource_calendar_id` = FX-CAL-VN; công ty CO-B có `resource_calendar_id` = FX-CAL-VN-PM; cả hai thuộc FX-CO.
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. Partner Q có `x_calendar_id` rỗng; partner P có `parent_id` = Q, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -11452,10 +11667,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task; `calendar_id` = FX-CAL-VN |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task; `schedule_id` = FX-CAL-VN |
 | 2 | Đọc `note` của event `attach` | `note` không rỗng và chứa `x_calendar_id` |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN và `note` nêu lý do; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN và `note` nêu lý do; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11475,7 +11690,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Công ty CO-A có `resource_calendar_id` = FX-CAL-VN; công ty CO-B có `resource_calendar_id` = FX-CAL-VN-PM; cả hai thuộc FX-CO.
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. Partner Q có `x_calendar_id` = FX-CAL-EMPTY (fully_fixed, không có dòng giờ làm); partner P có `parent_id` = Q, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -11488,10 +11703,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task; `calendar_id` = FX-CAL-VN |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task; `schedule_id` = FX-CAL-VN |
 | 2 | Đọc `note` của event `attach` | `note` không rỗng và chứa tên calendar 'FX-CAL-EMPTY' (NOTE_002) |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN và `note` nêu lý do; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN và `note` nêu lý do; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Ghi chú:** nguồn `record` không từ chối calendar rỗng khi lưu (REQ-FUNC-039 More Information); ghi chú nêu calendar không dùng được.
 
@@ -11513,25 +11728,25 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Công ty CO-A có `resource_calendar_id` = FX-CAL-VN; công ty CO-B có `resource_calendar_id` = FX-CAL-VN-PM; cả hai thuộc FX-CO.
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. Đặt `resource_calendar_id` của CO-A = FX-CAL-FLEX (không dùng được). Partner P có `parent_id` rỗng, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Lịch mặc định CO-A | FX-CAL-FLEX | không dùng được |
-| target_hours | 4 |  |
+| duration | 4 |  |
 | now | T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC) |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `calendar_id` rỗng |
-| 2 | Đọc `planned_end` | = 2026-03-02 06:00 UTC (24x7) |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task `in_progress`; `schedule_id` rỗng |
+| 2 | Đọc `planned_end_time` | = 2026-03-02 06:00 UTC (24x7) |
 | 3 | Đọc `note` của event `attach` | `note` không rỗng, nêu lịch công ty không dùng được và việc chạy 24x7 |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` rỗng, `planned_end` = 06:00 UTC và `note` nêu lý do; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` rỗng, `planned_end_time` = 06:00 UTC và `note` nêu lý do; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11551,7 +11766,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 2. Công ty CO-A có `resource_calendar_id` = FX-CAL-VN; công ty CO-B có `resource_calendar_id` = FX-CAL-VN-PM; cả hai thuộc FX-CO.
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. Partner P có `parent_id` rỗng, `company_id` rỗng, `ref` = `NEW`, tạo TRƯỚC định nghĩa; công ty hiện tại của env là CO-B.
-5. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+5. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
@@ -11565,9 +11780,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task; `calendar_id` = FX-CAL-VN-PM |
+| 1 | Gọi Engine `evaluate(P, now = T0 (2026-03-02 09:00 giờ địa phương = 02:00 UTC))` | Có 1 task; `schedule_id` = FX-CAL-VN-PM |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN-PM; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN-PM; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11588,23 +11803,23 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 3. Field Many2one `x_calendar_id` -> `resource.calendar` trên `res.partner` do ca tự tạo (`ir.model.fields` loại manual) để làm đích của đường dẫn lịch.
 4. Partner Q (parent) có `x_calendar_id` = FX-CAL-VN-PM; partner P có `parent_id` = Q, `company_id` = CO-A, `ref` = `NEW`, tạo TRƯỚC định nghĩa.
 5. Record rule bổ sung loại Q khỏi phạm vi đọc của U-BIZ (`[('id', '!=', Q.id)]`); xác nhận `Q.with_user(U-BIZ).read(['name'])` ném `AccessError`.
-6. Định nghĩa FX-DEF-STD trên `res.partner` với `target_hours` = 4, `calendar_source` = `record`, `calendar_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
+6. Định nghĩa FX-DEF-STD trên `res.partner` với `duration` = 4, `schedule_source` = `record`, `schedule_path` = `parent_id.x_calendar_id`; là định nghĩa duy nhất đang bật của `res.partner`.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Người dùng | U-BIZ | chỉ sửa `res.partner`, không đọc được Q |
-| calendar_path | `parent_id.x_calendar_id` |  |
+| schedule_path | `parent_id.x_calendar_id` |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Gọi Engine `evaluate(P, now = T0)` với môi trường của U-BIZ (`env = env(user=U-BIZ)`) | Không ném `AccessError`; có 1 task; `calendar_id` = FX-CAL-VN-PM |
+| 1 | Gọi Engine `evaluate(P, now = T0)` với môi trường của U-BIZ (`env = env(user=U-BIZ)`) | Không ném `AccessError`; có 1 task; `schedule_id` = FX-CAL-VN-PM |
 | 2 | Đếm event `error` của P | 0 event |
 
-**Pass/Fail Criteria:** ✅ Pass: `calendar_id` = FX-CAL-VN-PM và không có event `error`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
+**Pass/Fail Criteria:** ✅ Pass: `schedule_id` = FX-CAL-VN-PM và không có event `error`; ❌ Fail: Một giá trị bất kỳ ở cột Expected Result khác kết quả mong đợi, hoặc engine ném lỗi không dự kiến.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -11654,7 +11869,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Gọi là D1 với name='D1'.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Gọi là D1 với name='D1'.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -11685,7 +11900,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Gọi là D1 với name='D1'.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Gọi là D1 với name='D1'.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -11716,8 +11931,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Gọi là D1.
-3. Partner P (ref='NEW'). Tạo bằng sudo task K1: definition_id=FX-DEF-STD, res_model='res.partner', res_id của partner tương ứng, stage='in_progress', start_dt=FX-T0 (2026-03-02 02:00 UTC), target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Gọi là D1.
+3. Partner P (ref='NEW'). Tạo bằng sudo task K1: definition_id=FX-DEF-STD, res_model='res.partner', res_id của partner tương ứng, stage='in_progress', start_time=FX-T0 (2026-03-02 02:00 UTC), duration=4.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -11749,7 +11964,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Tạo thêm một mốc FX-ESC-STD và một event bằng sudo (event='attach').
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Tạo thêm một mốc FX-ESC-STD và một event bằng sudo (event='attach').
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -11779,7 +11994,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Partner P (ref='' ) tạo bằng quyền hệ thống; chưa có task.
 
 **Test Data:**
@@ -11812,8 +12027,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Partner P ref='NEW'; tạo bằng sudo task in_progress của P (start_dt=FX-T0, target_hours=4).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Partner P ref='NEW'; tạo bằng sudo task in_progress của P (start_time=FX-T0, duration=4).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -11843,8 +12058,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS và FX-CO; U-A: group_sla_user, chỉ được phép CO-A; U-MGR có cả CO-A và CO-B.
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Hai partner PA (company_id=CO-A) và PB (company_id=CO-B); tạo bằng sudo task KA (company_id=CO-A, res_id=PA) và KB (company_id=CO-B, res_id=PB), stage='in_progress', start_dt=FX-T0, target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Hai partner PA (company_id=CO-A) và PB (company_id=CO-B); tạo bằng sudo task KA (company_id=CO-A, res_id=PA) và KB (company_id=CO-B, res_id=PB), stage='in_progress', start_time=FX-T0, duration=4.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -11875,7 +12090,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS và FX-CO; U-A: group_sla_user, chỉ được phép CO-A; U-MGR có cả CO-A và CO-B.
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Tạo bằng sudo hai event: EA (company_id=CO-A, event='error') và EB (company_id=CO-B, event='error').
 
 **Test Data:**
@@ -11935,7 +12150,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS và FX-CO; U-A: group_sla_user, chỉ được phép CO-A; U-MGR có cả CO-A và CO-B.
-2. Không cần lịch (calendar_source=none).
+2. Không cần lịch (schedule_source=none).
 3. Dựng FX-DEF-STD nhưng company_id=CO-A.
 4. PA (company_id=CO-A, ref='NEW'), PB (company_id=CO-B, ref='NEW') tạo trước khi bật định nghĩa.
 
@@ -11968,7 +12183,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS và FX-CO; U-A: group_sla_user, chỉ được phép CO-A; U-MGR có cả CO-A và CO-B.
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). (company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). (company_id rỗng).
 3. PA (company_id=CO-A, ref='NEW'), PB (company_id=CO-B, ref='NEW').
 
 **Test Data:**
@@ -12000,9 +12215,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS và FX-CO; U-CRON thuộc group_sla_user, được cấp CO-A và CO-B, không có quyền quản trị người dùng.
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Server action SA-DENY loại code, model res.partner, nội dung `env['res.users'].create({'name': 'x', 'login': 'x@sla.test'})` (cần quyền quản trị người dùng mà U-CRON không có).
-4. Escalation ES1 trên FX-DEF-STD: percent=75, action_id=SA-DENY, retry=False. Partner P ref='NEW', task in_progress start_dt=T0 (02:00 UTC), target_hours=4, next_due_at=T0+3h.
+4. Escalation ES1 trên FX-DEF-STD: percent=75, action_id=SA-DENY, retry=False. Partner P ref='NEW', task in_progress start_time=T0 (02:00 UTC), duration=4, next_due_at=T0+3h.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -12023,7 +12238,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-SEC-014: Ghi escalate_retry khi action vượt quyền U-CRON và mốc bật retry
+### TC-SEC-014: Ghi escalate_retry khi action vượt quyền U-CRON và mốc bật retry [Đã gỡ D12]
 
 | Field | Giá trị |
 |---|---|
@@ -12036,9 +12251,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS và FX-CO; U-CRON thuộc `group_sla_user`, được cấp CO-A và CO-B, không có quyền quản trị người dùng.
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Server action SA-DENY loại code, model res.partner, nội dung `env['res.users'].create({'name': 'x', 'login': 'x@sla.test'})` (cần quyền quản trị người dùng mà U-CRON không có).
-4. Escalation ES1: percent=75, action_id=SA-DENY, retry=True, retry_pattern='[1, 10]'. Partner P ref='NEW', task in_progress start_dt=T0, target_hours=4.
+4. Escalation ES1: percent=75, action_id=SA-DENY, retry=True, retry_pattern='[1, 10]'. Partner P ref='NEW', task in_progress start_time=T0, duration=4.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -12108,7 +12323,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. Dựng FX-USERS và FX-CO; U-BIZ-S = U-BIZ cộng group_sla_user, allowed_company_ids=[CO-A] (không đọc được record của CO-B).
 2. Dựng FX-CAL-VN (fully_fixed, Asia/Ho_Chi_Minh, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa).
 3. CO-B.resource_calendar_id = FX-CAL-VN. Partner mẹ PM (name='PM-Secret', company_id=CO-B); partner con PC (company_id=CO-A, parent_id=PM, ref='NEW') [Giả định: res.partner cho phép con khác công ty với mẹ].
-4. Dựng định nghĩa như FX-DEF-STD nhưng calendar_source='record', calendar_path='parent_id.company_id.resource_calendar_id'.
+4. Dựng định nghĩa như FX-DEF-STD nhưng schedule_source='record', schedule_path='parent_id.company_id.resource_calendar_id'.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -12121,10 +12336,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Với env của U-BIZ-S, xác nhận `PM.read(['name'])` ném AccessError | Ném AccessError (xác nhận điều kiện tiền đề) |
 | 2 | Gọi Engine đánh giá PC với now = T0, thực thi trong ngữ cảnh U-BIZ-S | Có 1 task in_progress của PC |
-| 3 | Đọc task bằng quyền hệ thống | calendar_id = FX-CAL-VN; start_dt = 2026-03-02 09:00 giờ địa phương; planned_end = 2026-03-02 13:00 giờ địa phương (4 giờ làm việc) |
+| 3 | Đọc task bằng quyền hệ thống | schedule_id = FX-CAL-VN; start_time = 2026-03-02 09:00 giờ địa phương; planned_end_time = 2026-03-02 13:00 giờ địa phương (4 giờ làm việc) |
 | 4 | Đọc note của event 'attach' | Không chứa chuỗi 'fallback' hay 'dự phòng' (lịch lấy được, không rơi về mặc định) |
 
-**Pass/Fail Criteria:** ✅ Pass: 4 bước đúng. ❌ Fail: Task rơi về lịch mặc định hoặc 24x7 (planned_end khác 13:00), hoặc lỗi quyền.
+**Pass/Fail Criteria:** ✅ Pass: 4 bước đúng. ❌ Fail: Task rơi về lịch mặc định hoặc 24x7 (planned_end_time khác 13:00), hoặc lỗi quyền.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -12143,7 +12358,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 1. Dựng FX-USERS và FX-CO; U-BIZ-S = U-BIZ cộng group_sla_user, allowed_company_ids=[CO-A] (không đọc được record của CO-B).
 2. Dựng FX-CAL-VN (fully_fixed, Asia/Ho_Chi_Minh, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa).
 3. CO-B.resource_calendar_id = FX-CAL-VN. Partner mẹ PM (name='PM-Secret', company_id=CO-B); partner con PC (company_id=CO-A, parent_id=PM, ref='NEW') [Giả định: res.partner cho phép con khác công ty với mẹ].
-4. Dựng định nghĩa như FX-DEF-STD nhưng calendar_source='record', calendar_path='parent_id.company_id.resource_calendar_id'.
+4. Dựng định nghĩa như FX-DEF-STD nhưng schedule_source='record', schedule_path='parent_id.company_id.resource_calendar_id'.
 5. Task K của PC được tạo trong Preconditions của ca này bằng `evaluate(PC, now = T0)` với env hệ thống (lịch FX-CAL-VN lấy qua `parent_id.company_id.resource_calendar_id`); K `in_progress`.
 
 **Test Data:**
@@ -12155,7 +12370,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Với env của U-BIZ-S, đọc K với mọi field lưu trữ (`read()` không đối số) | Đọc được; calendar_id hiển thị tên 'FX-CAL-VN' |
+| 1 | Với env của U-BIZ-S, đọc K với mọi field lưu trữ (`read()` không đối số) | Đọc được; schedule_id hiển thị tên 'FX-CAL-VN' |
 | 2 | Duyệt giá trị chuỗi của mọi field trên K | Không giá trị nào chứa 'PM-Secret' hoặc tên của CO-B |
 | 3 | Đọc mọi event của K (field note, res_model, res_id) | Không note nào chứa 'PM-Secret' hoặc tên CO-B |
 | 4 | Với env của U-BIZ-S, đọc `PM.read(['name'])` | Vẫn ném AccessError |
@@ -12177,8 +12392,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Partner P ref='NEW'; task K (sudo) in_progress start_dt=T0, target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Partner P ref='NEW'; task K (sudo) in_progress start_time=T0, duration=4.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -12189,10 +12404,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Với env của U-MGR, `sla.task.create({definition_id: FX-DEF-STD, res_model: 'res.partner', res_id: P.id, start_dt: T0, target_hours: 4})` | Ném AccessError |
-| 2 | Với env của U-MGR, `K.write({'target_hours': 8})` | Ném AccessError |
+| 1 | Với env của U-MGR, `sla.task.create({definition_id: FX-DEF-STD, res_model: 'res.partner', res_id: P.id, start_time: T0, duration: 4})` | Ném AccessError |
+| 2 | Với env của U-MGR, `K.write({'duration': 8})` | Ném AccessError |
 | 3 | Với env của U-MGR, `K.unlink()` | Ném AccessError |
-| 4 | Đọc K bằng quyền hệ thống | K còn tồn tại, target_hours = 4 |
+| 4 | Đọc K bằng quyền hệ thống | K còn tồn tại, duration = 4 |
 
 **Pass/Fail Criteria:** ✅ Pass: 3 AccessError, K không đổi. ❌ Fail: Một thao tác thành công.
 
@@ -12262,12 +12477,12 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-SEC-021: Thay đổi task qua hành động Tính lại của SLA Manager
+### TC-SEC-021: Thay đổi task qua hành động Apply Current Settings của SLA Manager
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-16-06 |
-| Coverage Item | CI-4 (Tính lại là đường ghi hợp lệ) |
+| Coverage Item | CI-4 (Apply Current Settings là đường ghi hợp lệ) |
 | Requirement Ref | REQ-SEC-006 (AC2) |
 | Priority | P1-Critical |
 | Test Type | Positive |
@@ -12275,9 +12490,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-VN (như FX-DEF-STD nhưng calendar_source=definition, calendar_id=FX-CAL-VN).
+2. Dựng FX-DEF-VN (như FX-DEF-STD nhưng schedule_source=definition, schedule_id=FX-CAL-VN).
 3. Dựng FX-CAL-VN (fully_fixed, Asia/Ho_Chi_Minh, T2-T6 08:00-17:00, 9 giờ/ngày, không nghỉ trưa).
-4. Partner P ref='NEW'. Gọi Engine đánh giá P với now = T0 để có task K (planned_end = 2026-03-02 13:00 giờ địa phương). Sau đó đổi target_hours của FX-DEF-VN từ 4 thành 8.
+4. Partner P ref='NEW'. Gọi Engine đánh giá P với now = T0 để có task K (planned_end_time = 2026-03-02 13:00 giờ địa phương). Sau đó đổi duration của FX-DEF-VN từ 4 thành 8.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -12289,10 +12504,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Với env của U-MGR, gọi hành động Tính lại trên K (hàm hành động, now = T0) | Thành công, không AccessError |
-| 2 | Đọc K | target_hours = 8; business_elapsed = 0; planned_end = 2026-03-02 17:00 giờ địa phương (8 giờ làm việc tính từ 09:00 ngày T2, vừa tới hết ca 17:00) |
+| 1 | Với env của U-MGR, gọi hành động Apply Current Settings trên K (hàm hành động, now = T0) | Thành công, không AccessError |
+| 2 | Đọc K | duration = 8; business_duration = 0; planned_end_time = 2026-03-02 17:00 giờ địa phương (8 giờ làm việc tính từ 09:00 ngày T2, vừa tới hết ca 17:00) |
 
-**Pass/Fail Criteria:** ✅ Pass: target_hours = 8 và planned_end = 17:00 ngày 2026-03-02. ❌ Fail: Hành động bị từ chối hoặc planned_end khác 17:00.
+**Pass/Fail Criteria:** ✅ Pass: duration = 8 và planned_end_time = 17:00 ngày 2026-03-02. ❌ Fail: Hành động bị từ chối hoặc planned_end_time khác 17:00.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -12355,7 +12570,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Với env của U-MGR, `sla.task.get_view(view_type='list')` và `'form'`, phân tích arch | Thuộc tính create, edit, delete đều = '0' (hoặc 'false') trên cả 2 view; không có nút Xóa, không có nút Lưu |
 | 2 | Với env của U-MGR, `sla.event.get_view(view_type='list')` và `'form'`, phân tích arch | create và delete = '0'; trường duy nhất sửa được là is_resolved; các field khác readonly |
-| 3 | Đọc `ir.model.access` của `sla.task` cho nhóm `group_sla_manager` | `perm_create` = 0, `perm_write` = 0, `perm_unlink` = 0 (chỉ đọc; thay đổi qua các hành động Tính lại, Đánh giá lại) |
+| 3 | Đọc `ir.model.access` của `sla.task` cho nhóm `group_sla_manager` | `perm_create` = 0, `perm_write` = 0, `perm_unlink` = 0 (chỉ đọc; thay đổi qua các hành động Apply Current Settings, Re-check Conditions) |
 
 **Pass/Fail Criteria:** ✅ Pass: 3 bước đạt. ❌ Fail: Có create/edit/delete khả dụng trên view.
 
@@ -12374,7 +12589,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. FX-USERS: U-MGR (`group_sla_manager`), U-USR (chỉ `group_sla_user`), U-BIZ (chỉ quyền sửa `res.partner`), U-NONE (không quyền SLA); công ty hiện tại CO-A.
-2. Module `dwo_sla_core` đã cài; định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `target_hours` = 4, `calendar_source` = `none`); chưa có mốc escalation nào.
+2. Module `dwo_sla_core` đã cài; định nghĩa FX-DEF-STD trên `res.partner` (mục tiêu `duration` = 4, `schedule_source` = `none`); chưa có mốc escalation nào.
 3. Server action SA-N75 (model `res.partner`): code `record.message_post(body='N75')`.
 
 **Test Data:**
@@ -12419,13 +12634,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | name | UI-DEF-1 |  |
 | model | res.partner |  |
 | start_domain | [('is_company', '=', True)] | chuỗi chính xác |
-| target_hours | 4 |  |
+| duration | 4 |  |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Với U-MGR, mô phỏng form mới (`odoo.tests.Form`): chọn model res.partner, nhập name, start_domain, target_hours rồi lưu | Lưu thành công, tạo 1 bản ghi |
-| 2 | Đọc lại bản ghi từ database (invalidate cache) | model_name = 'res.partner'; start_domain = "[('is_company', '=', True)]"; target_hours = 4.0 |
+| 1 | Với U-MGR, mô phỏng form mới (`odoo.tests.Form`): chọn model res.partner, nhập name, start_domain, duration rồi lưu | Lưu thành công, tạo 1 bản ghi |
+| 2 | Đọc lại bản ghi từ database (invalidate cache) | model_name = 'res.partner'; start_domain = "[('is_company', '=', True)]"; duration = 4.0 |
 
 **Pass/Fail Criteria:** ✅ Pass: Ba giá trị đọc lại đúng. ❌ Fail: Giá trị đọc lại khác hoặc lưu lỗi.
 
@@ -12444,7 +12659,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS (U-USR).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -12611,7 +12826,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | record |  |
+| schedule_source | record |  |
 | Nội dung cần có | (1) không lấy được lịch thì dùng lịch làm việc mặc định của công ty; (2) nếu cũng không dùng được thì chạy 24x7 |  |
 
 **Steps & Expected Results:**
@@ -12643,7 +12858,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| calendar_source | none rồi definition |  |
+| schedule_source | none rồi definition |  |
 | Chuyển lại | record rồi none |  |
 
 **Steps & Expected Results:**
@@ -12657,12 +12872,12 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-UIX-009: Kiểm arch form: ghi chú chỉ hiện khi calendar_source là record
+### TC-UIX-009: Kiểm arch form: ghi chú chỉ hiện khi schedule_source là record
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-17-03 |
-| Coverage Item | CI-3 (Arch có ghi chú điều kiện theo calendar_source) |
+| Coverage Item | CI-3 (Arch có ghi chú điều kiện theo schedule_source) |
 | Requirement Ref | REQ-INT-003 (AC1, AC2) |
 | Priority | P3-Medium |
 | Test Type | Positive |
@@ -12681,8 +12896,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Với env U-MGR, lấy arch `sla.definition.get_view(view_type='form')` và tìm phần tử có class alert-warning cạnh field calendar_source (view `sla_definition_views.xml` dùng `<div class="alert alert-warning" invisible="calendar_source != 'record'">`) | Có đúng 1 phần tử |
-| 2 | Đọc điều kiện ẩn của phần tử | Ẩn khi calendar_source khác 'record' (biểu thức tham chiếu calendar_source) |
+| 1 | Với env U-MGR, lấy arch `sla.definition.get_view(view_type='form')` và tìm phần tử có class alert-warning cạnh field schedule_source (view `sla_definition_views.xml` dùng `<div class="alert alert-warning" invisible="schedule_source != 'record'">`) | Có đúng 1 phần tử |
+| 2 | Đọc điều kiện ẩn của phần tử | Ẩn khi schedule_source khác 'record' (biểu thức tham chiếu schedule_source) |
 | 3 | Đọc nội dung văn bản | Chứa cả 'mặc định' (lịch làm việc mặc định của công ty) và '24x7' |
 
 **Pass/Fail Criteria:** ✅ Pass: 3 mục đạt. ❌ Fail: Không có phần tử, điều kiện sai hoặc thiếu nội dung.
@@ -12702,20 +12917,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS (U-USR).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Partner P ref='NEW'; task K (sudo) stage='in_progress', start_dt=T0, planned_end=T0+4h (13:00 giờ địa phương), business_elapsed=0, target_hours=4, has_breached=False.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Partner P ref='NEW'; task K (sudo) stage='in_progress', start_time=T0, planned_end_time=T0+4h (13:00 giờ địa phương), business_duration=0, duration=4, has_breached=False.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Người dùng | U-USR |  |
-| Field bắt buộc trên list | res_id/record gốc, definition_id, stage, start_dt, planned_end, end_dt, business_elapsed, target_hours, has_breached | 9 mục |
+| Field bắt buộc trên list | res_id/record gốc, definition_id, stage, start_time, planned_end_time, end_time, business_duration, duration, has_breached | 9 mục |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Với env U-USR, `sla.task.get_view(view_type='list')`, đếm trong arch 9 field bắt buộc | Cả 9 field có trong arch (đếm = 9) |
-| 2 | Với env U-USR, `search_read([('id','=',K.id)], 9 field)` | Trả 1 dòng: stage='in_progress', target_hours=4.0, planned_end = 2026-03-02 13:00 giờ địa phương, business_elapsed=0.0, has_breached=False, definition_id=FX-DEF-STD |
+| 2 | Với env U-USR, `search_read([('id','=',K.id)], 9 field)` | Trả 1 dòng: stage='in_progress', duration=4.0, planned_end_time = 2026-03-02 13:00 giờ địa phương, business_duration=0.0, has_breached=False, definition_id=FX-DEF-STD |
 
 **Pass/Fail Criteria:** ✅ Pass: Arch đủ 9 field và dòng đọc đúng. ❌ Fail: Thiếu field hoặc giá trị sai.
 
@@ -12734,7 +12949,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS (U-MGR).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Task K (sudo) in_progress cho partner P.
 
 **Test Data:**
@@ -12772,14 +12987,14 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | Màn hình | Menu SLA > Task SLA |  |
-| Cột tối thiểu | Record gốc, Định nghĩa, Stage, start_dt, planned_end, end_dt, Thời gian đã trôi, Mục tiêu, Dấu vi phạm | 9 cột |
+| Cột tối thiểu | Record gốc, Định nghĩa, Stage, start_time, planned_end_time, end_time, Thời gian đã trôi, Mục tiêu, Dấu vi phạm | 9 cột |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | U-USR mở danh sách task | Thấy dòng task với đủ 9 cột, thời gian hiển thị theo múi giờ người dùng |
 | 2 | Mở form chi tiết một task | Mọi field ở chế độ chỉ đọc |
-| 3 | Đăng nhập U-MGR, mở form task | Không có nút Sửa, Xóa, Lưu; có nút Tính lại và Đánh giá lại |
+| 3 | Đăng nhập U-MGR, mở form task | Không có nút Sửa, Xóa, Lưu; có nút Apply Current Settings và Re-check Conditions |
 | 4 | Chọn nhiều dòng trên danh sách (U-MGR) | Không có hành động Xóa trong menu Action |
 
 **Pass/Fail Criteria:** ✅ Pass: 4 mục đạt. ❌ Fail: Thiếu cột hoặc có nút sửa/xóa.
@@ -12800,7 +13015,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
 2. Module dwo_sla_core đã cài; action 'SLA' là `ir.actions.act_window` có `binding_model_id` trỏ tới model của định nghĩa, domain `[('res_model','=','<model>'),('res_id','=',active_id)]`, `group_ids` = `group_sla_user`, do `sla.definition._register_sla_action_binding` tạo/xóa theo tập định nghĩa.
-3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 4. Partner P và Q (ref='NEW'). Hai định nghĩa D1 (FX-DEF-STD) và D2 (như D1, name='D2'); task của P: K1 (D1) và K2 (D2), stage='in_progress'; task của Q: K3 (D1).
 
 **Test Data:**
@@ -12833,7 +13048,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
 2. Module dwo_sla_core đã cài; action 'SLA' là `ir.actions.act_window` có `binding_model_id` trỏ tới model của định nghĩa, domain `[('res_model','=','<model>'),('res_id','=',active_id)]`, `group_ids` = `group_sla_user`, do `sla.definition._register_sla_action_binding` tạo/xóa theo tập định nghĩa.
-3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là định nghĩa duy nhất của res.partner.
+3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là định nghĩa duy nhất của res.partner.
 4. Partner P có 1 task in_progress.
 
 **Test Data:**
@@ -12865,7 +13080,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
 2. Module dwo_sla_core đã cài; action 'SLA' là `ir.actions.act_window` có `binding_model_id` trỏ tới model của định nghĩa, domain `[('res_model','=','<model>'),('res_id','=',active_id)]`, `group_ids` = `group_sla_user`, do `sla.definition._register_sla_action_binding` tạo/xóa theo tập định nghĩa.
-3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là định nghĩa duy nhất của res.partner.
+3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là định nghĩa duy nhất của res.partner.
 4. Partner P có 1 task stage='achieved' (không hoạt động); không có task in_progress hay paused.
 
 **Test Data:**
@@ -12898,7 +13113,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
 2. Module dwo_sla_core đã cài; action 'SLA' là `ir.actions.act_window` có `binding_model_id` trỏ tới model của định nghĩa, domain `[('res_model','=','<model>'),('res_id','=',active_id)]`, `group_ids` = `group_sla_user`, do `sla.definition._register_sla_action_binding` tạo/xóa theo tập định nghĩa.
-3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 4. Partner P có 1 task in_progress.
 
 **Test Data:**
@@ -12962,9 +13177,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_dt=FX-T0, target_hours=4.
-4. Tạo 5 task: A1 và A2 stage='in_progress' (has_breached=False); B stage='paused' (has_breached=False, paused_since=T0+1h); C stage='breached' (has_breached=True, end_dt=T0+5h); D stage='achieved' (has_breached=True, end_dt=T0+3h).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_time=FX-T0, duration=4.
+4. Tạo 5 task: A1 và A2 stage='in_progress' (has_breached=False); B stage='paused' (has_breached=False, pause_time=T0+1h); C stage='breached' (has_breached=True, end_time=T0+5h); D stage='achieved' (has_breached=True, end_time=T0+3h).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -12996,7 +13211,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Chỉ có 1 task stage='achieved', has_breached=False (không thỏa cả 3 bộ lọc).
 
 **Test Data:**
@@ -13026,11 +13241,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_dt=FX-T0, target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_time=FX-T0, duration=4.
 4. Tham số X (`dwo_sla_core.due_soon_hours`) = 6.
 5. now_real = thời điểm thật lấy một lần ở đầu ca (`fields.Datetime.now()`); các mốc tạo dữ liệu tính tương đối so với now_real; bộ lọc đánh giá theo đồng hồ thật nên mọi mốc cách biên tối thiểu 1 phút.
-6. 3 task in_progress, has_breached=False: T1 planned_end=now_real+1h; T2 planned_end=now_real+5h; T3 planned_end=now_real+3 ngày.
+6. 3 task in_progress, has_breached=False: T1 planned_end_time=now_real+1h; T2 planned_end_time=now_real+5h; T3 planned_end_time=now_real+3 ngày.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13047,12 +13262,12 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-UIX-021: Kiểm biên X = 6 giờ của bộ lọc Sắp đến hạn: planned_end đúng now + 6h có mặt, now + 6h + 1 giây vắng mặt
+### TC-UIX-021: Kiểm biên X = 6 giờ của bộ lọc Sắp đến hạn: planned_end_time đúng now + 6h có mặt, now + 6h + 1 giây vắng mặt
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-17-07 |
-| Coverage Item | CI-2 (Biên planned_end quanh now + X) |
+| Coverage Item | CI-2 (Biên planned_end_time quanh now + X) |
 | Requirement Ref | REQ-INT-012 (AC1 (biên)) |
 | Priority | P3-Medium |
 | Test Type | Boundary |
@@ -13060,11 +13275,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_dt=FX-T0, target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_time=FX-T0, duration=4.
 4. Tham số X (`dwo_sla_core.due_soon_hours`) = 6.
 5. `odoo.fields.Datetime.now` được patch trả NOW = 2026-03-02 10:00:00 UTC cố định; bộ lọc 'Sắp đến hạn' (`sla.task._search_is_due_soon`) đọc đồng hồ qua hàm này nên biên được kiểm chính xác đến giây.
-6. 3 task in_progress, has_breached=False: E1 planned_end = NOW - 10 phút (đã quá hạn nhưng chưa bật cờ: thuộc kết quả vì bộ lọc không có chặn dưới, theo Statement và `_search_is_due_soon`); E2 planned_end = NOW + 6h (đúng biên, so sánh `<=`); E3 planned_end = NOW + 6h + 1 giây.
+6. 3 task in_progress, has_breached=False: E1 planned_end_time = NOW - 10 phút (đã quá hạn nhưng chưa bật cờ: thuộc kết quả vì bộ lọc không có chặn dưới, theo Statement và `_search_is_due_soon`); E2 planned_end_time = NOW + 6h (đúng biên, so sánh `<=`); E3 planned_end_time = NOW + 6h + 1 giây.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13094,11 +13309,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_dt=FX-T0, target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_time=FX-T0, duration=4.
 4. Tham số X (`dwo_sla_core.due_soon_hours`) = 6.
 5. now_real = thời điểm thật lấy một lần ở đầu ca (`fields.Datetime.now()`); các mốc tạo dữ liệu tính tương đối so với now_real; bộ lọc đánh giá theo đồng hồ thật nên mọi mốc cách biên tối thiểu 1 phút.
-6. 3 task, cùng planned_end=now_real+1h: N1 stage='paused'; N2 stage='achieved', end_dt=now_real-1h; N3 stage='in_progress' có has_breached=True.
+6. 3 task, cùng planned_end_time=now_real+1h: N1 stage='paused'; N2 stage='achieved', end_time=now_real-1h; N3 stage='in_progress' có has_breached=True.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13127,11 +13342,11 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_dt=FX-T0, target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_time=FX-T0, duration=4.
 4. Tham số X (`dwo_sla_core.due_soon_hours`) = 6.
 5. now_real = thời điểm thật lấy một lần ở đầu ca (`fields.Datetime.now()`); các mốc tạo dữ liệu tính tương đối so với now_real; bộ lọc đánh giá theo đồng hồ thật nên mọi mốc cách biên tối thiểu 1 phút.
-6. 2 task in_progress, has_breached=False: F1 planned_end=now_real+30 phút; F2 planned_end=now_real+5h.
+6. 2 task in_progress, has_breached=False: F1 planned_end_time=now_real+30 phút; F2 planned_end_time=now_real+5h.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13164,10 +13379,10 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_dt=FX-T0, target_hours=4.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Mỗi task do sudo tạo trên partner riêng (chỉ mục duy nhất chỉ cho 1 task hoạt động mỗi (định nghĩa, record)), definition_id=FX-DEF-STD, res_model='res.partner', start_time=FX-T0, duration=4.
 4. Xóa tham số `dwo_sla_core.due_soon_hours` khỏi ir.config_parameter nếu có (module mới cài, chưa chỉnh). now_real = thời điểm thật lấy một lần ở đầu ca (`fields.Datetime.now()`); các mốc tạo dữ liệu tính tương đối so với now_real; bộ lọc đánh giá theo đồng hồ thật nên mọi mốc cách biên tối thiểu 1 phút.
-5. 2 task in_progress, has_breached=False: G1 planned_end=now_real+3h; G2 planned_end=now_real+5h.
+5. 2 task in_progress, has_breached=False: G1 planned_end_time=now_real+3h; G2 planned_end_time=now_real+5h.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13228,7 +13443,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1. Thêm D2 (cùng cấu hình, name='D2').
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1. Thêm D2 (cùng cấu hình, name='D2').
 3. 5 partner P1..P5 (ref='NEW'); task in_progress: 3 của D1 (P1, P2, P3), 2 của D2 (P4, P5).
 
 **Test Data:**
@@ -13258,7 +13473,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Dữ liệu dựng trong ca: D1 (FX-DEF-STD) và D2 (như D1, name = 'D2'); 5 partner P1..P5 (`ref` = 'NEW'); task `in_progress`: 3 của D1 (P1, P2, P3), 2 của D2 (P4, P5); thêm partner P6 có 1 task `paused` (D1) và 1 task thuộc `res_model` = 'demo.ticket' của FX-DEMO (`in_progress`).
 
 **Test Data:**
@@ -13418,7 +13633,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
 2. Dựng định nghĩa FX-DEF-STD nhưng stop_domain=[('parent_id.ref','=','DONE')] (điều kiện qua quan hệ, giới hạn REQ-FUNC-042). start ref in NEW/WORK.
-3. Partner mẹ PM (ref='NEW'); partner con PC (parent_id=PM, ref='WORK'); Engine đã gắn task K in_progress cho PC (start_dt=T0).
+3. Partner mẹ PM (ref='NEW'); partner con PC (parent_id=PM, ref='WORK'); Engine đã gắn task K in_progress cho PC (start_time=T0).
 4. Đổi PM.ref='DONE' bằng quyền hệ thống: task K vẫn in_progress (giới hạn REQ-FUNC-042, xác nhận ở bước 1).
 
 **Test Data:**
@@ -13432,19 +13647,19 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 |---|---|---|
 | 1 | Đọc K.stage | 'in_progress' (tiền đề) |
 | 2 | Với patch `odoo.fields.Datetime.now` trả T0 + 2h, U-MGR gọi `action_reevaluate()` (nút 'Re-evaluate') trên task của K | Không ném lỗi |
-| 3 | Đọc K | stage = 'achieved'; end_dt = 2026-03-02 11:00 giờ địa phương; business_elapsed = 2.0 |
+| 3 | Đọc K | stage = 'achieved'; end_time = 2026-03-02 11:00 giờ địa phương; business_duration = 2.0 |
 | 4 | Đếm event 'complete' của K | = 1 |
 
-**Pass/Fail Criteria:** ✅ Pass: Bốn bước đạt. ❌ Fail: K không kết thúc hoặc end_dt sai.
+**Pass/Fail Criteria:** ✅ Pass: Bốn bước đạt. ❌ Fail: K không kết thúc hoặc end_time sai.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-UIX-033: Từ chối group_sla_user dùng Đánh giá lại
+### TC-UIX-033: Từ chối group_sla_user dùng Re-check Conditions
 
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-17-10 |
-| Coverage Item | CI-2 (U-USR không có nút Đánh giá lại) |
+| Coverage Item | CI-2 (U-USR không có nút Re-check Conditions) |
 | Requirement Ref | REQ-INT-020 (AC2) |
 | Priority | P2-High |
 | Test Type | Negative |
@@ -13452,7 +13667,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. Task K in_progress cho partner P.
 
 **Test Data:**
@@ -13463,9 +13678,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Với env U-USR, `get_view(view_type='form')` của sla.task, tìm nút 'Đánh giá lại' | Không có (đếm = 0) |
-| 2 | Với env U-USR, gọi hàm hành động Đánh giá lại trên K | Ném AccessError |
-| 3 | Với env U-MGR, arch cùng view (đối chứng) | Có nút 'Đánh giá lại' |
+| 1 | Với env U-USR, `get_view(view_type='form')` của sla.task, tìm nút 'Re-check Conditions' | Không có (đếm = 0) |
+| 2 | Với env U-USR, gọi hàm hành động Re-check Conditions trên K | Ném AccessError |
+| 3 | Với env U-MGR, arch cùng view (đối chứng) | Có nút 'Re-check Conditions' |
 
 **Pass/Fail Criteria:** ✅ Pass: Ba bước đạt. ❌ Fail: U-USR thấy hoặc gọi được.
 
@@ -13484,8 +13699,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
-3. Partner P ref='DONE'; task K stage='achieved', end_dt=T0+1h (10:00 giờ địa phương), business_elapsed=1.0 (sudo); 2 event của K (attach, complete).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+3. Partner P ref='DONE'; task K stage='achieved', end_time=T0+1h (10:00 giờ địa phương), business_duration=1.0 (sudo); 2 event của K (attach, complete).
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13496,9 +13711,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Ghi lại stage, end_dt, business_elapsed và số event của K | stage='achieved', end_dt=10:00, elapsed=1.0, event = 2 |
-| 2 | U-MGR bấm Đánh giá lại trên K với now = T0 + 5h | Không ném lỗi nghiêm trọng (hoặc từ chối rõ ràng), không đổi dữ liệu |
-| 3 | Đọc lại K và số event | Giá trị y hệt bước 1: stage='achieved', end_dt=10:00, elapsed=1.0, event = 2 |
+| 1 | Ghi lại stage, end_time, business_duration và số event của K | stage='achieved', end_time=10:00, elapsed=1.0, event = 2 |
+| 2 | U-MGR bấm Re-check Conditions trên K với now = T0 + 5h | Không ném lỗi nghiêm trọng (hoặc từ chối rõ ràng), không đổi dữ liệu |
+| 3 | Đọc lại K và số event | Giá trị y hệt bước 1: stage='achieved', end_time=10:00, elapsed=1.0, event = 2 |
 
 **Pass/Fail Criteria:** ✅ Pass: Dữ liệu K không đổi. ❌ Fail: Bất kỳ giá trị nào đổi hoặc có event mới.
 
@@ -13517,7 +13732,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. 5 event (sudo): 2 event='error' (E1 is_resolved=False, E2 is_resolved=True), 1 'attach', 2 'escalate'; E1, E2, 1 attach thuộc FX-DEF-STD, 2 escalate thuộc D2 (định nghĩa thứ hai cùng cấu hình).
 
 **Test Data:**
@@ -13547,7 +13762,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. 5 event (sudo): 2 event='error' (E1 is_resolved=False, E2 is_resolved=True), 1 'attach', 2 'escalate'; E1, E2, 1 attach thuộc FX-DEF-STD, 2 escalate thuộc D2 (định nghĩa thứ hai cùng cấu hình).
 
 **Test Data:**
@@ -13578,7 +13793,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. 5 event (sudo): 2 event='error' (E1 is_resolved=False, E2 is_resolved=True), 1 'attach', 2 'escalate'; E1, E2, 1 attach thuộc FX-DEF-STD, 2 escalate thuộc D2 (định nghĩa thứ hai cùng cấu hình).
 
 **Test Data:**
@@ -13609,7 +13824,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng).
 3. 5 event (sudo): 2 event='error' (E1 is_resolved=False, E2 is_resolved=True), 1 'attach', 2 'escalate'; E1, E2, 1 attach thuộc FX-DEF-STD, 2 escalate thuộc D2 (định nghĩa thứ hai cùng cấu hình).
 
 **Test Data:**
@@ -13640,20 +13855,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
 3. (TA-30 ĐÃ SỬA) báo cáo pivot/graph của sla.task có measure 'Tỷ lệ đạt' (field `achieved_rate`, cột lưu của `sla.task`), đọc qua `read_group`; tỷ lệ rỗng/False khi mẫu số = 0 (REQ-FUNC-036, 062).
-4. 15 task của D1 có end_dt trong tháng 03/2026: 8 stage='achieved' (end_dt=2026-03-10 08:00 UTC), 2 stage='breached' (end_dt=2026-03-10 08:00 UTC), 5 stage='cancelled' (end_dt=2026-03-10 08:00 UTC); mỗi task trên partner riêng.
+4. 15 task của D1 có end_time trong tháng 03/2026: 8 stage='achieved' (end_time=2026-03-10 08:00 UTC), 2 stage='breached' (end_time=2026-03-10 08:00 UTC), 5 stage='cancelled' (end_time=2026-03-10 08:00 UTC); mỗi task trên partner riêng.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| Nhóm | definition_id=D1, end_dt:month=2026-03 |  |
+| Nhóm | definition_id=D1, end_time:month=2026-03 |  |
 | Người dùng | U-USR |  |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Với env U-USR, `read_group` theo definition_id và end_dt:month, lấy measure tỷ lệ đạt | 1 nhóm D1/2026-03 với tỷ lệ = 80% (0.8) |
+| 1 | Với env U-USR, `read_group` theo definition_id và end_time:month, lấy measure tỷ lệ đạt | 1 nhóm D1/2026-03 với tỷ lệ = 80% (0.8) |
 | 2 | Kiểm số task cancelled trong nhóm | Có 5 task cancelled nhưng không đổi tỷ lệ (nếu tính cả cancelled sẽ là 8/15 = 53.3%) |
 
 **Pass/Fail Criteria:** ✅ Pass: Tỷ lệ = 80%. ❌ Fail: Tỷ lệ khác 80% (ví dụ 53.3%).
@@ -13673,9 +13888,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
 3. (TA-30 ĐÃ SỬA) báo cáo pivot/graph của sla.task có measure 'Tỷ lệ đạt' (field `achieved_rate`, cột lưu của `sla.task`), đọc qua `read_group`; tỷ lệ rỗng/False khi mẫu số = 0 (REQ-FUNC-036, 062).
-4. Kỳ 2026-04: chỉ có 2 task D1 stage='cancelled' (end_dt=2026-04-10 08:00 UTC) và 1 task stage='in_progress'; không có achieved hay breached.
+4. Kỳ 2026-04: chỉ có 2 task D1 stage='cancelled' (end_time=2026-04-10 08:00 UTC) và 1 task stage='in_progress'; không có achieved hay breached.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13686,7 +13901,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | `read_group` theo definition_id và end_dt:month, đọc tỷ lệ của nhóm D1/2026-04 | Không ném ZeroDivisionError; giá trị rỗng/False tương ứng 'không xác định' (không phải 0%) |
+| 1 | `read_group` theo definition_id và end_time:month, đọc tỷ lệ của nhóm D1/2026-04 | Không ném ZeroDivisionError; giá trị rỗng/False tương ứng 'không xác định' (không phải 0%) |
 | 2 | Kiểm chuỗi hiển thị của pivot cho ô này (TA-30 ĐÃ SỬA: `achieved_rate` là cột lưu) | Hiển thị 'không xác định' |
 
 **Pass/Fail Criteria:** ✅ Pass: Không lỗi chia 0 và giá trị không phải 0%. ❌ Fail: Ném lỗi hoặc hiển thị 0%.
@@ -13698,7 +13913,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-17-12 |
-| Coverage Item | CI-3 (Kỳ theo end_dt) |
+| Coverage Item | CI-3 (Kỳ theo end_time) |
 | Requirement Ref | REQ-FUNC-036 (AC3) |
 | Priority | P3-Medium |
 | Test Type | Boundary |
@@ -13706,20 +13921,20 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
 3. (TA-30 ĐÃ SỬA) báo cáo pivot/graph của sla.task có measure 'Tỷ lệ đạt' (field `achieved_rate`, cột lưu của `sla.task`), đọc qua `read_group`; tỷ lệ rỗng/False khi mẫu số = 0 (REQ-FUNC-036, 062).
-4. Task X1 stage='achieved', end_dt=2026-09-30 08:00 UTC (15:00 giờ địa phương); task X2 stage='achieved', end_dt=2026-10-01 08:00 UTC (15:00 giờ địa phương); cả hai thuộc D1.
+4. Task X1 stage='achieved', end_time=2026-09-30 08:00 UTC (15:00 giờ địa phương); task X2 stage='achieved', end_time=2026-10-01 08:00 UTC (15:00 giờ địa phương); cả hai thuộc D1.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| Nhóm | end_dt:month |  |
+| Nhóm | end_time:month |  |
 | Người dùng | U-USR | timezone Asia/Ho_Chi_Minh |
 
 **Steps & Expected Results:**
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | `read_group` theo definition_id và end_dt:month | 2 nhóm: tháng 9/2026 chứa X1 (count=1, tỷ lệ 100%) và tháng 10/2026 chứa X2 (count=1, tỷ lệ 100%) |
+| 1 | `read_group` theo definition_id và end_time:month | 2 nhóm: tháng 9/2026 chứa X1 (count=1, tỷ lệ 100%) và tháng 10/2026 chứa X2 (count=1, tỷ lệ 100%) |
 | 2 | Kiểm X1 không có trong nhóm tháng 10 và X2 không có trong nhóm tháng 9 | Đúng |
 
 **Pass/Fail Criteria:** ✅ Pass: Hai nhóm tách đúng. ❌ Fail: X1 và X2 cùng một nhóm.
@@ -13739,9 +13954,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
 3. (TA-11 CÒN MỞ; TA-30 ĐÃ SỬA: `breaching_count` là cột lưu) measure/đếm 'Đang vi phạm' trong pivot = count của task has_breached=True và stage in (in_progress, paused)
-4. 5 task của D1: V1, V2 stage='in_progress' has_breached=True; V3 stage='paused' has_breached=True; V4 stage='breached' has_breached=True (end_dt=T0+5h); V5 stage='in_progress' has_breached=False.
+4. 5 task của D1: V1, V2 stage='in_progress' has_breached=True; V3 stage='paused' has_breached=True; V4 stage='breached' has_breached=True (end_time=T0+5h); V5 stage='in_progress' has_breached=False.
 
 **Test Data:**
 | Field | Giá trị | Ghi chú |
@@ -13772,7 +13987,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1.
 3. 2 task D1 stage='in_progress' has_breached=False và 1 task stage='achieved' has_breached=False.
 
 **Test Data:**
@@ -13803,7 +14018,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Dựng FX-USERS: U-MGR (group_sla_manager), U-USR (group_sla_user), U-BIZ (chỉ quyền sửa res.partner và demo.ticket), U-NONE (không quyền SLA, không sửa partner).
-2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; target_hours=4; calendar_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1; thêm D2 (cùng cấu hình, name='D2').
+2. Dựng FX-DEF-STD trên res.partner (start ref in NEW/WORK/HOLD; pause ref=HOLD; resume ref=WORK; stop ref=DONE; cancel ref=CANCEL; duration=4; schedule_source=none; cancel_mode=start_unmatched; resume_mode=condition; active=True; company_id rỗng). Là D1; thêm D2 (cùng cấu hình, name='D2').
 3. Task: D1 có 2 task in_progress has_breached=True; D2 có 1 task paused has_breached=True và 1 task in_progress has_breached=False.
 
 **Test Data:**
@@ -14075,7 +14290,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Field | Giá trị |
 |---|---|
 | Test Condition Ref | TCOND-18-03 |
-| Coverage Item | CI-3 (200 task vượt `planned_end` tại T) |
+| Coverage Item | CI-3 (200 task vượt `planned_end_time` tại T) |
 | Requirement Ref | REQ-PERF-003 AC2 |
 | Priority | P2-High |
 | Test Type | Performance |
@@ -14083,7 +14298,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Môi trường benchmark (Test Plan 11.1): cùng cấu hình container, 1 worker cron, không chạy tác vụ khác; FX-DEF-STD không escalation, 4 giờ, start T0; `dwo_sla_core.batch_size` = 50 (mặc định).
-2. Mỗi chu kỳ dựng 200 task `in_progress` có `planned_end` = T0 + 4h = T, `next_due_at` = T, `has_breached` = False.
+2. Mỗi chu kỳ dựng 200 task `in_progress` có `planned_end_time` = T0 + 4h = T, `next_due_at` = T, `has_breached` = False.
 3. `ir.cron._commit_progress` thay bằng `fake_progress` trả 100 giây; `odoo.fields.Datetime.now` được patch trả T + 60 giây.
 4. Định nghĩa độ trễ: L_k = 60 giây (độ trễ lịch tối đa do chu kỳ cron 1 phút, REQ-PERF-003 Statement) + D_k, trong đó D_k là tổng thời gian đo được của các lần gọi `process_due()` liên tiếp tới khi hết task đến hạn của chu kỳ k (TA-13).
 
@@ -14185,9 +14400,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (Odoo TransactionCase) |
 
 **Preconditions:**
-1. Cài FX-EXT: `selection_add` giá trị `team` cho `calendar_source`; điểm mở rộng nguồn lịch trả `record.team_id.calendar_id`. (override `sla.definition._get_calendar(record)`)
+1. Cài FX-EXT: `selection_add` giá trị `team` cho `schedule_source`; điểm mở rộng nguồn lịch trả `record.team_id.calendar_id`. (override `sla.definition._get_calendar(record)`)
 2. Calendar CAL-T = FX-CAL-VN gán cho team T; calendar mặc định của công ty là lịch khác (T2–T6 09:00–18:00).
-3. Định nghĩa D: FX-DEF-STD, mục tiêu 4 giờ, `calendar_source` = `team`, trên model có team (`demo.ticket` có `team_id`; phụ thuộc module demo, TA-15).
+3. Định nghĩa D: FX-DEF-STD, mục tiêu 4 giờ, `schedule_source` = `team`, trên model có team (`demo.ticket` có `team_id`; phụ thuộc module demo, TA-15).
 
 **Test Data:**
 
@@ -14202,7 +14417,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gọi Engine đánh giá K với now = T0. | Tạo 1 task `in_progress`. |
-| 2 | Đọc `calendar_id` của task và `planned_end`. | `calendar_id` = CAL-T; `planned_end` = 2026-03-02 13:00 (UTC+7). |
+| 2 | Đọc `schedule_id` của task và `planned_end_time`. | `schedule_id` = CAL-T; `planned_end_time` = 2026-03-02 13:00 (UTC+7). |
 
 **Pass/Fail Criteria:** ✅ Pass: Task dùng CAL-T. ❌ Fail: Task dùng lịch khác hoặc lỗi.
 
@@ -14221,7 +14436,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Cài FX-EXT: `sla.definition._get_calendar(record)` trả `record.team_id.calendar_id`, với lịch của team là FX-CAL-FLEX (calendar `flexible`).
-2. Lịch mặc định của công ty = FX-CAL-VN; D `calendar_source` = `team`, 4 giờ.
+2. Lịch mặc định của công ty = FX-CAL-VN; D `schedule_source` = `team`, 4 giờ.
 
 **Test Data:**
 
@@ -14234,8 +14449,8 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá K với now = T0. | Tạo 1 task. |
-| 2 | Đọc `calendar_id` task và event `attach`. | `calendar_id` = FX-CAL-VN (lịch công ty); `note` của event `attach` nêu lý do dự phòng (calendar `flexible`). |
-| 3 | Kiểm tra `planned_end`. | = 2026-03-02 13:00 (UTC+7). |
+| 2 | Đọc `schedule_id` task và event `attach`. | `schedule_id` = FX-CAL-VN (lịch công ty); `note` của event `attach` nêu lý do dự phòng (calendar `flexible`). |
+| 3 | Kiểm tra `planned_end_time`. | = 2026-03-02 13:00 (UTC+7). |
 
 **Pass/Fail Criteria:** ✅ Pass: Dùng lịch công ty và ghi lý do vào event `attach`. ❌ Fail: Dùng FX-CAL-FLEX hoặc không ghi lý do.
 
@@ -14253,22 +14468,22 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Automated (lệnh cài/gỡ trong CI) |
 
 **Preconditions:**
-1. Cài FX-EXT; định nghĩa D `calendar_source` = `team` đã lưu.
+1. Cài FX-EXT; định nghĩa D `schedule_source` = `team` đã lưu.
 
 **Test Data:**
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
 | module | `dwo_sla_test_ext` |  |
-| D | `calendar_source` = `team` |  |
+| D | `schedule_source` = `team` |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Gỡ module mẫu. | Không lỗi. |
-| 2 | Đọc `calendar_source` của D. | = `none`. |
-| 3 | Đánh giá 1 record thỏa start với now = T0. | Task tạo, `calendar_id` rỗng, `planned_end` = T0 + 4h = 2026-03-02 13:00 (UTC+7). |
+| 2 | Đọc `schedule_source` của D. | = `none`. |
+| 3 | Đánh giá 1 record thỏa start với now = T0. | Task tạo, `schedule_id` rỗng, `planned_end_time` = T0 + 4h = 2026-03-02 13:00 (UTC+7). |
 
 **Pass/Fail Criteria:** ✅ Pass: D về `none`, không lỗi. ❌ Fail: Lỗi gỡ hoặc D còn `team`.
 
@@ -14292,13 +14507,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 | Field | Giá trị | Ghi chú |
 |---|---|---|
-| field | `sla.definition.calendar_source` |  |
+| field | `sla.definition.schedule_source` |  |
 
 **Steps & Expected Results:**
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Đọc danh sách giá trị selection của `calendar_source`. | Đúng 3 giá trị: `none`, `definition`, `record`. |
+| 1 | Đọc danh sách giá trị selection của `schedule_source`. | Đúng 3 giá trị: `none`, `definition`, `record`. |
 
 **Pass/Fail Criteria:** ✅ Pass: Đúng 3 giá trị mặc định. ❌ Fail: Có giá trị lạ hoặc thiếu.
 
@@ -14317,7 +14532,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Cài FX-EXT với điểm mở rộng trả rỗng (`False`).
-2. Lịch công ty = FX-CAL-VN; D `calendar_source` = `team`, 4 giờ. (Statement REQ-INT-007 cho phép 'trả calendar hoặc không'; `sla.time.resolve_calendar` áp dụng dự phòng REQ-FUNC-020 cho mọi nguồn khác `none` và `definition`.)
+2. Lịch công ty = FX-CAL-VN; D `schedule_source` = `team`, 4 giờ. (Statement REQ-INT-007 cho phép 'trả calendar hoặc không'; `sla.time.resolve_calendar` áp dụng dự phòng REQ-FUNC-020 cho mọi nguồn khác `none` và `definition`.)
 
 **Test Data:**
 
@@ -14330,13 +14545,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá K với now = T0. | Tạo 1 task. |
-| 2 | Đọc `calendar_id` và event `attach`. | `calendar_id` = FX-CAL-VN; `note` nêu lý do dự phòng. |
+| 2 | Đọc `schedule_id` và event `attach`. | `schedule_id` = FX-CAL-VN; `note` nêu lý do dự phòng. |
 
 **Pass/Fail Criteria:** ✅ Pass: Dùng lịch công ty và ghi lý do. ❌ Fail: Task không có lịch mà không ghi lý do, hoặc lỗi.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-EXT-006: Task P1 có `target_hours` = 3 khi module mẫu trả 3 (định nghĩa ghi 4)
+### TC-EXT-006: Task P1 có `target_duration` = 3 khi module mẫu trả 3 (định nghĩa ghi 4)
 
 | Field | Giá trị |
 |---|---|
@@ -14363,13 +14578,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá K1 với now = T0. | 1 task `in_progress`. |
-| 2 | Đọc `target_hours` và `planned_end`. | `target_hours` = 3; `planned_end` = 2026-03-02 12:00 (UTC+7). |
+| 2 | Đọc `target_duration` và `planned_end_time`. | `target_duration` = 3; `planned_end_time` = 2026-03-02 12:00 (UTC+7). |
 
-**Pass/Fail Criteria:** ✅ Pass: `target_hours` = 3. ❌ Fail: `target_hours` = 4 hoặc khác.
+**Pass/Fail Criteria:** ✅ Pass: `target_duration` = 3. ❌ Fail: `target_duration` = 4 hoặc khác.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-EXT-007: Task có `target_hours` = 4 (theo định nghĩa) khi không có module mẫu
+### TC-EXT-007: Task có `target_duration` = 4 (theo định nghĩa) khi không có module mẫu
 
 | Field | Giá trị |
 |---|---|
@@ -14396,9 +14611,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá K1 với now = T0. | 1 task. |
-| 2 | Đọc `target_hours`, `planned_end`. | `target_hours` = 4; `planned_end` = 2026-03-02 13:00 (UTC+7). |
+| 2 | Đọc `target_duration`, `planned_end_time`. | `target_duration` = 4; `planned_end_time` = 2026-03-02 13:00 (UTC+7). |
 
-**Pass/Fail Criteria:** ✅ Pass: `target_hours` = 4. ❌ Fail: Khác 4.
+**Pass/Fail Criteria:** ✅ Pass: `target_duration` = 4. ❌ Fail: Khác 4.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -14435,7 +14650,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-EXT-009: Chấp nhận thời lượng 0 từ điểm mở rộng và tạo task có `planned_end` = mốc bắt đầu
+### TC-EXT-009: Chấp nhận thời lượng 0 từ điểm mở rộng và tạo task có `planned_end_time` = mốc bắt đầu
 
 | Field | Giá trị |
 |---|---|
@@ -14462,7 +14677,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá K1 với now = T0. | 1 task `in_progress`. |
-| 2 | Đọc `target_hours`, `planned_end`. | `target_hours` = 0; `planned_end` = `start_dt` = 2026-03-02 09:00 (UTC+7). |
+| 2 | Đọc `target_duration`, `planned_end_time`. | `target_duration` = 0; `planned_end_time` = `start_time` = 2026-03-02 09:00 (UTC+7). |
 
 **Pass/Fail Criteria:** ✅ Pass: Task tạo với 0 giờ. ❌ Fail: Không tạo task hoặc có event `error`.
 
@@ -14495,13 +14710,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá K2 với now = T0. | 1 task. |
-| 2 | Đọc `target_hours`. | = 4. |
+| 2 | Đọc `target_duration`. | = 4. |
 
-**Pass/Fail Criteria:** ✅ Pass: `target_hours` = 4. ❌ Fail: Khác 4.
+**Pass/Fail Criteria:** ✅ Pass: `target_duration` = 4. ❌ Fail: Khác 4.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-EXT-011: `start_dt` bằng mốc do module mẫu trả (cách đây 2 giờ)
+### TC-EXT-011: `start_time` bằng mốc do module mẫu trả (cách đây 2 giờ)
 
 | Field | Giá trị |
 |---|---|
@@ -14529,13 +14744,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá P với now = T0. | 1 task. |
-| 2 | Đọc `start_dt`, `planned_end`. | `start_dt` = 2026-03-02 07:00 (UTC+7); `planned_end` = 2026-03-02 11:00 (UTC+7) (24x7). |
+| 2 | Đọc `start_time`, `planned_end_time`. | `start_time` = 2026-03-02 07:00 (UTC+7); `planned_end_time` = 2026-03-02 11:00 (UTC+7) (24x7). |
 
-**Pass/Fail Criteria:** ✅ Pass: `start_dt` = T0 - 2h. ❌ Fail: Khác.
+**Pass/Fail Criteria:** ✅ Pass: `start_time` = T0 - 2h. ❌ Fail: Khác.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-EXT-012: `start_dt` bằng thời điểm attach khi không có module mẫu và không bật retroactive
+### TC-EXT-012: `start_time` bằng thời điểm attach khi không có module mẫu và không bật retroactive
 
 | Field | Giá trị |
 |---|---|
@@ -14562,13 +14777,13 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá P với now = T0. | 1 task. |
-| 2 | Đọc `start_dt`. | = 2026-03-02 09:00 (UTC+7). |
+| 2 | Đọc `start_time`. | = 2026-03-02 09:00 (UTC+7). |
 
-**Pass/Fail Criteria:** ✅ Pass: `start_dt` = T0. ❌ Fail: Khác T0.
+**Pass/Fail Criteria:** ✅ Pass: `start_time` = T0. ❌ Fail: Khác T0.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
-### TC-EXT-013: `start_dt` theo field retroactive khi không có module mẫu
+### TC-EXT-013: `start_time` theo field retroactive khi không có module mẫu
 
 | Field | Giá trị |
 |---|---|
@@ -14596,9 +14811,9 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Đánh giá P với now = T0. | 1 task. |
-| 2 | Đọc `start_dt`. | = 2026-03-02 08:00 (UTC+7). |
+| 2 | Đọc `start_time`. | = 2026-03-02 08:00 (UTC+7). |
 
-**Pass/Fail Criteria:** ✅ Pass: `start_dt` = T0 - 1h. ❌ Fail: Khác.
+**Pass/Fail Criteria:** ✅ Pass: `start_time` = T0 - 1h. ❌ Fail: Khác.
 
 **Postconditions:** Không: dữ liệu bị rollback cuối ca (TransactionCase).
 
@@ -14697,7 +14912,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Step | Action | Expected Result |
 |---|---|---|
 | 1 | Sửa `ref` = `DONE`; đánh giá P với now = T0 + 1h, changed = {ref}. | Không lỗi. |
-| 2 | Đọc `stage` của task. | = `achieved`; `end_dt` = 2026-03-02 10:00 (UTC+7). |
+| 2 | Đọc `stage` của task. | = `achieved`; `end_time` = 2026-03-02 10:00 (UTC+7). |
 
 **Pass/Fail Criteria:** ✅ Pass: Task `achieved` theo stop đã lưu. ❌ Fail: Task còn `in_progress`.
 
@@ -14847,7 +15062,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 **Preconditions:**
 1. Cài FX-EXT override cả 5 điểm trên `sla.definition`: `_get_calendar(record)` (nguồn lịch `team`), `_get_target_hours(record)` (3 cho `p1`), `_get_start_dt(record, now)` (now - 2h), `_get_domain(cond)` (điều kiện `start` = `[('ref','=','WORK')]`), `_after_transition(task, old_stage, new_stage, event)` (ghi lại tham số).
-2. Baseline nằm trong Steps của ca này (bước 1), không dựa vào ca khác. Dữ liệu: model có team (`demo.ticket` có `team_id`, `priority`), định nghĩa D (FX-DEF-STD, `calendar_source` = `team`), lịch của team = FX-CAL-VN.
+2. Baseline nằm trong Steps của ca này (bước 1), không dựa vào ca khác. Dữ liệu: model có team (`demo.ticket` có `team_id`, `priority`), định nghĩa D (FX-DEF-STD, `schedule_source` = `team`), lịch của team = FX-CAL-VN.
 
 **Test Data:**
 
@@ -15457,7 +15672,7 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 | Automation | Manual |
 
 **Preconditions:**
-1. MR đổi tên cột `sla_task.target_hours` hoặc đổi CHECK của `stage`.
+1. MR đổi tên cột `sla_task.duration` hoặc đổi CHECK của `stage`.
 
 **Test Data:**
 
@@ -15479,6 +15694,1018 @@ Trạng thái ban đầu của mọi dòng là `Planned`. Cập nhật khi chạ
 
 ---
 
+
+## Bổ sung 19.0.1.1.0 cho TG-01 đến TG-20 (ca mới và biến thể)
+
+Các ca dưới đây được thêm cho test đã có mà bản 0.2 của tài liệu chưa mô tả (ID nối tiếp nhóm cũ; không dùng lại ID của ca đã gỡ). Test chưa có ca riêng nhưng cùng mục tiêu với một ca cũ được ghi là biến thể trong bảng ánh xạ ở Phụ lục C.
+
+### TC-BRE-024: Task `paused` không bị xử lý nền so với `planned_end_time`
+
+- **Truy vết:** REQ-FUNC-022 (AC5) · TCOND-03-24 · P2-High · Negative · Automated: `test_bre_paused_task_not_breached_by_processor`
+- **Precondition:** FX-DEF-STD, hạn T0+4h; task `in_progress`.
+- **Bước → Kết quả:** (1) Pause lúc T0+1h. (2) Xử lý nền tại T0+10h (quá hạn) → `has_breached` = False.
+- **Pass/Fail:** Pass nếu không vi phạm.
+
+### TC-BRE-025: Phần trăm đã dùng của task đang chạy tính cả đoạn đang chạy
+
+- **Truy vết:** REQ-INT-023 (AC4) · TCOND-03-25 · P1-Critical · Positive · Automated: `test_bre_017b_running_percent_live`
+- **Precondition:** task `in_progress` mục tiêu 4 giờ, lịch `none`, gắn lúc T0.
+- **Bước → Kết quả:** (1) Xem lúc T0+1h → `business_percent_used` = 25. (2) Xem lúc T0+5h → 125 (không cắt ở 100). Ở cả hai lần `business_duration` (cột lưu) vẫn 0,0 và stage `in_progress`.
+- **Pass/Fail:** Pass nếu 25 và 125.
+
+### TC-BRE-026: `settle_batch` cho kết quả bằng `settle` từng task
+
+- **Truy vết:** REQ-INT-023, REQ-PERF-002 · TCOND-03-26 · P2-High · Positive · Automated: `test_bre_017c_settle_batch_equals_settle`
+- **Precondition:** lịch FX-CAL-VN có ngày nghỉ T0+24h đến T0+48h; năm mốc start (T0, +5h, +30h, +100h, +400h); mốc kết thúc T0+300h.
+- **Bước → Kết quả:** (1) Với lịch FX-CAL-VN và với "không có lịch": `settle_batch(calendar, starts, end)` từng phần tử bằng `settle(calendar, start, end)` (sai số 1e-6).
+- **Pass/Fail:** Pass nếu mọi cặp bằng nhau.
+
+### TC-PRC-001: `process_due` xử lý task đến hạn
+
+- **Truy vết:** REQ-FUNC-022, REQ-REL-002 · TCOND-08-70 · P1-Critical · Positive · Automated: `test_process_due_handles_due_tasks`
+- **Bước → Kết quả:** (1) Task mới có `next_due_at` = T0+4h. (2) Gọi `process_due()` tại T0+5h → `has_breached` True; `next_due_at` rỗng.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-PRC-002: `process_due` bỏ qua task chưa đến hạn
+
+- **Truy vết:** REQ-FUNC-022, REQ-REL-002 · TCOND-08-70 · P2-High · Negative · Automated: `test_process_due_skips_tasks_not_due`
+- **Bước → Kết quả:** (1) Gọi `process_due()` tại T0+1h với task hạn T0+4h → `has_breached` False.
+- **Pass/Fail:** Pass nếu không vi phạm.
+
+### TC-PRC-003: `batch_size` là trần mỗi lần gọi `process_due`
+
+- **Truy vết:** REQ-REL-002 (AC1) · TCOND-08-71 · P1-Critical · Boundary · Automated: `test_process_due_batch_size_caps_each_call`
+- **Precondition:** `dwo_sla_core.batch_size` = 2; 3 task đều quá hạn tại T0+5h.
+- **Bước → Kết quả:** (1) `process_due()` lần 1 → 2 task vi phạm. (2) Lần 2 → cả 3 task vi phạm.
+- **Pass/Fail:** Pass nếu 2 rồi 3.
+
+### TC-EML-001: Mốc email người nhận `fixed` gửi tới địa chỉ cố định
+
+- **Truy vết:** REQ-FUNC-064 (AC1) · TCOND-08-72 · P1-Critical · Positive · Automated: `test_esc_060_fixed_email`
+- **Precondition:** mốc 75% `action_type=email`, `email_recipient_type=fixed`, `email_fixed_address=oncall@example.com`.
+- **Bước → Kết quả:** (1) Xử lý nền khi đạt 75% → đúng 1 `mail.mail` tới `oncall@example.com`, subject chứa tên định nghĩa; mốc nằm trong `done_escalation_ids`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-EML-002: Người nhận `field` đọc field email của record gốc
+
+- **Truy vết:** REQ-FUNC-065 (AC4) · TCOND-08-72 · P1-Critical · Positive · Automated: `test_esc_061_field_email`
+- **Bước → Kết quả:** (1) Mốc `field` trỏ `res.partner.email`; partner có email `customer@example.com`; xử lý nền → 1 mail tới địa chỉ đó.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-EML-003: Người nhận `responsible` lấy email của user/partner ở field Many2one
+
+- **Truy vết:** REQ-FUNC-065 (AC5) · TCOND-08-72 · P1-Critical · Positive · Automated: `test_esc_062_responsible_email`
+- **Bước → Kết quả:** (1) Mốc `responsible` trỏ `res.partner.user_id`; gán user admin; xử lý nền → 1 mail tới email của admin.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-EML-004: `responsible` trên field x2many: một mail, nhiều người nhận
+
+- **Truy vết:** REQ-FUNC-065 (AC6) · TCOND-08-72 · P2-High · Positive · Automated: `test_esc_064_responsible_x2many_multiple_to`
+- **Bước → Kết quả:** (1) Mốc `responsible` trỏ `child_ids`; hai liên hệ `a@example.com`, `b@example.com`; xử lý nền → đúng 1 mail có `email_to` = `a@example.com,b@example.com`.
+- **Pass/Fail:** Pass nếu một mail, hai người nhận.
+
+### TC-EML-005: Không resolve được người nhận: `escalate_failed`, không ném lỗi ra ngoài
+
+- **Truy vết:** REQ-FUNC-065 (AC3), REQ-FUNC-026 · TCOND-08-73 · P1-Critical · Negative · Automated: `test_esc_063_no_recipient_marks_failed`
+- **Bước → Kết quả:** (1) Mốc `field` trỏ `email`, partner không có email; xử lý nền (log ERROR được ghi nhận) → 1 event `escalate_failed`; không exception.
+- **Pass/Fail:** Pass nếu đúng 1 event lỗi.
+
+### TC-EML-006: Không có template: dùng nội dung mặc định
+
+- **Truy vết:** REQ-FUNC-064 (AC3) · TCOND-08-74 · P2-High · Positive · Automated: `test_esc_065_no_template_falls_back_to_plain_body`
+- **Bước → Kết quả:** (1) Mốc email `fixed` với `email_template_id` xoá; xử lý nền → 1 mail tới `oncall@example.com`, subject chứa tên định nghĩa, body chứa ký tự `%`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-EML-007: Template không thuộc model `sla.task` bị từ chối khi lưu
+
+- **Truy vết:** REQ-FUNC-064 (AC4) · TCOND-08-74 · P2-High · Negative · Automated: `test_esc_066_template_wrong_model_rejected`
+- **Bước → Kết quả:** (1) Lưu mốc email với template của model `res.partner` → `ValidationError`.
+- **Pass/Fail:** Pass nếu bị từ chối.
+
+### TC-ERR-030: Exception gốc trích giá trị field: ghi chú và log chỉ còn `<redacted>`
+
+- **Truy vết:** REQ-OBS-003 (AC2), REQ-FUNC-026 · TCOND-12-30 · P1-Critical · Negative · Automated: `test_err_011b_raw_exception_values_redacted`
+- **Precondition:** mốc 50% với server action `raise UserError('failed for ' + record.comment)`; partner `comment`='SECRET-123'.
+- **Bước → Kết quả:** (1) Xử lý nền tại T0+2h (log ERROR được thu) → log không chứa `SECRET-123`; `note` của event `escalate_failed` chứa "failed for" và `<redacted>`, không chứa `SECRET-123`.
+- **Pass/Fail:** Pass nếu giá trị nhạy cảm không lộ.
+
+### TC-CMP-017: Điều kiện start dùng field related không lưu vẫn gắn task khi field nguồn đổi
+
+- **Truy vết:** REQ-FUNC-005, REQ-FUNC-042 · TCOND-13-17 · P1-Critical · Regression · Automated: `test_start_on_unstored_related_field_still_attaches`
+- **Precondition:** start `[('country_code','=','VN')]` (`country_code` là related không lưu), các điều kiện khác trống; partner chưa có quốc gia.
+- **Bước → Kết quả:** (1) Chưa có task. (2) Ghi `country_id` = Việt Nam lúc T0+1h → có đúng 1 task.
+- **Pass/Fail:** Pass nếu task được gắn.
+
+### TC-INF-036: Không xoá được công ty hoặc lịch đang được định nghĩa dùng (RESTRICT)
+
+- **Truy vết:** REQ-FUNC-001 (AC4), `030` mục 4 · TCOND-14-36 · P2-High · Negative · Automated: `test_inf_ondelete_company_calendar_restricted`
+- **Precondition:** định nghĩa "Scoped" gán công ty "SLA Co"; định nghĩa "Fixed" dùng lịch FX-CAL-VN.
+- **Bước → Kết quả:** (1) Xoá công ty → lỗi CSDL. (2) Xoá lịch → lỗi CSDL. (3) Cả hai vẫn tồn tại.
+- **Pass/Fail:** Pass nếu cả hai bị chặn.
+
+### TC-INF-037: `next_due_at` chỉ có một index từng phần
+
+- **Truy vết:** REQ-PERF-003, `030` mục 6 · TCOND-14-37 · P3-Low · Positive · Automated: `test_inf_next_due_at_only_partial_index`
+- **Bước → Kết quả:** (1) Truy vấn `pg_indexes` của bảng `sla_task` với index chứa `(next_due_at)` → đúng 1 index và có mệnh đề `WHERE`.
+- **Pass/Fail:** Pass nếu một index từng phần.
+
+### TC-SEC-025: Quản trị hệ thống mặc định là SLA Manager
+
+- **Truy vết:** REQ-SEC-001 (AC5) · TCOND-16-25 · P1-Critical · Positive · Automated: `test_sec_admin_default_sla_manager`
+- **Bước → Kết quả:** (1) `group_sla_manager` nằm trong `implied_ids` của `base.group_system`. (2) User `admin` có `group_sla_manager` và `group_sla_user`. (3) Một user nội bộ được thêm `base.group_system` cũng có `group_sla_manager`, và thấy menu gốc SLA.
+- **Pass/Fail:** Pass nếu cả ba đúng.
+
+### TC-PRF-011: Tải 300 ticket x 30 task (opt-in `SLA_PERF=1`)
+
+- **Truy vết:** REQ-PERF-001, REQ-PERF-002, REQ-REL-002 · TCOND-18-11 · P3-Low · Performance · Automated, chỉ chạy khi đặt `SLA_PERF=1`: `test_prf_load_300_tickets_30_tasks`
+- **Precondition:** 30 định nghĩa cùng khớp, 6 định nghĩa có mốc email 50/75/100% (9000 task, 1800 task có escalation).
+- **Bước → Kết quả:** (1) Đo từng pha (attach, ghi hàng loạt, stop hàng loạt, `process_due`) và ghi log tiền tố "SLA-PERF" → không lỗi; số liệu ghi vào Test Summary Report.
+- **Pass/Fail:** Pass nếu mọi pha hoàn tất; ngưỡng thời gian lấy từ Test Plan.
+
+### TC-PRF-012: Đọc `business_percent_used` của 80 task (một trang list), có lịch và không lịch
+
+- **Truy vết:** REQ-INT-023, REQ-PERF-002 · TCOND-18-12 · P2-High · Performance · Automated, opt-in `SLA_PERF=1`: `test_prf_percent_used_list_80`
+- **Bước → Kết quả:** (1) 80 task `in_progress` cho mỗi cấu hình (không lịch, lịch FX-CAL-VN); tại T0+2h đọc `business_percent_used` → mọi giá trị = 50; số truy vấn và thời gian được ghi log.
+- **Pass/Fail:** Pass nếu mọi giá trị bằng 50.
+
+### TC-PRF-013: Như TC-PRF-012 với lịch có ngày nghỉ lễ và task chạy 120 ngày
+
+- **Truy vết:** REQ-INT-023, REQ-PERF-002 · TCOND-18-12 · P3-Low · Performance · Automated, opt-in `SLA_PERF=1`: `test_prf_percent_used_list_80_holidays`
+- **Bước → Kết quả:** (1) Lịch có 11 ngày nghỉ/năm x 3 năm; 80 task đã chạy 120 ngày; đọc `business_percent_used` → hoàn tất, thời gian được ghi log.
+- **Pass/Fail:** Pass nếu hoàn tất không lỗi.
+
+## TG-21 — Field metadata của định nghĩa (type, vendor, service commitment, target)
+
+Fixture: FX-DEF-STD trên `res.partner` (hàm `make_definition`). Không có task nào cần dựng trừ ca TC-MDF-010.
+
+### TC-MDF-001: Định nghĩa không truyền `type`: mặc định `sla`
+
+- **Truy vết:** REQ-FUNC-070 (AC1) · TCOND-28-01 · P3-Low · Positive · Automated: `test_type_default_sla`
+- **Precondition:** module đã cài.
+- **Bước → Kết quả mong đợi:** (1) Tạo định nghĩa không truyền `type` → `type` = `sla`.
+- **Pass/Fail:** Pass nếu `type == 'sla'`; Fail nếu khác.
+
+### TC-MDF-002: Định nghĩa với `type='ola'`: lưu và đọc lại đúng
+
+- **Truy vết:** REQ-FUNC-070 (AC1) · TCOND-28-01 · P3-Low · Positive · Automated: `test_type_ola`
+- **Bước → Kết quả:** (1) Tạo định nghĩa `type='ola'` → đọc lại `type` = `ola`.
+- **Pass/Fail:** Pass nếu `type == 'ola'`.
+
+### TC-MDF-003: Chọn nhà cung cấp (`vendor_id`): lưu đúng partner
+
+- **Truy vết:** REQ-FUNC-070 (AC2) · TCOND-28-02 · P3-Low · Positive · Automated: `test_vendor_id_set`
+- **Precondition:** partner "Vendor Co" đã tạo.
+- **Bước → Kết quả:** (1) Tạo định nghĩa với `vendor_id` = Vendor Co → `d.vendor_id` = Vendor Co.
+- **Pass/Fail:** Pass nếu đúng partner.
+
+### TC-MDF-004: Không chọn nhà cung cấp: `vendor_id` rỗng
+
+- **Truy vết:** REQ-FUNC-070 (AC2) · TCOND-28-02 · P3-Low · Positive · Automated: `test_vendor_id_default_empty`
+- **Bước → Kết quả:** (1) Tạo định nghĩa không truyền `vendor_id` → `vendor_id` rỗng.
+- **Pass/Fail:** Pass nếu rỗng.
+
+### TC-MDF-005: Không truyền `service_commitment`: mặc định `False`
+
+- **Truy vết:** REQ-FUNC-070 (AC3) · TCOND-28-03 · P3-Low · Positive · Automated: `test_service_commitment_default_false`
+- **Bước → Kết quả:** (1) Tạo định nghĩa mặc định → `service_commitment` = `False`.
+- **Pass/Fail:** Pass nếu `False`.
+
+### TC-MDF-006: `service_commitment=True`: lưu đúng
+
+- **Truy vết:** REQ-FUNC-070 (AC3) · TCOND-28-03 · P3-Low · Positive · Automated: `test_service_commitment_true`
+- **Bước → Kết quả:** (1) Tạo định nghĩa `service_commitment=True` → đọc lại `True`.
+- **Pass/Fail:** Pass nếu `True`.
+
+### TC-MDF-007: Không chọn `target`: rỗng
+
+- **Truy vết:** REQ-FUNC-070 (AC4) · TCOND-28-04 · P3-Low · Positive · Automated: `test_target_default_empty`
+- **Bước → Kết quả:** (1) Tạo định nghĩa mặc định → `target` rỗng.
+- **Pass/Fail:** Pass nếu rỗng.
+
+### TC-MDF-008: `target='response'`: lưu đúng
+
+- **Truy vết:** REQ-FUNC-070 (AC4) · TCOND-28-04 · P3-Low · Positive · Automated: `test_target_response`
+- **Bước → Kết quả:** (1) Tạo định nghĩa `target='response'` → đọc lại `response`.
+- **Pass/Fail:** Pass nếu `response`.
+
+### TC-MDF-009: `target='resolution'`: lưu đúng
+
+- **Truy vết:** REQ-FUNC-070 (AC4) · TCOND-28-04 · P3-Low · Positive · Automated: `test_target_resolution`
+- **Bước → Kết quả:** (1) Tạo định nghĩa `target='resolution'` → đọc lại `resolution`.
+- **Pass/Fail:** Pass nếu `resolution`.
+
+### TC-MDF-010: Bốn field metadata không đổi hành vi engine
+
+- **Truy vết:** REQ-FUNC-070 (AC5) · TCOND-28-05 · P2-High · Regression · Automated: `test_metadata_fields_do_not_change_engine_behaviour`
+- **Precondition:** định nghĩa `type='ola'`, `service_commitment=True`, `target='response'`, start khớp `ref`=NEW.
+- **Bước → Kết quả:** (1) Tạo partner `ref`='NEW' → có đúng 1 task, `stage` = `in_progress`.
+- **Pass/Fail:** Pass nếu task được gắn như định nghĩa thường; Fail nếu không gắn hoặc stage khác.
+
+## TG-22 — Retroactive pause
+
+Fixture: FX-RETRO-PAUSE: field manual `x_hold3` (boolean, `tracking=1`) và `x_retro3` (datetime) trên `res.partner`; định nghĩa `retroactive=True`, `start_field_id=x_retro3`, `pause_domain=[('x_hold3','=',True)]`, `duration`=4, lịch `none`. `ict(d,h)` = 2026-03-`d` giờ `h` ICT đổi sang UTC. Lịch sử pause dựng bằng `mail.message` + `mail.tracking.value` (không qua `write()`), vì mail.thread gộp các lần đổi trong một giao dịch.
+
+### TC-RPS-001: Model không có `mail.thread`: cảnh báo nêu rõ model
+
+- **Truy vết:** REQ-FUNC-071 (AC1) · TCOND-29-01 · P2-High · Negative · Automated: `test_warning_model_not_trackable`
+- **Precondition:** model `res.partner.category` (không có `mail.thread`).
+- **Bước → Kết quả:** (1) Tạo định nghĩa trên model đó với `retroactive_pause=True` → lưu được (không bị chặn); `retroactive_pause_warning` chứa "not change-tracked" và tên model `res.partner.category`.
+- **Pass/Fail:** Pass nếu cảnh báo đúng nội dung và lưu thành công.
+
+### TC-RPS-002: Field trong `pause_domain` không bật tracking: cảnh báo nêu tên field
+
+- **Truy vết:** REQ-FUNC-071 (AC1) · TCOND-29-01 · P2-High · Negative · Automated: `test_warning_field_not_tracked`
+- **Precondition:** FX-DEF-STD (`pause_domain` dùng `ref`, không `tracking=True`).
+- **Bước → Kết quả:** (1) Tạo định nghĩa `retroactive_pause=True` → cảnh báo không rỗng và chứa `ref`.
+- **Pass/Fail:** Pass nếu cảnh báo nêu `ref`.
+
+### TC-RPS-003: Mọi field pause đều có tracking: không cảnh báo
+
+- **Truy vết:** REQ-FUNC-071 (AC1) · TCOND-29-01 · P3-Low · Positive · Automated: `test_no_warning_when_all_pause_fields_tracked`
+- **Precondition:** field `x_hold_w1` boolean `tracking=1`.
+- **Bước → Kết quả:** (1) Tạo định nghĩa `retroactive_pause=True`, `pause_domain=[('x_hold_w1','=',True)]` → `retroactive_pause_warning` rỗng.
+- **Pass/Fail:** Pass nếu rỗng.
+
+### TC-RPS-004: Tính năng tắt: không tính cảnh báo
+
+- **Truy vết:** REQ-FUNC-071 (AC1) · TCOND-29-01 · P3-Low · Positive · Automated: `test_no_warning_when_feature_off`
+- **Bước → Kết quả:** (1) Tạo định nghĩa `retroactive_pause=False` (pause dùng `ref` không tracking) → cảnh báo rỗng.
+- **Pass/Fail:** Pass nếu rỗng.
+
+### TC-RPS-005: Đổi `pause_domain`: cảnh báo tính lại
+
+- **Truy vết:** REQ-FUNC-071 (AC1) · TCOND-29-01 · P3-Low · Positive · Automated: `test_warning_recomputes_when_pause_domain_changes`
+- **Precondition:** field `x_hold_w2` `tracking=1`; định nghĩa `retroactive_pause=True`, pause dùng `ref`.
+- **Bước → Kết quả:** (1) Đọc cảnh báo → có. (2) Đổi `pause_domain` sang `x_hold_w2` → cảnh báo rỗng.
+- **Pass/Fail:** Pass nếu cảnh báo mất sau bước 2.
+
+### TC-RPS-006: Có lịch sử pause trong khoảng quá khứ: trừ đúng thời gian pause, dời hạn
+
+- **Truy vết:** REQ-FUNC-071 (AC2) · TCOND-29-02 · P1-Critical · Positive · Automated: `test_excludes_tracked_pause_history`
+- **Precondition:** FX-RETRO-PAUSE, `retroactive_pause=True`; mốc `x_retro3` = 08:00 ICT; lịch sử tracking `x_hold3` False → True lúc 09:00 ICT, vẫn True lúc attach; `now` = 11:00 ICT.
+- **Bước → Kết quả:** (1) Gọi `evaluate(P, now=11:00)` → 1 task; `start_time` = 08:00 ICT; `business_duration` = `duration` = 1,0 giờ; `business_pause_duration` = `pause_duration` = 2,0 giờ; `planned_end_time` = 08:00 + 6 giờ; `original_breach_time` = `planned_end_time`; `has_breached` = False.
+- **Pass/Fail:** Pass nếu mọi giá trị khớp (sai số 0,001); Fail nếu hạn chót vẫn là 12:00.
+
+### TC-RPS-007: Cùng lịch sử nhưng `retroactive_pause` tắt: không trừ gì
+
+- **Truy vết:** REQ-FUNC-071 (AC3) · TCOND-29-03 · P2-High · Negative · Automated: `test_flag_off_counts_full_backdated_window`
+- **Precondition:** FX-RETRO-PAUSE; partner có `x_hold3` True 09:00 rồi False 10:00 (ghi qua hook); `retroactive_pause=False`.
+- **Bước → Kết quả:** (1) `evaluate(P, now=11:00)` → `business_duration` = 3,0; `business_pause_duration` = 0; `planned_end_time` = 08:00 + 4 giờ.
+- **Pass/Fail:** Pass nếu không trừ pause.
+
+### TC-RPS-008: Không có thay đổi tracking trong khoảng: không trừ gì
+
+- **Truy vết:** REQ-FUNC-071 (AC3) · TCOND-29-03 · P2-High · Positive · Automated: `test_no_history_in_window_no_effect`
+- **Precondition:** `retroactive_pause=True`; `x_hold3` giữ mặc định False suốt khoảng.
+- **Bước → Kết quả:** (1) `evaluate(P, now=11:00)` → `business_duration` = 3,0; `business_pause_duration` = 0.
+- **Pass/Fail:** Pass nếu khớp.
+
+### TC-RPS-009: Field pause không tracking: bỏ qua, không trừ dù tính năng bật
+
+- **Truy vết:** REQ-FUNC-071 (AC4) · TCOND-29-04 · P2-High · Negative · Automated: `test_untracked_pause_field_falls_back_no_effect`
+- **Precondition:** `x_retro4` datetime; định nghĩa `retroactive=True`, `retroactive_pause=True`, `pause_domain=[('ref','=','HOLD')]`.
+- **Bước → Kết quả:** (1) `evaluate(P, now=11:00)` với `x_retro4`=08:00 → `business_duration` = 3,0; `business_pause_duration` = 0.
+- **Pass/Fail:** Pass nếu không trừ gì.
+
+## TG-23 — Timezone override của lịch (bản sao calendar)
+
+Fixture: FX-CAL-VN (`make_calendar`: tz `Asia/Ho_Chi_Minh`, T2–T6 08:00–17:00), định nghĩa `schedule_source='definition'`.
+
+### TC-TZO-001: Timezone SLA khác tz của lịch: hạn chót tính theo tz của SLA
+
+- **Truy vết:** REQ-FUNC-067 (AC2) · TCOND-30-01 · P1-Critical · Positive · Automated: `test_override_shifts_working_hours`
+- **Precondition:** hai định nghĩa trên cùng lịch FX-CAL-VN, `duration`=2: D-plain (tz mặc định của lịch) và D-override (`calendar_tz_override='UTC'`); hai partner `ref`='NEW' tạo tại T0 (02:00 UTC = 09:00 ICT).
+- **Bước → Kết quả:** (1) Task của D-plain → `planned_end_time` = 04:00 UTC. (2) Task của D-override → `planned_end_time` = 10:00 UTC (02:00 UTC trước giờ làm 08:00–17:00 UTC nên dời tới 08:00 rồi cộng 2 giờ). (3) Hai hạn chót khác nhau.
+- **Pass/Fail:** Pass nếu đúng hai giá trị.
+
+### TC-TZO-002: Hai định nghĩa cùng lịch, cùng tz: dùng chung một bản sao
+
+- **Truy vết:** REQ-FUNC-067 (AC4) · TCOND-30-02 · P2-High · Positive · Automated: `test_override_reuses_cached_clone_no_duplicate`
+- **Precondition:** hai định nghĩa D-1, D-2 cùng lịch, `calendar_tz_override='UTC'`.
+- **Bước → Kết quả:** (1) Tạo partner `ref`='NEW' (gắn cả hai) → số `resource.calendar` có `sla_tz_override_source_id` = lịch gốc và `tz`='UTC' là 1.
+- **Pass/Fail:** Pass nếu đúng 1 bản sao.
+
+### TC-TZO-003: Lịch gốc không bị đổi timezone
+
+- **Truy vết:** REQ-FUNC-067 (AC4) · TCOND-30-02 · P1-Critical · Negative · Automated: `test_override_does_not_mutate_source_calendar`
+- **Bước → Kết quả:** (1) Định nghĩa `calendar_tz_override='UTC'`, tạo partner `ref`='NEW' → `cal.tz` vẫn `Asia/Ho_Chi_Minh`.
+- **Pass/Fail:** Pass nếu `tz` không đổi.
+
+### TC-TZO-004: Bản sao giữ nguyên khung giờ làm của lịch gốc
+
+- **Truy vết:** REQ-FUNC-067 (AC4) · TCOND-30-02 · P2-High · Positive · Automated: `test_clone_copies_attendance_pattern`
+- **Bước → Kết quả:** (1) Sau khi attach với tz override UTC → có đúng 1 bản sao và `len(clone.attendance_ids)` = `len(cal.attendance_ids)`.
+- **Pass/Fail:** Pass nếu bằng nhau.
+
+### TC-TZO-005: Tz của SLA trùng tz của lịch: không tạo bản sao
+
+- **Truy vết:** REQ-FUNC-067 (AC5) · TCOND-30-03 · P2-High · Positive · Automated: `test_no_override_no_clone_created`
+- **Bước → Kết quả:** (1) Định nghĩa dùng lịch FX-CAL-VN, tz mặc định theo lịch, tạo partner `ref`='NEW' → không có `resource.calendar` nào có `sla_tz_override_source_id` = lịch gốc.
+- **Pass/Fail:** Pass nếu không có bản sao.
+
+## TG-24 — Hạn chót ban đầu và thời lượng giờ đồng hồ
+
+### TC-CLK-001: `original_breach_time` đặt một lần lúc attach, không đổi khi resume
+
+- **Truy vết:** REQ-FUNC-072 (AC1) · TCOND-31-01 · P1-Critical · Positive · Automated: `test_set_once_at_attach_never_rewritten_on_resume`
+- **Precondition:** FX-DEF-STD, lịch `none`, duration 4; partner `ref`='NEW' tại T0.
+- **Bước → Kết quả:** (1) Đọc `original_breach_time` = T0 + 4h. (2) Pause lúc T0+1h (`ref`=HOLD), resume lúc T0+3h (`ref`=WORK). (3) `original_breach_time` giữ T0 + 4h; `planned_end_time` = T0 + 6h; hai giá trị khác nhau.
+- **Pass/Fail:** Pass nếu `original_breach_time` không đổi.
+
+### TC-CLK-002: Apply Current Settings không đổi `original_breach_time`
+
+- **Truy vết:** REQ-FUNC-072 (AC1) · TCOND-31-01 · P2-High · Negative · Automated: `test_unaffected_by_action_recalculate`
+- **Precondition:** task đang chạy; user SLA Manager.
+- **Bước → Kết quả:** (1) Manager gọi `action_recalculate` → `original_breach_time` giữ nguyên.
+- **Pass/Fail:** Pass nếu không đổi.
+
+### TC-CLK-003: Không có lịch (24x7): `duration`/`pause_duration` bằng bản giờ làm việc
+
+- **Truy vết:** REQ-FUNC-072 (AC2) · TCOND-31-02 · P2-High · Positive · Automated: `test_equals_business_without_calendar`
+- **Precondition:** FX-DEF-STD lịch `none`.
+- **Bước → Kết quả:** (1) Attach T0, pause T0+2h, resume T0+5h, stop T0+9h. (2) `business_duration` = `duration` = 6,0; `business_pause_duration` = `pause_duration` = 3,0.
+- **Pass/Fail:** Pass nếu các cặp bằng nhau và đúng 6,0 / 3,0.
+
+### TC-CLK-004: Có lịch, pause qua cuối tuần: giờ đồng hồ khác giờ làm việc
+
+- **Truy vết:** REQ-FUNC-072 (AC2) · TCOND-31-02 · P1-Critical · Positive · Automated: `test_differs_from_business_across_weekend`
+- **Precondition:** lịch FX-CAL-VN, `schedule_source='definition'`.
+- **Bước → Kết quả:** (1) Attach; pause thứ Sáu 17:00 ICT (ngày 6); resume thứ Hai 08:00 ICT (ngày 9). (2) `business_pause_duration` = 0,0; `pause_duration` = 63,0; hai giá trị khác nhau.
+- **Pass/Fail:** Pass nếu 0,0 và 63,0.
+
+## TG-25 — Bật/tắt định nghĩa, domain `[]` là chưa cấu hình, timezone bắt buộc
+
+Quy ước: `MATCH_ALL` = `[('id', '!=', 0)]`. Hàm `make_definition` mặc định `active=True`, lịch `none`, FX-DEF-STD.
+
+### TC-ENB-001: Định nghĩa tạo mới không truyền `active`: mặc định tắt, start là `[]`
+
+- **Truy vết:** REQ-FUNC-066 (AC1) · TCOND-20-01 · P1-Critical · Positive · Automated: `test_new_definition_is_disabled_by_default`
+- **Bước → Kết quả:** (1) Tạo định nghĩa chỉ có `name`, `model_id`, `duration` → `active` = False; `start_domain` = `[]`.
+- **Pass/Fail:** Pass nếu cả hai đúng.
+
+### TC-ENB-002: `model_name` là related có lưu, theo `model_id`
+
+- **Truy vết:** REQ-FUNC-001 (AC1), REQ-INT-001 · TCOND-20-02 · P2-High · Positive · Automated: `test_model_name_related_stored`
+- **Bước → Kết quả:** (1) Tạo FX-DEF-STD → `model_name` = `res.partner` (không truyền tay). (2) Đổi `model_id` sang `res.partner.category` → `model_name` = `res.partner.category`.
+- **Pass/Fail:** Pass nếu `model_name` đổi theo.
+
+### TC-ENB-003: Enable/Disable đảo `active` và trả về soft reload
+
+- **Truy vết:** REQ-FUNC-066 (AC2) · TCOND-20-03 · P1-Critical · Positive · Automated: `test_enable_disable_toggle_and_reload`
+- **Precondition:** định nghĩa `active=False` có start cấu hình.
+- **Bước → Kết quả:** (1) `action_enable()` → `active` True; action trả `tag='soft_reload'`. (2) `action_disable()` → `active` False; `tag='soft_reload'`.
+- **Pass/Fail:** Pass nếu trạng thái và tag đúng.
+
+### TC-ENB-004: Enable khi start chưa cấu hình: bật được kèm cảnh báo
+
+- **Truy vết:** REQ-FUNC-066 (AC3) · TCOND-20-03 · P1-Critical · Negative · Automated: `test_enable_without_start_warns_but_enables`
+- **Precondition:** định nghĩa `active=False`, `start_domain='[]'`.
+- **Bước → Kết quả:** (1) `action_enable()` → `active` True; action là `display_notification`, `params.type` = `warning`, `params.next.tag` = `soft_reload`.
+- **Pass/Fail:** Pass nếu bật được và có cảnh báo.
+
+### TC-ENB-005: Định nghĩa đã bật gắn task cho record mới, định nghĩa tắt thì không
+
+- **Truy vết:** REQ-FUNC-066 (AC1, AC2) · TCOND-20-04 · P1-Critical · Positive · Automated: `test_enabled_attaches_disabled_does_not`
+- **Precondition:** định nghĩa `active=False`; partner `ref`='NEW'.
+- **Bước → Kết quả:** (1) Không có task. (2) `action_enable()`, rồi ghi `ref`='WORK' lúc T0+1h → có đúng 1 task.
+- **Pass/Fail:** Pass nếu chỉ gắn sau khi bật.
+
+### TC-ENB-006: Định nghĩa tắt còn task đang chạy: model vẫn được patch; hết task thì gỡ
+
+- **Truy vết:** REQ-FUNC-066 (AC4) · TCOND-20-05 · P1-Critical · Positive · Automated: `test_hook_models_disabled_with_running_task`
+- **Precondition:** định nghĩa bật, 1 task `in_progress`; sau đó đặt `active=False`.
+- **Bước → Kết quả:** (1) `_get_hook_models()` chứa `res.partner`. (2) Ghi `ref`='DONE' → task `achieved`. (3) `_get_hook_models()` không còn `res.partner`.
+- **Pass/Fail:** Pass nếu cả ba bước đúng.
+
+### TC-ENB-007: Định nghĩa tắt, không có task đang chạy: engine không so khớp điều kiện
+
+- **Truy vết:** REQ-FUNC-066 (AC5), REQ-PERF-001 · TCOND-20-05 · P2-High · Positive · Automated: `test_disabled_without_running_task_skips_condition_matching`
+- **Precondition:** định nghĩa `active=False`; partner `ref`='NEW'; `Engine._match_sets` được bọc mock.
+- **Bước → Kết quả:** (1) `evaluate(P, T0)` → `_match_sets` không được gọi; không có task.
+- **Pass/Fail:** Pass nếu mock không bị gọi.
+
+### TC-ENB-008: Định nghĩa tắt nhưng còn task đang chạy: vẫn đánh giá, task kết thúc khi stop khớp
+
+- **Truy vết:** REQ-FUNC-066 (AC4), REQ-FUNC-060 · TCOND-20-05 · P1-Critical · Positive · Automated: `test_disabled_with_running_task_still_evaluated`
+- **Bước → Kết quả:** (1) Tạo task, đặt `active=False`. (2) Ghi `ref`='DONE' lúc T0+1h → task `achieved`.
+- **Pass/Fail:** Pass nếu `achieved`.
+
+### TC-CND-001: `_get_domain` trả `None` cho `[]`, domain thật cho điều kiện đã cấu hình
+
+- **Truy vết:** REQ-FUNC-003 (AC2) · TCOND-20-06 · P1-Critical · Positive · Automated: `test_get_domain_empty_list_is_none`
+- **Bước → Kết quả:** (1) Định nghĩa `start_domain='[]'` → `_get_domain('start')` là `None`; `_get_domain('stop')` = `[('ref','=','DONE')]`.
+- **Pass/Fail:** Pass nếu đúng cả hai.
+
+### TC-CND-002: Start `[]` không bao giờ gắn task
+
+- **Truy vết:** REQ-FUNC-003 (AC2) · TCOND-20-06 · P1-Critical · Negative · Automated: `test_start_empty_list_never_attaches`
+- **Bước → Kết quả:** (1) Định nghĩa `start_domain='[]'`; tạo partner `ref`='NEW' → không có task.
+- **Pass/Fail:** Pass nếu không có task.
+
+### TC-CND-003: Start `MATCH_ALL` gắn task cho mọi record
+
+- **Truy vết:** REQ-FUNC-003 (AC2) · TCOND-20-06 · P1-Critical · Positive · Automated: `test_start_match_all_attaches`
+- **Bước → Kết quả:** (1) Định nghĩa `start_domain=MATCH_ALL`; tạo partner `ref`=False → có đúng 1 task.
+- **Pass/Fail:** Pass nếu 1 task.
+
+### TC-CND-004: Stop `[]` không bao giờ kết thúc task
+
+- **Truy vết:** REQ-FUNC-003 (AC1) · TCOND-20-06 · P1-Critical · Negative · Automated: `test_stop_empty_list_never_completes`
+- **Bước → Kết quả:** (1) Định nghĩa `stop_domain='[]'`, `start_domain=MATCH_ALL`; partner `ref`='NEW', ghi `ref`='DONE' lúc T0+1h → task vẫn `in_progress`.
+- **Pass/Fail:** Pass nếu `in_progress`.
+
+### TC-CND-005: Mọi điều kiện `[]`: hook không đặt dấu `*` (không chạy engine ở mỗi lần ghi)
+
+- **Truy vết:** REQ-FUNC-003, REQ-PERF-001 · TCOND-20-07 · P2-High · Positive · Automated: `test_new_definition_has_no_star_watch`
+- **Bước → Kết quả:** (1) Tạo định nghĩa mới chỉ có tên, model, duration → `_get_watched_field_names('res.partner')` không chứa `*`.
+- **Pass/Fail:** Pass nếu không có `*`.
+
+### TC-CND-006: Điều kiện reset có domain nhưng không có field theo dõi: theo dõi mọi field (`*`)
+
+- **Truy vết:** REQ-FUNC-013, REQ-FUNC-051 · TCOND-20-07 · P2-High · Positive · Automated: `test_reset_condition_without_fields_watches_all`
+- **Bước → Kết quả:** (1) Định nghĩa `reset_domain=[('ref','=','RESET')]`, không đặt field theo dõi → `_get_watched_field_names('res.partner')` chứa `*`.
+- **Pass/Fail:** Pass nếu chứa `*`.
+
+### TC-TZR-001: Tạo định nghĩa không truyền timezone: điền tz của người dùng hoặc `UTC`
+
+- **Truy vết:** REQ-FUNC-067 (AC6) · TCOND-20-08 · P1-Critical · Positive · Automated: `test_create_fills_user_tz_or_utc`
+- **Bước → Kết quả:** (1) Tạo FX-DEF-STD → `calendar_tz_override` = `env.user.tz` hoặc `UTC` nếu người dùng chưa có tz.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-TZR-002: Nguồn `definition` với lịch cố định: điền tz của lịch
+
+- **Truy vết:** REQ-FUNC-067 (AC6) · TCOND-20-08 · P1-Critical · Positive · Automated: `test_create_fills_fixed_calendar_tz`
+- **Precondition:** lịch tz `Asia/Tokyo`.
+- **Bước → Kết quả:** (1) Tạo định nghĩa `schedule_source='definition'`, `schedule_id`=lịch → `calendar_tz_override` = `Asia/Tokyo`.
+- **Pass/Fail:** Pass nếu `Asia/Tokyo`.
+
+### TC-TZR-003: Timezone truyền tường minh được giữ nguyên
+
+- **Truy vết:** REQ-FUNC-067 (AC6) · TCOND-20-08 · P2-High · Positive · Automated: `test_create_keeps_explicit_tz`
+- **Bước → Kết quả:** (1) Tạo định nghĩa `calendar_tz_override='Europe/Paris'` → giữ `Europe/Paris`.
+- **Pass/Fail:** Pass nếu giữ nguyên.
+
+### TC-TZR-004: Onchange trên bản ghi chưa lưu: luôn lấy tz của lịch
+
+- **Truy vết:** REQ-FUNC-067 (AC6) · TCOND-20-09 · P2-High · Positive · Automated: `test_onchange_new_record_takes_calendar_tz`
+- **Bước → Kết quả:** (1) Bản ghi `new()` nguồn `definition`, lịch tz `Asia/Tokyo`, tz đang là `UTC`; gọi `_onchange_schedule_suggest_tz` → tz = `Asia/Tokyo`.
+- **Pass/Fail:** Pass nếu `Asia/Tokyo`.
+
+### TC-TZR-005: Onchange trên bản ghi đã lưu: chỉ điền khi tz đang trống
+
+- **Truy vết:** REQ-FUNC-067 (AC6) · TCOND-20-09 · P2-High · Positive · Automated: `test_onchange_saved_record_fills_only_when_empty`
+- **Bước → Kết quả:** (1) Định nghĩa đã lưu tz `UTC`, lịch `Asia/Tokyo`; gọi onchange → vẫn `UTC`. (2) Xoá tz rồi gọi onchange → `Asia/Tokyo`.
+- **Pass/Fail:** Pass nếu bước 1 giữ, bước 2 điền.
+
+### TC-TZR-006: Onchange bỏ qua nguồn không phải `definition`
+
+- **Truy vết:** REQ-FUNC-067 (AC6) · TCOND-20-09 · P3-Low · Negative · Automated: `test_onchange_ignores_non_definition_source`
+- **Bước → Kết quả:** (1) Bản ghi `new()` `schedule_source='none'`, có `schedule_id` tz Tokyo; gọi onchange → tz khác `Asia/Tokyo`.
+- **Pass/Fail:** Pass nếu tz không bị lấy từ lịch.
+
+### TC-TZR-007: Form mới có sẵn tz mặc định và theo tz lịch khi chọn lịch
+
+- **Truy vết:** REQ-FUNC-067 (AC1, AC6) · TCOND-20-10 · P1-Critical · Positive · Automated: `test_form_new_has_default_tz_and_follows_calendar`
+- **Bước → Kết quả:** (1) Mở `Form` mới → tz = tz người dùng hoặc `UTC`. (2) Nhập tên, model; chọn nguồn `definition` và lịch Tokyo → tz = `Asia/Tokyo`. (3) Lưu → bản ghi có tz `Asia/Tokyo`.
+- **Pass/Fail:** Pass nếu cả ba đúng.
+
+### TC-TZR-008: Bản sao calendar theo tz sao chép ngày nghỉ chung
+
+- **Truy vết:** REQ-FUNC-067 (AC7) · TCOND-20-11 · P2-High · Positive · Automated: `test_tz_variant_copies_global_leaves`
+- **Precondition:** lịch FX-CAL-VN có 1 ngày nghỉ chung "Holiday" (2026-03-03).
+- **Bước → Kết quả:** (1) `_sla_get_tz_variant(cal, 'UTC')` → bản sao có `global_leave_ids` tên "Holiday" và `date_from` bằng lịch gốc.
+- **Pass/Fail:** Pass nếu sao chép đủ.
+
+### TC-TZR-009: Đổi timezone định nghĩa không đổi hạn của task đang chạy
+
+- **Truy vết:** REQ-FUNC-067 (AC2), REQ-FUNC-021 · TCOND-20-12 · P1-Critical · Positive · Automated: `test_changing_definition_tz_keeps_running_task_deadline`
+- **Precondition:** định nghĩa nguồn `definition` lịch FX-CAL-VN, duration 2, có 1 task.
+- **Bước → Kết quả:** (1) Ghi nhận `planned_end_time` và `schedule_id` của task. (2) Đặt `calendar_tz_override='UTC'` → task giữ nguyên cả hai.
+- **Pass/Fail:** Pass nếu không đổi.
+
+## TG-26 — Trải nghiệm form/list định nghĩa và task
+
+Quy ước: `raw_task(definition, partner, stage, **extra)` tạo trực tiếp một `sla.task` (sudo) với `start_time` = T0, `target_duration` 4, `planned_end_time` = T0+4h, `running_since` = T0 khi `in_progress`. `arch(model, view_type)` lấy arch đã kế thừa của view. Với nhóm DUE: Settings `dwo_sla_core.due_soon_hours` = 4; ba định nghĩa Default (`due_soon_hours` trống), Short (1), Long (10); `now` = T0+1h; ba task `in_progress` cùng `planned_end_time` = now+3h.
+
+### TC-DUE-001: Sắp đến hạn theo ngưỡng riêng của định nghĩa, nếu trống theo Settings
+
+- **Truy vết:** REQ-INT-012 (AC4) · TCOND-21-01 · P1-Critical · Positive · Automated: `test_compute_uses_definition_then_settings`
+- **Bước → Kết quả:** (1) Tính lại `is_due_soon` tại `now` → Default True (còn 3h ≤ 4h), Short False (3h > 1h), Long True (3h ≤ 10h).
+- **Pass/Fail:** Pass nếu (True, False, True).
+
+### TC-DUE-002: Đổi Settings chỉ tác động định nghĩa chưa đặt ngưỡng riêng
+
+- **Truy vết:** REQ-INT-012 (AC3, AC5) · TCOND-21-01 · P2-High · Positive · Automated: `test_settings_change_applies_to_empty_only`
+- **Bước → Kết quả:** (1) Đặt Settings = 2 → Default False (3h > 2h), Short False, Long True.
+- **Pass/Fail:** Pass nếu (False, False, True).
+
+### TC-DUE-003: Tìm kiếm `is_due_soon` đúng với các toán tử `=`, `!=`, `in`, `not in`
+
+- **Truy vết:** REQ-INT-012 (AC4) · TCOND-21-02 · P1-Critical · Positive · Automated: `test_search_operators`
+- **Bước → Kết quả:** (1) Với 8 domain trên `is_due_soon` (`= True`, `!= False`, `in [True]`, `= False`, `!= True`, `in [False]`, `not in [True]`, `not in [False]`) → tập kết quả lần lượt là {Default, Long} cho 3 domain đầu và `not in [False]`, {Short} cho các domain còn lại.
+- **Pass/Fail:** Pass nếu cả 8 domain đúng.
+
+### TC-DUE-004: Task paused hoặc đã vi phạm không bao giờ "sắp đến hạn"
+
+- **Truy vết:** REQ-INT-012 (AC2) · TCOND-21-02 · P1-Critical · Negative · Automated: `test_search_excludes_breached_and_paused`
+- **Precondition:** một task `paused` và một task `has_breached=True`, `planned_end_time` = now+1h, định nghĩa Long.
+- **Bước → Kết quả:** (1) Tìm `is_due_soon = True` trên hai task → rỗng. (2) Tìm `is_due_soon = False` → cả hai task.
+- **Pass/Fail:** Pass nếu đúng cả hai.
+
+### TC-DUE-005: `due_soon_hours` âm bị CSDL từ chối
+
+- **Truy vết:** REQ-INT-012 (AC5) · TCOND-21-03 · P2-High · Negative · Automated: `test_negative_value_rejected`
+- **Bước → Kết quả:** (1) Ghi `due_soon_hours = -1` (trong savepoint) → phát sinh lỗi CHECK.
+- **Pass/Fail:** Pass nếu có exception.
+
+### TC-LCK-001: Định nghĩa đã có task không đổi được model
+
+- **Truy vết:** REQ-FUNC-069 (AC1) · TCOND-21-04 · P1-Critical · Negative · Automated: `test_model_change_blocked_with_tasks`
+- **Bước → Kết quả:** (1) Tạo task cho định nghĩa; đổi `model_id` sang `res.partner.category` → `ValidationError`; `model_name` vẫn `res.partner`.
+- **Pass/Fail:** Pass nếu bị từ chối và model không đổi.
+
+### TC-LCK-002: Ghi lại cùng model (kèm sửa field khác) vẫn được khi đã có task
+
+- **Truy vết:** REQ-FUNC-069 (AC1) · TCOND-21-04 · P2-High · Positive · Automated: `test_same_model_write_allowed_with_tasks`
+- **Bước → Kết quả:** (1) `write({'model_id': <res.partner>, 'duration': 6})` → thành công, `duration` = 6.
+- **Pass/Fail:** Pass nếu `duration == 6`.
+
+### TC-LCK-003: Định nghĩa chưa có task đổi model được
+
+- **Truy vết:** REQ-FUNC-069 (AC1) · TCOND-21-04 · P2-High · Positive · Automated: `test_model_change_allowed_without_tasks`
+- **Bước → Kết quả:** (1) Ghi `model_id` = `res.partner.category` cùng domain mới hợp lệ (start `MATCH_ALL`, các điều kiện khác `[]`) → `model_name` = `res.partner.category`.
+- **Pass/Fail:** Pass nếu đổi được.
+
+### TC-AUD-001: Đổi `duration` sinh dấu vết trong chatter
+
+- **Truy vết:** REQ-FUNC-069 (AC3) · TCOND-21-05 · P2-High · Positive · Automated: `test_tracked_change_posts_message`
+- **Bước → Kết quả:** (1) Tạo định nghĩa duration 4, chạy precommit; bật tracking, đổi `duration` = 8, chạy precommit → `message_ids.tracking_value_ids` có field `duration`.
+- **Pass/Fail:** Pass nếu có.
+
+### TC-AUD-002: Đổi điều kiện (`stop_domain`) được theo dõi
+
+- **Truy vết:** REQ-FUNC-069 (AC3) · TCOND-21-05 · P2-High · Positive · Automated: `test_condition_change_is_tracked`
+- **Bước → Kết quả:** (1) Đổi `stop_domain` sang `[('ref','=','CLOSED')]` (tracking bật) → tracking value có field `stop_domain`.
+- **Pass/Fail:** Pass nếu có.
+
+### TC-AUD-003: Form định nghĩa có chatter
+
+- **Truy vết:** REQ-FUNC-069 (AC3) · TCOND-21-05 · P3-Low · Positive · Automated: `test_form_has_chatter`
+- **Bước → Kết quả:** (1) Lấy arch form `sla.definition` → có phần tử `<chatter>`.
+- **Pass/Fail:** Pass nếu có.
+
+### TC-SBT-001: Số task đang chạy đếm `in_progress` và `paused`, không đếm task đã đóng
+
+- **Truy vết:** REQ-INT-025 (AC1) · TCOND-21-06 · P1-Critical · Positive · Automated: `test_running_task_count_counts_in_progress_and_paused`
+- **Precondition:** định nghĩa D có 3 task (`in_progress`, `paused`, `achieved`); định nghĩa Other có 1 task `in_progress`.
+- **Bước → Kết quả:** (1) Đọc `running_task_count` → D = 2, Other = 1.
+- **Pass/Fail:** Pass nếu (2, 1).
+
+### TC-SBT-002: Định nghĩa không có task: số đếm bằng 0
+
+- **Truy vết:** REQ-INT-025 (AC1) · TCOND-21-06 · P3-Low · Positive · Automated: `test_count_zero_without_tasks`
+- **Bước → Kết quả:** (1) Định nghĩa mới → `running_task_count` = 0.
+- **Pass/Fail:** Pass nếu 0.
+
+### TC-SBT-003: Nút Running Tasks mở mọi task của đúng định nghĩa
+
+- **Truy vết:** REQ-INT-025 (AC2) · TCOND-21-07 · P1-Critical · Positive · Automated: `test_action_opens_all_tasks_of_definition`
+- **Precondition:** D có 2 task (một `achieved`); định nghĩa khác có 1 task.
+- **Bước → Kết quả:** (1) `action_view_tasks()` → `res_model` = `sla.task`; `search(action['domain'])` trả 2 task; `context` = `{}` (không lọc theo trạng thái).
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-SBT-004: Form định nghĩa có nút `action_view_tasks` trong button box và `js_class`
+
+- **Truy vết:** REQ-INT-025 (AC3), REQ-FUNC-069 (AC2) · TCOND-21-07 · P2-High · Positive · Automated: `test_form_arch_button_and_js_class`
+- **Bước → Kết quả:** (1) Arch form có `js_class='sla_definition_form'`; (2) đúng 1 nút `action_view_tasks` trong `div[@name='button_box']`; (3) có field `running_task_count`.
+- **Pass/Fail:** Pass nếu cả ba đúng.
+
+### TC-DLV-001: List định nghĩa: mờ khi tắt, nút Enable/Disable có xác nhận, cột mặc định
+
+- **Truy vết:** REQ-FUNC-066 (AC6) · TCOND-21-08 · P2-High · Positive · Automated: `test_list_arch`
+- **Bước → Kết quả:** (1) `decoration-muted` = `not active`. (2) Các nút trên list: `action_enable`, `action_disable`, đều có thuộc tính `confirm`. (3) Cột hiển thị mặc định (không `optional`, không ẩn): `name`, `model_id`, `type`, `duration`, `schedule_source`, `calendar_tz_override`. (4) Không có cột `running_task_count`.
+- **Pass/Fail:** Pass nếu cả bốn đúng.
+
+### TC-DLV-002: Action của list hiện cả định nghĩa tắt và không nhóm sẵn
+
+- **Truy vết:** REQ-FUNC-066 (AC6) · TCOND-21-08 · P2-High · Positive · Automated: `test_action_shows_inactive_without_grouping`
+- **Bước → Kết quả:** (1) Context của `action_sla_definition` không chứa `search_default_group_model`. (2) Tìm theo domain của action → thấy định nghĩa `active=False`.
+- **Pass/Fail:** Pass nếu đúng cả hai.
+
+### TC-EHS-001: Tab Escalation của task chỉ liệt kê event `escalate` và `escalate_failed`
+
+- **Truy vết:** REQ-INT-026 (AC1) · TCOND-21-09 · P2-High · Positive · Automated: `test_only_escalation_events`
+- **Precondition:** task có 4 event: `escalate`, `escalate_failed`, `pause`, `error`.
+- **Bước → Kết quả:** (1) `escalation_event_ids` = {`escalate`, `escalate_failed`}; `event_ids` vẫn 4.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-EHS-002: Lịch sử escalation sắp mới nhất trước
+
+- **Truy vết:** REQ-INT-026 (AC1) · TCOND-21-09 · P3-Low · Positive · Automated: `test_newest_first`
+- **Bước → Kết quả:** (1) Hai event `escalate` lúc T0 và T0+2h → `escalation_event_ids` = [mới, cũ].
+- **Pass/Fail:** Pass nếu mới trước cũ.
+
+### TC-EHS-003: Form task hiển thị lịch sử escalation với 3 cột
+
+- **Truy vết:** REQ-INT-026 (AC1) · TCOND-21-09 · P3-Low · Positive · Automated: `test_form_arch_lists_events`
+- **Bước → Kết quả:** (1) Trang `escalation` của form task chứa `escalation_event_ids` với các cột `event_dt`, `event`, `note`.
+- **Pass/Fail:** Pass nếu đúng thứ tự cột.
+
+### TC-OSR-001: Nút Open Source Record mở form của record gốc
+
+- **Truy vết:** REQ-INT-026 (AC2) · TCOND-21-10 · P1-Critical · Positive · Automated: `test_opens_source_record`
+- **Bước → Kết quả:** (1) Gọi `action_open_source_record()` → action `ir.actions.act_window`, `res_model` = `res.partner`, `res_id` = id partner, `view_mode` = `form`, `target` = `current`.
+- **Pass/Fail:** Pass nếu đúng năm giá trị.
+
+### TC-OSR-002: Record gốc đã bị xoá: báo lỗi thân thiện
+
+- **Truy vết:** REQ-INT-026 (AC3) · TCOND-21-10 · P2-High · Negative · Automated: `test_missing_record_friendly_error`
+- **Bước → Kết quả:** (1) Xoá partner rồi gọi `action_open_source_record()` → `UserError` chứa "no longer exists".
+- **Pass/Fail:** Pass nếu đúng thông báo.
+
+### TC-OSR-003: Model của record gốc không còn tồn tại: báo lỗi thân thiện
+
+- **Truy vết:** REQ-INT-026 (AC3) · TCOND-21-10 · P2-High · Negative · Automated: `test_unknown_model_friendly_error`
+- **Bước → Kết quả:** (1) Đặt `res_model='x.not.installed'` rồi gọi action → `UserError` chứa "no longer exists".
+- **Pass/Fail:** Pass nếu đúng thông báo.
+
+### TC-OSR-004: Nút nằm trong header của form task, luôn hiện, không có trong list
+
+- **Truy vết:** REQ-INT-026 (AC2) · TCOND-21-10 · P3-Low · Positive · Automated: `test_button_in_form_header_always_visible`
+- **Bước → Kết quả:** (1) Đúng 1 nút `action_open_source_record` trong `//header`; thuộc tính `invisible` không có. (2) Không có nút này trong `list`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-TLV-001: List task: cột mặc định, thanh tiến độ, tô đỏ task vi phạm
+
+- **Truy vết:** REQ-INT-027 (AC1) · TCOND-21-11 · P2-High · Positive · Automated: `test_default_columns_and_progressbar`
+- **Bước → Kết quả:** (1) `decoration-danger` = `has_breached`. (2) Cột hiển thị mặc định: `sla_id`, `target_duration`, `schedule_id`, `stage`, `start_time`, `planned_end_time`, `business_duration_live`, `duration_live`, `business_percent_used`. (3) `business_percent_used` dùng widget `progressbar` có `overflow_class`. (4) `display_name`, `res_model`, `res_id` là `optional="hide"`.
+- **Pass/Fail:** Pass nếu cả bốn đúng.
+
+### TC-LGT-001: SCSS của widget chỉ có light mode
+
+- **Truy vết:** REQ-INT-024 (AC5) · TCOND-21-12 · P3-Low · Positive · Automated: `test_scss_has_no_dark_block`
+- **Bước → Kết quả:** (1) Đọc `static/src/sla_progress/sla_progress_widget.scss` → không chứa `prefers-color-scheme`.
+- **Pass/Fail:** Pass nếu không có.
+
+### TC-TOUR-001: Tour trình duyệt: lưu định nghĩa có task đang chạy hiện hộp xác nhận
+
+- **Truy vết:** REQ-FUNC-069 (AC2) · TCOND-21-13 · P1-Critical · Positive · Automated (HttpCase tour): `test_confirm_save_with_running_tasks`
+- **Precondition:** định nghĩa "Tour SLA" trên `res.partner` có 1 task `in_progress`; đăng nhập `admin`.
+- **Bước → Kết quả:** (1) Chạy tour `dwo_sla_definition_confirm_save` trên `/odoo/action-dwo_sla_core.action_sla_definition/<id>` → bundle JS tải được, sửa điều kiện và lưu hiện hộp xác nhận nêu số task, tour hoàn tất.
+- **Pass/Fail:** Pass nếu tour kết thúc không lỗi.
+
+## TG-27 — Re-check Conditions (giới hạn một định nghĩa)
+
+Fixture: `U-MGR` (`tg27_manager`, SLA Manager), `U-VIEW` (`tg27_viewer`, SLA User). `REL_STOP` = `[('parent_id.ref', '=', 'DONE')]` (điều kiện qua quan hệ: engine không tự đánh giá khi parent đổi, REQ-FUNC-042). `recheck(tasks, now)` = `tasks.with_user(U-MGR).action_reevaluate()` với đồng hồ giả `now`.
+
+### TC-RCK-001: Re-check task của B không đụng task của A và không gắn task của định nghĩa C
+
+- **Truy vết:** REQ-INT-020 (AC4), REQ-FUNC-032 (AC4) · TCOND-22-01 · P1-Critical · Positive · Automated: `test_scope_is_one_definition`
+- **Precondition:** định nghĩa A, B (stop `REL_STOP`); parent P và child C1 (`ref`='NEW', `parent_id`=P) có task A và task B `in_progress`; định nghĩa C tạo sau (C1 chưa có task C); ghi `ref`='DONE' vào P lúc T0+1h (C1 không được ghi).
+- **Bước → Kết quả:** (1) Hai task vẫn `in_progress`. (2) Re-check task B lúc T0+2h → task B `achieved`; task A vẫn `in_progress`; C1 không có task C. (3) Kết quả là `display_notification` với `next` = `soft_reload` và thông báo chứa "1 task(s) checked, 1 changed".
+- **Pass/Fail:** Pass nếu đúng cả ba; Fail nếu task A đổi hoặc task C xuất hiện.
+
+### TC-RCK-002: Task đã đóng không đổi nhưng vẫn ghi event `reevaluate` kèm người bấm
+
+- **Truy vết:** REQ-INT-020 (AC3, AC5) · TCOND-22-02 · P1-Critical · Negative · Automated: `test_closed_task_unchanged_with_event`
+- **Precondition:** task `achieved` (stop lúc T0+1h).
+- **Bước → Kết quả:** (1) Re-check lúc T0+3h → `stage`, `end_time`, `business_duration` không đổi; thông báo "1 task(s) checked, 0 changed"; có đúng 1 event `reevaluate` có "No change" và tên manager trong `note`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-RCK-003: Task đổi stage: event ghi stage cũ và mới
+
+- **Truy vết:** REQ-INT-020 (AC5) · TCOND-22-02 · P2-High · Positive · Automated: `test_changed_event_records_old_and_new_stage`
+- **Precondition:** như TC-RCK-001 với một định nghĩa.
+- **Bước → Kết quả:** (1) Re-check lúc T0+2h → event `reevaluate` có `event_dt` = T0+2h, `note` chứa "In Progress -> Achieved", `definition_id` = định nghĩa.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-RCK-004: Nhiều task thuộc hai định nghĩa trong một lần bấm: mỗi task theo định nghĩa của nó
+
+- **Truy vết:** REQ-INT-020 (AC4) · TCOND-22-03 · P2-High · Positive · Automated: `test_many_tasks_grouped_per_definition`
+- **Bước → Kết quả:** (1) Hai task (A, B) của cùng record, điều kiện stop qua parent đã khớp; re-check cả hai → cả hai `achieved`; 2 event `reevaluate`; thông báo "2 task(s) checked, 2 changed".
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-RCK-005: SLA User không dùng được Re-check
+
+- **Truy vết:** REQ-INT-020 (AC2), REQ-FUNC-032 (AC3) · TCOND-22-04 · P1-Critical · Negative · Automated: `test_viewer_cannot_recheck`
+- **Bước → Kết quả:** (1) `U-VIEW` gọi `action_reevaluate` → `AccessError`.
+- **Pass/Fail:** Pass nếu bị từ chối.
+
+### TC-RCK-006: `Engine.evaluate(definitions=...)` chỉ xét định nghĩa được truyền
+
+- **Truy vết:** REQ-FUNC-032 (AC4) · TCOND-22-05 · P1-Critical · Positive · Automated: `test_engine_definitions_param_limits_scope`
+- **Precondition:** định nghĩa A có task cho partner P; định nghĩa B tạo sau (P chưa có task B).
+- **Bước → Kết quả:** (1) `evaluate(P, now=T0, definitions=A)` → P không có task B. (2) `evaluate(P, now=T0)` (không giới hạn) → P có 1 task B.
+- **Pass/Fail:** Pass nếu đúng cả hai.
+
+## TG-28 — Apply Current Settings
+
+Fixture: `U-MGR` (`tg28_manager`), định nghĩa D `duration`=8, `apply(tasks, now)` = `tasks.with_user(U-MGR).action_recalculate()` với đồng hồ giả `now`.
+
+### TC-APS-001: Task đang chạy nhận mục tiêu mới, ghi event `recalculate`, báo kết quả
+
+- **Truy vết:** REQ-INT-005 (AC2, AC6) · TCOND-23-01 · P1-Critical · Positive · Automated: `test_running_task_gets_new_target_and_event`
+- **Precondition:** task `in_progress` gắn tại T0 (hạn T0+8h); đổi `duration` của D thành 4.
+- **Bước → Kết quả:** (1) Apply lúc T0+1h → `target_duration` = 4; `planned_end_time` = T0+1h + 4h (thời gian đã chốt = 0); `original_breach_time` không đổi. (2) Có đúng 1 event `recalculate`, `note` chứa tên manager và "8.00 h -> 4.00 h". (3) Kết quả là `display_notification` + `soft_reload`, thông báo "1 task(s) updated, 0 skipped".
+- **Pass/Fail:** Pass nếu đúng cả ba.
+
+### TC-APS-002: Task đã vi phạm giữ nguyên hạn chót
+
+- **Truy vết:** REQ-INT-005 (AC5) · TCOND-23-02 · P1-Critical · Positive · Automated: `test_breached_task_keeps_deadline`
+- **Bước → Kết quả:** (1) Engine ghi vi phạm tại T0+9h (`has_breached`). (2) Đổi `duration`=4 rồi Apply lúc T0+10h → `target_duration` = 4; `planned_end_time` và `original_breach_time` giữ nguyên; có 1 event `recalculate`.
+- **Pass/Fail:** Pass nếu hạn giữ nguyên.
+
+### TC-APS-003: Task paused đổi mục tiêu nhưng giữ hạn chót (xếp lại khi resume)
+
+- **Truy vết:** REQ-INT-005 (statement) · TCOND-23-03 · P2-High · Positive · Automated: `test_paused_task_keeps_deadline`
+- **Bước → Kết quả:** (1) Pause lúc T0+1h; đổi `duration`=4; Apply lúc T0+2h → `stage`=`paused`, `target_duration`=4; `planned_end_time`, `original_breach_time` không đổi.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-APS-004: Task không có gì đổi: không ghi event nhưng vẫn tính vào "updated"
+
+- **Truy vết:** REQ-INT-005 (AC7) · TCOND-23-04 · P2-High · Positive · Automated: `test_unchanged_task_has_no_event_but_counts_updated`
+- **Bước → Kết quả:** (1) Apply ngay tại T0 với cấu hình không đổi → `planned_end_time` = T0+8h; không có event `recalculate`; thông báo "1 task(s) updated, 0 skipped".
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-APS-005: Task đã đóng bị bỏ qua
+
+- **Truy vết:** REQ-INT-005 (AC3) · TCOND-23-05 · P1-Critical · Negative · Automated: `test_closed_tasks_skipped`
+- **Bước → Kết quả:** (1) Task `achieved`; đổi `duration`=4; Apply → `target_duration` vẫn 8; không có event `recalculate`; thông báo "0 task(s) updated, 1 skipped".
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-APS-006: Nhiều task trong một lần bấm: mỗi task đúng một event
+
+- **Truy vết:** REQ-INT-005 (AC6) · TCOND-23-06 · P2-High · Positive · Automated: `test_many_tasks_one_event_each`
+- **Bước → Kết quả:** (1) Hai task `in_progress`; đổi `duration`=4; Apply cả hai → 2 event `recalculate`; thông báo "2 task(s) updated, 0 skipped".
+- **Pass/Fail:** Pass nếu đúng.
+
+## TG-29 — Apply to Existing Records (wizard, `sla.apply.job`, cron)
+
+Fixture: `U-MGR` (`tg29_manager`), `U-VIEW` (`tg29_viewer`); `_commit_progress` được thay bằng "không giới hạn thời gian" (test không được commit). `existing_records(n)` = tạo định nghĩa tắt, `n` partner `ref`='NEW' TRƯỚC khi bật, bật định nghĩa, xác nhận chưa có task nào. `apply(d, filter_domain, now)` = tạo wizard (U-MGR), gọi `action_apply()` với đồng hồ giả, trả về job mới nhất của định nghĩa.
+
+### TC-APX-001: Áp dụng cho record có sẵn: đủ task, chạy lại không tạo trùng
+
+- **Truy vết:** REQ-FUNC-068 (AC1) · TCOND-24-01 · P1-Critical · Positive · Automated: `test_all_matching_records_get_task_and_rerun_has_no_duplicates`
+- **Precondition:** `existing_records(10)`.
+- **Bước → Kết quả:** (1) Wizard `match_count` = 10. (2) `apply` → job `done`, `total`=`processed`=`attached`=10, `error_count`=0; 10 task đúng 10 partner; kết quả `display_notification` với `next` = `act_window_close`. (3) `apply` lần hai → job mới khác job cũ, `done`, `processed`=10, `attached`=0; vẫn 10 task; có 2 job.
+- **Pass/Fail:** Pass nếu đúng cả ba; Fail nếu có task trùng.
+
+### TC-APX-002: Domain lọc thu hẹp tập record
+
+- **Truy vết:** REQ-FUNC-068 (AC4) · TCOND-24-02 · P2-High · Positive · Automated: `test_filter_domain_narrows_set`
+- **Bước → Kết quả:** (1) `existing_records(10)`; apply với `filter_domain` = id của 3 partner → `total`=`processed`=`attached`=3; chỉ 3 partner đó có task.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-APX-003: Domain lọc không mở rộng được điều kiện Start
+
+- **Truy vết:** REQ-FUNC-068 (AC4) · TCOND-24-02 · P1-Critical · Negative · Automated: `test_filter_cannot_widen_start_condition`
+- **Precondition:** 2 partner khớp Start; 1 partner `ref`='DONE' không khớp.
+- **Bước → Kết quả:** (1) Apply với filter chứa cả 3 id → `processed`=`attached`=2; partner `DONE` không có task.
+- **Pass/Fail:** Pass nếu partner không khớp không được gắn.
+
+### TC-APX-004: Start chưa cấu hình (`[]`): job không nạp record nào
+
+- **Truy vết:** REQ-FUNC-068 (AC5), REQ-FUNC-003 (AC2) · TCOND-24-03 · P2-High · Negative · Automated: `test_unconfigured_start_loads_nothing`
+- **Bước → Kết quả:** (1) Định nghĩa bật `start_domain='[]'`, có partner `NEW`; apply → job `done`, `total`=`processed`=`attached`=0; không task.
+- **Pass/Fail:** Pass nếu không task nào.
+
+### TC-APX-005: Định nghĩa đang tắt: từ chối áp dụng
+
+- **Truy vết:** REQ-FUNC-068 (AC5) · TCOND-24-03 · P1-Critical · Negative · Automated: `test_inactive_definition_rejected`
+- **Bước → Kết quả:** (1) Wizard cho định nghĩa `active=False`; `action_apply()` → `UserError`.
+- **Pass/Fail:** Pass nếu bị từ chối.
+
+### TC-APX-006: Chia lô: lô đầu chạy ngay, phần còn lại do cron, không xử lý trùng
+
+- **Truy vết:** REQ-FUNC-068 (AC2, AC3), REQ-REL-002 · TCOND-24-04 · P1-Critical · Positive · Automated: `test_batching_first_batch_now_rest_by_cron`
+- **Precondition:** `dwo_sla_core.batch_size` = 3; `existing_records(10)`.
+- **Bước → Kết quả:** (1) Apply → job `running`, `processed`=`attached`=3, `last_id` = id thứ 3; có bản ghi `ir.cron.trigger` cho cron `ir_cron_sla_apply`. (2) Tạo wizard mới và `action_apply()` khi job còn chạy → `UserError`. (3) Chạy `Job._cron_run()` → job `done`, `processed`=`attached`=10, `last_id` = id cuối; 10 task đúng 10 partner, không trùng.
+- **Pass/Fail:** Pass nếu đúng ba bước.
+
+### TC-APX-007: Job `queued` cũng chặn tạo job mới cùng định nghĩa
+
+- **Truy vết:** REQ-FUNC-068 (AC3) · TCOND-24-04 · P2-High · Negative · Automated: `test_queued_job_also_blocks_new_job`
+- **Bước → Kết quả:** (1) Có job `queued` của định nghĩa; wizard mới `action_apply()` → `UserError`.
+- **Pass/Fail:** Pass nếu bị từ chối.
+
+### TC-APX-008: Hủy job: dừng xử lý, cho phép tạo job mới
+
+- **Truy vết:** REQ-FUNC-068 (AC6) · TCOND-24-05 · P1-Critical · Positive · Automated: `test_cancel_stops_job`
+- **Precondition:** batch_size 3; `existing_records(10)`; apply (job `running`, đã xử lý 3).
+- **Bước → Kết quả:** (1) U-MGR `action_cancel()` → `cancelled`, có `end_time`. (2) `_cron_run()` → job vẫn `cancelled`, `processed`=3; có 3 task. (3) Apply lần nữa → job mới khác job cũ.
+- **Pass/Fail:** Pass nếu đúng ba bước.
+
+### TC-APX-009: Lô lỗi làm job `failed` kèm ghi chú
+
+- **Truy vết:** REQ-FUNC-068 (AC7) · TCOND-24-05 · P2-High · Negative · Automated: `test_failed_batch_marks_job_failed`
+- **Bước → Kết quả:** (1) Tạo job với `filter_domain=[('bad_field','=',1)]`; `_cron_run()` → `state`=`failed`; `note` không rỗng.
+- **Pass/Fail:** Pass nếu `failed` kèm ghi chú.
+
+### TC-APX-010: Autovacuum xoá job đã kết thúc quá hạn lưu, giữ job đang chạy/chờ/mới
+
+- **Truy vết:** REQ-FUNC-068 (AC8), REQ-INT-010 · TCOND-24-06 · P2-High · Positive · Automated: `test_autovacuum_removes_old_finished_keeps_running`
+- **Precondition:** 5 job: `done` 400 ngày trước, `cancelled` 400 ngày trước, `running`, `queued`, `done` 1 ngày trước; retention mặc định 365.
+- **Bước → Kết quả:** (1) `_gc_old_jobs()` → hai job cũ đã kết thúc bị xoá; ba job còn lại còn.
+- **Pass/Fail:** Pass nếu đúng tập bị xoá.
+
+### TC-APX-011: Backfill retroactive: mốc escalation đã vượt được đánh dấu xong, không bắn hồi tố
+
+- **Truy vết:** REQ-FUNC-068 (AC9), REQ-FUNC-053 · TCOND-24-07 · P1-Critical · Positive · Automated: `test_backfill_retroactive_leaves_no_pending_passed_escalation`
+- **Precondition:** field `x_retro_dt`; định nghĩa tắt `retroactive=True`; partner có mốc retroactive cách đây 10 giờ (250% của 4 giờ); mốc escalation 50%, 100%, 300%; bật định nghĩa.
+- **Bước → Kết quả:** (1) Apply → `attached`=1. (2) Task `has_breached`; `done_escalation_ids` = {50%, 100%} (không có 300%). (3) `_next_due_escalation(task, T0)` rỗng; `next_due_at` > T0. (4) Chạy `_process_task(task, T0)` → `done_escalation_ids` không đổi; không có event `escalate`/`escalate_failed`.
+- **Pass/Fail:** Pass nếu không có escalation hồi tố.
+
+### TC-APX-012: Phân quyền: chỉ SLA Manager tạo wizard và sửa job
+
+- **Truy vết:** REQ-FUNC-068 (AC10), REQ-SEC-001 · TCOND-24-08 · P1-Critical · Negative · Automated: `test_security`
+- **Bước → Kết quả:** (1) U-VIEW tạo wizard → `AccessError`. (2) U-MGR đọc job → thấy (state `queued`). (3) U-VIEW đọc job → `AccessError`. (4) U-MGR ghi trực tiếp `state='done'` → `AccessError`.
+- **Pass/Fail:** Pass nếu đúng bốn bước.
+
+## TG-30 — Chip trạng thái SLA trên form record
+
+Quy ước: `raw_task(definition, partner, stage, **extra)` dựng task trực tiếp theo đồng hồ thật (`start_time` = now-1h, `target_duration` 4, `planned_end_time` = now+10h, `running_since` = now-10 phút khi `in_progress`). `summary(P)` = `sla.task.get_record_sla_summary('res.partner', P.id)`. Fixture: định nghĩa "Chip SLA" trên `res.partner`, partner "Chip P".
+
+### TC-FST-001: Record chưa có task: `state` rỗng
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-01 · P1-Critical · Positive · Automated: `test_no_task_is_none`
+- **Bước → Kết quả:** (1) `summary(P)` khi chưa có task → `state` = None.
+- **Pass/Fail:** Pass nếu None.
+
+### TC-FST-002: `res_id` rỗng: trả `{'state': None}`
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-01 · P3-Low · Negative · Automated: `test_missing_id_is_none`
+- **Bước → Kết quả:** (1) `get_record_sla_summary('res.partner', False)` → `{'state': None}`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-003: Task đang chạy, chưa trễ: `state` = `running`
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-02 · P1-Critical · Positive · Automated: `test_running`
+- **Bước → Kết quả:** (1) Một task `in_progress` hạn sau 10 giờ → `state`=`running`, `count`=1, `late_count`=0, `lines` có 1 phần tử.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-004: Hạn trong ngưỡng Sắp đến hạn: `state` = `due_soon`
+
+- **Truy vết:** REQ-INT-024 (AC6), REQ-INT-012 · TCOND-25-02 · P1-Critical · Positive · Automated: `test_due_soon`
+- **Bước → Kết quả:** (1) Task `in_progress` có `planned_end_time` = now+1h → `state`=`due_soon`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-005: Task paused: `state` = `paused`, `percent` theo thời gian đã dùng
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-02 · P2-High · Positive · Automated: `test_paused`
+- **Bước → Kết quả:** (1) Task `paused`, `business_duration`=1 (mục tiêu 4) → `state`=`paused`, `percent`=25.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-006: Task trễ nhiều: `state` = `breached`, `percent` bị chặn ở 100
+
+- **Truy vết:** REQ-INT-024 (AC4) · TCOND-25-03 · P1-Critical · Boundary · Automated: `test_breached_running_percent_capped`
+- **Bước → Kết quả:** (1) Task `in_progress`, `has_breached`, `business_duration`=10 (250%) → `state`=`breached`, `late_count`=1, `percent`=100, mọi dòng trong `lines` có `percent` ≤ 100.
+- **Pass/Fail:** Pass nếu không có % lớn hơn 100.
+
+### TC-FST-007: Task đã `achieved`: `state` = `met`
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-02 · P2-High · Positive · Automated: `test_met`
+- **Bước → Kết quả:** (1) Một task `achieved` → `state`=`met`, `count`=1, `late_count`=0.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-008: Task đã `breached` (đóng trễ): `state` = `missed`
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-02 · P2-High · Positive · Automated: `test_missed`
+- **Bước → Kết quả:** (1) Một task stage `breached` → `state`=`missed`, `late_count`=1.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-009: Chỉ có task `cancelled`: không có trạng thái
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-01 · P2-High · Negative · Automated: `test_cancelled_only_is_none`
+- **Bước → Kết quả:** (1) Một task `cancelled` → `state` = None.
+- **Pass/Fail:** Pass nếu None.
+
+### TC-FST-010: Nhiều task: chọn trạng thái khẩn nhất
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-04 · P1-Critical · Positive · Automated: `test_multiple_tasks_pick_most_urgent`
+- **Bước → Kết quả:** (1) Hai định nghĩa: task thứ nhất đang chạy (3 giờ đã dùng), task thứ hai đã vi phạm → `state`=`breached`, `count`=2, `late_count`=1.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-011: Task đang hoạt động thắng task đã đóng
+
+- **Truy vết:** REQ-INT-024 (AC6) · TCOND-25-04 · P2-High · Positive · Automated: `test_active_task_wins_over_done_ones`
+- **Bước → Kết quả:** (1) Một task stage `breached` (đã đóng) và một task `in_progress` → `state`=`running`.
+- **Pass/Fail:** Pass nếu `running`.
+
+### TC-FST-012: Người dùng không thuộc nhóm SLA gọi RPC bị từ chối (không `sudo`)
+
+- **Truy vết:** REQ-INT-024 (AC7), REQ-SEC-002 · TCOND-25-05 · P1-Critical · Negative · Automated: `test_no_sudo_user_without_group_is_refused`
+- **Bước → Kết quả:** (1) Người dùng chỉ có `base.group_user` gọi `get_record_sla_summary` → `AccessError`.
+- **Pass/Fail:** Pass nếu bị từ chối.
+
+### TC-FST-013: SLA User đọc được tóm tắt
+
+- **Truy vết:** REQ-INT-024 (AC7) · TCOND-25-05 · P1-Critical · Positive · Automated: `test_sla_user_can_read`
+- **Bước → Kết quả:** (1) Người dùng `group_sla_user` gọi RPC → `state`=`running`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-014: Chưa có bản ghi tham số cờ: coi là bật
+
+- **Truy vết:** REQ-INT-024 (AC8) · TCOND-25-06 · P2-High · Positive · Automated: `test_flag_on_when_never_configured`
+- **Bước → Kết quả:** (1) Xoá bản ghi `dwo_sla_core.show_form_sla_status`; `_sla_show_form_status()` → True.
+- **Pass/Fail:** Pass nếu True.
+
+### TC-FST-015: Tắt cờ qua Settings lưu chuỗi `'False'` tường minh
+
+- **Truy vết:** REQ-INT-024 (AC8) · TCOND-25-06 · P2-High · Positive · Automated: `test_setting_off_is_stored_explicitly`
+- **Bước → Kết quả:** (1) Settings đặt `sla_show_form_status=False`, `execute()` → tham số lưu chuỗi `False` (bản ghi còn); `_sla_show_form_status()` → False.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-FST-016: `session_info` liệt kê model có SLA cho SLA User
+
+- **Truy vết:** REQ-INT-024 (AC3) · TCOND-25-07 · P1-Critical · Positive · Automated (HttpCase): `test_models_listed_for_sla_user`
+- **Precondition:** định nghĩa "Session SLA" bật trên `res.partner`.
+- **Bước → Kết quả:** (1) Đăng nhập admin, gọi `/web/session/get_session_info` → `dwo_sla_models` chứa `res.partner`.
+- **Pass/Fail:** Pass nếu có.
+
+### TC-FST-017: Cờ tắt: `dwo_sla_models` rỗng
+
+- **Truy vết:** REQ-INT-024 (AC3) · TCOND-25-07 · P1-Critical · Negative · Automated (HttpCase): `test_empty_when_setting_off`
+- **Bước → Kết quả:** (1) Đặt tham số cờ = `'False'`; admin lấy session info → `dwo_sla_models` = [].
+- **Pass/Fail:** Pass nếu rỗng.
+
+### TC-FST-018: Người dùng không thuộc nhóm SLA: `dwo_sla_models` rỗng
+
+- **Truy vết:** REQ-INT-024 (AC3) · TCOND-25-07 · P1-Critical · Negative · Automated (HttpCase): `test_empty_without_sla_group`
+- **Bước → Kết quả:** (1) Người dùng nội bộ không thuộc nhóm SLA lấy session info → `dwo_sla_models` = [].
+- **Pass/Fail:** Pass nếu rỗng.
+
+### TC-FST-019: Tour: form partner có chip, bấm chip mở list task của record
+
+- **Truy vết:** REQ-INT-024 (AC1) · TCOND-25-08 · P1-Critical · Positive · Automated (HttpCase tour): `test_chip_on_partner_form`
+- **Precondition:** định nghĩa "Chip Tour SLA" và một task `in_progress` cho partner "Chip Tour P"; đăng nhập admin.
+- **Bước → Kết quả:** (1) Chạy tour `dwo_sla_form_status_chip` trên `/odoo/res.partner/<id>` → chip hiện cạnh pager; bấm chip mở list task của partner; tour hoàn tất.
+- **Pass/Fail:** Pass nếu tour kết thúc không lỗi.
+
+### TC-FST-020: Tour: form của model không có SLA không có chip
+
+- **Truy vết:** REQ-INT-024 (AC2) · TCOND-25-08 · P1-Critical · Negative · Automated (HttpCase tour): `test_no_chip_without_sla`
+- **Bước → Kết quả:** (1) Chạy tour `dwo_sla_form_status_chip_absent` trên form `res.partner.category` → không có chip, tour hoàn tất.
+- **Pass/Fail:** Pass nếu tour kết thúc không lỗi.
+
+## TG-31 — Tab Note, chuỗi giao diện không lỗi thời
+
+Quy ước: `note(model)` = văn bản của `<page name="note">` trong arch form (chuẩn hoá khoảng trắng); `MODULE_PATH` = thư mục module.
+
+### TC-NOT-001: Tab Note của định nghĩa có đủ 9 nhóm tiêu đề
+
+- **Truy vết:** REQ-INT-029 (AC1) · TCOND-26-01 · P3-Low · Positive · Automated: `test_definition_note_has_nine_groups`
+- **Bước → Kết quả:** (1) Lấy arch form `sla.definition` → trong `page[@name='note']` có đúng 9 phần tử `<h4>`.
+- **Pass/Fail:** Pass nếu 9.
+
+### TC-NOT-002: Tab Note của định nghĩa nêu các điểm cần lưu ý của đợt 1.1.0
+
+- **Truy vết:** REQ-INT-029 (AC2), REQ-FUNC-003, REQ-FUNC-067, REQ-INT-024 · TCOND-26-01 · P2-High · Positive · Automated: `test_definition_note_content`
+- **Bước → Kết quả:** (1) Văn bản tab Note chứa lần lượt: "Match all records" (giải thích `[]` không phải match-all), `[('id', '!=', 0)]`, "not kept in sync" (bản sao calendar), "public holidays", "reload the page" (chip cho model mới), "Re-check Conditions", "equal to or longer than the Duration" (ngưỡng sắp đến hạn), "Disable".
+- **Pass/Fail:** Pass nếu đủ cả tám cụm từ.
+
+### TC-NOT-003: Tab Note của task có 4 nhóm và 3 kịch bản đánh số
+
+- **Truy vết:** REQ-INT-029 (AC3) · TCOND-26-02 · P3-Low · Positive · Automated: `test_task_note_has_four_groups_and_three_scenarios`
+- **Bước → Kết quả:** (1) Arch form `sla.task` → `page[@name='note']` có 4 `<h4>` và 3 `<li>` trong `<ol>`. (2) Văn bản chứa "Apply Current Settings", "Re-check Conditions", "Original Breach Time", "from the moment you press the button", "creates a new one".
+- **Pass/Fail:** Pass nếu đúng cả hai.
+
+### TC-NOT-004: Không còn tên nút cũ "Recalculate"/"Re-evaluate" trong chuỗi hiển thị
+
+- **Truy vết:** REQ-INT-029 (AC4), REQ-INT-005, REQ-INT-020 · TCOND-26-03 · P2-High · Negative · Automated: `test_no_old_button_names_in_user_strings`
+- **Bước → Kết quả:** (1) `constants/message.py` không có chuỗi "Recalculate"/"Re-evaluate" trong dấu nháy kép. (2) Help của mọi field `sla.definition`, `sla.task`, `sla.escalation` không chứa "Recalculate" hoặc "Re-evaluate". (3) `views/sla_definition_views.xml` và `views/sla_task_views.xml` không có `string="Recalculate"`/`string="Re-evaluate"` và không có chuỗi `"Re-evaluate"`.
+- **Pass/Fail:** Pass nếu không còn xuất hiện.
+
+## TG-32 — Duration (live) và Business Duration (live)
+
+Fixture: FX-DEF-STD (lịch `none`, duration 4). Hai field live là compute không lưu, chỉ để hiển thị: giá trị đã chốt cộng đoạn đang chạy tới `fields.Datetime.now()`.
+
+### TC-DUR-001: Task đang chạy: cột lưu đứng yên, bản live cộng đoạn tới hiện tại
+
+- **Truy vết:** REQ-INT-028 (AC1) · TCOND-27-01 · P2-High · Positive · Automated: `test_running_adds_current_period`
+- **Bước → Kết quả:** (1) Tạo task lúc T0; xem lúc T0+1,5h → `business_duration` = `duration` = 0,0 (cột lưu); `business_duration_live` = `duration_live` = 1,5.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-DUR-002: Task paused: live bằng giá trị đã lưu
+
+- **Truy vết:** REQ-INT-028 (AC2) · TCOND-27-02 · P2-High · Positive · Automated: `test_paused_equals_stored`
+- **Bước → Kết quả:** (1) Pause lúc T0+1h; xem lúc T0+3h → `stage`=`paused`; `business_duration_live` = `business_duration` = 1,0; `duration_live` = `duration`.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-DUR-003: Có lịch: live theo giờ làm khác live theo giờ đồng hồ
+
+- **Truy vết:** REQ-INT-028 (AC3) · TCOND-27-03 · P2-High · Positive · Automated: `test_calendar_counts_working_hours_only`
+- **Precondition:** lịch FX-CAL-VN (T2–T6 08:00–17:00 ICT); định nghĩa nguồn `definition`, start `ref`='CAL'; task gắn lúc T0.
+- **Bước → Kết quả:** (1) Xem lúc T0+24h → `duration_live` = 24,0; 0 < `business_duration_live` < 24.
+- **Pass/Fail:** Pass nếu đúng.
+
+### TC-DUR-004: List task hiện hai cột live mặc định, hai cột lưu vẫn có nhưng ẩn
+
+- **Truy vết:** REQ-INT-028 (AC4) · TCOND-27-04 · P3-Low · Positive · Automated: `test_list_shows_live_and_hides_stored`
+- **Bước → Kết quả:** (1) Arch list `sla.task`: `business_duration_live` và `duration_live` có `optional="show"`; `business_duration` và `duration` có `optional="hide"`.
+- **Pass/Fail:** Pass nếu đúng bốn giá trị.
+
+---
+
 ## Phụ lục A — Vấn đề SRS, TAD phát hiện khi viết test, quyết định đã chốt và giả định còn lại
 
 Mỗi mục dưới đây là một câu hỏi cho người sở hữu tài liệu. Cột "Trạng thái": **ĐÃ CHỐT** (kèm nguồn: D-xx trong `TASKS.md` hoặc code đã hiện thực) nghĩa là test case đã cập nhật theo quyết định; **CÒN MỞ** nghĩa là chưa có quyết định, test case dùng giả định ghi ở cột "Giả định / quyết định đã dùng" và có dòng "Phụ thuộc: TA-xx" hoặc ghi chú tại ca. Đối chiếu code ngày 2026-10-12.
@@ -15491,7 +16718,7 @@ Mỗi mục dưới đây là một câu hỏi cho người sở hữu tài li�
 | TA-02 | Tên hàm test phải gọi | TAD 5.1, 5.2; REQ-INT-007, 015 đến 018 | Tên thật theo code: Background Processor `sla.processor.process_due()` (KHÔNG nhận `now`; khóa và lưu từng task, báo `ir.cron._commit_progress(1, remaining=R)`, dừng khi hết task đến hạn, chạm `batch_size` hoặc thời gian còn lại <= 0); `sla.processor._process_task(task, now)` (xử lý đúng một task tại `now`); `sla.engine.evaluate(records, now=None, changed=None)`; `sla.task.action_reevaluate()`, `sla.task.action_recalculate()`, `sla.event.action_reevaluate_batch()`, `sla.event.action_mark_resolved()`; điểm mở rộng của `sla.definition`: `_get_calendar`, `_get_target_hours`, `_get_start_dt`, `_get_domain`, `_after_transition`; `sla.mixin`: `sla_task_count`, `action_view_sla_tasks()`; `sla.time.resolve_calendar/plan/settle/next_due_at`. Người dùng chọn SỬA TC theo code, không sửa code | Bổ sung "Interface spec" vào TAD | ĐÃ CHỐT (code) |
 | TA-03 | Khi reset, task cũ ghi những event nào | REQ-FUNC-012, REQ-FUNC-029 | TC khẳng định task cũ nhận event `cancel` (reset_action `cancel`) hoặc `complete` (reset_action `complete`) rồi event `reset`, theo code `sla_engine._reset` | Người dùng chọn giữ code; SRS ghi cả hai event (D2 ban đầu đề xuất chỉ ghi `reset`) | ĐÃ CHỐT (người dùng, giữ code) |
 | TA-04 | Attach thẳng vào `paused`: có ghi `pause` không | REQ-FUNC-006 AC2 | Đúng 1 event `attach`, 0 event `pause` | Ghi vào SRS | ĐÃ CHỐT (D2, code) |
-| TA-05 | `event_dt` của `breach` và thứ tự với mốc | REQ-FUNC-022 | Breach khi `now >= planned_end`, `event_dt` = `now` lúc xử lý; task `paused` không bị so với `planned_end`; `breach` ghi TRƯỚC mọi mốc >= 100% (AC3) | Ghi vào SRS | ĐÃ CHỐT (D3, code) |
+| TA-05 | `event_dt` của `breach` và thứ tự với mốc | REQ-FUNC-022 | Breach khi `now >= planned_end_time`, `event_dt` = `now` lúc xử lý; task `paused` không bị so với `planned_end_time`; `breach` ghi TRƯỚC mọi mốc >= 100% (AC3) | Ghi vào SRS | ĐÃ CHỐT (D3, code) |
 | TA-06 | `percent` Integer ép 75,5 thành 75 im lặng | REQ-FUNC-023 AC2 | `percent` là FLOAT8; số không nguyên bị `ValidationError` ("is not an integer"); `percent` <= 0 bị CHECK CSDL `sla_escalation_percent_check` | Cập nhật SRS và 030 | ĐÃ CHỐT (D6, code) |
 | TA-07 | Thêm mốc khi task đang chạy: tính lại `next_due_at` | REQ-FUNC-053 AC2 | Mốc đã vượt chèn `done_escalation_ids` không event; mốc chưa tới thì tính lại `next_due_at` (D4) | Ghi vào SRS | ĐÃ CHỐT (D4) về thiết kế; lệch code xem TA-24 |
 | TA-08 | Mốc đang chờ thử lại khi task pause, stop, cancel, reset (và resume) | REQ-FUNC-055 AC2, REQ-FUNC-058 | Hành vi ĐÃ ĐỔI: thêm boolean `cancel_retry_on_stop` trên `sla.escalation` (nhãn 'Cancel Retries When Task Stops', mặc định True, một cờ chung cho pause, stop, cancel, reset). Cờ True (mặc định): dòng `sla.escalation.retry` đang chờ bị xóa khi pause, stop, cancel, reset (như trước; TC-ESC-016, 030..032). Cờ False: dòng retry được giữ và tiến trình nền vẫn chạy lượt thử (event `escalate_retry`, `escalate_failed` hoặc `escalate`) dù task `paused`, `achieved`, `breached` hay `cancelled`; KHÔNG bắn mốc mới trên task không `in_progress` (REQ-FUNC-054 không đổi) (TC-ESC-060). Resume không còn xóa lượt thử (chỉ các dòng của cờ True đã bị xóa từ lúc pause) | Ghi vào SRS | ĐÃ CHỐT (người dùng, code đã đổi 2026-10-12) |
@@ -15508,14 +16735,14 @@ Mỗi mục dưới đây là một câu hỏi cho người sở hữu tài li�
 | TA-19 | Mô phỏng "server action chậm 30 giây" và đồng thời bằng thời gian thật không ổn định | REQ-REL-001 AC2; Test Plan 6.4 | Giữ giao dịch của cursor nền mở bằng barrier, không dùng `sleep`; kết quả quan sát là trạng thái đã lưu | Cập nhật Test Plan nếu cần | CÒN MỞ |
 | TA-20 | AC2 REQ-FUNC-014 "cả hai giao dịch lưu record thành công" không thể đúng nếu cùng ghi một dòng | REQ-FUNC-014 | TC-ERR-005 viết lại: hai cursor cùng gọi `evaluate` cho (định nghĩa, record) mà không ghi record; kết quả dựa trên chỉ mục `sla_task_one_active_uniq`. SRS AC2 được viết lại: chỉ một task hoạt động tồn tại, không có task trùng, bên thua ghi event `error` hoặc kết thúc mà không tạo task trùng; không yêu cầu cả hai giao dịch lưu record | Ghi vào SRS | ĐÃ CHỐT (người dùng; TC đã sửa) |
 | TA-21 | Gỡ module (REQ-INT-007 AC3, REQ-INST-001) cần database riêng | REQ-INT-007, REQ-INST-001 | Ca Automated (CI) trên database riêng | Ghi vào Test Plan 6.4 | CÒN MỞ |
-| TA-22 | `percent_used`: lưu hay tính khi đọc, có gồm đoạn đang chạy không | REQ-INT-023 | `percent_used` KHÔNG lưu: tính khi đọc và với task `in_progress` gồm cả đoạn từ `running_since` tới thời điểm xem (code đổi 2026-10-12, `sla.time.settle_batch`). TC-BRE-015 đến 021 vẫn pause trước để có số cố định; TC-BRE-015 thêm ví dụ chạy trực tiếp (mục tiêu 4 giờ: chạy 1 giờ = 25%, chạy 5 giờ = 125%) | Ghi vào SRS | ĐÃ CHỐT (người dùng, code) |
+| TA-22 | `business_percent_used`: lưu hay tính khi đọc, có gồm đoạn đang chạy không | REQ-INT-023 | `business_percent_used` KHÔNG lưu: tính khi đọc và với task `in_progress` gồm cả đoạn từ `running_since` tới thời điểm xem (code đổi 2026-10-12, `sla.time.settle_batch`). TC-BRE-015 đến 021 vẫn pause trước để có số cố định; TC-BRE-015 thêm ví dụ chạy trực tiếp (mục tiêu 4 giờ: chạy 1 giờ = 25%, chạy 5 giờ = 125%) | Ghi vào SRS | ĐÃ CHỐT (người dùng, code) |
 | TA-23 | Định dạng và múi giờ của giờ thử kế tiếp trong `note` của `escalate_retry` | REQ-FUNC-027 AC1 | Code ghi "Error: %s. Will retry at %s." với chuỗi datetime UTC; TC-ESC-020 kiểm '2026-03-02 03:01:00' | Nêu định dạng trong SRS | CÒN MỞ |
 | TA-24 | `sla_escalation.create` chỉ chèn mốc đã vượt vào `done_escalation_ids`, chưa tính lại `next_due_at` cho mốc chưa tới | REQ-FUNC-053 AC2 (D4) | TC-ESC-047, TC-CHG-013 kỳ vọng `next_due_at` = 12:36 | Sửa code | ĐÃ SỬA (code, TASKS T13) |
 | TA-25 | `action_recalculate` trên task đã kết thúc: code bỏ qua lặng lẽ, không `UserError`; AC3 REQ-INT-005 viết "không có nút" | REQ-INT-005 AC3, AC4 | Mức kiểm: (1) arch view `views/sla_task_views.xml` có `invisible="stage not in ('in_progress', 'paused')"` và `groups="dwo_sla_core.group_sla_manager"`; (2) gọi hàm trực tiếp không đổi task; (3) SLA User bị `AccessError`. Hiển thị trên trình duyệt kiểm bằng Demonstration TG-17 | Không cần thêm | ĐÃ CHỐT (code) |
 | TA-26 | AC5 REQ-FUNC-012 ("reset khớp mà start không khớp thì kết thúc task cũ theo reset_action") mâu thuẫn FUNC-008 (nhánh reset chỉ vào khi reset VÀ start cùng khớp) | REQ-FUNC-012 AC5, REQ-FUNC-008 | Giữ code theo FUNC-008: reset khớp mà start không khớp KHÔNG đóng task cũ (TC-CAN-016 dùng `cancel_mode` = `never`); với `start_unmatched` task cũ bị đóng bởi quy tắc cancel | SRS REQ-FUNC-012 AC5 đang được viết lại cho khớp FUNC-008 | ĐÃ CHỐT (người dùng, giữ code) |
 | TA-27 | Code chưa gọi `flush_recordset()` tường minh trước `create` task mới khi reset hoặc attach lại, trong khi 030 mục 6 yêu cầu | 030 mục 6, REQ-FUNC-012, 007 | TC-CAN-032 kiểm kết quả quan sát (không event `error`, không vi phạm `sla_task_one_active_uniq`) | Xác nhận hoặc sửa code | CÒN MỞ (phía code) |
 | TA-28 | Cơ chế lọc giá trị field khỏi thông báo lỗi gốc; code lưu `str(exc)` thô vào `note` | REQ-OBS-003 | TC-ERR-011 kỳ vọng 'SECRET-123' không xuất hiện | Cơ chế lọc: `sla.event._scrub_values` thay giá trị field `char`/`text`/`html` (từ 3 ký tự) của record gốc bằng `<redacted>` trước khi ghi `note` và log (áp dụng cho `_log_error` và lỗi action escalation; SRS OBS-003 AC2) | ĐÃ CHỐT (code đã sửa) |
-| TA-29 | Nơi đặt hành động "Đánh giá lại" cho record chưa có task (hiện chỉ có trên task và event `error`) | REQ-FUNC-032, REQ-INT-020 | TG-13 gọi `sla.engine.evaluate(K, changed=set())` như lõi của hành động | Quyết định giao diện | CÒN MỞ |
+| TA-29 | Nơi đặt hành động Re-check Conditions cho record chưa có task (hiện chỉ có trên task và event `error`) | REQ-FUNC-032, REQ-INT-020 | TG-13 gọi `sla.engine.evaluate(K, changed=set())` như lõi của hành động | Quyết định giao diện | CÒN MỞ |
 | TA-30 | Measure "Tỷ lệ đạt" và "Đang vi phạm" tính sẵn trong pivot/graph | REQ-FUNC-036, 062, REQ-INT-013 | Code đã thêm `sla.task.achieved_rate` (avg chỉ tính task `achieved`/`breached`) và `breaching_count` (sum) dạng cột lưu cho pivot/graph; TC-UIX-039 đến 042 mô tả theo AC | Cập nhật 030 (cột mới) | ĐÃ SỬA (code, TASKS T13) |
 | TA-31 | `res.partner` cho phép partner con khác công ty với mẹ (fixture TC-SEC-016, 017) | REQ-SEC-005 | Giả định fixture; nếu Odoo từ chối thì dùng model liên kết khác | Xác nhận khi dựng fixture | CÒN MỞ |
 | TA-32 | `res.config.settings.execute()` của Odoo chỉ cho quản trị viên (`env.is_admin()`), trong khi các ca Settings (ESC-056..058, INF-018..022, UIX-023, UIX-025; INF-017 chỉ đọc giá trị mặc định) giả định SLA Manager lưu được | REQ-INT-010, 012, REQ-REL-002, REQ-SEC-001 | Ca viết như SRS (Manager lưu được); ca của U-USR bị từ chối vẫn đúng nhưng chưa chứng minh quy tắc SLA | Quyết định: giữ cơ chế chuẩn của Odoo (chỉ quản trị hệ thống lưu Settings; `base.group_system` kế thừa SLA Manager); SRS SEC-001 AC5 đã ghi | ĐÃ CHỐT |
@@ -15537,4 +16764,520 @@ Các giả định riêng của nhóm TG-04, TG-05, TG-07, TG-09 nằm ở Phụ
 - G3: ở `cancel_mode` = `start_unmatched`, domain cancel không có tác dụng (theo `_cancel_matches`). G4: task gắn lại sau `cancelled` ghi event `attach`.
 - G5: field compute có lưu dùng `res.partner.complete_name` (phụ thuộc `name`). G6: hai giao dịch mô phỏng bằng hai cursor gọi `evaluate`; kết quả dựa trên chỉ mục `sla_task_one_active_uniq` (xem TA-20).
 - G7: thay bằng TA-26: AC5 của REQ-FUNC-012 mâu thuẫn FUNC-008, TC-CAN-016 theo code. G8: attach vào `paused` ghi đúng 1 event `attach` (TA-04).
-- G9: `RETRO-DT` là một field Datetime ghi được của `res.partner` do module test cung cấp. G10: từ khóa `note` của event `attach` do `constants/message.py` (NOTE_005: "Start-marker field '%s' is empty; using the current time instead."). G11: breach khi `now >= planned_end` (TA-05). G12: nội dung `note` của event `error` do code ghi (`str(exc)` hoặc `constants/message.py`); TC chỉ kiểm không rỗng.
+- G9: `RETRO-DT` là một field Datetime ghi được của `res.partner` do module test cung cấp. G10: từ khóa `note` của event `attach` do `constants/message.py` (NOTE_005: "Start-marker field '%s' is empty; using the current time instead."). G11: breach khi `now >= planned_end_time` (TA-05). G12: nội dung `note` của event `error` do code ghi (`str(exc)` hoặc `constants/message.py`); TC chỉ kiểm không rỗng.
+
+## Phụ lục C — Ánh xạ hàm test sang test case (435 hàm)
+
+Mỗi dòng là một hàm `def test_` trong `tests/`. Một hàm có thể phủ nhiều test case (cột Test case); test case do hàm đó phủ là biến thể hoặc hợp nhất khi hàm gom nhiều ca tương tự. Cột REQ-ID là hợp REQ-ID của các test case đó.
+
+| # | File | Class | Hàm test | Test case | REQ-ID |
+|---|---|---|---|---|---|
+| 1 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_007_attach` | TC-ATT-007 | FUNC-006 |
+| 2 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_019_create_record_attaches` | TC-ATT-019 | FUNC-004 |
+| 3 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_017_stop_achieved` | TC-ATT-017 | FUNC-009 |
+| 4 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_012_achieved_not_reattached` | TC-ATT-012 | FUNC-007 |
+| 5 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_014_achieved_not_reset` | TC-ATT-014 | FUNC-007 |
+| 6 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_015_cancelled_reattach` | TC-ATT-015 | FUNC-007 |
+| 7 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_022_unrelated_field_no_change` | TC-ATT-022 | FUNC-004 |
+| 8 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_023_reevaluate_idempotent` | TC-ATT-023 | FUNC-015 |
+| 9 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_001_empty_stop_never_matches` | TC-ATT-001 | FUNC-003 |
+| 10 | `test_tg01_lifecycle.py` | TestAttachStop | `test_att_002_empty_list_matches_all` | TC-ATT-002 | FUNC-003 |
+| 11 | `test_tg01_lifecycle.py` | TestPauseResume | `test_pau_001_pause` | TC-PAU-001 | FUNC-011 |
+| 12 | `test_tg01_lifecycle.py` | TestPauseResume | `test_pau_004_and_009_resume_replans_deadline` | TC-PAU-004, TC-PAU-009 | FUNC-037, FUNC-044 |
+| 13 | `test_tg01_lifecycle.py` | TestPauseResume | `test_pau_008_011_full_lifecycle` | TC-PAU-008, TC-PAU-011 | FUNC-029, FUNC-048 |
+| 14 | `test_tg01_lifecycle.py` | TestPauseResume | `test_pau_resume_pause_unmatched_mode` | TC-PAU-008 | FUNC-048 |
+| 15 | `test_tg01_lifecycle.py` | TestPauseResume | `test_pau_resume_condition_not_matching_stays_paused` | TC-PAU-005 | FUNC-037 |
+| 16 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_001_stop_beats_pause` | TC-CAN-001 | FUNC-008 |
+| 17 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_002_stop_beats_cancel` | TC-CAN-002 | FUNC-008 |
+| 18 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_003_cancel_beats_pause` | TC-CAN-003 | FUNC-008 |
+| 19 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_004_reset_beats_pause` | TC-CAN-004 | FUNC-008 |
+| 20 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_005_nothing_matches_no_change` | TC-CAN-005 | FUNC-008 |
+| 21 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_007_start_unmatched_cancels` | TC-CAN-007 | FUNC-010 |
+| 22 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_008_condition_cancels_while_start_matches` | TC-CAN-008 | FUNC-010 |
+| 23 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_can_009_never_does_not_cancel` | TC-CAN-009 | FUNC-010 |
+| 24 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_reset_complete_action` | TC-CAN-013 | FUNC-012 |
+| 25 | `test_tg01_lifecycle.py` | TestPriorityCancelReset | `test_reset_only_when_tracked_field_changes` | TC-CAN-021, TC-CAN-026 | FUNC-013, FUNC-050 |
+| 26 | `test_tg01_lifecycle.py` | TestMisconfig | `test_mis_001_start_subset_of_stop` | TC-MIS-001 | FUNC-016 |
+| 27 | `test_tg01_lifecycle.py` | TestMisconfig | `test_mis_004_attach_paused` | TC-MIS-004 | FUNC-016 |
+| 28 | `test_tg01_lifecycle.py` | TestMisconfig | `test_mis_005_leaving_hold_cancels` | TC-MIS-005 | FUNC-016 |
+| 29 | `test_tg01_lifecycle.py` | TestMisconfig | `test_mis_006_exclusive_start_pause_cancel_no_pause_event` | TC-MIS-006 | FUNC-008, FUNC-016 |
+| 30 | `test_tg01_lifecycle.py` | TestMisconfig | `test_mis_007_exclusive_never_pauses` | TC-MIS-007 | FUNC-016 |
+| 31 | `test_tg01_lifecycle.py` | TestMultipleDefinitions | `test_mul_001_002_independent_tasks` | TC-MUL-001, TC-MUL-002 | FUNC-014 |
+| 32 | `test_tg01_lifecycle.py` | TestMultipleDefinitions | `test_mul_004_second_active_task_rejected` | TC-MUL-004, TC-MUL-006 | FUNC-014 |
+| 33 | `test_tg01_lifecycle.py` | TestMultipleDefinitions | `test_mul_008_conflict_logged_as_error_event` | TC-MUL-008 | FUNC-014, FUNC-030 |
+| 34 | `test_tg01_lifecycle.py` | TestGeneric | `test_gen_001_two_models` | TC-GEN-001 | FUNC-001 |
+| 35 | `test_tg01_more.py` | TestConditionSaving | `test_att_003_unknown_field_rejected` | TC-ATT-003 | FUNC-003 |
+| 36 | `test_tg01_more.py` | TestConditionSaving | `test_att_004_function_call_rejected` | TC-ATT-004 | FUNC-003 |
+| 37 | `test_tg01_more.py` | TestConditionSaving | `test_att_005_variable_rejected` | TC-ATT-005 | FUNC-003 |
+| 38 | `test_tg01_more.py` | TestConditionSaving | `test_att_006_literal_saved` | TC-ATT-006 | FUNC-003 |
+| 39 | `test_tg01_more.py` | TestAttachEdges | `test_att_008_start_and_pause_attach_paused` | TC-ATT-008 | FUNC-006 |
+| 40 | `test_tg01_more.py` | TestAttachEdges | `test_att_009_start_and_stop_no_attach` | TC-ATT-009 | FUNC-006 |
+| 41 | `test_tg01_more.py` | TestAttachEdges | `test_att_010_start_and_cancel_no_attach` | TC-ATT-010 | FUNC-006 |
+| 42 | `test_tg01_more.py` | TestAttachEdges | `test_att_011_020_start_unmatched` | TC-ATT-011, TC-ATT-020 | FUNC-004, FUNC-006 |
+| 43 | `test_tg01_more.py` | TestAttachEdges | `test_att_013_breached_not_reattached` | TC-ATT-013 | FUNC-007 |
+| 44 | `test_tg01_more.py` | TestAttachEdges | `test_att_016_cancelled_start_and_stop` | TC-ATT-016 | FUNC-007 |
+| 45 | `test_tg01_more.py` | TestAttachEdges | `test_att_018_stop_again_noop` | TC-ATT-018 | FUNC-009 |
+| 46 | `test_tg01_more.py` | TestAttachEdges | `test_att_021_stop_running_task` | TC-ATT-021 | FUNC-004 |
+| 47 | `test_tg01_more.py` | TestAttachEdges | `test_att_024_paused_reevaluate_noop` | TC-ATT-024 | FUNC-015 |
+| 48 | `test_tg01_more.py` | TestAttachEdges | `test_att_025_026_no_change_no_event` | TC-ATT-025, TC-ATT-026 | FUNC-029 |
+| 49 | `test_tg01_more.py` | TestAttachEdges | `test_att_027_hook_self_heals` | TC-ATT-027 | FUNC-004 |
+| 50 | `test_tg01_more.py` | TestPauseResumeEdges | `test_pau_002_pause_again_noop` | TC-PAU-002 | FUNC-011 |
+| 51 | `test_tg01_more.py` | TestPauseResumeEdges | `test_pau_003_achieved_ignores_pause` | TC-PAU-003 | FUNC-011 |
+| 52 | `test_tg01_more.py` | TestPauseResumeEdges | `test_pau_005_condition_mode_needs_resume_match` | TC-PAU-005 | FUNC-037 |
+| 53 | `test_tg01_more.py` | TestPauseResumeEdges | `test_pau_006_pause_unmatched_resumes` | TC-PAU-006 | FUNC-048 |
+| 54 | `test_tg01_more.py` | TestPauseResumeEdges | `test_pau_007_pause_unmatched_still_paused` | TC-PAU-007 | FUNC-048 |
+| 55 | `test_tg01_more.py` | TestPauseResumeEdges | `test_pau_010_resume_keeps_planned_end_after_breach` | TC-PAU-010 | FUNC-044 |
+| 56 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_002_at_planned_end` | TC-BRE-002 | FUNC-022 |
+| 57 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_before_planned_end` | TC-BRE-001 | FUNC-022 |
+| 58 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_003_004_once_only` | TC-BRE-003, TC-BRE-004 | FUNC-022 |
+| 59 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_005_pause_before_processor` | TC-BRE-005 | FUNC-022 |
+| 60 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_009_stop_after_planned_end` | TC-BRE-009 | FUNC-009 |
+| 61 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_013_flag_survives_pause_resume` | TC-BRE-013, TC-PAU-010 | FUNC-044, FUNC-046 |
+| 62 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_paused_task_not_breached_by_processor` | TC-BRE-024 | FUNC-022 |
+| 63 | `test_tg03_08_breach_escalation.py` | TestBreach | `test_bre_023_cross_check_constraints` | TC-BRE-023 | FUNC-009, FUNC-046 |
+| 64 | `test_tg03_08_breach_escalation.py` | TestRetroactive | `test_ret_002_retroactive_breach_on_attach` | TC-RET-002 | FUNC-017 |
+| 65 | `test_tg03_08_breach_escalation.py` | TestRetroactive | `test_ret_retroactive_not_yet_due` | TC-RET-005 | FUNC-017 |
+| 66 | `test_tg03_08_breach_escalation.py` | TestEscalation | `test_esc_001_three_milestones` | TC-ESC-001 | FUNC-023 |
+| 67 | `test_tg03_08_breach_escalation.py` | TestEscalation | `test_bre_007_breach_before_100_escalation` | TC-BRE-007 | FUNC-022 |
+| 68 | `test_tg03_08_breach_escalation.py` | TestEscalation | `test_esc_008_not_refired` | TC-ESC-008 | FUNC-024 |
+| 69 | `test_tg03_08_breach_escalation.py` | TestEscalation | `test_esc_not_before_threshold` | TC-ESC-006 | FUNC-023 |
+| 70 | `test_tg03_08_breach_escalation.py` | TestEscalation | `test_bre_014_elapsed_survives_pause` | TC-BRE-014 | FUNC-046 |
+| 71 | `test_tg03_08_breach_escalation.py` | TestEscalation | `test_esc_048_context_and_record` | TC-ESC-048, TC-ESC-049 | INT-008 |
+| 72 | `test_tg03_08_breach_escalation.py` | TestEscalation | `test_esc_018_019_failure_isolated` | TC-ESC-018, TC-ESC-019 | FUNC-026 |
+| 73 | `test_tg03_08_breach_escalation.py` | TestProcessDue | `test_process_due_handles_due_tasks` | TC-PRC-001 | FUNC-022, REL-002 |
+| 74 | `test_tg03_08_breach_escalation.py` | TestProcessDue | `test_process_due_skips_tasks_not_due` | TC-PRC-002 | FUNC-022, REL-002 |
+| 75 | `test_tg03_08_breach_escalation.py` | TestProcessDue | `test_process_due_batch_size_caps_each_call` | TC-PRC-003 | REL-002 |
+| 76 | `test_tg03_more.py` | TestBreachMore | `test_bre_001_before_planned_end` | TC-BRE-001 | FUNC-022 |
+| 77 | `test_tg03_more.py` | TestBreachMore | `test_bre_006_pause_at_target` | TC-BRE-006 | FUNC-022 |
+| 78 | `test_tg03_more.py` | TestBreachMore | `test_bre_008_breach_before_escalate` | TC-BRE-008 | FUNC-022 |
+| 79 | `test_tg03_more.py` | TestBreachMore | `test_bre_010_long_pause_then_stop` | TC-BRE-010 | FUNC-009 |
+| 80 | `test_tg03_more.py` | TestBreachMore | `test_bre_011_stop_paused_breached` | TC-BRE-011 | FUNC-009 |
+| 81 | `test_tg03_more.py` | TestBreachMore | `test_bre_012_stop_after_breach_no_duplicate` | TC-BRE-012 | FUNC-009 |
+| 82 | `test_tg03_more.py` | TestBreachMore | `test_bre_015_016_percent_used` | TC-BRE-015, TC-BRE-016 | INT-023 |
+| 83 | `test_tg03_more.py` | TestBreachMore | `test_bre_017b_running_percent_live` | TC-BRE-025 | INT-023 |
+| 84 | `test_tg03_more.py` | TestBreachMore | `test_bre_017c_settle_batch_equals_settle` | TC-BRE-026 | INT-023, PERF-002 |
+| 85 | `test_tg03_more.py` | TestBreachMore | `test_bre_017_paused_percent_stable` | TC-BRE-017 | INT-023 |
+| 86 | `test_tg03_more.py` | TestBreachMore | `test_bre_018_021_percent_boundaries` | TC-BRE-018, TC-BRE-019, TC-BRE-020, TC-BRE-021 | INT-023 |
+| 87 | `test_tg03_more.py` | TestBreachMore | `test_bre_022_failed_action_note` | TC-BRE-022 | FUNC-029 |
+| 88 | `test_tg03_more.py` | TestBreachMore | `test_bre_023_task_db_constraints` | TC-BRE-023 | FUNC-009, FUNC-046 |
+| 89 | `test_tg04_more.py` | TestCancelRules | `test_can_006_cancel_beats_reset` | TC-CAN-006 | FUNC-008 |
+| 90 | `test_tg04_more.py` | TestCancelRules | `test_can_010_condition_mode_needs_cancel_match` | TC-CAN-010 | FUNC-010 |
+| 91 | `test_tg04_more.py` | TestCancelRules | `test_can_011_start_unmatched_needs_start_gone` | TC-CAN-011 | FUNC-010 |
+| 92 | `test_tg04_more.py` | TestResetAction | `test_can_012_reset_cancel` | TC-CAN-012 | FUNC-012 |
+| 93 | `test_tg04_more.py` | TestResetAction | `test_can_013_reset_complete` | TC-CAN-013 | FUNC-012 |
+| 94 | `test_tg04_more.py` | TestResetAction | `test_can_014_new_task_paused` | TC-CAN-014 | FUNC-012 |
+| 95 | `test_tg04_more.py` | TestResetAction | `test_can_015_latest_achieved_not_reset` | TC-CAN-015 | FUNC-007, FUNC-012 |
+| 96 | `test_tg04_more.py` | TestResetAction | `test_can_016_reset_without_start_no_branch` | TC-CAN-016 | FUNC-008, FUNC-012 |
+| 97 | `test_tg04_more.py` | TestResetAction | `test_can_017_reset_paused_task` | TC-CAN-017 | FUNC-012 |
+| 98 | `test_tg04_more.py` | TestResetAction | `test_can_018_reset_complete_after_planned_end` | TC-CAN-018 | FUNC-009, FUNC-012 |
+| 99 | `test_tg04_more.py` | TestResetAction | `test_can_019_attach_after_cancelled_not_reset` | TC-CAN-019 | FUNC-007, FUNC-012 |
+| 100 | `test_tg04_more.py` | TestResetAction | `test_can_032_reset_then_reattach_unique_index` | TC-CAN-032 | FUNC-007, FUNC-012 |
+| 101 | `test_tg04_more.py` | TestResetOnField | `test_can_020_30_field_changed_resets` | TC-CAN-020, TC-CAN-030 | FUNC-013, FUNC-051 |
+| 102 | `test_tg04_more.py` | TestResetOnField | `test_can_021_25_unchanged_values_no_reset` | TC-CAN-021, TC-CAN-025 | FUNC-013, FUNC-050 |
+| 103 | `test_tg04_more.py` | TestResetOnField | `test_can_022_computed_stored_field` | TC-CAN-022 | FUNC-013 |
+| 104 | `test_tg04_more.py` | TestResetOnField | `test_can_023_reset_condition_unmatched` | TC-CAN-023 | FUNC-013 |
+| 105 | `test_tg04_more.py` | TestResetOnField | `test_can_024_one_of_two_fields` | TC-CAN-024, TC-CAN-031 | FUNC-013, FUNC-051 |
+| 106 | `test_tg04_more.py` | TestResetOnField | `test_can_026_other_field_no_reset` | TC-CAN-026 | FUNC-050 |
+| 107 | `test_tg04_more.py` | TestResetOnField | `test_can_027_28_manual_and_background_no_reset` | TC-CAN-027, TC-CAN-028 | FUNC-050 |
+| 108 | `test_tg04_more.py` | TestResetOnField | `test_can_029_empty_reset_domain` | TC-CAN-029 | FUNC-051 |
+| 109 | `test_tg06_time_calendar.py` | TestTimePlanning | `test_tim_001_over_weekend` | TC-TIM-001 | FUNC-018 |
+| 110 | `test_tg06_time_calendar.py` | TestTimePlanning | `test_tim_002_global_leave` | TC-TIM-002 | FUNC-018 |
+| 111 | `test_tg06_time_calendar.py` | TestTimePlanning | `test_tim_003_zero_target` | TC-TIM-003 | FUNC-018 |
+| 112 | `test_tg06_time_calendar.py` | TestTimePlanning | `test_tim_004_start_at_closing_time` | TC-TIM-004 | FUNC-018 |
+| 113 | `test_tg06_time_calendar.py` | TestTimePlanning | `test_tim_005_local_timezone` | TC-TIM-005 | FUNC-018 |
+| 114 | `test_tg06_time_calendar.py` | TestTimePlanning | `test_tim_006_no_calendar_24x7` | TC-TIM-006 | FUNC-018 |
+| 115 | `test_tg06_time_calendar.py` | TestTimePlanning | `test_tim_007_unplannable_calendar` | TC-TIM-007 | FUNC-018 |
+| 116 | `test_tg06_time_calendar.py` | TestTimeElapsed | `test_tim_008_accumulate_across_pause` | TC-TIM-008, TC-TIM-010, TC-TIM-011 | FUNC-043 |
+| 117 | `test_tg06_time_calendar.py` | TestTimeElapsed | `test_tim_009_working_hours_only` | TC-TIM-009 | FUNC-043 |
+| 118 | `test_tg06_time_calendar.py` | TestCalendarSource | `test_cal_001_empty_calendar_rejected` | TC-CAL-001 | FUNC-039 |
+| 119 | `test_tg06_time_calendar.py` | TestCalendarSource | `test_cal_002_valid_calendar_saved` | TC-CAL-002 | FUNC-039 |
+| 120 | `test_tg06_time_calendar.py` | TestCalendarSource | `test_cal_003_flexible_calendar_rejected` | TC-CAL-003 | INT-009 |
+| 121 | `test_tg06_time_calendar.py` | TestCalendarSource | `test_cal_006_007_invalid_paths` | TC-CAL-006, TC-CAL-007 | FUNC-019 |
+| 122 | `test_tg06_time_calendar.py` | TestCalendarSource | `test_cal_008_none_is_24x7` | TC-CAL-008 | FUNC-019 |
+| 123 | `test_tg06_time_calendar.py` | TestCalendarSource | `test_cal_005_009_path_resolves_record_calendar` | TC-CAL-005, TC-CAL-009 | FUNC-019 |
+| 124 | `test_tg06_time_calendar.py` | TestCalendarSource | `test_cal_011_013_fallbacks` | TC-CAL-011, TC-CAL-013 | FUNC-020 |
+| 125 | `test_tg07_retroactive.py` | TestRetroactiveStart | `test_ret_001_start_from_field` | TC-RET-001 | FUNC-017 |
+| 126 | `test_tg07_retroactive.py` | TestRetroactiveStart | `test_ret_003_empty_field_uses_now` | TC-RET-003 | FUNC-017 |
+| 127 | `test_tg07_retroactive.py` | TestRetroactiveStart | `test_ret_004_breach_at_attach` | TC-RET-004 | FUNC-017 |
+| 128 | `test_tg07_retroactive.py` | TestRetroactiveStart | `test_ret_005_one_minute_left` | TC-RET-005 | FUNC-017 |
+| 129 | `test_tg07_retroactive.py` | TestRetroactiveStart | `test_ret_006_paused_before_attach` | TC-RET-006 | FUNC-017 |
+| 130 | `test_tg07_retroactive.py` | TestRetroactiveStart | `test_ret_007_calendar_across_weekend` | TC-RET-007 | FUNC-017, FUNC-018 |
+| 131 | `test_tg07_retroactive.py` | TestRetroactiveFieldValidation | `test_ret_008_char_field_rejected` | TC-RET-008 | FUNC-041 |
+| 132 | `test_tg07_retroactive.py` | TestRetroactiveFieldValidation | `test_ret_009_other_model_rejected` | TC-RET-009 | FUNC-041 |
+| 133 | `test_tg07_retroactive.py` | TestRetroactiveFieldValidation | `test_ret_010_reset_field_other_model_rejected` | TC-RET-010 | FUNC-041 |
+| 134 | `test_tg07_retroactive.py` | TestRetroactiveFieldValidation | `test_ret_011_012_valid_fields` | TC-RET-011, TC-RET-012 | FUNC-041 |
+| 135 | `test_tg08_more.py` | TestEscalationValidation | `test_esc_002_003_percent_not_positive` | TC-ESC-002, TC-ESC-003 | FUNC-023 |
+| 136 | `test_tg08_more.py` | TestEscalationValidation | `test_esc_004_percent_not_integer` | TC-ESC-004 | FUNC-023 |
+| 137 | `test_tg08_more.py` | TestEscalationValidation | `test_esc_005_percent_one` | TC-ESC-005 | FUNC-023 |
+| 138 | `test_tg08_more.py` | TestEscalationValidation | `test_esc_044_045_action_model` | TC-ESC-044, TC-ESC-045 | FUNC-038 |
+| 139 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_006_007_threshold` | TC-ESC-006, TC-ESC-007 | FUNC-023 |
+| 140 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_010_save_does_not_run_action` | TC-ESC-010 | FUNC-025 |
+| 141 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_011_to_014_no_fire_when_not_running` | TC-ESC-011, TC-ESC-012, TC-ESC-013, TC-ESC-014 | FUNC-054 |
+| 142 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_015_resume_recomputes_due` | TC-ESC-015 | FUNC-055 |
+| 143 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_017_paused_not_recomputed` | TC-ESC-017 | FUNC-055 |
+| 144 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_024_failed_action_marks_done_no_retry` | TC-ESC-024 | FUNC-026 |
+| 145 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_046_late_escalation_not_caught_up` | TC-ESC-046 | FUNC-053 |
+| 146 | `test_tg08_more.py` | TestEscalationFiring | `test_esc_047_late_escalation_fires_at_threshold` | TC-ESC-047 | FUNC-053 |
+| 147 | `test_tg08_more.py` | TestEmailEscalation | `test_esc_060_fixed_email` | TC-EML-001 | FUNC-064 |
+| 148 | `test_tg08_more.py` | TestEmailEscalation | `test_esc_061_field_email` | TC-EML-002 | FUNC-065 |
+| 149 | `test_tg08_more.py` | TestEmailEscalation | `test_esc_062_responsible_email` | TC-EML-003 | FUNC-065 |
+| 150 | `test_tg08_more.py` | TestEmailEscalation | `test_esc_064_responsible_x2many_multiple_to` | TC-EML-004 | FUNC-065 |
+| 151 | `test_tg08_more.py` | TestEmailEscalation | `test_esc_063_no_recipient_marks_failed` | TC-EML-005 | FUNC-026, FUNC-065 |
+| 152 | `test_tg08_more.py` | TestEmailEscalation | `test_esc_065_no_template_falls_back_to_plain_body` | TC-EML-006 | FUNC-064 |
+| 153 | `test_tg08_more.py` | TestEmailEscalation | `test_esc_066_template_wrong_model_rejected` | TC-EML-007 | FUNC-064 |
+| 154 | `test_tg08_more.py` | TestEscalationCompanyAndProgress | `test_esc_050_runs_in_record_company` | TC-ESC-050 | INT-019 |
+| 155 | `test_tg08_more.py` | TestEscalationCompanyAndProgress | `test_esc_051_no_company_access_fails_once` | TC-ESC-051 | INT-019 |
+| 156 | `test_tg08_more.py` | TestEscalationCompanyAndProgress | `test_esc_053_progress_reported_per_task` | TC-ESC-053 | REL-002 |
+| 157 | `test_tg08_more.py` | TestEscalationCompanyAndProgress | `test_esc_054_resume_after_interruption` | TC-ESC-054 | REL-002 |
+| 158 | `test_tg08_more.py` | TestEscalationCompanyAndProgress | `test_esc_055_no_time_left` | TC-ESC-055 | REL-002 |
+| 159 | `test_tg08_more.py` | TestEscalationCompanyAndProgress | `test_esc_056_058_batch_size_setting` | TC-ESC-056, TC-ESC-057, TC-ESC-058 | REL-002 |
+| 160 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_001_running_task_keeps_target` | TC-CHG-001 | FUNC-021 |
+| 161 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_003_new_task_uses_new_target` | TC-CHG-003 | FUNC-021 |
+| 162 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_007_recalculate_applies_new_target` | TC-CHG-007 | INT-005 |
+| 163 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_006_recalculate_keeps_elapsed` | TC-CHG-006 | INT-005 |
+| 164 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_008_010_recalculate_ignores_finished` | TC-CHG-008, TC-CHG-009, TC-CHG-010 | INT-005 |
+| 165 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_011_recalculate_paused` | TC-CHG-011 | INT-005 |
+| 166 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_028_viewer_cannot_recalculate` | TC-CHG-028 | INT-005 |
+| 167 | `test_tg11_change_archive.py` | TestChangeConfig | `test_chg_012_013_escalation_added_late` | TC-CHG-012, TC-CHG-013 | FUNC-053 |
+| 168 | `test_tg11_change_archive.py` | TestArchiveDelete | `test_chg_015_017_archive_unarchive` | TC-CHG-015, TC-CHG-016, TC-CHG-017 | FUNC-033 |
+| 169 | `test_tg11_change_archive.py` | TestArchiveDelete | `test_chg_019_archived_keeps_breach` | TC-CHG-019 | FUNC-060 |
+| 170 | `test_tg11_change_archive.py` | TestArchiveDelete | `test_chg_021_023_archived_still_transitions` | TC-CHG-021, TC-CHG-022, TC-CHG-023 | FUNC-060 |
+| 171 | `test_tg11_change_archive.py` | TestArchiveDelete | `test_chg_024_027_reject_delete_with_tasks` | TC-CHG-024, TC-CHG-026, TC-CHG-027 | FUNC-061 |
+| 172 | `test_tg11_change_archive.py` | TestArchiveDelete | `test_chg_025_delete_without_tasks` | TC-CHG-025 | FUNC-061 |
+| 173 | `test_tg11_more.py` | TestDefinitionSaving | `test_gen_002_full_definition_roundtrip` | TC-GEN-002 | FUNC-001 |
+| 174 | `test_tg11_more.py` | TestDefinitionSaving | `test_gen_003_model_required` | TC-GEN-003 | FUNC-001 |
+| 175 | `test_tg11_more.py` | TestDefinitionSaving | `test_gen_004_negative_target_rejected` | TC-GEN-004 | FUNC-001 |
+| 176 | `test_tg11_more.py` | TestDefinitionSaving | `test_gen_005_zero_target_accepted` | TC-GEN-005 | FUNC-001 |
+| 177 | `test_tg11_more.py` | TestMisconfigMore | `test_mis_002_003_start_subset_of_stop` | TC-MIS-002, TC-MIS-003 | FUNC-016 |
+| 178 | `test_tg11_more.py` | TestMisconfigMore | `test_mis_008_exclusive_start_pause` | TC-MIS-008 | FUNC-016 |
+| 179 | `test_tg11_more.py` | TestMultipleMore | `test_mul_003_independent_tasks` | TC-MUL-003 | FUNC-014 |
+| 180 | `test_tg11_more.py` | TestMultipleMore | `test_mul_005_new_active_after_cancelled` | TC-MUL-005 | FUNC-007, FUNC-014 |
+| 181 | `test_tg11_more.py` | TestChangeCalendar | `test_chg_002_definition_calendar_snapshot` | TC-CHG-002 | FUNC-021 |
+| 182 | `test_tg11_more.py` | TestChangeCalendar | `test_chg_004_005_path_calendar_snapshot_and_recalculate` | TC-CHG-004, TC-CHG-005 | FUNC-052 |
+| 183 | `test_tg11_more.py` | TestChangeCalendar | `test_chg_018_archived_stop_one_of_30` | TC-CHG-018 | FUNC-060 |
+| 184 | `test_tg11_more.py` | TestChangeCalendar | `test_chg_020_archived_no_new_task` | TC-CHG-020 | FUNC-060 |
+| 185 | `test_tg11_more.py` | TestCalendarFallbacks | `test_cal_004_flexible_falls_back` | TC-CAL-004 | INT-009 |
+| 186 | `test_tg11_more.py` | TestCalendarFallbacks | `test_cal_010_empty_step` | TC-CAL-010 | FUNC-020 |
+| 187 | `test_tg11_more.py` | TestCalendarFallbacks | `test_cal_012_no_working_hours` | TC-CAL-012 | FUNC-020 |
+| 188 | `test_tg11_more.py` | TestCalendarFallbacks | `test_cal_014_record_without_company_uses_current` | TC-CAL-014 | FUNC-020 |
+| 189 | `test_tg11_more.py` | TestCalendarFallbacks | `test_cal_015_user_without_read_access` | TC-CAL-015 | FUNC-020 |
+| 190 | `test_tg12_errors.py` | TestEngineErrors | `test_err_001_002_record_saved_with_error_event` | TC-ERR-001, TC-ERR-002, TC-ERR-006, TC-ERR-012 | FUNC-030, FUNC-040, OBS-001 |
+| 191 | `test_tg12_errors.py` | TestEngineErrors | `test_err_008_log_line` | TC-ERR-008 | OBS-002 |
+| 192 | `test_tg12_errors.py` | TestEngineErrors | `test_err_009_011_no_field_values_leak` | TC-ERR-009, TC-ERR-011 | OBS-003 |
+| 193 | `test_tg12_errors.py` | TestEngineErrors | `test_err_011c_engine_error_value_in_message` | TC-ERR-011 | OBS-003 |
+| 194 | `test_tg12_errors.py` | TestEngineErrors | `test_err_011b_raw_exception_values_redacted` | TC-ERR-030 | FUNC-026, OBS-003 |
+| 195 | `test_tg12_errors.py` | TestEngineErrors | `test_err_013_mark_resolved` | TC-ERR-013 | FUNC-040 |
+| 196 | `test_tg12_errors.py` | TestEngineErrors | `test_err_014_reevaluate_resolves` | TC-ERR-014, TC-ERR-016 | FUNC-031, FUNC-040 |
+| 197 | `test_tg12_errors.py` | TestEngineErrors | `test_err_015_still_broken` | TC-ERR-015 | FUNC-040 |
+| 198 | `test_tg12_errors.py` | TestEngineErrors | `test_err_017_keeps_achieved_task` | TC-ERR-017 | FUNC-031 |
+| 199 | `test_tg12_errors.py` | TestEngineErrors | `test_err_018_ignores_non_error_events` | TC-ERR-018 | FUNC-031 |
+| 200 | `test_tg12_errors.py` | TestEngineErrors | `test_err_019_viewer_denied` | TC-ERR-019 | FUNC-031 |
+| 201 | `test_tg12_errors.py` | TestEngineErrors | `test_err_020_start_now_without_retroactive` | TC-ERR-020 | FUNC-031 |
+| 202 | `test_tg12_more.py` | TestEngineErrorsMore | `test_err_003_007_empty_calendar` | TC-ERR-003, TC-ERR-007 | FUNC-030, OBS-001 |
+| 203 | `test_tg12_more.py` | TestEngineErrorsMore | `test_err_004_isolation_per_record` | TC-ERR-004 | FUNC-030 |
+| 204 | `test_tg12_more.py` | TestEngineErrorsMore | `test_err_021_retroactive_reevaluate` | TC-ERR-021 | FUNC-031 |
+| 205 | `test_tg12_more.py` | TestEngineErrorsMore | `test_err_022_023_unresolved_count` | TC-ERR-022, TC-ERR-023 | INT-022 |
+| 206 | `test_tg12_more.py` | TestEngineErrorsMore | `test_err_024_non_group_hidden` | TC-ERR-024 | INT-022 |
+| 207 | `test_tg13_compute.py` | TestStoredCompute | `test_cmp_001_stage_drives_stored_compute` | TC-CMP-001 | FUNC-005 |
+| 208 | `test_tg13_compute.py` | TestStoredCompute | `test_cmp_002_three_writes_no_extra_events` | TC-CMP-002 | FUNC-005 |
+| 209 | `test_tg13_compute.py` | TestStoredCompute | `test_cmp_003_compute_change_same_condition_result` | TC-CMP-003 | FUNC-005 |
+| 210 | `test_tg13_compute.py` | TestStoredCompute | `test_cmp_004_child_change_drives_parent_stop` | TC-CMP-004 | FUNC-005 |
+| 211 | `test_tg13_compute.py` | TestStoredCompute | `test_cmp_005_unwatched_recompute_skipped` | TC-CMP-005 | FUNC-005 |
+| 212 | `test_tg13_compute.py` | TestManualReevaluate | `test_cmp_006_010_relation_condition_needs_reevaluate` | TC-CMP-006, TC-CMP-010 | FUNC-032, FUNC-042 |
+| 213 | `test_tg13_compute.py` | TestManualReevaluate | `test_cmp_007_008_unstored_compute_no_error` | TC-CMP-007, TC-CMP-008 | FUNC-042 |
+| 214 | `test_tg13_compute.py` | TestManualReevaluate | `test_cmp_011_batch_attaches_only_matching` | TC-CMP-011 | FUNC-032 |
+| 215 | `test_tg13_compute.py` | TestManualReevaluate | `test_cmp_012_015_reevaluate_idempotent_and_now` | TC-CMP-012, TC-CMP-015 | FUNC-032 |
+| 216 | `test_tg13_compute.py` | TestManualReevaluate | `test_cmp_013_viewer_denied` | TC-CMP-013 | FUNC-032 |
+| 217 | `test_tg13_compute.py` | TestManualReevaluate | `test_cmp_014_no_reset_on_manual_reevaluate` | TC-CMP-014 | FUNC-032 |
+| 218 | `test_tg13_compute.py` | TestManualReevaluate | `test_cmp_016_stop_beats_cancel` | TC-CMP-016 | FUNC-032 |
+| 219 | `test_tg13_compute.py` | TestDerivedConditionFields | `test_start_on_unstored_related_field_still_attaches` | TC-CMP-017 | FUNC-005, FUNC-042 |
+| 220 | `test_tg14_infra.py` | TestModelRestrictions | `test_inf_001_to_006_forbidden_models` | TC-INF-001, TC-INF-002, TC-INF-003, TC-INF-004, TC-INF-005, TC-INF-006 | FUNC-002 |
+| 221 | `test_tg14_infra.py` | TestModelRestrictions | `test_inf_007_partner_accepted` | TC-INF-007 | FUNC-002 |
+| 222 | `test_tg14_infra.py` | TestModelRestrictions | `test_inf_009_ir_model_not_observed` | TC-INF-009 | FUNC-002 |
+| 223 | `test_tg14_infra.py` | TestHousekeeping | `test_inf_010_orphans_removed` | TC-INF-010 | FUNC-034 |
+| 224 | `test_tg14_infra.py` | TestHousekeeping | `test_inf_011_012_keep_existing_records` | TC-INF-011, TC-INF-012 | FUNC-034 |
+| 225 | `test_tg14_infra.py` | TestHousekeeping | `test_inf_013_to_016_retention` | TC-INF-013, TC-INF-014, TC-INF-015, TC-INF-016 | FUNC-035 |
+| 226 | `test_tg14_infra.py` | TestRetentionSetting | `test_inf_017_default_365` | TC-INF-017 | INT-010 |
+| 227 | `test_tg14_infra.py` | TestRetentionSetting | `test_inf_018_019_invalid_values` | TC-INF-018, TC-INF-019 | INT-010 |
+| 228 | `test_tg14_infra.py` | TestRetentionSetting | `test_inf_020_021_valid_values` | TC-INF-020, TC-INF-021 | INT-010 |
+| 229 | `test_tg14_infra.py` | TestRetentionSetting | `test_inf_022_viewer_denied` | TC-INF-022 | INT-010 |
+| 230 | `test_tg14_infra.py` | TestSchemaAndSource | `test_inf_027_029_no_columns_added` | TC-INF-027, TC-INF-029 | INST-003 |
+| 231 | `test_tg14_infra.py` | TestSchemaAndSource | `test_inf_ondelete_company_calendar_restricted` | TC-INF-036 | FUNC-001 |
+| 232 | `test_tg14_infra.py` | TestSchemaAndSource | `test_inf_next_due_at_only_partial_index` | TC-INF-037 | PERF-003 |
+| 233 | `test_tg14_infra.py` | TestSchemaAndSource | `test_inf_034_only_stdlib_and_odoo_imports` | TC-INF-034 | PORT-001 |
+| 234 | `test_tg14_infra.py` | TestSchemaAndSource | `test_ins_001_depends` | TC-INS-001 | INST-002 |
+| 235 | `test_tg14_infra.py` | TestSchemaAndSource | `test_ins_002_no_forbidden_references` | TC-INS-002 | INST-002 |
+| 236 | `test_tg14_infra.py` | TestSchemaAndSource | `test_ins_004_js_scoped_to_static_src` | TC-INS-004 | BUILD-001 |
+| 237 | `test_tg14_infra.py` | TestSchemaAndSource | `test_ins_005_pylintrc_covers_module` | TC-INS-005 | BUILD-001 |
+| 238 | `test_tg14_infra.py` | TestSchemaAndSource | `test_ins_012_suite_is_generic` | TC-INS-012 | MAINT-002 |
+| 239 | `test_tg16_more.py` | TestSecurityMore | `test_sec_admin_default_sla_manager` | TC-SEC-025 | SEC-001 |
+| 240 | `test_tg16_more.py` | TestSecurityMore | `test_sec_015_escalation_permission_note` | TC-SEC-015 | SEC-004 |
+| 241 | `test_tg16_more.py` | TestSecurityMore | `test_sec_001_menu_hidden` | TC-SEC-001 | SEC-001 |
+| 242 | `test_tg16_more.py` | TestSecurityMore | `test_sec_013_denied_action_fails` | TC-SEC-013 | SEC-004 |
+| 243 | `test_tg16_more.py` | TestSecurityMore | `test_sec_021_recalculate_by_manager` | TC-SEC-021 | SEC-006 |
+| 244 | `test_tg16_more.py` | TestSecurityMore | `test_sec_023_readonly_views` | TC-SEC-023 | SEC-006 |
+| 245 | `test_tg16_more.py` | TestSecurityLinkedRecord | `test_sec_016_calendar_resolved_without_read_access` | TC-SEC-016 | SEC-005 |
+| 246 | `test_tg16_more.py` | TestSecurityLinkedRecord | `test_sec_017_no_leak_of_linked_record` | TC-SEC-017 | SEC-005 |
+| 247 | `test_tg16_security.py` | TestSecurity | `test_sec_002_003_definition_write` | TC-SEC-002, TC-SEC-003 | SEC-001 |
+| 248 | `test_tg16_security.py` | TestSecurity | `test_sec_004_viewer_reads` | TC-SEC-004 | SEC-001 |
+| 249 | `test_tg16_security.py` | TestSecurity | `test_sec_005_007_plain_user_denied` | TC-SEC-005, TC-SEC-007 | SEC-001, SEC-002 |
+| 250 | `test_tg16_security.py` | TestSecurity | `test_sec_006_task_created_with_record_rights_only` | TC-SEC-006 | SEC-002 |
+| 251 | `test_tg16_security.py` | TestSecurity | `test_sec_018_manager_cannot_write_tasks` | TC-SEC-018 | SEC-006 |
+| 252 | `test_tg16_security.py` | TestSecurity | `test_sec_019_020_event_rights` | TC-SEC-019, TC-SEC-020 | SEC-006 |
+| 253 | `test_tg16_security.py` | TestSecurity | `test_sec_022_viewer_cannot_mark_resolved` | TC-SEC-022 | SEC-006 |
+| 254 | `test_tg16_security.py` | TestSecurity | `test_sec_024_viewer_cannot_create_escalation` | TC-SEC-024 | SEC-001 |
+| 255 | `test_tg16_security.py` | TestMultiCompany | `test_sec_008_009_hidden_other_company` | TC-SEC-008, TC-SEC-009 | SEC-003 |
+| 256 | `test_tg16_security.py` | TestMultiCompany | `test_sec_010_definition_visibility` | TC-SEC-010 | SEC-003 |
+| 257 | `test_tg16_security.py` | TestMultiCompany | `test_sec_011_012_definition_company_scope` | TC-SEC-011, TC-SEC-012 | SEC-003 |
+| 258 | `test_tg17_ui.py` | TestDefinitionForm | `test_uix_001_save_via_form` | TC-UIX-001 | INT-001 |
+| 259 | `test_tg17_ui.py` | TestDefinitionForm | `test_uix_002_viewer_readonly` | TC-UIX-002 | INT-001 |
+| 260 | `test_tg17_ui.py` | TestDefinitionForm | `test_uix_004_005_help_warnings` | TC-CMP-009, TC-UIX-004, TC-UIX-005 | FUNC-042, INT-002 |
+| 261 | `test_tg17_ui.py` | TestDefinitionForm | `test_uix_009_calendar_fallback_note_in_arch` | TC-UIX-009 | INT-003 |
+| 262 | `test_tg17_ui.py` | TestTaskViews | `test_uix_010_list_fields` | TC-UIX-010 | INT-004 |
+| 263 | `test_tg17_ui.py` | TestTaskViews | `test_uix_011_form_readonly` | TC-UIX-011 | INT-004 |
+| 264 | `test_tg17_ui.py` | TestTaskViews | `test_uix_013_to_016_action_binding` | TC-UIX-013, TC-UIX-014, TC-UIX-015, TC-UIX-016 | INT-006 |
+| 265 | `test_tg17_ui.py` | TestTaskFilters | `test_uix_018_019_status_filters` | TC-UIX-018, TC-UIX-019 | INT-011 |
+| 266 | `test_tg17_ui.py` | TestTaskFilters | `test_uix_020_to_024_due_soon` | TC-UIX-020, TC-UIX-021, TC-UIX-022, TC-UIX-023, TC-UIX-024 | INT-012 |
+| 267 | `test_tg17_ui.py` | TestTaskFilters | `test_uix_023_025_setting_roles` | TC-UIX-023, TC-UIX-025 | INT-012 |
+| 268 | `test_tg17_ui.py` | TestTaskFilters | `test_uix_026_027_grouping` | TC-UIX-026, TC-UIX-027 | INT-013 |
+| 269 | `test_tg17_ui.py` | TestReevaluateAndEvents | `test_uix_032_033_034_reevaluate_action` | TC-UIX-032, TC-UIX-033, TC-UIX-034 | INT-020 |
+| 270 | `test_tg17_ui.py` | TestReevaluateAndEvents | `test_uix_035_to_038_event_filters_grouping` | TC-UIX-035, TC-UIX-036, TC-UIX-037, TC-UIX-038 | INT-021 |
+| 271 | `test_tg17_ui.py` | TestReportMeasures | `test_uix_039_achieved_rate_excludes_cancelled` | TC-UIX-039 | FUNC-036 |
+| 272 | `test_tg17_ui.py` | TestReportMeasures | `test_uix_040_no_ended_tasks_is_undefined` | TC-UIX-040 | FUNC-036 |
+| 273 | `test_tg17_ui.py` | TestReportMeasures | `test_uix_041_month_boundary_timezone` | TC-UIX-041 | FUNC-036 |
+| 274 | `test_tg17_ui.py` | TestReportMeasures | `test_uix_042_043_044_breaching_counts` | TC-UIX-042, TC-UIX-043, TC-UIX-044 | FUNC-062 |
+| 275 | `test_tg18_more.py` | TestQueryCount | `test_prf_003_attach_batch` | TC-PRF-003 | PERF-002 |
+| 276 | `test_tg18_more.py` | TestQueryCount | `test_prf_004_no_match_batch` | TC-PRF-004 | PERF-002 |
+| 277 | `test_tg18_more.py` | TestQueryCount | `test_prf_005_stop_batch` | TC-PRF-005 | PERF-002 |
+| 278 | `test_tg18_more.py` | TestBackgroundScale | `test_prf_007_200_escalations_four_calls` | TC-PRF-007 | PERF-003 |
+| 279 | `test_tg18_more.py` | TestBackgroundScale | `test_prf_008_200_breaches_four_calls` | TC-PRF-008 | PERF-003 |
+| 280 | `test_tg18_more.py` | TestBackgroundScale | `test_prf_006_cycle_time_independent_of_total` | TC-PRF-006 | PERF-003 |
+| 281 | `test_tg18_more.py` | TestCronAndPatches | `test_prf_009_cron_every_minute` | TC-PRF-009 | PERF-003 |
+| 282 | `test_tg18_more.py` | TestCronAndPatches | `test_prf_010_patch_only_models_with_definition` | TC-PRF-010 | FUNC-004, FUNC-005, PERF-001 |
+| 283 | `test_tg18_performance.py` | TestPerformanceLoad | `test_prf_load_300_tickets_30_tasks` | TC-PRF-011 | PERF-001, PERF-002, REL-002 |
+| 284 | `test_tg18_performance.py` | TestPerformanceLoad | `test_prf_percent_used_list_80` | TC-PRF-012 | INT-023, PERF-002 |
+| 285 | `test_tg18_performance.py` | TestPerformanceLoad | `test_prf_percent_used_list_80_holidays` | TC-PRF-013 | INT-023, PERF-002 |
+| 286 | `test_tg19_extension.py` | TestCalendarExtension | `test_ext_001_team_calendar` | TC-EXT-001 | INT-007 |
+| 287 | `test_tg19_extension.py` | TestCalendarExtension | `test_ext_002_005_fallback_on_unusable` | TC-EXT-002, TC-EXT-005 | INT-007 |
+| 288 | `test_tg19_extension.py` | TestCalendarExtension | `test_ext_004_default_sources` | TC-EXT-004 | INT-007 |
+| 289 | `test_tg19_extension.py` | TestValueExtensions | `test_ext_006_007_010_target_hours` | TC-EXT-006, TC-EXT-007, TC-EXT-010 | INT-015 |
+| 290 | `test_tg19_extension.py` | TestValueExtensions | `test_ext_008_negative_hours` | TC-EXT-008 | INT-015 |
+| 291 | `test_tg19_extension.py` | TestValueExtensions | `test_ext_009_zero_hours` | TC-EXT-009 | INT-015 |
+| 292 | `test_tg19_extension.py` | TestValueExtensions | `test_ext_011_012_start_dt` | TC-EXT-011, TC-EXT-012 | INT-016 |
+| 293 | `test_tg19_extension.py` | TestValueExtensions | `test_ext_013_retroactive_field` | TC-EXT-013 | INT-016 |
+| 294 | `test_tg19_extension.py` | TestValueExtensions | `test_ext_014_015_016_domain_override` | TC-EXT-014, TC-EXT-015, TC-EXT-016 | INT-017 |
+| 295 | `test_tg19_extension.py` | TestTransitionHook | `test_ext_017_pause_calls_hook_once` | TC-EXT-017 | INT-018 |
+| 296 | `test_tg19_extension.py` | TestTransitionHook | `test_ext_018_no_transition_no_call` | TC-EXT-018 | INT-018 |
+| 297 | `test_tg19_extension.py` | TestTransitionHook | `test_ext_019_complete_calls_hook` | TC-EXT-019 | INT-018 |
+| 298 | `test_tg19_extension.py` | TestTransitionHook | `test_ext_attach_calls_hook` | TC-EXT-021 | REUSE-001 |
+| 299 | `test_tg19_extension.py` | TestSignatureContract | `test_ext_022_contract` | TC-EXT-022 | REUSE-001 |
+| 300 | `test_tg19_extension.py` | TestSignatureContract | `test_ext_020_default_hook_noop` | TC-EXT-020 | INT-018 |
+| 301 | `test_tg20_concurrency.py` | TestConcurrentAttach | `test_err_005_mul_007_two_transactions_attach_same_record` | TC-ERR-005, TC-MUL-007 | FUNC-014, FUNC-030, REL-001 |
+| 302 | `test_tg20_concurrency.py` | TestConcurrentProcessing | `test_esc_009_locked_task_skipped` | TC-ESC-009 | FUNC-024 |
+| 303 | `test_tg20_concurrency.py` | TestConcurrentProcessing | `test_esc_059_stop_other_task_not_blocked` | TC-ESC-059 | REL-002 |
+| 304 | `test_tg20_concurrency.py` | TestConcurrentProcessing | `test_err_027_029_task_stopped_before_lock` | TC-ERR-027, TC-ERR-029 | REL-001, REL-002 |
+| 305 | `test_tg20_concurrency.py` | TestConcurrentProcessing | `test_err_026_stop_conflicts_with_committed_processing` | TC-ERR-026 | REL-001 |
+| 306 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_type_default_sla` | TC-MDF-001 | FUNC-070 |
+| 307 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_type_ola` | TC-MDF-002 | FUNC-070 |
+| 308 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_vendor_id_set` | TC-MDF-003 | FUNC-070 |
+| 309 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_vendor_id_default_empty` | TC-MDF-004 | FUNC-070 |
+| 310 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_service_commitment_default_false` | TC-MDF-005 | FUNC-070 |
+| 311 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_service_commitment_true` | TC-MDF-006 | FUNC-070 |
+| 312 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_target_default_empty` | TC-MDF-007 | FUNC-070 |
+| 313 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_target_response` | TC-MDF-008 | FUNC-070 |
+| 314 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_target_resolution` | TC-MDF-009 | FUNC-070 |
+| 315 | `test_tg21_new_fields.py` | TestNewMetadataFields | `test_metadata_fields_do_not_change_engine_behaviour` | TC-MDF-010 | FUNC-070 |
+| 316 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseWarning | `test_warning_model_not_trackable` | TC-RPS-001 | FUNC-071 |
+| 317 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseWarning | `test_warning_field_not_tracked` | TC-RPS-002 | FUNC-071 |
+| 318 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseWarning | `test_no_warning_when_all_pause_fields_tracked` | TC-RPS-003 | FUNC-071 |
+| 319 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseWarning | `test_no_warning_when_feature_off` | TC-RPS-004 | FUNC-071 |
+| 320 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseWarning | `test_warning_recomputes_when_pause_domain_changes` | TC-RPS-005 | FUNC-071 |
+| 321 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseAlgorithm | `test_excludes_tracked_pause_history` | TC-RPS-006 | FUNC-071 |
+| 322 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseAlgorithm | `test_flag_off_counts_full_backdated_window` | TC-RPS-007 | FUNC-071 |
+| 323 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseAlgorithm | `test_no_history_in_window_no_effect` | TC-RPS-008 | FUNC-071 |
+| 324 | `test_tg22_retroactive_pause.py` | TestRetroactivePauseAlgorithm | `test_untracked_pause_field_falls_back_no_effect` | TC-RPS-009 | FUNC-071 |
+| 325 | `test_tg23_tz_override.py` | TestCalendarTzOverride | `test_override_shifts_working_hours` | TC-TZO-001 | FUNC-067 |
+| 326 | `test_tg23_tz_override.py` | TestCalendarTzOverride | `test_override_reuses_cached_clone_no_duplicate` | TC-TZO-002 | FUNC-067 |
+| 327 | `test_tg23_tz_override.py` | TestCalendarTzOverride | `test_override_does_not_mutate_source_calendar` | TC-TZO-003 | FUNC-067 |
+| 328 | `test_tg23_tz_override.py` | TestCalendarTzOverride | `test_clone_copies_attendance_pattern` | TC-TZO-004 | FUNC-067 |
+| 329 | `test_tg23_tz_override.py` | TestCalendarTzOverride | `test_no_override_no_clone_created` | TC-TZO-005 | FUNC-067 |
+| 330 | `test_tg24_clock_duration.py` | TestOriginalBreachTime | `test_set_once_at_attach_never_rewritten_on_resume` | TC-CLK-001 | FUNC-072 |
+| 331 | `test_tg24_clock_duration.py` | TestOriginalBreachTime | `test_unaffected_by_action_recalculate` | TC-CLK-002 | FUNC-072 |
+| 332 | `test_tg24_clock_duration.py` | TestClockDuration | `test_equals_business_without_calendar` | TC-CLK-003 | FUNC-072 |
+| 333 | `test_tg24_clock_duration.py` | TestClockDuration | `test_differs_from_business_across_weekend` | TC-CLK-004 | FUNC-072 |
+| 334 | `test_tg25_enable_conditions_tz.py` | TestEnableDisable | `test_new_definition_is_disabled_by_default` | TC-ENB-001 | FUNC-066 |
+| 335 | `test_tg25_enable_conditions_tz.py` | TestEnableDisable | `test_model_name_related_stored` | TC-ENB-002 | FUNC-001, INT-001 |
+| 336 | `test_tg25_enable_conditions_tz.py` | TestEnableDisable | `test_enable_disable_toggle_and_reload` | TC-ENB-003 | FUNC-066 |
+| 337 | `test_tg25_enable_conditions_tz.py` | TestEnableDisable | `test_enable_without_start_warns_but_enables` | TC-ENB-004 | FUNC-066 |
+| 338 | `test_tg25_enable_conditions_tz.py` | TestEnableDisable | `test_enabled_attaches_disabled_does_not` | TC-ENB-005 | FUNC-066 |
+| 339 | `test_tg25_enable_conditions_tz.py` | TestHotPath | `test_hook_models_disabled_with_running_task` | TC-ENB-006 | FUNC-066 |
+| 340 | `test_tg25_enable_conditions_tz.py` | TestHotPath | `test_disabled_without_running_task_skips_condition_matching` | TC-ENB-007 | FUNC-066, PERF-001 |
+| 341 | `test_tg25_enable_conditions_tz.py` | TestHotPath | `test_disabled_with_running_task_still_evaluated` | TC-ENB-008 | FUNC-060, FUNC-066 |
+| 342 | `test_tg25_enable_conditions_tz.py` | TestEmptyListNotConfigured | `test_get_domain_empty_list_is_none` | TC-CND-001 | FUNC-003 |
+| 343 | `test_tg25_enable_conditions_tz.py` | TestEmptyListNotConfigured | `test_start_empty_list_never_attaches` | TC-CND-002 | FUNC-003 |
+| 344 | `test_tg25_enable_conditions_tz.py` | TestEmptyListNotConfigured | `test_start_match_all_attaches` | TC-CND-003 | FUNC-003 |
+| 345 | `test_tg25_enable_conditions_tz.py` | TestEmptyListNotConfigured | `test_stop_empty_list_never_completes` | TC-CND-004 | FUNC-003 |
+| 346 | `test_tg25_enable_conditions_tz.py` | TestEmptyListNotConfigured | `test_new_definition_has_no_star_watch` | TC-CND-005 | FUNC-003, PERF-001 |
+| 347 | `test_tg25_enable_conditions_tz.py` | TestEmptyListNotConfigured | `test_reset_condition_without_fields_watches_all` | TC-CND-006 | FUNC-013, FUNC-051 |
+| 348 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_create_fills_user_tz_or_utc` | TC-TZR-001 | FUNC-067 |
+| 349 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_create_fills_fixed_calendar_tz` | TC-TZR-002 | FUNC-067 |
+| 350 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_create_keeps_explicit_tz` | TC-TZR-003 | FUNC-067 |
+| 351 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_onchange_new_record_takes_calendar_tz` | TC-TZR-004 | FUNC-067 |
+| 352 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_onchange_saved_record_fills_only_when_empty` | TC-TZR-005 | FUNC-067 |
+| 353 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_onchange_ignores_non_definition_source` | TC-TZR-006 | FUNC-067 |
+| 354 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_form_new_has_default_tz_and_follows_calendar` | TC-TZR-007 | FUNC-067 |
+| 355 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_tz_variant_copies_global_leaves` | TC-TZR-008 | FUNC-067 |
+| 356 | `test_tg25_enable_conditions_tz.py` | TestTimezoneRequired | `test_changing_definition_tz_keeps_running_task_deadline` | TC-TZR-009 | FUNC-021, FUNC-067 |
+| 357 | `test_tg26_definition_ux.py` | TestDueSoonPerDefinition | `test_compute_uses_definition_then_settings` | TC-DUE-001 | INT-012 |
+| 358 | `test_tg26_definition_ux.py` | TestDueSoonPerDefinition | `test_settings_change_applies_to_empty_only` | TC-DUE-002 | INT-012 |
+| 359 | `test_tg26_definition_ux.py` | TestDueSoonPerDefinition | `test_search_operators` | TC-DUE-003 | INT-012 |
+| 360 | `test_tg26_definition_ux.py` | TestDueSoonPerDefinition | `test_search_excludes_breached_and_paused` | TC-DUE-004 | INT-012 |
+| 361 | `test_tg26_definition_ux.py` | TestDueSoonPerDefinition | `test_negative_value_rejected` | TC-DUE-005 | INT-012 |
+| 362 | `test_tg26_definition_ux.py` | TestModelLock | `test_model_change_blocked_with_tasks` | TC-LCK-001 | FUNC-069 |
+| 363 | `test_tg26_definition_ux.py` | TestModelLock | `test_same_model_write_allowed_with_tasks` | TC-LCK-002 | FUNC-069 |
+| 364 | `test_tg26_definition_ux.py` | TestModelLock | `test_model_change_allowed_without_tasks` | TC-LCK-003 | FUNC-069 |
+| 365 | `test_tg26_definition_ux.py` | TestAuditTrail | `test_tracked_change_posts_message` | TC-AUD-001 | FUNC-069 |
+| 366 | `test_tg26_definition_ux.py` | TestAuditTrail | `test_condition_change_is_tracked` | TC-AUD-002 | FUNC-069 |
+| 367 | `test_tg26_definition_ux.py` | TestAuditTrail | `test_form_has_chatter` | TC-AUD-003 | FUNC-069 |
+| 368 | `test_tg26_definition_ux.py` | TestSmartButton | `test_running_task_count_counts_in_progress_and_paused` | TC-SBT-001 | INT-025 |
+| 369 | `test_tg26_definition_ux.py` | TestSmartButton | `test_count_zero_without_tasks` | TC-SBT-002 | INT-025 |
+| 370 | `test_tg26_definition_ux.py` | TestSmartButton | `test_action_opens_all_tasks_of_definition` | TC-SBT-003 | INT-025 |
+| 371 | `test_tg26_definition_ux.py` | TestSmartButton | `test_form_arch_button_and_js_class` | TC-SBT-004 | FUNC-069, INT-025 |
+| 372 | `test_tg26_definition_ux.py` | TestDefinitionListView | `test_list_arch` | TC-DLV-001 | FUNC-066 |
+| 373 | `test_tg26_definition_ux.py` | TestDefinitionListView | `test_action_shows_inactive_without_grouping` | TC-DLV-002 | FUNC-066 |
+| 374 | `test_tg26_definition_ux.py` | TestTaskEscalationHistory | `test_only_escalation_events` | TC-EHS-001 | INT-026 |
+| 375 | `test_tg26_definition_ux.py` | TestTaskEscalationHistory | `test_newest_first` | TC-EHS-002 | INT-026 |
+| 376 | `test_tg26_definition_ux.py` | TestTaskEscalationHistory | `test_form_arch_lists_events` | TC-EHS-003 | INT-026 |
+| 377 | `test_tg26_definition_ux.py` | TestOpenSourceRecord | `test_opens_source_record` | TC-OSR-001 | INT-026 |
+| 378 | `test_tg26_definition_ux.py` | TestOpenSourceRecord | `test_missing_record_friendly_error` | TC-OSR-002 | INT-026 |
+| 379 | `test_tg26_definition_ux.py` | TestOpenSourceRecord | `test_unknown_model_friendly_error` | TC-OSR-003 | INT-026 |
+| 380 | `test_tg26_definition_ux.py` | TestOpenSourceRecord | `test_button_in_form_header_always_visible` | TC-OSR-004 | INT-026 |
+| 381 | `test_tg26_definition_ux.py` | TestTaskListView | `test_default_columns_and_progressbar` | TC-TLV-001 | INT-027 |
+| 382 | `test_tg26_definition_ux.py` | TestLightModeOnly | `test_scss_has_no_dark_block` | TC-LGT-001 | INT-024 |
+| 383 | `test_tg26_definition_ux.py` | TestDefinitionFormTour | `test_confirm_save_with_running_tasks` | TC-TOUR-001 | FUNC-069 |
+| 384 | `test_tg27_recheck_conditions.py` | TestRecheckConditions | `test_scope_is_one_definition` | TC-RCK-001 | FUNC-032, INT-020 |
+| 385 | `test_tg27_recheck_conditions.py` | TestRecheckConditions | `test_closed_task_unchanged_with_event` | TC-RCK-002 | INT-020 |
+| 386 | `test_tg27_recheck_conditions.py` | TestRecheckConditions | `test_changed_event_records_old_and_new_stage` | TC-RCK-003 | INT-020 |
+| 387 | `test_tg27_recheck_conditions.py` | TestRecheckConditions | `test_many_tasks_grouped_per_definition` | TC-RCK-004 | INT-020 |
+| 388 | `test_tg27_recheck_conditions.py` | TestRecheckConditions | `test_viewer_cannot_recheck` | TC-RCK-005 | FUNC-032, INT-020 |
+| 389 | `test_tg27_recheck_conditions.py` | TestRecheckConditions | `test_engine_definitions_param_limits_scope` | TC-RCK-006 | FUNC-032 |
+| 390 | `test_tg28_apply_settings.py` | TestApplyCurrentSettings | `test_running_task_gets_new_target_and_event` | TC-APS-001 | INT-005 |
+| 391 | `test_tg28_apply_settings.py` | TestApplyCurrentSettings | `test_breached_task_keeps_deadline` | TC-APS-002 | INT-005 |
+| 392 | `test_tg28_apply_settings.py` | TestApplyCurrentSettings | `test_paused_task_keeps_deadline` | TC-APS-003 | INT-005 |
+| 393 | `test_tg28_apply_settings.py` | TestApplyCurrentSettings | `test_unchanged_task_has_no_event_but_counts_updated` | TC-APS-004 | INT-005 |
+| 394 | `test_tg28_apply_settings.py` | TestApplyCurrentSettings | `test_closed_tasks_skipped` | TC-APS-005 | INT-005 |
+| 395 | `test_tg28_apply_settings.py` | TestApplyCurrentSettings | `test_many_tasks_one_event_each` | TC-APS-006 | INT-005 |
+| 396 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_all_matching_records_get_task_and_rerun_has_no_duplicates` | TC-APX-001 | FUNC-068 |
+| 397 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_filter_domain_narrows_set` | TC-APX-002 | FUNC-068 |
+| 398 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_filter_cannot_widen_start_condition` | TC-APX-003 | FUNC-068 |
+| 399 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_unconfigured_start_loads_nothing` | TC-APX-004 | FUNC-003, FUNC-068 |
+| 400 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_inactive_definition_rejected` | TC-APX-005 | FUNC-068 |
+| 401 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_batching_first_batch_now_rest_by_cron` | TC-APX-006 | FUNC-068, REL-002 |
+| 402 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_queued_job_also_blocks_new_job` | TC-APX-007 | FUNC-068 |
+| 403 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_cancel_stops_job` | TC-APX-008 | FUNC-068 |
+| 404 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_failed_batch_marks_job_failed` | TC-APX-009 | FUNC-068 |
+| 405 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_autovacuum_removes_old_finished_keeps_running` | TC-APX-010 | FUNC-068, INT-010 |
+| 406 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_backfill_retroactive_leaves_no_pending_passed_escalation` | TC-APX-011 | FUNC-053, FUNC-068 |
+| 407 | `test_tg29_apply_existing.py` | TestApplyExisting | `test_security` | TC-APX-012 | FUNC-068, SEC-001 |
+| 408 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_no_task_is_none` | TC-FST-001 | INT-024 |
+| 409 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_missing_id_is_none` | TC-FST-002 | INT-024 |
+| 410 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_running` | TC-FST-003 | INT-024 |
+| 411 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_due_soon` | TC-FST-004 | INT-012, INT-024 |
+| 412 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_paused` | TC-FST-005 | INT-024 |
+| 413 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_breached_running_percent_capped` | TC-FST-006 | INT-024 |
+| 414 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_met` | TC-FST-007 | INT-024 |
+| 415 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_missed` | TC-FST-008 | INT-024 |
+| 416 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_cancelled_only_is_none` | TC-FST-009 | INT-024 |
+| 417 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_multiple_tasks_pick_most_urgent` | TC-FST-010 | INT-024 |
+| 418 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_active_task_wins_over_done_ones` | TC-FST-011 | INT-024 |
+| 419 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_no_sudo_user_without_group_is_refused` | TC-FST-012 | INT-024, SEC-002 |
+| 420 | `test_tg30_form_status.py` | TestRecordSlaSummary | `test_sla_user_can_read` | TC-FST-013 | INT-024 |
+| 421 | `test_tg30_form_status.py` | TestSessionInfo | `test_flag_on_when_never_configured` | TC-FST-014 | INT-024 |
+| 422 | `test_tg30_form_status.py` | TestSessionInfo | `test_setting_off_is_stored_explicitly` | TC-FST-015 | INT-024 |
+| 423 | `test_tg30_form_status.py` | TestSessionInfo | `test_models_listed_for_sla_user` | TC-FST-016 | INT-024 |
+| 424 | `test_tg30_form_status.py` | TestSessionInfo | `test_empty_when_setting_off` | TC-FST-017 | INT-024 |
+| 425 | `test_tg30_form_status.py` | TestSessionInfo | `test_empty_without_sla_group` | TC-FST-018 | INT-024 |
+| 426 | `test_tg30_form_status.py` | TestFormStatusTour | `test_chip_on_partner_form` | TC-FST-019 | INT-024 |
+| 427 | `test_tg30_form_status.py` | TestFormStatusTour | `test_no_chip_without_sla` | TC-FST-020 | INT-024 |
+| 428 | `test_tg31_notes_i18n.py` | TestNotePages | `test_definition_note_has_nine_groups` | TC-NOT-001 | INT-029 |
+| 429 | `test_tg31_notes_i18n.py` | TestNotePages | `test_definition_note_content` | TC-NOT-002 | FUNC-003, FUNC-067, INT-024, INT-029 |
+| 430 | `test_tg31_notes_i18n.py` | TestNotePages | `test_task_note_has_four_groups_and_three_scenarios` | TC-NOT-003 | INT-029 |
+| 431 | `test_tg31_notes_i18n.py` | TestNoStaleButtonNames | `test_no_old_button_names_in_user_strings` | TC-NOT-004 | INT-005, INT-020, INT-029 |
+| 432 | `test_tg32_duration_live.py` | TestDurationLive | `test_running_adds_current_period` | TC-DUR-001 | INT-028 |
+| 433 | `test_tg32_duration_live.py` | TestDurationLive | `test_paused_equals_stored` | TC-DUR-002 | INT-028 |
+| 434 | `test_tg32_duration_live.py` | TestDurationLive | `test_calendar_counts_working_hours_only` | TC-DUR-003 | INT-028 |
+| 435 | `test_tg32_duration_live.py` | TestDurationLive | `test_list_shows_live_and_hides_stored` | TC-DUR-004 | INT-028 |
+
+## Phụ lục D — Test case không có hàm test trong `tests/`
+
+Gồm ba loại: **Đã gỡ (D12)** (cơ chế thử lại; không còn hiệu lực, ID giữ nguyên để không đánh số lại); **Manual** (Inspection, Demonstration; thực hiện thủ công và ghi kết quả ở Test Summary Report); **Ngoài `tests/`** (lệnh cài/gỡ trong CI, benchmark `odoo shell`, lint, hoặc ca chưa tự động hóa như các ca `demo.ticket`, Docker và mixin `sla.mixin` TC-UIX-029, TC-UIX-031). Ca ngoài `tests/` vẫn là yêu cầu kiểm tra; việc chưa có hàm test là việc còn dở của `docs/TASKS.md`.
+
+| Test case | Trạng thái | Requirement Ref | Mục tiêu |
+|---|---|---|---|
+| TC-ERR-010 | Manual (Inspection hoặc Demonstration) | REQ-OBS-003 | Kiểm tra mã nguồn: đường ghi event error và log chỉ dùng tên model, id và tên định nghĩa |
+| TC-ERR-025 | Manual (Inspection hoặc Demonstration) | REQ-INT-022 | Trình diễn nhãn số event lỗi chưa xử lý trên menu SLA cho Manager và ẩn với người không thuộc nhóm SLA |
+| TC-ERR-028 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-REL-001 AC2 | Đo thời gian chờ khóa của lần lưu record khác khi action nền đang chậm (p95 qua 20 lần ≤ 5 giây) |
+| TC-ESC-016 | Đã gỡ (D12), không có test | REQ-FUNC-055 AC2 | Tính lại mốc đang chờ thử lại như mốc chưa xử lý khi resume |
+| TC-ESC-020 | Đã gỡ (D12), không có test | REQ-FUNC-027 AC1 | Ghi escalate_retry nêu giờ thử kế tiếp 10:01 khi action lỗi lúc 10:00 |
+| TC-ESC-021 | Đã gỡ (D12), không có test | REQ-FUNC-027 AC1 | Không thử lại sớm hơn giờ thử kế tiếp (10:00:59 < 10:01:00) |
+| TC-ESC-022 | Đã gỡ (D12), không có test | REQ-FUNC-027 AC1 | Thử lại chạy khi now đúng bằng giờ thử kế tiếp 10:01:00 |
+| TC-ESC-023 | Đã gỡ (D12), không có test | REQ-FUNC-027 AC1 | Lần thử lại chạy trong khoảng 10:01 đến 10:03 với tick cron lệch 30 giây |
+| TC-ESC-025 | Đã gỡ (D12), không có test | REQ-FUNC-056 AC1 | Ghi escalate_retry rồi escalate khi action lỗi một lần rồi thành công |
+| TC-ESC-026 | Đã gỡ (D12), không có test | REQ-FUNC-056 AC2 | Không chạy lại action sau khi thử lại đã thành công |
+| TC-ESC-027 | Đã gỡ (D12), không có test | REQ-FUNC-057 AC1 | Ghi 2 escalate_retry rồi escalate_failed khi mẫu [1, 10] và action luôn lỗi |
+| TC-ESC-028 | Đã gỡ (D12), không có test | REQ-FUNC-057 AC2 | Chỉ thử lại đúng 1 lần với mẫu một phần tử [5] |
+| TC-ESC-029 | Đã gỡ (D12), không có test | REQ-FUNC-057 AC3 | Không ghi escalate_failed khi lần thử lại cuối cùng thành công |
+| TC-ESC-030 | Đã gỡ (D12), không có test | REQ-FUNC-058 AC1 | Hủy lượt thử lại đang chờ khi task bị stop |
+| TC-ESC-031 | Đã gỡ (D12), không có test | REQ-FUNC-058 AC2 | Hủy lượt thử lại đang chờ khi task bị cancel |
+| TC-ESC-032 | Đã gỡ (D12), không có test | REQ-FUNC-058 AC3 | Hủy lượt thử lại đang chờ khi task chuyển paused |
+| TC-ESC-033 | Đã gỡ (D12), không có test | REQ-FUNC-059 AC1 | Giữ nguyên giờ thử 10:01 của lượt chờ khi sửa mẫu sang [1, 30] |
+| TC-ESC-034 | Đã gỡ (D12), không có test | REQ-FUNC-059 AC2 | Tính giờ thử kế tiếp 10:31 theo mẫu mới [1, 30] khi lần thử 10:01 lại lỗi |
+| TC-ESC-035 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC1 | Từ chối mẫu thử lại rỗng khi bật thử lại |
+| TC-ESC-036 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC1 | Từ chối mẫu thử lại chứa số 0 |
+| TC-ESC-037 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC1 | Từ chối mẫu thử lại có số âm |
+| TC-ESC-038 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC1 | Từ chối mẫu thử lại có số không nguyên |
+| TC-ESC-039 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC1 | Từ chối mẫu thử lại không phải danh sách ('abc') |
+| TC-ESC-040 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC1 | Từ chối mẫu thử lại 11 phần tử (vượt biên trên 10) |
+| TC-ESC-041 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC2 | Chấp nhận mẫu thử lại hợp lệ [1, 10, 20, 60] |
+| TC-ESC-042 | Đã gỡ (D12), không có test | REQ-FUNC-028 AC2 | Chấp nhận mẫu thử lại 10 phần tử (biên trên) |
+| TC-ESC-043 | Đã gỡ (D12), không có test | REQ-FUNC-028 | Không kiểm tra mẫu khi tắt thử lại (retry = false) |
+| TC-ESC-052 | Đã gỡ (D12), không có test | REQ-INT-019 AC2 | Ghi escalate_retry thay cho escalate_failed ở lần lỗi quyền đầu tiên khi mốc bật thử lại |
+| TC-ESC-060 | Đã gỡ (D12), không có test | REQ-FUNC-058 (mở rộng theo TA-08), REQ-FUNC-054 | Giữ lượt thử lại đang chờ và vẫn chạy khi cờ `cancel_retry_on_stop` = False (pause, stop, cancel, reset) |
+| TC-EXT-003 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INT-007 AC3 | Gỡ module mẫu đưa định nghĩa nguồn `team` về nguồn `none` không lỗi |
+| TC-EXT-023 | Manual (Inspection hoặc Demonstration) | REQ-REUSE-001 AC2 | Rà soát MR đổi chữ ký điểm mở rộng có tuân thủ REQ-CM-001 |
+| TC-INF-008 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-FUNC-002 AC3 (mở rộng) | Chấp nhận lưu định nghĩa trỏ tới model `demo.ticket` |
+| TC-INF-023 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-001 AC1 | Cài `dwo_sla_core` trên database có dữ liệu không lỗi và không làm đổi dữ liệu |
+| TC-INF-024 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-001 AC1 | Nâng cấp `dwo_sla_core` đã cài không lỗi và không làm đổi dữ liệu |
+| TC-INF-025 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-001 AC1 | Gỡ `dwo_sla_core` không lỗi và dữ liệu `res.partner`, `sh.helpdesk.ticket` nguyên vẹn |
+| TC-INF-026 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-001 AC1 (phần sau gỡ) | Sau khi gỡ, sửa record không phát sinh event hay task |
+| TC-INF-028 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-003 AC1 | Bảng `sh_helpdesk_ticket` không đổi cột sau khi cài module |
+| TC-INF-030 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-004 AC1 | Gỡ `dwo_sla_demo_ticket` xóa hết task của `demo.ticket` và không lỗi |
+| TC-INF-031 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-004 AC1 | Gỡ `dwo_sla_demo_ticket` xóa 4 định nghĩa mẫu |
+| TC-INF-032 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-004 AC1 (negative bổ sung) | Gỡ `dwo_sla_demo_ticket` không xóa task của `res.partner` |
+| TC-INF-033 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-PORT-001 AC1 | Cài module trên image dựng từ Dockerfile của repo không cần thêm gói Python |
+| TC-INF-035 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INST-001 (mở rộng: gỡ module có model gắn SLA) | Gỡ module chứa model có định nghĩa SLA: CASCADE xóa định nghĩa, task, event, lượt thử lại và dấu mốc đã xử lý, không lỗi và `dwo_sla_core` vẫn hoạt động |
+| TC-INS-003 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-BUILD-001 AC1 | Pylint đạt điểm không dưới 9 trên mọi file Python của module |
+| TC-INS-006 | Manual (Inspection hoặc Demonstration) | REQ-MAINT-001 AC1 | Rà soát có comment lý do tại chỗ cài đặt cho mục: Hook trên ORM |
+| TC-INS-007 | Manual (Inspection hoặc Demonstration) | REQ-MAINT-001 AC1 | Rà soát có comment lý do tại chỗ cài đặt cho mục: Cô lập lỗi engine |
+| TC-INS-008 | Manual (Inspection hoặc Demonstration) | REQ-MAINT-001 AC1 | Rà soát có comment lý do tại chỗ cài đặt cho mục: Đánh giá lại |
+| TC-INS-009 | Manual (Inspection hoặc Demonstration) | REQ-MAINT-001 AC1 | Rà soát có comment lý do tại chỗ cài đặt cho mục: Nhật ký sự kiện |
+| TC-INS-010 | Manual (Inspection hoặc Demonstration) | REQ-MAINT-001 AC1 | Rà soát có comment lý do tại chỗ cài đặt cho mục: Field compute không lưu |
+| TC-INS-011 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-MAINT-002 AC1 | Một lệnh trên database trống chạy toàn bộ test và báo kết quả đạt |
+| TC-INS-013 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-MAINT-002 Statement | Suite end-to-end trên `demo.ticket` tồn tại và được chạy bởi lệnh test |
+| TC-INS-014 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-MAINT-002 AC1 (đạt hoặc không đạt) | Lệnh test báo không đạt (mã thoát khác 0) khi một test cố ý thất bại |
+| TC-INS-015 | Manual (Inspection hoặc Demonstration) | REQ-CM-001 AC1 | Rà soát MR gây phá vỡ có script nâng cấp và dòng Revision History |
+| TC-INS-016 | Manual (Inspection hoặc Demonstration) | REQ-CM-001 AC1 (negative) | Rà soát MR gây phá vỡ thiếu script nâng cấp bị đánh dấu không đạt |
+| TC-INS-017 | Manual (Inspection hoặc Demonstration) | REQ-CM-001 Statement (cấu trúc dữ liệu) | Rà soát MR đổi cấu trúc dữ liệu SLA (đổi cột/CHECK) được phân loại gây phá vỡ |
+| TC-PRF-001 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-PERF-001 AC1 | Đo overhead ghi hàng loạt 1000 `res.partner` trước và sau khi cài module (10 lần lặp) |
+| TC-PRF-002 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-PERF-001 AC1 (biến thể) | Đo overhead trên `res.partner` khi `demo.ticket` có 4 định nghĩa mẫu (10 lần lặp) |
+| TC-SEC-014 | Đã gỡ (D12), không có test | REQ-SEC-004 (AC1 (nhánh retry)) | Ghi escalate_retry khi action vượt quyền U-CRON và mốc bật retry |
+| TC-UIX-003 | Manual (Inspection hoặc Demonstration) | REQ-INT-001 (Statement) | Trình diễn bố cục form định nghĩa SLA |
+| TC-UIX-006 | Manual (Inspection hoặc Demonstration) | REQ-INT-002 (AC1 (hiển thị)) | Trình diễn hiển thị help của start và pause trên giao diện |
+| TC-UIX-007 | Manual (Inspection hoặc Demonstration) | REQ-INT-003 (AC1) | Trình diễn ghi chú lịch dự phòng khi nguồn lịch là record |
+| TC-UIX-008 | Manual (Inspection hoặc Demonstration) | REQ-INT-003 (AC2) | Trình diễn ghi chú ẩn khi nguồn lịch là none hoặc definition |
+| TC-UIX-012 | Manual (Inspection hoặc Demonstration) | REQ-INT-004 (AC1, AC2) | Trình diễn danh sách và form chi tiết task SLA ở chế độ chỉ đọc |
+| TC-UIX-017 | Manual (Inspection hoặc Demonstration) | REQ-INT-006 (AC1, AC4 (hiển thị)) | Trình diễn action SLA trong menu Action của form partner |
+| TC-UIX-028 | Manual (Inspection hoặc Demonstration) | REQ-INT-013 (AC2) | Trình diễn chế độ xem pivot và graph của task SLA |
+| TC-UIX-029 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INT-014 (AC1) | Đếm task của record và mở danh sách task qua nút |
+| TC-UIX-030 | Manual (Inspection hoặc Demonstration) | REQ-INT-014 (AC1) | Trình diễn nút số task SLA trên form record |
+| TC-UIX-031 | Ngoài `tests/` (CI, benchmark) hoặc chưa tự động hóa | REQ-INT-014 (AC2) | Ẩn nút số task SLA với người dùng không thuộc nhóm SLA |
