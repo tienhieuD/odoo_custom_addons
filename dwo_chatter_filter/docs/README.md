@@ -2,7 +2,7 @@
 
 Module của DUO-TEK, chỉ phụ thuộc `mail`. License LGPL-3. Giá 9 EUR (Odoo Apps tối thiểu 9 EUR). Tên kỹ thuật giữ là
 `dwo_chatter_filter`; tên hiển thị đổi từ "Message Filter on Chatter" thành **Chatter Quick Filter** ở `19.0.2.0.0`.
-Bản 2.0.0 mới chỉ có ở Odoo 19; các bản 12–18 và 20 vẫn là 1.1.0 (badge cố định) cho tới khi được port.
+Bản 2.0.0 (chip chỉnh được) có ở cả 12–20: bản 19 là nguồn, các bản khác port từ đây (khác biệt ghi ở mục "Khác biệt" trong docs của từng bản).
 
 ## 1. Vấn đề
 

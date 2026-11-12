@@ -54,7 +54,6 @@ class MailMessage(models.Model):
         6. other       : everything else (automatic messages, notifications without tracking, custom
                          subtypes)
 
-        The same rule is written in JavaScript (``dwoCategoryOf``): keep them equal.
         """
         mt_note = self.env.ref("mail.mt_note").id
         mt_comment = self.env.ref("mail.mt_comment").id
