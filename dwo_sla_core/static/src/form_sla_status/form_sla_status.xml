@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="dwo_sla_core.SlaStatusChip">
+        <button t-if="this.summary" type="button"
+                class="o_sla_status_chip btn btn-sm ms-2"
+                t-att-class="this.meta.cls"
+                data-tooltip-template="dwo_sla_core.SlaStatusChip.Tooltip"
+                data-tooltip-position="bottom"
+                t-att-data-tooltip-info="this.tooltipInfo"
+                t-on-click.stop="() => this.openTasks()">
+            <i class="oi me-1" t-att-data-icon="this.meta.icon"/>
+            <span class="o_sla_status_label" t-out="this.label"/>
+            <span t-if="this.hasBar" class="o_sla_status_bar">
+                <span class="o_sla_status_bar_fill" t-attf-style="width: #{this.barWidth}%"/>
+            </span>
+        </button>
+    </t>
+
+    <t t-name="dwo_sla_core.SlaStatusChip.Tooltip">
+        <div t-foreach="lines" t-as="line" t-key="line_index" t-out="line"/>
+    </t>
+
+    <t t-inherit="web.FormView" t-inherit-mode="extension">
+        <xpath expr="//Layout" position="inside">
+            <t t-set-slot="control-panel-navigation-additional">
+                <t t-if="this.slaChipVisible" t-component="this.SlaStatusChip"
+                   resModel="this.props.resModel" resId="this.model.root.resId"
+                   reloadKey="this.slaChipState.key"/>
+            </t>
+        </xpath>
+    </t>
+
+</templates>

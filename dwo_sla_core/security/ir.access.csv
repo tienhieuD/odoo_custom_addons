@@ -1,0 +1,17 @@
+id,name,model_id,group_id/id,operation,domain
+access_sla_definition_user,sla.definition.user,sla.definition,group_sla_user,r,
+access_sla_definition_manager,sla.definition.manager,sla.definition,group_sla_manager,crud,
+access_sla_escalation_user,sla.escalation.user,sla.escalation,group_sla_user,r,
+access_sla_escalation_manager,sla.escalation.manager,sla.escalation,group_sla_manager,crud,
+access_sla_task_user,sla.task.user,sla.task,group_sla_user,r,
+access_sla_task_manager,sla.task.manager,sla.task,group_sla_manager,r,
+access_sla_event_user,sla.event.user,sla.event,group_sla_user,r,
+access_sla_event_manager,sla.event.manager,sla.event,group_sla_manager,r,
+access_ir_model_sla_manager,ir.model.sla.manager,ir.model,group_sla_manager,r,
+access_ir_model_fields_sla_manager,ir.model.fields.sla.manager,ir.model.fields,group_sla_manager,r,
+access_sla_apply_job_manager,sla.apply.job.manager,sla.apply.job,group_sla_manager,r,
+access_sla_apply_wizard_manager,sla.apply.wizard.manager,sla.apply.wizard,group_sla_manager,crud,
+rule_sla_definition_company,sla.definition: company,sla.definition,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+rule_sla_task_company,sla.task: company,sla.task,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+rule_sla_event_company,sla.event: company,sla.event,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+rule_sla_apply_job_company,sla.apply.job: company,sla.apply.job,,crud,"['|', ('definition_id.company_id', '=', False), ('definition_id.company_id', 'in', company_ids)]"

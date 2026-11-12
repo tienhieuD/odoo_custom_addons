@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="dwo_sla_core.SlaProgressWidget">
+        <div class="o_sla_progress_card" t-att-class="'o_sla_progress_card_' + this.statusMeta.key">
+            <div class="o_sla_progress_head">
+                <span t-attf-class="o_sla_progress_badge badge rounded-pill text-bg-{{this.statusMeta.color}}">
+                    <i class="oi me-1" t-att-data-icon="this.statusMeta.icon"/>
+                    <t t-esc="this.statusMeta.label"/>
+                </span>
+                <span t-attf-class="o_sla_progress_percent text-{{this.statusMeta.color}}">
+                    <t t-esc="this.headlinePercent"/>%
+                    <small t-if="this.showPercentOverflow" class="o_sla_progress_over" title="Over the target time">
+                        (+<t t-esc="this.overPercent"/>%)
+                    </small>
+                    <small t-if="this.overflowAsMultiplier and this.overflowMultiplier" class="o_sla_progress_over" title="Business time used, as a multiple of the target">
+                        (<t t-esc="this.overflowMultiplier"/> over target)
+                    </small>
+                </span>
+            </div>
+
+            <div class="o_sla_progress_track">
+                <div class="o_sla_progress_target_line" title="100% of target"/>
+                <div t-attf-class="o_sla_progress_fill bg-{{this.statusMeta.color}}"
+                     t-attf-style="width: {{this.barPercent}}%"/>
+                <div t-if="this.isOver" class="o_sla_progress_overflow bg-danger" title="Running over target"/>
+            </div>
+
+            <div class="o_sla_progress_milestones">
+                <div class="o_sla_progress_milestone">
+                    <i class="oi text-muted me-1" data-icon="flag"/>
+                    <span class="o_sla_progress_milestone_label">Start</span>
+                    <t t-if="this.startMilestone">
+                        <div class="o_sla_progress_milestone_value" t-esc="this.startMilestone.absolute"/>
+                        <div class="o_sla_progress_milestone_relative text-muted" t-esc="this.startMilestone.relative"/>
+                    </t>
+                    <div t-else="" class="o_sla_progress_milestone_value text-muted">—</div>
+                </div>
+                <div class="o_sla_progress_milestone">
+                    <i class="oi text-muted me-1" data-icon="target"/>
+                    <span class="o_sla_progress_milestone_label">Deadline</span>
+                    <t t-if="this.deadlineMilestone">
+                        <div class="o_sla_progress_milestone_value" t-esc="this.deadlineMilestone.absolute"/>
+                        <div class="o_sla_progress_milestone_relative text-muted" t-esc="this.deadlineMilestone.relative"/>
+                    </t>
+                    <div t-else="" class="o_sla_progress_milestone_value text-muted">—</div>
+                </div>
+                <div class="o_sla_progress_milestone">
+                    <i class="oi text-muted me-1" data-icon="check_box"/>
+                    <span class="o_sla_progress_milestone_label">End</span>
+                    <t t-if="this.endMilestone">
+                        <div class="o_sla_progress_milestone_value" t-esc="this.endMilestone.absolute"/>
+                        <div class="o_sla_progress_milestone_relative text-muted" t-esc="this.endMilestone.relative"/>
+                    </t>
+                    <div t-else="" class="o_sla_progress_milestone_value text-muted">In progress</div>
+                </div>
+            </div>
+
+            <div class="o_sla_progress_foot text-muted">
+                <span class="o_sla_progress_foot_item">
+                    <i class="oi me-1" data-icon="schedule"/><t t-esc="this.businessUsedLabel"/> worked
+                </span>
+                <span t-if="this.hasPause" class="o_sla_progress_foot_item">
+                    <i class="oi me-1" data-icon="pause"/><t t-esc="this.pauseLabel"/> paused
+                </span>
+                <span class="o_sla_progress_foot_item">
+                    <i class="oi me-1" data-icon="calendar_today"/><t t-esc="this.calendarLabel"/>
+                </span>
+            </div>
+        </div>
+    </t>
+
+</templates>
