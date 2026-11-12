@@ -102,16 +102,43 @@ const rect = (el) => el.getBoundingClientRect();
 tour.register("lshc_header_sticky", { test: true }, expandAsync([
         { trigger: `${LIST} .o_data_row`, run: () => {} },
         {
-            content: "header cells are sticky and stay at the top of the scroll area",
+            content: "header is sticky and stays at the top of the scroll area BEFORE any column is pinned",
             trigger: `${LIST} .o_data_row`,
             run: async () => {
                 clearKeys();
                 const root = document.querySelector(LIST);
-                // Odoo 16 core has no sticky header: the module adds it with the first pinned column
+                assert(lshcKeys().length === 0 && pinStyles().length === 0, "a column is pinned: not the state to measure");
+                const thead = root.querySelector("thead");
+                const cell = root.querySelector("thead th:not(.o_list_record_selector)");
+                assert(getComputedStyle(thead).position === "sticky" && getComputedStyle(cell).position === "sticky",
+                    `thead/th not position: sticky (${getComputedStyle(thead).position}/${getComputedStyle(cell).position})`);
+                assert(!/rgba\(.*,\s*0\)$|^transparent$/.test(getComputedStyle(cell).backgroundColor), "sticky header cell must be opaque");
+                const sc = scroller(thead, "y");
+                assert(sc, "no vertical scroll area: not enough demo rows?");
+                near(rect(thead).top, rect(sc).top, 2, "header top before scroll");
+                const row0 = root.querySelector(".o_data_row");
+                sc.scrollTop = 400;
+                await sleep(300);
+                assert(sc.scrollTop > 100, `did not scroll (${sc.scrollTop})`);
+                near(rect(thead).top, rect(sc).top, 2, "header top after scroll");
+                assert(rect(row0).bottom <= rect(thead).bottom + 1, "first row should have scrolled under the header");
+                sc.scrollTop = 0;
+            },
+        },
+]));
+
+tour.register("lshc_header_sticky_pinned", { test: true }, expandAsync([
+        { trigger: `${LIST} .o_data_row`, run: () => {} },
+        {
+            content: "header is still sticky once a column is pinned",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                clearKeys();
+                const root = document.querySelector(LIST);
                 await pin(root, "email");
                 const thead = root.querySelector("thead");
                 const cell = root.querySelector("thead th:not(.o_list_record_selector)");
-                assert(["sticky"].includes(getComputedStyle(thead).position) ||
+                assert(getComputedStyle(thead).position === "sticky" ||
                     getComputedStyle(cell).position === "sticky", "thead/th is not position: sticky");
                 const sc = scroller(thead, "y");
                 assert(sc, "no vertical scroll area: not enough demo rows?");
@@ -398,11 +425,23 @@ tour.register("lshc_dialog", { test: true }, expandAsync([
             run: async () => {
                 clearKeys();
                 const root = document.querySelector(".modal .o_list_view");
+                // the header is sticky in the dialog too, before any pin (the demo list is short: stretch the table to scroll)
+                const thead = root.querySelector("thead");
+                assert(getComputedStyle(thead).position === "sticky", `dialog thead not sticky: ${getComputedStyle(thead).position}`);
+                root.querySelector("table").style.height = "2500px";
+                await sleep(200);
+                const sc = scroller(thead, "y");
+                assert(sc, "no vertical scroll area in the dialog");
+                sc.scrollTop = 300;
+                await sleep(300);
+                assert(sc.scrollTop > 100, `dialog did not scroll (${sc.scrollTop})`);
+                near(rect(thead).top, rect(sc).top, 2, "dialog header top after scroll");
+                sc.scrollTop = 0;
+                root.querySelector("table").style.height = "";
                 const btn = await waitFor(() => root.querySelector("thead th[data-name] .js_pin_this_column"), "pin button in dialog");
                 btn.click();
                 await sleep(700);
                 // rules are scoped to `.o_content`, a dialog has none: nothing may be broken
-                // Odoo 16 core has no sticky header in a dialog either: just check the list is intact
                 assert(root.querySelector("thead th") && root.querySelectorAll(".o_data_row").length > 0, "dialog list broken after pin click");
             },
         },

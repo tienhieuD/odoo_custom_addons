@@ -40,6 +40,7 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
         });
 
         onMounted(async () => {
+            this.lshcMarkStickyHead();
             this.lshcRemoveOldStyle();
             const columnIndex = this.lshcGetColumnIndex();
             if (columnIndex) {
@@ -76,6 +77,17 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
     lshcGetFieldSuffix() {
         const name = this.lshcGetRootElement()?.closest('.o_field_widget[name]')?.getAttribute('name');
         return name ? `__field_${name}` : '';
+    },
+
+    /**
+     * Always-sticky header (even with no pinned column): class read by main.scss.
+     * Not for a list embedded in a form (x2many): it keeps its own scrollbar.
+     */
+    lshcMarkStickyHead() {
+        const el = this.lshcGetRootElement();
+        if (el && !el.closest('.o_field_widget[name]')) {
+            el.classList.add('lshc-sticky-head');
+        }
     },
 
     /**

@@ -33,6 +33,19 @@
   }
 }
 
+// Header always sticky while scrolling vertically (Odoo 16 core has none), even with no pinned column.
+// The class is set by main.js on non-embedded lists; overflow visible lets the thead stick to the real scroll area.
+.o_list_renderer.lshc-sticky-head {
+  overflow: visible;
+
+  thead,
+  thead > tr > th {
+    position: sticky;
+    top: 0;
+    background-color: var(--ListRenderer-thead-bg-color, #fff);
+    z-index: 2;
+  }
+}
 
 // Common css
 // .o_content .table-responsive {
