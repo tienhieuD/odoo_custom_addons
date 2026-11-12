@@ -10,7 +10,7 @@ OUTDIR = sys.argv[2]
 SRC = {12: 'odoo-12.0.20211011', 13: 'odoo-13.0.20230607', 14: 'odoo-14.0.20231205', 15: 'odoo-15.0.20250115',
        16: 'odoo-16.0.20261021', 17: 'odoo-17.0.20240624', 18: 'odoo-18.0.20260412', 19: 'odoo-19.0.20260412',
        20: 'odoo-20.0.20261104'}[V]
-ROOT = '/Users/hieu/Documents/Odoo'
+ROOT = os.path.expanduser('~/Documents/Project')
 CHROME = '/private/tmp/claude-501/-Users-hieu--claude/2c6103e7-e2d6-4a63-9270-126ab80a6cbe/scratchpad/cft/shell/chrome-headless-shell-mac-arm64/chrome-headless-shell'
 DB = 'shot%d' % V
 PORT = 8400 + V
@@ -20,7 +20,7 @@ URL = ('http://127.0.0.1:%d/odoo/action-listview_sticky_test_lab.action_lshc_tes
        else 'http://127.0.0.1:%d/web#action=listview_sticky_test_lab.action_lshc_test_showcase') % PORT
 
 os.makedirs(OUTDIR, exist_ok=True)
-conf = open('%s/myproject/odoo_custom_addons%d_conf/odoo.conf' % (ROOT, V)).read()
+conf = open('%s/odoo_appstore/_conf/odoo%d.conf' % (ROOT, V)).read()
 conf = '\n'.join(l for l in conf.split('\n') if not l.startswith(('dev_mode', 'http_port', 'xmlrpc_port', 'longpolling_port', 'gevent_port')))
 tmpconf = '/tmp/shot%d.conf' % V
 open(tmpconf, 'w').write(conf)
