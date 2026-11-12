@@ -1,7 +1,7 @@
 """usage: adapt_conc.py <NN>  -- adapt the 18.0 copy of dwo_record_concurrency to an older version (17 .. 12)."""
 import re, sys
 v = int(sys.argv[1])
-base = f'/Users/hieu/Documents/Odoo/myproject/odoo_custom_addons{v}/dwo_record_concurrency/'
+base = os.path.expanduser(f'~/Documents/Project/odoo_appstore/odoo_custom_addons{v}/dwo_record_concurrency/')
 def edit(rel, fn):
     s = open(base + rel).read(); s2 = fn(s); open(base + rel, 'w').write(s2)
 edit('__manifest__.py', lambda s: s.replace('"version": "18.0.1.1.0"', f'"version": "{v}.0.1.1.0"'))
