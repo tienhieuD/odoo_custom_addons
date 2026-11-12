@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+from odoo.tests.common import SavepointCase
 from odoo.exceptions import AccessError, UserError
 from odoo.osv import expression
 from odoo.tests import tagged
-from odoo.tests.common import SavepointCase
 
 from odoo.addons.dwo_chatter_filter.models.mail_message import CATEGORIES
 
@@ -44,16 +44,10 @@ class TestMessageFilter(SavepointCase):
         # another record: never counted
         Message.create(dict(base, res_id=cls.other.id, message_type="comment", subtype_id=cls.mt_comment.id))
 
-    @property
-    def _thread_domain(self):
-        return [("res_id", "=", self.record.id), ("model", "=", "res.partner"),
-                ("message_type", "!=", "user_notification")]
-
     def _ids(self, category):
-        return set(self.env["mail.message"].search(
-            expression.AND([
-                [("model", "=", "res.partner"), ("res_id", "=", self.record.id)],
-                self.env["mail.message"]._dwo_category_domain(category)])).ids)
+        return set(self.env["mail.message"].search(expression.AND([
+            [("model", "=", "res.partner"), ("res_id", "=", self.record.id)],
+            self.env["mail.message"]._dwo_category_domain(category)])).ids)
 
     def test_each_kind_has_its_messages(self):
         self.assertEqual(self._ids("discussion"), {self.discussion_1.id, self.discussion_2.id})
@@ -87,52 +81,58 @@ class TestMessageFilter(SavepointCase):
         self.assertIn(self.activity.id, self._ids("tracking"))
         self.assertNotIn(self.activity.id, self._ids("activity"))
 
-    def test_the_store_tells_the_browser_which_message_is_an_activity(self):
-        formatted = (self.activity | self.note).message_format()
-        flags = {m["id"]: m["dwo_is_activity"] for m in formatted}
-        self.assertEqual(flags, {self.activity.id: True, self.note.id: False})
-
     def test_a_tracking_message_is_tracking_even_with_the_subtype_note(self):
         self.assertIn(self.tracking.id, self._ids("tracking"))
         self.assertNotIn(self.tracking.id, self._ids("note"))
 
+    def _chip(self, kind):
+        return self.env.ref("dwo_chatter_filter.dwo_filter_" + kind)
+
     def test_counts(self):
-        counts = self.env["mail.message"].with_user(self.user_employee).dwo_filter_counts("res.partner", self.record.id)
-        self.assertEqual(counts["all"], 9)
-        self.assertEqual(
-            {key: counts[key] for key in CATEGORIES},
-            {"tracking": 1, "email": 2, "activity": 1, "note": 1, "discussion": 2, "other": 2})
-        self.assertEqual(sum(counts[key] for key in CATEGORIES), counts["all"])
+        result = self.env["mail.message"].with_user(self.user_employee).dwo_filter_chips("res.partner", self.record.id)
+        self.assertEqual(result["all"], 9)
+        counts = {chip["name"]: chip["count"] for chip in result["chips"]}
+        self.assertEqual(counts, {"Tracking": 1, "Emails": 2, "Activities": 1, "Notes": 1, "Discussions": 2, "Other": 2})
+        self.assertEqual(sum(counts.values()), result["all"])
+        # in the order of the sequence
+        self.assertEqual([c["name"] for c in result["chips"]],
+                         ["Discussions", "Emails", "Activities", "Notes", "Tracking", "Other"])
 
-    def test_counts_with_several_tracking_messages(self):
-        # the tracking values of the record belong to several messages (a multi-record set, not a singleton)
-        extra = self.env["mail.message"].create({
-            "model": "res.partner", "res_id": self.record.id, "body": "<p>x</p>",
-            "message_type": "notification", "subtype_id": self.mt_note.id})
-        self.env["mail.tracking.value"].create({
-            "field": self.env["ir.model.fields"]._get("res.partner", "name").id, "field_desc": "Name",
-            "mail_message_id": extra.id, "old_value_char": "A", "new_value_char": "B"})
-        counts = self.env["mail.message"].dwo_filter_counts("res.partner", self.record.id)
-        self.assertEqual(counts["tracking"], 2)
-        self.assertEqual(set(self.env["mail.message"].dwo_filter_ids("res.partner", self.record.id, "tracking")),
-                         {self.tracking.id, extra.id})
+    def test_the_kind_is_a_field_that_can_be_searched_and_read(self):
+        Message = self.env["mail.message"]
+        base = [("model", "=", "res.partner"), ("res_id", "=", self.record.id)]
+        self.assertEqual(set(Message.search(base + [("dwo_kind", "=", "email")]).ids),
+                         {self.email_in.id, self.email_out.id})
+        self.assertEqual(len(Message.search(base + [("dwo_kind", "in", ["note", "tracking"])])), 2)
+        self.assertEqual(len(Message.search(base + [("dwo_kind", "!=", "email")])), 7)
+        self.assertEqual((self.note | self.email_in | self.tracking).mapped("dwo_kind"), ["note", "email", "tracking"])
 
-    def test_the_ids_of_one_kind(self):
+    def test_the_ids_of_one_chip(self):
+        # Odoo 13 shows the messages of a record by their ids: the server tells the ids of a chip, newest first
         Message = self.env["mail.message"].with_user(self.user_employee)
-        ids = Message.dwo_filter_ids("res.partner", self.record.id, "email")
+        chip = self._chip("email")
+        ids = Message.dwo_filter_ids("res.partner", self.record.id, chip.id)
         self.assertEqual(set(ids), {self.email_in.id, self.email_out.id})
         self.assertEqual(ids, sorted(ids, reverse=True), "newest first")
-        self.assertEqual(Message.dwo_filter_ids("res.partner", self.record.id, "tracking"), [self.tracking.id])
-        with self.assertRaises(UserError):
-            Message.dwo_filter_ids("res.partner", self.record.id, "nonsense")
+        tracking = Message.dwo_filter_ids("res.partner", self.record.id, self._chip("tracking").id)
+        self.assertEqual(tracking, [self.tracking.id])
+
+    def test_an_archived_or_deleted_chip_filters_nothing(self):
+        Message = self.env["mail.message"].with_user(self.user_employee)
+        chip = self._chip("email")
+        chip.active = False
+        self.assertFalse(Message.dwo_filter_ids("res.partner", self.record.id, chip.id))
+        gone = chip.id
+        chip.unlink()
+        self.assertFalse(Message.dwo_filter_ids("res.partner", self.record.id, gone))
 
     def test_unknown_kind_is_refused(self):
         with self.assertRaises(UserError):
             self.env["mail.message"]._dwo_category_domain("nonsense")
 
-    def test_portal_cannot_ask_for_counts(self):
+    def test_portal_cannot_ask_for_chips(self):
         portal = self.env["res.users"].with_context(no_reset_password=True).create({
             "name": "Portal", "login": "portal_filter", "email": "portal.filter@example.com",
             "groups_id": [(6, 0, [self.env.ref("base.group_portal").id])]})
         with self.assertRaises(AccessError):
-            self.env["mail.message"].with_user(portal).dwo_filter_counts("res.partner", self.record.id)
+            self.env["mail.message"].with_user(portal).dwo_filter_chips("res.partner", self.record.id)

@@ -2,15 +2,15 @@
 <div class="container">
 
     <div class="text-center pt-5 pb-3 border-bottom">
-        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Message Filter on Chatter for Odoo</h1>
-        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Stop scrolling through the whole chatter.</p>
-        <p class="mb-4" style="font-size: 15px;">A <strong>Filter by:</strong> row of coloured badges above the messages: click one to see only discussions, emails, notes or tracking.</p>
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Chatter Quick Filter for Odoo</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Stop scrolling through the whole chatter, and make the filters your team needs.</p>
+        <p class="mb-4" style="font-size: 15px;">A <strong>Filter by:</strong> row of coloured chips above the messages. Six chips come ready; the administrator adds, renames, colours, orders or hides chips, and writes the filter of each one.</p>
     </div>
 
     <div class="my-5">
-        <p class="mb-4" style="font-size: 17px;">A long-lived record has hundreds of messages: talks, emails, notes, changed fields and automatic notices, all mixed. The search box only finds words. <strong>Message Filter on Chatter</strong> shows one kind at a time, with the number of messages of each kind.</p>
+        <p class="mb-4" style="font-size: 17px;">A long-lived record has hundreds of messages: talks, emails, notes, changed fields and automatic notices, all mixed. The search box only finds words. <strong>Chatter Quick Filter</strong> shows the messages you care about with one click, with the number of messages on every chip. And the chips are yours: want a <em>Quotes</em> chip, or <em>Messages from the customer</em>? The administrator makes it in a minute, and every chatter shows it.</p>
         <div class="text-center mb-4">
-            <img src="flow.png" alt="Open a record, see the badges, click one, only those messages are shown" class="img-fluid rounded shadow-sm"/>
+            <img src="flow.png" alt="Open a record, see your chips, click one, only those messages are shown" class="img-fluid rounded shadow-sm"/>
         </div>
     </div>
 
@@ -19,8 +19,24 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Seven badges</h4>
-                    <p class="mb-0" style="font-size: 14px;">All, Discussions, Emails, Activities, Notes, Tracking and Other, each with its own colour.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Six chips ready</h4>
+                    <p class="mb-0" style="font-size: 14px;">Discussions, Emails, Activities, Notes, Tracking and Other, each with its own colour. Nothing to set up.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Your own chips</h4>
+                    <p class="mb-0" style="font-size: 14px;">Name it, pick the colour, build the filter with the usual domain editor: no code.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Drag to order</h4>
+                    <p class="mb-0" style="font-size: 14px;">Put the chips your team uses most first: drag the lines of the list.</p>
                 </div>
             </div>
         </div>
@@ -28,15 +44,15 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">A count on each</h4>
-                    <p class="mb-0" style="font-size: 14px;">You see how many messages of each kind before you click.</p>
+                    <p class="mb-0" style="font-size: 14px;">You see how many messages a chip holds before you click.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">One click</h4>
-                    <p class="mb-0" style="font-size: 14px;">One kind at a time: the badge fills with its colour. Click All to come back.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Archive, do not lose</h4>
+                    <p class="mb-0" style="font-size: 14px;">Hide a chip you do not need now and bring it back later.</p>
                 </div>
             </div>
         </div>
@@ -48,63 +64,47 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100" style="border-top: 4px solid #875A7B;">
-                <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Every message once</h4>
-                    <p class="mb-0" style="font-size: 14px;">Each message is in exactly one kind, so the counts add up.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100" style="border-top: 4px solid #875A7B;">
-                <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Always All on open</h4>
-                    <p class="mb-0" style="font-size: 14px;">The choice is not kept: nobody misses a message without knowing.</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The whole picture</h2>
-    <p class="mb-4" style="font-size: 16px;">On a wide screen the chatter sits beside the record. <strong>Filter by:</strong> comes under the planned activities and above the messages. Each badge has its own colour and its count.</p>
+    <p class="mb-4" style="font-size: 16px;">On a wide screen the chatter sits beside the record. <strong>Filter by:</strong> comes under the planned activities. Each chip has its colour and its count; <strong>Edit</strong> shows only to administrators.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_1.png" alt="A record with its chatter on the right: the Filter by label and the badges All, Discussions, Emails, Activities, Notes, Tracking and Other, under the planned activities and above the messages" class="img-fluid rounded shadow"/>
+        <img src="screenshot_1.png" alt="A record with its chatter on the right: the Filter by label, the chips with their counts and the Edit link, above the messages" class="img-fluid rounded shadow"/>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Discussions</h2>
-    <p class="mb-4" style="font-size: 16px;">Send message, whether it went to internal followers or to a customer linked to the record.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">One click: Emails</h2>
+    <p class="mb-4" style="font-size: 16px;">Emails received and sent. The email sent from the Email Composer is here too.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_2.png" alt="The chatter filtered on Discussions" class="img-fluid rounded shadow"/>
+        <img src="screenshot_2.png" alt="The chatter filtered on Emails" class="img-fluid rounded shadow"/>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Emails</h2>
-    <p class="mb-4" style="font-size: 16px;">Emails received and emails sent. The email sent from the Email Composer is here too.</p>
-    <div class="text-center mb-4">
-        <img src="screenshot_3.png" alt="The chatter filtered on Emails" class="img-fluid rounded shadow"/>
-    </div>
-
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Activities</h2>
-    <p class="mb-4" style="font-size: 16px;">The message Odoo leaves when a planned activity is marked as done, with its feedback.</p>
-    <div class="text-center mb-4">
-        <img src="screenshot_4.png" alt="The chatter filtered on Activities" class="img-fluid rounded shadow"/>
-    </div>
-
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Notes</h2>
-    <p class="mb-4" style="font-size: 16px;">What people wrote with Log note.</p>
-    <div class="text-center mb-4">
-        <img src="screenshot_5.png" alt="The chatter filtered on Notes" class="img-fluid rounded shadow"/>
-    </div>
-
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Tracking</h2>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">One click: Tracking</h2>
     <p class="mb-4" style="font-size: 16px;">Every change of a field, and nothing else.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_6.png" alt="The chatter filtered on Tracking" class="img-fluid rounded shadow"/>
+        <img src="screenshot_3.png" alt="The chatter filtered on Tracking" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Edit the chips: the list</h2>
+    <p class="mb-4" style="font-size: 16px;">Drag the lines to put the chips in the order you want. Archive a chip to hide it without losing it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_4.png" alt="The list of chips with a handle to drag each line, its colour, its filter and an archive toggle" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Edit the chips: the form</h2>
+    <p class="mb-4" style="font-size: 16px;">Change the name, pick the colour, and set the rules of the messages the chip shows. Here, the messages whose contents mention a quotation.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_5.png" alt="The form of a chip: name, colour and the rule editor for the messages it shows" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Your chip, in every chatter</h2>
+    <p class="mb-4" style="font-size: 16px;">Save, reload, and the new chip is in the chatter of every record, with its own colour and its count.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_6.png" alt="The chatter with a new Quotes chip filtering the messages that mention a quotation" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
     <p class="mb-3" style="font-size: 16px;">Needs only the standard <code>mail</code> module. No external library.</p>
-    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">For internal users. The choice of badge is not kept: the next time you open a record, all messages are shown.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">For internal users. Only administrators see the Edit link. The choice of chip is not kept: the next time you open a record, all messages are shown.</p>
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
             <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dcf_install" role="tab" aria-controls="dcf_install" aria-selected="true">Install</a>
@@ -121,15 +121,18 @@
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
             <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_chatter_filter</code> folder into an add-ons path of your Odoo server.</p>
             <p class="mb-2" style="font-size: 14px;">2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu.</p>
-            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Message Filter on Chatter</em> and click <strong>Install</strong>.</p>
+            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Chatter Quick Filter</em> and click <strong>Install</strong>.</p>
             <p class="text-muted mb-0" style="font-size: 14px;">Reload your browser page after installing so the new assets are loaded.</p>
         </div>
         <div class="tab-pane fade" id="dcf_use" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Filter the messages</h4>
-            <p class="mb-2" style="font-size: 14px;">Under <strong>Filter by:</strong>, click a badge to see that kind of message only. Click <strong>All</strong> to see everything again.</p>
-            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">What each badge holds</h4>
+            <p class="mb-2" style="font-size: 14px;">Under <strong>Filter by:</strong>, click a chip to see its messages only. Click <strong>All</strong> to see everything again.</p>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Edit the chips (administrators)</h4>
+            <p class="mb-2" style="font-size: 14px;">Click <strong>Edit</strong> after the last chip. The list shows the chips: drag a line by its handle to change the order, use the toggle to archive or bring back a chip. <strong>New</strong> makes a chip with its own colour.</p>
+            <p class="mb-2" style="font-size: 14px;">Open a chip to change its name, its colour and its filter. The filter is the usual rule editor on the messages: contents, type, author, date, and more. Save, reload the page, and every chatter shows the change.</p>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">The chips that come with the module</h4>
             <p class="mb-2" style="font-size: 14px;"><strong>Discussions</strong>: Send message. <strong>Emails</strong>: emails received and sent. <strong>Activities</strong>: the message left by a done activity. <strong>Notes</strong>: Log note. <strong>Tracking</strong>: changed fields. <strong>Other</strong>: automatic messages and the rest.</p>
-            <p class="text-muted mb-0" style="font-size: 14px;">A badge with no message is greyed out.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">A chip with no message is greyed out. At most 15 chips are shown.</p>
         </div>
         <div class="tab-pane fade" id="dcf_limits" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Good to know</h4>
@@ -143,6 +146,15 @@
     <div class="card mb-3"><div class="card-body">
         <div class="row">
             <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">2.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-12</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Chips you edit: add, rename, colour, order, archive; your own filters; name of the module is now Chatter Quick Filter.</p></div>
+        </div>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
                 <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0</h4>
                 <p class="text-muted mb-0" style="font-size: 13px;">2026-11-09</p>
             </div>
@@ -152,24 +164,32 @@
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">In which badge is an email sent from the Email Composer?</h4>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Who can edit the chips?</h4>
+        <p class="mb-0" style="font-size: 14px;">Administrators (Settings access). Everyone else sees the chips and uses them, without the Edit link.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What can a chip filter on?</h4>
+        <p class="mb-0" style="font-size: 14px;">Any field of the messages: words in the contents, type, subtype, author, date, and the kind of message the module computes (discussion, email, activity, note, tracking, other).</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What if I write a filter that does not work?</h4>
+        <p class="mb-0" style="font-size: 14px;">The form refuses to save it and says why. A chip that breaks later (a field of a removed module) shows no number and filters nothing; the other chips keep working.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">In which chip is an email sent from the Email Composer?</h4>
         <p class="mb-0" style="font-size: 14px;">In Emails. It is an outgoing email, even though it has the subtype of a discussion.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does the Activities badge filter the planned activities?</h4>
-        <p class="mb-0" style="font-size: 14px;">No. It shows the messages left when an activity is marked as done. The planned activities stay in their own list above the badges.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does the Activities chip filter the planned activities?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It shows the messages left when an activity is marked as done. The planned activities stay in their own list above the chips.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Where are the changes of a field?</h4>
-        <p class="mb-0" style="font-size: 14px;">In Tracking, whatever their subtype.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does Load more work when a chip is chosen?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. The server returns only that chip's messages, so Load more goes on in the filtered list.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Is my choice kept?</h4>
-        <p class="mb-0" style="font-size: 14px;">No. Open the record again and all the messages are shown, so nobody misses a message without knowing.</p>
-    </div></div>
-    <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does Load more work when a badge is chosen?</h4>
-        <p class="mb-0" style="font-size: 14px;">Yes. The server returns only that kind, so Load more goes on in the filtered list.</p>
+        <p class="mb-0" style="font-size: 14px;">No. Open the record again and all messages are shown, so nobody misses a message without knowing.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it work with other modules that change the chatter?</h4>
@@ -178,7 +198,7 @@
 
     <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
         <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Find the message you need in one click.</p>
-        <p class="mb-2" style="font-size: 15px;">Install it and open the chatter of any record.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it, open the chatter of any record, then make the chip your team keeps asking for.</p>
         <p class="text-muted mb-0" style="font-size: 13px;">Developed by DUO-TEK Software Vietnam</p>
     </div>
 
