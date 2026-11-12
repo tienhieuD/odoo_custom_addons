@@ -55,6 +55,22 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
                 <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Enable When You Are Ready</h4>
+                    <p class="mb-0" style="font-size: 14px;">A new definition starts disabled, so you can finish and review it first. One <strong>Enable</strong> button turns it on, <strong>Disable</strong> stops it attaching to new records while running tasks finish, and a ribbon and a list toggle show which is which.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Apply to Existing Records</h4>
+                    <p class="mb-0" style="font-size: 14px;">Turn an SLA on after the fact: <strong>Apply to Existing Records</strong> attaches it to the records that already match, with an optional extra filter. The first batch runs at once, larger sets continue in the background, and every run is listed on the definition.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Real Working-Hour Calculations</h4>
                     <p class="mb-0" style="font-size: 14px;">Durations are measured against a working calendar (business hours), not the wall clock &mdash; a 4-hour SLA opened Friday at 16:00 does not breach over the weekend. No calendar selected means a straightforward 24/7 clock instead.</p>
                 </div>
@@ -87,8 +103,8 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Per-Rule Timezone Override</h4>
-                    <p class="mb-0" style="font-size: 14px;">Reuse one working calendar across regions by overriding its timezone per SLA definition, without touching the original calendar or affecting anything else that uses it.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Per-Rule Timezone</h4>
+                    <p class="mb-0" style="font-size: 14px;">Every definition has its own timezone, which always wins over the timezone of the working calendar. Reuse one calendar across regions without touching the original: the engine keeps a hidden copy of it in the timezone you chose.</p>
                 </div>
             </div>
         </div>
@@ -96,7 +112,7 @@
             <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Status On the Record Itself</h4>
-                    <p class="mb-0" style="font-size: 14px;">A single smart button on the ticket, task or any record it watches shows how many SLAs are active and turns red the instant one is breached &mdash; no separate screen to check.</p>
+                    <p class="mb-0" style="font-size: 14px;">A status chip in the top bar of every record under an SLA shows the worst running task at a glance: time left, a progress bar and a red state the instant it is breached &mdash; no separate screen to check, no code. An optional smart button adds the count of active and breached tasks.</p>
                 </div>
             </div>
         </div>
@@ -109,13 +125,16 @@
             <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_catalogue" role="tab" aria-controls="dwo_sla_shot_catalogue" aria-selected="true">SLA Catalogue</a>
         </li>
         <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_enable" role="tab" aria-controls="dwo_sla_shot_enable" aria-selected="false">Enable &amp; Apply</a>
+        </li>
+        <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_conditions" role="tab" aria-controls="dwo_sla_shot_conditions" aria-selected="false">Any-Model Conditions</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_progress" role="tab" aria-controls="dwo_sla_shot_progress" aria-selected="false">Live Progress</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_smart_button" role="tab" aria-controls="dwo_sla_shot_smart_button" aria-selected="false">Smart Button</a>
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_smart_button" role="tab" aria-controls="dwo_sla_shot_smart_button" aria-selected="false">Status Chip</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_escalation" role="tab" aria-controls="dwo_sla_shot_escalation" aria-selected="false">Multi-Stage Escalation</a>
@@ -138,6 +157,18 @@
                 <img src="screenshot_1.png" alt="SLA Definitions list showing multiple priority tiers, an OLA with a vendor, and retroactive rules, all on the same model" class="img-fluid rounded shadow"/>
             </div>
         </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_enable" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Draft First, Enable When Ready</h4>
+            <p class="mb-2" style="font-size: 14px;">The definition form shows its state: <strong>Enable</strong> or <strong>Disable</strong> at the top, a <strong>Running Tasks</strong> button with the number of tasks, and a <strong>Disabled</strong> ribbon on a draft. The model is locked once a definition has tasks.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_10.png" alt="SLA Definition form with Disable and Apply to Existing Records buttons, a Running Tasks button showing 6, and the Start Condition tab" class="img-fluid rounded shadow"/>
+            </div>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Attach the SLA to Records That Already Exist</h4>
+            <p class="mb-2" style="font-size: 14px;"><strong>Apply to Existing Records</strong> shows how many records it will check, takes an optional extra filter and skips records that already have a task. The first batch runs now; larger sets continue in the background.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_11.png" alt="Apply to Existing Records dialog with an extra filter, the number of records to check and the Apply button" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
         <div class="tab-pane fade" id="dwo_sla_shot_conditions" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Point-and-Click Conditions, Any Field</h4>
             <p class="mb-2" style="font-size: 14px;">Every condition uses Odoo's native domain builder. Combine any field of the target model &mdash; here a Project and a Priority &mdash; with no custom code and no external configuration file.</p>
@@ -158,17 +189,20 @@
             <p class="text-muted mb-3" style="font-size: 14px;">The same widget on a task that finished on time.</p>
         </div>
         <div class="tab-pane fade" id="dwo_sla_shot_smart_button" role="tabpanel">
-            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Status Without Leaving the Ticket</h4>
-            <p class="mb-2" style="font-size: 14px;">Add one smart button to any model's own form &mdash; a few lines in your own customization, no dependency on this module's views. It shows how many SLA tasks are active and turns red the instant one is breached, so an agent sees the signal without opening a separate screen.</p>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Status on the Record, With No Code</h4>
+            <p class="mb-2" style="font-size: 14px;">Open any record that has an SLA: the form shows a status chip with the time left or the overrun and a progress bar, and it turns red when a task is breached. Hover for each task. It shows to SLA users only, and can be switched off in the settings. Prefer a count on the form itself? Add the optional smart button with a few lines in your own customization.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_12.png" alt="Contact form with a green SLA status chip showing 0 percent used in the top right corner" class="img-fluid rounded shadow"/>
+            </div>
             <div class="text-center mb-3">
                 <img src="screenshot_9.png" alt="Project Task form with a red SLA smart button showing 2 active tasks, one of them breached" class="img-fluid rounded shadow"/>
             </div>
         </div>
         <div class="tab-pane fade" id="dwo_sla_shot_escalation" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Multi-Stage Escalation, Configured in Minutes</h4>
-            <p class="mb-2" style="font-size: 14px;">Stack as many thresholds as the process needs. This rule emails every assignee (a Many2many field, one email with multiple recipients) at 75%, then emails a fixed on-call address once the deadline passes &mdash; no Server Action required for either stage, though one is still available for advanced automation.</p>
+            <p class="mb-2" style="font-size: 14px;">Stack as many thresholds as the process needs. This rule emails the person in a field of the record (here the salesperson) at 75%, then emails a fixed on-call address once the deadline passes. Each percentage fires once.</p>
             <div class="text-center mb-3">
-                <img src="screenshot_4.png" alt="Escalation tab with two threshold rules at 75% and 100%, one emailing every assignee and one emailing a fixed on-call address" class="img-fluid rounded shadow"/>
+                <img src="screenshot_4.png" alt="Escalation tab of a definition with two rules: 75% emails the salesperson of the record, 100% emails a fixed on-call address" class="img-fluid rounded shadow"/>
             </div>
         </div>
         <div class="tab-pane fade" id="dwo_sla_shot_ola" role="tabpanel">
@@ -201,13 +235,13 @@
             <div class="col-md-3 mb-3">
                 <div class="card h-100"><div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2C2A6B;">1. Define</h4>
-                    <p class="mb-0" style="font-size: 13px;">Pick a model and write the Start Condition, a target duration and, optionally, a working calendar.</p>
+                    <p class="mb-0" style="font-size: 13px;">Pick a model and write the Start and Stop Conditions, a target duration and, optionally, a working calendar. A new definition is a draft until you press Enable.</p>
                 </div></div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="card h-100"><div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2C2A6B;">2. Attach</h4>
-                    <p class="mb-0" style="font-size: 13px;">The moment a record matches the Start Condition, a task is created and the clock starts &mdash; immediately, or retroactively from a date on the record.</p>
+                    <p class="mb-0" style="font-size: 13px;">The moment a record matches the Start Condition, a task is created and the clock starts &mdash; immediately, or retroactively from a date on the record. Records that already exist can be attached with Apply to Existing Records.</p>
                 </div></div>
             </div>
             <div class="col-md-3 mb-3">
@@ -269,6 +303,9 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_guide" role="tab" aria-controls="dwo_sla_guide" aria-selected="false">Full User Guide</a>
         </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_upgrade" role="tab" aria-controls="dwo_sla_upgrade" aria-selected="false">Upgrading</a>
+        </li>
     </ul>
     <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
         <div class="tab-pane fade show active" id="dwo_sla_install" role="tabpanel">
@@ -278,7 +315,7 @@
         </div>
         <div class="tab-pane fade" id="dwo_sla_first_rule" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Create your first SLA</h4>
-            <p class="mb-2" style="font-size: 14px;">Go to <strong>SLA &rarr; SLA Definitions &rarr; New</strong>, pick a model, write a Start Condition and a Duration, then save. The next record that matches gets its own SLA Task automatically &mdash; no restart needed.</p>
+            <p class="mb-2" style="font-size: 14px;">Go to <strong>SLA &rarr; SLA Definitions &rarr; New</strong>, pick a model, write a Start Condition, a Stop Condition and a Duration, then save and press <strong>Enable</strong>. The next record that matches gets its own SLA Task automatically &mdash; no restart needed. For records that already exist, press <strong>Apply to Existing Records</strong>.</p>
         </div>
         <div class="tab-pane fade" id="dwo_sla_security" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Grant access</h4>
@@ -289,7 +326,34 @@
             <p class="mb-2" style="font-size: 14px;">Every concept, field and screen in this module, explained in one place: conditions, escalation, retroactive start/pause, the SLA Progress widget, reporting and troubleshooting.</p>
             <p class="mb-2" style="font-size: 14px;"><a href="user_guide.html"><strong>Open the User Guide &rarr;</strong></a></p>
         </div>
+        <div class="tab-pane fade" id="dwo_sla_upgrade" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Upgrading from the first release</h4>
+            <p class="mb-2" style="font-size: 14px;">An empty condition, including the empty domain, now means &ldquo;not configured&rdquo; and never matches (the domain editor still labels it &ldquo;Match all records&rdquo;). On upgrade, an empty Start Condition is rewritten to <code>[('id', '!=', 0)]</code>, so tasks that were running are not cancelled.</p>
+            <p class="mb-2" style="font-size: 14px;">A definition created from the form now starts disabled; one created by code or import must set <code>active=True</code>. The timezone of a definition is required and always wins over the timezone of the calendar: the upgrade fills it from the fixed calendar, or UTC.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Calendar copies made for a timezone share the public holidays of the original at the time of the copy and do not follow later changes to it.</p>
+        </div>
     </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">Changelog</h2>
+    <p class="mb-3" style="font-size: 16px;">Module releases, newest first.</p>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #2C2A6B;">1.1</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-12</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Enable and Disable, Apply to Existing Records, SLA status chip on the record, Running Tasks button, Due Soon hours per definition, required timezone, empty condition means not configured.</p></div>
+        </div>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #2C2A6B;">1.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-07</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release.</p></div>
+        </div>
+    </div></div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">Frequently Asked Questions</h2>
     <div class="card mb-3"><div class="card-body">
@@ -299,6 +363,22 @@
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">What happens if I edit a rule while tasks are already running?</h4>
         <p class="mb-0" style="font-size: 14px;">Nothing changes for tasks already attached: the duration, calendar and conditions are captured as a snapshot the moment a task attaches. Only new tasks created after the edit use the new configuration.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Why does a new definition start disabled?</h4>
+        <p class="mb-0" style="font-size: 14px;">So you can finish the conditions and review them before any record is touched. Press Enable when you are ready. Definitions created by code or import must set <code>active=True</code>.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Do records that existed before I enabled the SLA get a task?</h4>
+        <p class="mb-0" style="font-size: 14px;">Not by themselves. Press <strong>Apply to Existing Records</strong> on the definition: it attaches the SLA to the records that match the Start Condition and skips the ones that already have a task.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">What does an empty condition mean?</h4>
+        <p class="mb-0" style="font-size: 14px;">&ldquo;Not configured&rdquo;: it never matches, even though the domain editor labels the empty domain &ldquo;Match all records&rdquo;. To mean every record, write a rule that is always true, for example <code>[('id', '!=', 0)]</code>.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Which timezone is used when the calendar has its own?</h4>
+        <p class="mb-0" style="font-size: 14px;">The one on the definition. It is required and always wins over the timezone of the calendar; when they differ, the engine uses a hidden copy of the calendar in the timezone you chose.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Can one record have more than one SLA at the same time?</h4>

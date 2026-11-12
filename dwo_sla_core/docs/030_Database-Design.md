@@ -20,6 +20,7 @@ Liên quan:
 | 2026-10-09 | 0.2 | hieudt | Sửa theo review: tên chỉ mục theo ORM, chính sách gỡ module (task CASCADE, chặn xóa ở ứng dụng), cơ chế không bắn bù mốc (REQ-FUNC-053), predicate chỉ mục, bảng CHECK đầy đủ, chỉ mục khóa ngoại, quy tắc flush khi reset, sửa các mục MINOR (số bảng, ON UPDATE, selection, bảng quan hệ) |
 | 2026-10-12 | 0.3 | hieudt | Đối chiếu với code: thêm `sla_escalation.cancel_retry_on_stop`, `sla_task.achieved_rate`, `sla_task.breaching_count`; ghi rõ `percent_used`, `is_due_soon` không lưu; sửa quy tắc REQ-FUNC-053 (đổi `percent` hoặc xóa mốc không tính lại riêng, có ví dụ); `next_due_at` chỉ có chỉ mục từng phần; thêm mục 5 phần Quyền truy cập và record rule; làm rõ ràng buộc `percent`; sửa nhãn phiên bản DBML |
 | 2026-11-07 | 0.4 | hieudt | D12/D13 (xem `docs/TASKS.md`): xóa bảng `sla_escalation_retry` và mọi tham chiếu (FK, CASCADE, CHECK, index, access, record rule); `sla_escalation` bỏ `retry`/`retry_pattern`/`cancel_retry_on_stop`, thêm `action_type` (`email` mặc định/`server_action`), `email_recipient_type`/`email_field_id`/`email_fixed_address` (REQ-FUNC-064, 065); `sla_event.event` CHECK bỏ giá trị `escalate_retry` (còn 10 giá trị). |
+| 2026-11-12 | 0.5 | hieudt | Đợt cải thiện 01 (19.0.1.1.0): thêm bảng `sla_apply_job`; `sla_definition`: `active` mặc định false, `calendar_tz_override` bắt buộc, thêm `due_soon_hours`, `model_name` thành related có lưu, kế thừa `mail.thread`; script nâng cấp `19.0.1.1.0`. Xem mục 3b và mục 8b. |
 
 ---
 
@@ -320,6 +321,43 @@ Field tính lại mỗi lần đọc, KHÔNG có cột trong bảng: `percent_us
 | company_id | Công ty của record liên quan, dùng cho record rule | INT4 | Yes | — | FK → res_company.id, RESTRICT |
 | is_resolved | Event `error` đã được xử lý hay chưa (REQ-FUNC-040) | BOOL | No | false | — |
 
+### 3b. Thay đổi của 19.0.1.1.0 (đợt cải thiện 01)
+
+Phần này bổ sung và, khi khác, thay cho bảng tương ứng ở trên (tên cột trong code là nguồn đúng: `duration`, `schedule_source`, `schedule_id`, `schedule_path`, `calendar_tz_override`).
+
+#### Table: sla_apply_job (mới)
+
+**Mô tả:** Một lần "Apply to Existing Records": gắn SLA cho các record có sẵn theo lô. Mỗi lần chạy là một dòng, không ghi đè lần trước. Lô đầu chạy ngay trong request của wizard, phần còn lại do cron `SLA: apply to existing records` (5 phút) xử lý; cả hai dùng chung hàm lô `_run_batch`. Chỉ hệ thống ghi (mọi ghi qua `sudo()`).
+
+| Field | Business Meaning | Type | Nullable | Default | Constraint |
+|-------|------------------|------|----------|---------|-----------|
+| id | Định danh lần chạy | SERIAL (INT4) | No | sequence | PK |
+| definition_id | Định nghĩa được áp dụng | INT4 | No | — | FK → sla_definition.id, CASCADE; chỉ mục |
+| filter_domain | Bộ lọc thêm, thu hẹp (không thay) Start Condition; rỗng hoặc `[]` không lọc thêm | TEXT | Yes | — | domain literal, kiểm ở ứng dụng |
+| state | `queued`, `running`, `done`, `cancelled`, `failed` | VARCHAR | No | `queued` | chỉ mục |
+| total | Số record khớp lúc tạo (chỉ để hiện tiến độ) | INT4 | Yes | 0 | — |
+| processed | Số record đã xem | INT4 | Yes | 0 | — |
+| attached | Số task đã tạo | INT4 | Yes | 0 | — |
+| error_count | Số record lỗi (engine cô lập lỗi theo record) | INT4 | Yes | 0 | — |
+| last_id | Con trỏ id đã xử lý (id tăng dần), cho phép chạy tiếp sau khi bị ngắt | INT4 | Yes | 0 | — |
+| user_id | Người bấm Apply | INT4 | Yes | — | FK → res_users.id, SET NULL |
+| start_time, end_time | Thời điểm bắt đầu và kết thúc | TIMESTAMP | Yes | — | — |
+| note | Lỗi không lường trước làm job `failed` | TEXT | Yes | — | — |
+
+Không có bảng cho wizard `sla.apply.wizard` (TransientModel: `definition_id`, `filter_domain`, `match_count` tính khi mở). Job xong, huỷ hoặc lỗi cũ hơn `event_retention_days` (mặc định 365) bị dọn bởi autovacuum `_gc_old_jobs`; job đang chạy không bị đụng. Record rule: theo công ty của định nghĩa. Quyền: `group_sla_manager` đọc `sla.apply.job` và toàn quyền với wizard.
+
+#### Table: sla_definition (thay đổi)
+
+| Field | Thay đổi |
+|-------|----------|
+| active | Mặc định **false** (định nghĩa mới là bản nháp; nút Enable/Disable). Có `tracking`. |
+| model_name | Từ field nhập tay thành `related='model_id.model'`, lưu, chỉ đọc, có chỉ mục. |
+| calendar_tz_override | **Bắt buộc**, mặc định múi giờ của người dùng hoặc `UTC`; luôn thắng múi giờ của calendar. Cột NOT NULL được đặt sau khi script `pre-migrate` điền dữ liệu cũ. |
+| due_soon_hours | Mới. Float, nullable; số giờ trước hạn để task tính là "Due Soon"; CHECK `due_soon_hours IS NULL OR due_soon_hours >= 0`; 0 hoặc rỗng dùng giá trị cài đặt chung. |
+| start_domain ... reset_domain | Mặc định `[]` và nghĩa là "chưa cấu hình" (không khớp record nào), kể cả `reset_domain`. Muốn "mọi record" viết `[('id', '!=', 0)]`. |
+| (mixin) | Kế thừa `mail.thread`: không thêm cột; thay đổi của các field có `tracking` ghi vào chatter của định nghĩa. |
+| model_id | Không đổi cột; ứng dụng chặn đổi model khi định nghĩa đã có task. |
+
 ---
 
 ## 4. Naming Conventions
@@ -501,3 +539,12 @@ N/A — hệ thống không dùng vector store hay kho phi quan hệ. `sla_event
 **Gỡ module:** hook là `_inherit` trên `base` nên biến mất cùng module; dữ liệu SLA bị xóa cùng bảng khi gỡ. Với module demo, `uninstall_hook` xóa task của `demo.ticket` trước (REQ-INST-004).
 
 **Dung lượng:** bảng tăng nhanh nhất là `sla_event` (nhiều dòng mỗi task); số ngày lưu cấu hình qua tham số (mặc định 365). Với quy mô hiện tại chưa cần phân vùng; nếu `sla_event` vượt hàng chục triệu dòng thì xem xét phân vùng theo `event_dt`.
+
+### 8b. Script nâng cấp 19.0.1.1.0
+
+`migrations/19.0.1.1.0/pre-migrate.py`, chạy trước khi schema áp dụng (hai câu SQL, chạy lại không đổi gì thêm):
+
+1. `calendar_tz_override` còn NULL được điền bằng múi giờ của calendar cố định của định nghĩa, nếu không có thì `UTC` (cột chuyển sang NOT NULL ở bước schema; Odoo không tự điền).
+2. `start_domain` đúng bằng `[]` được đổi thành `[('id', '!=', 0)]`, để task đang chạy không bị huỷ hàng loạt khi `[]` đổi nghĩa thành "chưa cấu hình". Năm domain còn lại không cần.
+
+Kiểm chứng (2026-11-12): cài 19.0.1.0.0, tạo hai định nghĩa (Start `[]` và Start có điều kiện) cùng 6 task đang chạy, rồi `-u dwo_sla_core` với bản mới: Start `[]` thành `[('id', '!=', 0)]`, múi giờ được điền, cả 6 task giữ nguyên trạng thái `in_progress`.

@@ -13,6 +13,7 @@ DUO-TEK Software Vietnam
 | 0.2 | 2026-10-09 | hieudt | Sửa theo review TAD: AD-01 chuyển sang patch động trong `_register_hook` chỉ trên model có định nghĩa; sửa AD-12 (cơ chế `ir.cron` đọc đúng theo source, khóa và lưu từng task); bỏ làm mất `ormcache` theo từng task; thêm AD-13 (mô hình quyền); thêm kịch bản 6.5, whitebox L2; sửa 1.2, 1.3, 3, 5.1, 7.2, 11, 12 |
 | 0.3 | 2026-10-12 | hieudt | Đối chiếu với code và SRS 0.4: K-02 ghi thêm `web` (D1); 1.2 và 7.2 sửa ngưỡng REQ-PERF-001 (5%, đã chốt O-01) áp cho model KHÔNG có định nghĩa; 1.2 nhóm TG-01 đến TG-19; 5.1 và 6.1 hook gọi `evaluate(records, now=None, changed)`; AD-06 thêm cờ `cancel_retry_on_stop` và bước xử lý lượt thử lại của task không còn `in_progress`; AD-12 nêu tên 3 tham số cấu hình; tham chiếu Phụ lục 060 dùng tiền tố `TA-`; trỏ `docs/TASKS.md` |
 | 0.4 | 2026-11-07 | hieudt | D12/D13: AD-06 đánh dấu Superseded by AD-14 (bỏ bảng thử lại, giữ phần khóa từng task); thêm AD-14 (bỏ `sla.escalation.retry`, mặc định escalation = email qua `mail.mail`, server action vẫn có cho nâng cao); kịch bản 6.3 và §8.2 viết lại không còn nhánh thử lại. |
+| 0.5 | 2026-11-12 | hieudt | Đợt cải thiện 01 (19.0.1.1.0): thêm mục 5.4 (thành phần mới: `sla.apply.job`, `sla.apply.wizard`, `ir.http`, chip trạng thái và controller form định nghĩa), 6.6 (kịch bản Apply to Existing Records), 8.9 (nâng cấp và tương thích). |
 
 ---
 
@@ -241,6 +242,20 @@ Reset kết thúc task cũ rồi gắn task mới (một trạng thái `[*] --> 
 
 **Time Service:** `resolve_calendar` (nguồn `none`, `definition`, `record` kèm dự phòng), `plan` (hạn chót bằng `plan_hours`, `compute_leaves=True`), `settle` (cộng thời gian đã trôi giữa hai mốc), `next_due_at` (mốc sớm nhất trong `planned_end` chưa vi phạm, mốc escalation chưa xử lý). Phương thức nào nhận `now` làm tham số để test cố định thời điểm.
 
+### 5.4 Whitebox Level 2: Thành phần của đợt cải thiện 01 (19.0.1.1.0)
+
+| Thành phần | Vai trò |
+|---|---|
+| `models/sla_apply_job.py` (`sla.apply.job`) | Một lần "Apply to Existing Records". `_run_batch` xử lý MỘT lô (kích thước lấy từ `dwo_sla_core.batch_size`, mặc định 50), theo id tăng dần sau con trỏ `last_id`, gọi engine với đúng định nghĩa đó (idempotent nhờ `_can_attach`) và đánh dấu sẵn các mốc escalation đã vượt của task mới để không bắn hàng loạt (REQ-FUNC-053). `_cron_run` (cron "SLA: apply to existing records", 5 phút) chạy tiếp các job còn lại, mỗi lô trong savepoint, lỗi không lường trước làm job `failed`. `action_cancel` huỷ; autovacuum `_gc_old_jobs` dọn job cũ. |
+| `models/sla_apply_wizard.py` (`sla.apply.wizard`, TransientModel) | Hộp thoại từ nút "Apply to Existing Records": `filter_domain` thu hẹp thêm, `match_count` đếm record sẽ được xem. `action_apply` từ chối định nghĩa đang tắt và định nghĩa còn job `queued`/`running`; tạo job, chạy lô đầu ngay, nếu còn thì kích cron (`_trigger`) và báo kết quả bằng thông báo. Chỉ có chế độ lọc theo domain (không có chế độ "Record cụ thể"). |
+| `models/sla_definition.py` | `action_enable`/`action_disable` (nút trên form và công tắc trên list); `active` mặc định false; kế thừa `mail.thread` (các field `tracking` ghi chatter); `due_soon_hours`; `calendar_tz_override` bắt buộc; `write` chặn đổi `model_id` khi đã có task; `action_view_tasks` cho nút Running Tasks; `action_open_apply_wizard`. Domain `[]` là "chưa cấu hình" nên không bao giờ khớp. |
+| `models/sla_task.py` | `get_record_sla_summary(res_model, res_id)` trả tóm tắt cho chip trạng thái (task "gấp nhất" theo thứ tự `breached` > `due_soon` > `paused` > `running`; không có task chạy thì `met`/`missed`/`None`; `percent` luôn ≤ 100); `action_open_source_record`; field `business_duration_live`, `duration_live`. |
+| `models/ir_http.py` | Mở rộng `session_info` với `dwo_sla_models`: danh sách model có SLA mà người dùng được xem chip. Rỗng khi cờ `dwo_sla_core.show_form_sla_status` tắt hoặc người dùng không thuộc `group_sla_user`. Hệ quả chấp nhận: thêm định nghĩa cho model mới thì phải tải lại trang mới thấy chip. |
+| `static/src/form_sla_status/` | Component `SlaStatusChip` gắn vào `FormController` qua `patch`: chỉ gọi RPC `get_record_sla_summary` khi model của form nằm trong `dwo_sla_models`. |
+| `static/src/definition_form/` | `SlaDefinitionFormController.onWillSaveRecord`: hỏi xác nhận trước khi lưu thay đổi điều kiện (`start/stop/pause/resume/cancel/reset_domain`, `cancel_mode`, `resume_mode`) của định nghĩa đang có task chạy, vì thay đổi áp dụng cho các task đó ở lần đánh giá kế (không snapshot). |
+| `views/sla_apply_views.xml`, `views/sla_definition_views.xml` | Wizard và tab "Manual Apply" (danh sách các lần chạy), nút Enable/Disable, ribbon Disabled, nút Running Tasks, công tắc trên list, tab Note (giới hạn và lỗi thường gặp). |
+| `migrations/19.0.1.1.0/pre-migrate.py` | Điền `calendar_tz_override` và đổi Start `[]` cũ thành `[('id', '!=', 0)]` (xem `030_Database-Design.md` mục 8b). |
+
 ---
 
 ## 6. Runtime View
@@ -366,6 +381,13 @@ sequenceDiagram
 
 Concern: SLA Manager, Compliance. Test: TG-12, TG-17. (Job dọn dẹp chạy độc lập: autovacuum xóa task mồ côi và event cũ, xem AD-09.)
 
+### 6.6 Kịch bản: Apply to Existing Records
+
+1. SLA Manager mở định nghĩa **đang bật**, bấm **Apply to Existing Records**; wizard hiện số record sẽ được xem (`match_count`, theo Start Condition và bộ lọc thêm).
+2. `action_apply` tạo `sla.apply.job` (`queued`), chạy ngay lô đầu (`_run_batch`): engine gắn task cho record khớp, bỏ qua record đã có task, đánh dấu sẵn các mốc escalation đã qua.
+3. Hết record thì job `done`. Còn thì job `running`, cron `ir_cron_sla_apply` được kích ngay và chạy tiếp từng lô tới khi xong hoặc hết ngân sách thời gian của cron.
+4. Tiến độ (`processed`, `attached`, `error_count`) hiện ở tab **Manual Apply** của định nghĩa; Manager có thể Cancel, cron dừng ở lô kế. Lỗi của một record được engine cô lập; lỗi không lường trước làm job `failed` kèm `note`, không kéo theo job khác.
+
 ---
 
 ## 7. Deployment View
@@ -443,6 +465,12 @@ Test `TransactionCase` chạy trên `res.partner` (không phụ thuộc model ti
 ### 8.8 AI/ML
 
 N/A — hệ thống không có thành phần AI/ML.
+
+### 8.9 Nâng cấp và tương thích (19.0.1.1.0)
+
+- Domain `[]` đổi nghĩa thành "chưa cấu hình": script `pre-migrate` đổi Start `[]` cũ thành `[('id', '!=', 0)]` để không huỷ task đang chạy. Mã của module khác tạo định nghĩa bằng `start_domain='[]'` phải đổi, và phải truyền `active=True` (mặc định mới là false).
+- Múi giờ của định nghĩa luôn thắng múi giờ của calendar. Bản sao calendar (cho múi giờ khác) sao chép ngày nghỉ chung tại thời điểm tạo và **không tự đồng bộ** khi calendar gốc đổi.
+- Bản 18 và 20 của module vẫn ở 1.0.0 (tạm dừng), chưa có các thay đổi này.
 
 ---
 

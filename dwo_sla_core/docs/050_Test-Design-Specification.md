@@ -9,6 +9,8 @@ Prepared by: hieudt
 Date: 2026-10-12
 Parent Test Plan: TP-SLACORE-001 (`040_Test-Plan.md`)
 
+> **Ghi chú 2026-11-12 (19.0.1.1.0):** các nhóm **tg25 đến tg32** (bật/tắt, `[]` là chưa cấu hình, timezone bắt buộc, giao diện định nghĩa, Re-check, Apply Current Settings, Apply to Existing Records, chip trạng thái, Note và ja_JP, Duration live) chưa được viết thành test case chi tiết ở tài liệu này: xem docstring của từng test trong `tests/test_tg25_*.py` đến `tests/test_tg32_*.py` (435 test tự động trong tổng số). Mục tiêu và nhóm: `040_Test-Plan.md`, FT-20 đến FT-27.
+
 ## Revision History
 
 | Date | Version | Author | Changes |

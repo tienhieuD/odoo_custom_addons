@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "SLA & Escalation",
-    'summary': "Enterprise SLA &amp; escalation engine for any Odoo model, with working-calendar durations and multi-stage alerts",
+    'summary': "Enterprise SLA & escalation engine for any Odoo model: working-calendar durations, multi-stage alerts, enable and apply to existing records",
     'description': """
 Enterprise-grade Service Level Agreement (SLA) and Operational Level
 Agreement (OLA) engine for Odoo, not tied to any specific model.
@@ -9,11 +9,11 @@ Configure start/stop/pause/resume/cancel/reset conditions (domain-based, no
 code) on any model, track the full lifecycle, compute duration against a
 working calendar (resource.calendar), run multi-stage percentage-based
 escalations (built-in email notification or a custom server action),
-support retroactive start/pause and a per-rule calendar timezone override,
-and show live SLA progress with the built-in SLA Progress widget and a
-smart button on the source record.
-
-See custom-addons/dwo_sla_core/docs/ for the SRS, TAD, DB Design.
+support retroactive start/pause and a per-rule timezone, enable or disable
+a definition with one button, attach a definition to records that already
+exist, and show live SLA progress with the built-in SLA Progress widget, a
+status chip on the form of the source record and an optional smart button.
+Requires only the standard base, resource, web and mail modules.
 """,
     'author': "DUO-TEK Software Vietnam",
     'website': 'https://duotek.io.vn',

@@ -15,6 +15,7 @@ Parent document: N/A — không có Test Strategy riêng cấp tổ chức
 |------|---------|--------|---------|
 | 2026-10-09 | 0.1 | hieudt | Khởi tạo từ SRS 0.2, TAD 0.1, Database Design 0.1 |
 | 2026-10-12 | 0.2 | hieudt | Đối chiếu với code và test đã viết (FT-06 bỏ FUNC-044, INT-014 theo SRS mục 4): TI-01 đã có code; EC-03 và Smoke theo bộ Smoke của `060`; thêm nhóm FT-INS (Inspection) và INS-001 theo `web` (D1); ngưỡng PERF-001 đã chốt (O-01); số test case 437; thẻ test dùng `tg_xx`; cập nhật phiên bản tài liệu tham chiếu |
+| 2026-11-12 | 0.3 | hieudt | Đợt cải thiện 01 (19.0.1.1.0): thêm nhóm FT-20 đến FT-27 (TG-25 đến TG-32); bộ test tự động từ 333 lên 435 test, xanh trên Odoo 19 (2026-11-12). Test nâng cấp từ 19.0.1.0.0 làm tay (xem mục 8b của `030`). |
 
 ---
 
@@ -37,7 +38,7 @@ Parent document: N/A — không có Test Strategy riêng cấp tổ chức
 
 | Item ID | Component | Version / Build | Source |
 |---------|-----------|-----------------|--------|
-| TI-01 | `dwo_sla_core` | Đã có code và bộ test tự động (`tests/`), xem `docs/TASKS.md` | `custom-addons/dwo_sla_core/` |
+| TI-01 | `dwo_sla_core` | 19.0.1.1.0: code và 435 test tự động (`tests/`), xem `docs/TASKS.md` | `custom-addons/dwo_sla_core/` |
 | TI-02 | `dwo_sla_demo_ticket` | TBD — dự kiến giai đoạn 6 | thư mục addons riêng, không nằm trong `addons_path` của production |
 | TI-03 | Schema database của module | Theo `030_Database-Design.md` 0.3 | Sinh bởi ORM khi cài |
 | TI-04 | Image nền | `odoo:19.0-20260421` | Dockerfile của repo |
@@ -69,6 +70,14 @@ Mỗi Feature tương ứng một nhóm test (TG) trong SRS mục 4. Ma trận R
 | FT-17 | Giao diện và báo cáo | TG-17 | REQ-INT-001 đến 006, 011 đến 014, 020 đến 023, REQ-FUNC-036, 062 | Medium | System + Demonstration |
 | FT-18 | Hiệu năng | TG-18 | REQ-PERF-001 đến 003 | High | Performance |
 | FT-19 | Điểm mở rộng | TG-19 | REQ-INT-007, 015 đến 018, REQ-REUSE-001 | Medium | Integration |
+| FT-20 | Bật/tắt định nghĩa (mặc định tắt, Enable/Disable), `[]` là chưa cấu hình, timezone bắt buộc | TG-25 | REQ-FUNC-001, 003, 033; cải thiện 01 | High | Integration |
+| FT-21 | Giao diện định nghĩa: due soon theo định nghĩa, khoá model, audit, nút Running Tasks, list | TG-26 | cải thiện 01 | Medium | Integration |
+| FT-22 | Re-check Conditions giới hạn một định nghĩa | TG-27 | REQ-FUNC-007; cải thiện 01 | Medium | Integration |
+| FT-23 | Apply Current Settings ghi event và báo kết quả | TG-28 | cải thiện 01 | Medium | Integration |
+| FT-24 | Apply to Existing Records: wizard, job theo lô, cron, huỷ, dọn, backfill escalation | TG-29 | REQ-FUNC-053; cải thiện 01 | High | Integration |
+| FT-25 | Chip trạng thái trên form record gốc: RPC tóm tắt, `session_info`, tour | TG-30 | cải thiện 01 | Medium | Integration + tour |
+| FT-26 | Tab Note, chuỗi lỗi thời, bản dịch ja_JP | TG-31 | cải thiện 01 | Low | Integration |
+| FT-27 | Duration (live), Business Duration (live) | TG-32 | cải thiện 01 | Low | Integration |
 | FT-INS | Inspection, review code, hạ tầng ngoài test chạy | TC-INS-* | REQ-INST-002, REQ-MAINT-001, REQ-CM-001, REQ-BUILD-001 và các mục kiểm tra thủ công | Medium | Inspection |
 
 **Yêu cầu kiểm chứng không bằng chạy test** (Inspection): REQ-INT-002 (một phần), REQ-INST-002, REQ-MAINT-001, REQ-CM-001, REQ-BUILD-001 (lint trong CI). Danh sách kiểm tra ở mục 9.
