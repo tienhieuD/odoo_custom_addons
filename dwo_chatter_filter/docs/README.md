@@ -1,8 +1,8 @@
 # dwo_chatter_filter: Chatter Quick Filter (Odoo 17)
 
 Module của DUO-TEK, chỉ phụ thuộc `mail`. License LGPL-3. Giá 9 EUR (Odoo Apps tối thiểu 9 EUR). Tên kỹ thuật giữ là
-`dwo_chatter_filter`; tên hiển thị đổi từ "Message Filter on Chatter" thành **Chatter Quick Filter** ở `18.0.2.0.0`.
-Bản 18 port từ bản 19 (2.0.0: chip chỉnh được).
+`dwo_chatter_filter`; tên hiển thị đổi từ "Message Filter on Chatter" thành **Chatter Quick Filter** ở `17.0.2.0.0`.
+Bản 17 port từ bản 19 (2.0.0: chip chỉnh được).
 
 ## 1. Vấn đề
 
@@ -69,7 +69,7 @@ Nhờ trường này, admin dùng luật cũ trong bộ chọn domain như một
 
 - Sáu chip nằm trong `data/dwo_chatter_filter_data.xml` với `noupdate="1"` và `forcecreate="0"`: cài mới tạo đủ; cập nhật module
   không ghi đè chỉnh sửa và **không tạo lại chip đã xoá**.
-- Nâng cấp từ 18.0.1.x: `migrations/18.0.2.0.0/post-migrate.py` nạp file data ở chế độ `init` để tạo sáu chip một lần,
+- Nâng cấp từ 17.0.1.x: `migrations/17.0.2.0.0/post-migrate.py` nạp file data ở chế độ `init` để tạo sáu chip một lần,
   người dùng cũ thấy đúng như trước.
 
 ## 7. Kiểm thử
