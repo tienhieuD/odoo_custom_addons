@@ -3,10 +3,10 @@
 ## Cho `dwo_sla_core` (SLA generic cho Odoo 19) — phiên bản 1
 
 Test Plan ID: TP-SLACORE-001
-Version: 0.2
+Version: 0.4
 Status: Draft
 Prepared by: hieudt
-Date: 2026-10-12
+Date: 2026-11-12
 Parent document: N/A — không có Test Strategy riêng cấp tổ chức
 
 ## Revision History
@@ -16,12 +16,13 @@ Parent document: N/A — không có Test Strategy riêng cấp tổ chức
 | 2026-10-09 | 0.1 | hieudt | Khởi tạo từ SRS 0.2, TAD 0.1, Database Design 0.1 |
 | 2026-10-12 | 0.2 | hieudt | Đối chiếu với code và test đã viết (FT-06 bỏ FUNC-044, INT-014 theo SRS mục 4): TI-01 đã có code; EC-03 và Smoke theo bộ Smoke của `060`; thêm nhóm FT-INS (Inspection) và INS-001 theo `web` (D1); ngưỡng PERF-001 đã chốt (O-01); số test case 437; thẻ test dùng `tg_xx`; cập nhật phiên bản tài liệu tham chiếu |
 | 2026-11-12 | 0.3 | hieudt | Đợt cải thiện 01 (19.0.1.1.0): thêm nhóm FT-20 đến FT-27 (TG-25 đến TG-32); bộ test tự động từ 333 lên 435 test, xanh trên Odoo 19 (2026-11-12). Test nâng cấp từ 19.0.1.0.0 làm tay (xem mục 8b của `030`). |
+| 2026-11-12 | 0.4 | hieudt | Đồng bộ với `050` 0.3 và `060` 0.3: thêm FT-28 đến FT-31 (TG-21 đến TG-24); số liệu thành 588 test case (ID), 435 hàm test (432 chạy thường, 3 hàm hiệu năng chạy với `SLA_PERF=1`), 214 test condition (126 cũ + 88 mới), phủ mọi REQ-ID `active` của SRS 0.7 (115 REQ-ID, 111 `active`); 27 test case thử lại đã gỡ (D12), 19 manual, 21 ngoài `tests/`. |
 
 ---
 
 ## 1. Test Plan Identifier
 
-- **ID:** TP-SLACORE-001, version 0.2, trạng thái Draft.
+- **ID:** TP-SLACORE-001, version 0.4, trạng thái Draft.
 - **Tài liệu test liên quan:** `050_Test-Design-Specification.md` (TDS-SLACORE-001), `060_Test-Case-Specification.md` (TCS-SLACORE-001).
 
 ## 2. Introduction
@@ -70,14 +71,18 @@ Mỗi Feature tương ứng một nhóm test (TG) trong SRS mục 4. Ma trận R
 | FT-17 | Giao diện và báo cáo | TG-17 | REQ-INT-001 đến 006, 011 đến 014, 020 đến 023, REQ-FUNC-036, 062 | Medium | System + Demonstration |
 | FT-18 | Hiệu năng | TG-18 | REQ-PERF-001 đến 003 | High | Performance |
 | FT-19 | Điểm mở rộng | TG-19 | REQ-INT-007, 015 đến 018, REQ-REUSE-001 | Medium | Integration |
-| FT-20 | Bật/tắt định nghĩa (mặc định tắt, Enable/Disable), `[]` là chưa cấu hình, timezone bắt buộc | TG-25 | REQ-FUNC-001, 003, 033; cải thiện 01 | High | Integration |
-| FT-21 | Giao diện định nghĩa: due soon theo định nghĩa, khoá model, audit, nút Running Tasks, list | TG-26 | cải thiện 01 | Medium | Integration |
-| FT-22 | Re-check Conditions giới hạn một định nghĩa | TG-27 | REQ-FUNC-007; cải thiện 01 | Medium | Integration |
-| FT-23 | Apply Current Settings ghi event và báo kết quả | TG-28 | cải thiện 01 | Medium | Integration |
-| FT-24 | Apply to Existing Records: wizard, job theo lô, cron, huỷ, dọn, backfill escalation | TG-29 | REQ-FUNC-053; cải thiện 01 | High | Integration |
-| FT-25 | Chip trạng thái trên form record gốc: RPC tóm tắt, `session_info`, tour | TG-30 | cải thiện 01 | Medium | Integration + tour |
-| FT-26 | Tab Note, chuỗi lỗi thời, bản dịch ja_JP | TG-31 | cải thiện 01 | Low | Integration |
-| FT-27 | Duration (live), Business Duration (live) | TG-32 | cải thiện 01 | Low | Integration |
+| FT-20 | Bật/tắt định nghĩa (mặc định tắt, Enable/Disable), `[]` là chưa cấu hình, timezone bắt buộc | TG-25 | REQ-FUNC-001, 003, 051, 060, 066, 067 | High | Integration |
+| FT-21 | Giao diện định nghĩa: due soon theo định nghĩa, khoá model, audit, nút Running Tasks, list | TG-26 | REQ-FUNC-066, 069, REQ-INT-012, 024, 025, 026, 027 | Medium | Integration |
+| FT-22 | Re-check Conditions giới hạn một định nghĩa | TG-27 | REQ-FUNC-032, REQ-INT-020 | Medium | Integration |
+| FT-23 | Apply Current Settings ghi event và báo kết quả | TG-28 | REQ-INT-005 | Medium | Integration |
+| FT-24 | Apply to Existing Records: wizard, job theo lô, cron, huỷ, dọn, backfill escalation | TG-29 | REQ-FUNC-053, 068 | High | Integration |
+| FT-25 | Chip trạng thái trên form record gốc: RPC tóm tắt, `session_info`, tour | TG-30 | REQ-INT-024 | Medium | Integration + tour |
+| FT-26 | Tab Note, chuỗi lỗi thời, bản dịch ja_JP | TG-31 | REQ-INT-029 | Low | Integration |
+| FT-27 | Duration (live), Business Duration (live) | TG-32 | REQ-INT-028 | Low | Integration |
+| FT-28 | Field phân loại của định nghĩa (type, vendor, service commitment, target) | TG-21 | REQ-FUNC-070 | Low | Integration |
+| FT-29 | Retroactive pause | TG-22 | REQ-FUNC-071 | Medium | Integration |
+| FT-30 | Timezone override của lịch (bản sao calendar) | TG-23 | REQ-FUNC-067 | Medium | Integration |
+| FT-31 | Hạn chót ban đầu và thời lượng giờ đồng hồ | TG-24 | REQ-FUNC-072 | Medium | Integration |
 | FT-INS | Inspection, review code, hạ tầng ngoài test chạy | TC-INS-* | REQ-INST-002, REQ-MAINT-001, REQ-CM-001, REQ-BUILD-001 và các mục kiểm tra thủ công | Medium | Inspection |
 
 **Yêu cầu kiểm chứng không bằng chạy test** (Inspection): REQ-INT-002 (một phần), REQ-INST-002, REQ-MAINT-001, REQ-CM-001, REQ-BUILD-001 (lint trong CI). Danh sách kiểm tra ở mục 9.
@@ -125,7 +130,7 @@ Black-box: Equivalence Partitioning, Boundary Value Analysis (hạn chót, giờ
 - **Công cụ:** framework test của Odoo 19 (`odoo.tests.common.TransactionCase`, `HttpCase` khi cần), chạy bằng `odoo --test-enable --test-tags`.
 - **Thời điểm:** engine nhận `now` làm tham số nên test đặt thời điểm cụ thể mà không cần đóng băng đồng hồ; riêng xử lý nền, test gọi trực tiếp hàm xử lý với `now` truyền vào.
 - **Gắn thẻ:** `@tagged('post_install', '-at_install', 'dwo_sla_core', 'tg_xx')`.
-- **Tự động hóa:** toàn bộ TG-01 đến TG-16, TG-18, TG-19; TG-14 gồm cả các ca chạy bằng lệnh cài và gỡ trong CI; TG-17 tự động phần dữ liệu và bộ lọc, phần hiển thị (REQ-INT-002, 003 ngoài help text, 013) kiểm bằng Demonstration có biên bản; REQ-INT-014 kiểm bằng Test (TC-UIX-029, 031) và Demonstration cho một ca (TC-UIX-030).
+- **Tự động hóa:** toàn bộ TG-01 đến TG-16, TG-18, TG-19 và TG-21 đến TG-32 (TG-30 và TG-26 gồm tour trình duyệt `HttpCase`); TG-14 gồm cả các ca chạy bằng lệnh cài và gỡ trong CI; TG-17 tự động phần dữ liệu và bộ lọc, phần hiển thị (REQ-INT-002, 003 ngoài help text, 013) kiểm bằng Demonstration có biên bản; REQ-INT-014 kiểm bằng Test (TC-UIX-029, 031) và Demonstration cho một ca (TC-UIX-030).
 - **Tỷ lệ mục tiêu:** ≥ 90% ca test tự động khi kết thúc giai đoạn 6.
 - **Cố định:** không dùng `sleep` thật; thời gian xử lý nền và thử lại dùng `now` truyền vào.
 
@@ -145,7 +150,7 @@ Black-box: Equivalence Partitioning, Boundary Value Analysis (hạn chót, giờ
 
 | Feature | Pass Criteria |
 |---------|---------------|
-| FT-01 đến FT-13, FT-15, FT-16, FT-19 | 100% ca P1 và P2 đạt; ≥ 95% ca P3 và P4 đạt; 0 defect Critical hoặc High còn mở |
+| FT-01 đến FT-13, FT-15, FT-16, FT-19 đến FT-31 | 100% ca P1 và P2 đạt; ≥ 95% ca P3 và P4 đạt; 0 defect Critical hoặc High còn mở |
 | FT-14 | 100% ca đạt (cài, nâng cấp, gỡ không có ngoại lệ); 0 defect Critical hoặc High còn mở |
 | FT-17 | ≥ 95% ca tự động đạt; mọi mục Demonstration có biên bản xác nhận; 0 defect Critical hoặc High còn mở |
 | FT-18 | REQ-PERF-001: trung vị thời gian sau cài ≤ 105% trước cài (ngưỡng đã chốt ở O-01); REQ-PERF-002: chênh số truy vấn giữa lô 100 và lô 10 ≤ 5; REQ-PERF-003: p95 độ trễ mốc ≤ 2 phút qua 20 chu kỳ |
@@ -153,7 +158,7 @@ Black-box: Equivalence Partitioning, Boundary Value Analysis (hạn chót, giờ
 ### 7.3 Overall Release Criteria (Exit Criteria)
 
 Phiên bản 1 được phép đi tiếp (UAT, production) khi:
-- Tất cả FT-01 đến FT-19 đạt theo 7.2;
+- Tất cả FT-01 đến FT-31 đạt theo 7.2;
 - Run rate ≥ 95% (số ca đã chạy chia tổng số ca đã lên kế hoạch), và 100% ca P1 đã chạy;
 - 0 defect Critical, ≤ 2 defect High còn mở (kèm workaround đã duyệt), 0 defect High liên quan REQ-FUNC-014, REQ-FUNC-030, REQ-INST-001;
 - Cài, nâng cấp, gỡ sạch trên database có dữ liệu đạt (REQ-INST-001);
@@ -237,7 +242,7 @@ docker compose exec -u 0 odoo odoo -d sla_test -i dwo_sla_core,dwo_sla_demo_tick
 
 ### 11.2 Test Data và Fixture dùng chung
 
-Các ca test trong `060` tham chiếu fixture bằng ID để giữ tính độc lập (mỗi ca tự dựng fixture trong Preconditions). Tổng số: 437 test case, 126 test condition, phủ 106 REQ-ID (xem `050` và `060`).
+Các ca test trong `060` tham chiếu fixture bằng ID để giữ tính độc lập (mỗi ca tự dựng fixture trong Preconditions). Tổng số: 588 test case (ID; 435 hàm test), 214 test condition, phủ 111 REQ-ID `active` của SRS 0.7 (xem `050` và `060`).
 
 | Fixture | Mô tả |
 |---------|-------|
