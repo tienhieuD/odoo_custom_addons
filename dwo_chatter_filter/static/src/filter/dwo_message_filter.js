@@ -1,20 +1,29 @@
 import { Component, onWillUnmount, useEffect, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
-// Each kind has its own colour (a Bootstrap contextual colour, and purple, defined in the stylesheet): outlined when off, filled when chosen.
-const KINDS = [
-    { id: "discussion", label: _t("Discussions"), color: "primary" },
-    { id: "email", label: _t("Emails"), color: "info" },
-    { id: "activity", label: _t("Activities"), color: "purple" },
-    { id: "note", label: _t("Notes"), color: "warning" },
-    { id: "tracking", label: _t("Tracking"), color: "success" },
-    { id: "other", label: _t("Other"), color: "danger" },
-];
+const ALL_COLOR = "#212529";
+
+/** Relative luminance (WCAG) of a colour given as #rrggbb. */
+function luminance(hex) {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+        const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** The text of a chip that is filled with that colour: white or black, whichever reads better. */
+export function textColorOn(hex) {
+    const L = luminance(hex);
+    return 1.05 / (L + 0.05) >= (L + 0.05) / 0.05 ? "#ffffff" : "#000000";
+}
 
 /**
- * The badges at the top of the chatter: All, Discussions, Emails, Activities, Notes, Tracking, Other, each with its
- * number of messages. One at a time; a click shows only that kind. Closing the record forgets the choice.
+ * The chips at the top of the chatter: All, then the chips the administrator made (see the model
+ * dwo.chatter.filter), each with its number of messages. One at a time; a click shows only the messages of
+ * that chip. Closing the record forgets the choice. The administrators have a link to edit the chips.
  */
 export class DwoMessageFilter extends Component {
     static template = "dwo_chatter_filter.MessageFilter";
@@ -22,8 +31,11 @@ export class DwoMessageFilter extends Component {
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ counts: null });
+        this.action = useService("action");
+        this.isAdmin = user.isAdmin;
+        this.state = useState({ data: null });
         this.timer = null;
+        this.lastNewestId = undefined;
         onWillUnmount(() => {
             this.unmounted = true;
             clearTimeout(this.timer);
@@ -31,7 +43,7 @@ export class DwoMessageFilter extends Component {
         // a new record, or leaving this one: back to all the messages
         useEffect(
             (thread) => {
-                this.loadCounts();
+                this.loadChips();
                 return () => {
                     clearTimeout(this.timer);
                     thread.dwoReset();
@@ -39,20 +51,25 @@ export class DwoMessageFilter extends Component {
             },
             () => [this.props.thread]
         );
-        // a message arrived (bus) or was posted: the numbers follow
+        // a message arrived (bus) or was posted: the numbers follow, and the list if a chip is chosen
         useEffect(
             () => {
                 clearTimeout(this.timer);
-                this.timer = setTimeout(() => this.loadCounts(), 400);
+                this.timer = setTimeout(() => this.onNewMessage(), 400);
             },
             () => [this.props.thread.newestPersistentMessage?.id]
         );
     }
 
     get items() {
-        const counts = this.state.counts || {};
-        return [{ id: false, label: _t("All"), color: "dark", count: counts.all ?? 0 }].concat(
-            KINDS.map((kind) => ({ ...kind, count: counts[kind.id] ?? 0 }))
+        const data = this.state.data || { all: 0, chips: [] };
+        return [{ id: false, label: _t("All"), color: ALL_COLOR, count: data.all }].concat(
+            data.chips.map((chip) => ({
+                id: chip.id,
+                label: chip.name,
+                color: chip.color,
+                count: chip.count,
+            }))
         );
     }
 
@@ -60,22 +77,59 @@ export class DwoMessageFilter extends Component {
         return (this.props.thread.dwoFilter || false) === item.id;
     }
 
-    async loadCounts() {
+    isDisabled(item) {
+        return Boolean(item.id) && !this.isActive(item) && !item.count;
+    }
+
+    chipStyle(item) {
+        return `--dwo-chip: ${item.color}; --dwo-chip-text: ${textColorOn(item.color)}`;
+    }
+
+    async loadChips() {
         const thread = this.props.thread;
         if (!thread.id || this.unmounted) {
             return;
         }
         try {
-            this.state.counts = await this.orm.call("mail.message", "dwo_filter_counts", [
+            const data = await this.orm.call("mail.message", "dwo_filter_chips", [
                 thread.model,
                 thread.id,
             ]);
+            if (this.unmounted) {
+                return;
+            }
+            this.state.data = data;
+            // the chip that is chosen was archived or deleted meanwhile: back to all the messages
+            if (thread.dwoFilter && !data.chips.some((chip) => chip.id === thread.dwoFilter)) {
+                thread.dwoSetFilter(false);
+            }
         } catch {
-            // the badges are a convenience: without numbers they stay hidden
+            // the chips are a convenience: without them the row stays hidden
         }
     }
 
-    select(item) {
-        this.props.thread.dwoSetFilter(item.id);
+    async onNewMessage() {
+        const thread = this.props.thread;
+        if (this.unmounted) {
+            return;
+        }
+        const newestId = thread.newestPersistentMessage?.id;
+        const changed = newestId !== this.lastNewestId;
+        this.lastNewestId = newestId;
+        await this.loadChips();
+        // the server decides which messages a chip shows: ask it again when a new message came
+        if (changed && thread.dwoFilter && !this.unmounted) {
+            await thread.dwoReload();
+            this.lastNewestId = thread.newestPersistentMessage?.id;
+        }
+    }
+
+    async select(item) {
+        await this.props.thread.dwoSetFilter(item.id);
+        this.lastNewestId = this.props.thread.newestPersistentMessage?.id;
+    }
+
+    edit() {
+        this.action.doAction("dwo_chatter_filter.action_dwo_chatter_filter");
     }
 }

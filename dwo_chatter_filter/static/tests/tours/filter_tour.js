@@ -1,6 +1,12 @@
 import { registry } from "@web/core/registry";
 
-const badge = (kind) => `.o-dwo-messageFilter .o-dwo-filterBadge[data-kind='${kind}']`;
+const NAMES = {
+    all: "All", discussion: "Discussions", email: "Emails", activity: "Activities",
+    note: "Notes", tracking: "Tracking", other: "Other",
+};
+const badge = (kind) => `.o-dwo-messageFilter .o-dwo-filterBadge[data-chip-name='${NAMES[kind]}']`;
+// the colour of a chip is a CSS variable set on the chip
+const colored = (hex) => `[style*='--dwo-chip: ${hex}']`;
 const showing = (text) => `.o-mail-Thread .o-mail-Message:contains('${text}')`;
 const hidden = (text) => `.o-mail-Thread:not(:has(.o-mail-Message:contains('${text}')))`;
 
@@ -39,14 +45,14 @@ registry.category("web_tour.tours").add("dwo_chatter_filter", {
         { trigger: ".o-mail-ActivityList + .o-dwo-messageFilter + .o-mail-Thread" },
         // a label, then the badges, each with its own colour (outlined while off)
         { trigger: ".o-dwo-messageFilter .o-dwo-filterLabel:contains('Filter by:')" },
-        { trigger: `${badge("discussion")}.text-primary.border-primary` },
-        { trigger: `${badge("email")}.text-info.border-info` },
-        { trigger: `${badge("activity")}.text-purple.border-purple` },
-        { trigger: `${badge("note")}.text-warning.border-warning` },
-        { trigger: `${badge("tracking")}.text-success.border-success` },
-        { trigger: `${badge("other")}.text-danger.border-danger` },
+        { trigger: `${badge("discussion")}${colored("#71639e")}` },
+        { trigger: `${badge("email")}${colored("#17a2b8")}` },
+        { trigger: `${badge("activity")}${colored("#6f42c1")}` },
+        { trigger: `${badge("note")}${colored("#ffac00")}` },
+        { trigger: `${badge("tracking")}${colored("#28a745")}` },
+        { trigger: `${badge("other")}${colored("#dc3545")}` },
         // the numbers
-        { trigger: `${badge("all")}.text-bg-dark:contains('6')` },
+        { trigger: `${badge("all")}.o-dwo-filterActive:contains('6')` },
         { trigger: `${badge("discussion")}:contains('1')` },
         { trigger: `${badge("email")}:contains('1')` },
         { trigger: `${badge("activity")}:contains('1')` },
@@ -60,14 +66,14 @@ registry.category("web_tour.tours").add("dwo_chatter_filter", {
         // Emails: only the email
         { trigger: badge("email"), run: "click" },
         // chosen: filled with its colour
-        { trigger: `${badge("email")}.text-bg-info` },
+        { trigger: `${badge("email")}.o-dwo-filterActive` },
         emailShown("Email from the customer"),
         { trigger: hidden("Talk about the order") },
         { trigger: hidden("Private reminder") },
         { trigger: hidden("Automatic message") },
         // Activities: the message left by a done activity
         { trigger: badge("activity"), run: "click" },
-        { trigger: `${badge("activity")}.text-bg-purple` },
+        { trigger: `${badge("activity")}.o-dwo-filterActive` },
         { trigger: showing("Call done with the customer") },
         { trigger: hidden("Private reminder") },
         // Notes
@@ -88,9 +94,41 @@ registry.category("web_tour.tours").add("dwo_chatter_filter", {
         { trigger: hidden("Automatic message") },
         // All: back to everything
         { trigger: badge("all"), run: "click" },
-        { trigger: `${badge("all")}.text-bg-dark` },
+        { trigger: `${badge("all")}.o-dwo-filterActive` },
         { trigger: showing("Private reminder") },
         { trigger: showing("Automatic message") },
         emailShown("Email from the customer"),
+    ],
+});
+
+// The administrator edits the chips: the Edit link opens the list, a new chip is made and shows in the chatter.
+registry.category("web_tour.tours").add("dwo_chatter_filter_edit", {
+    steps: () => [
+        { trigger: ".o-dwo-messageFilter .o-dwo-filterEdit", run: "click" },
+        // the list: the six chips, each with a handle to drag it
+        { trigger: ".o_list_view .o_data_row:nth-child(6) .o_row_handle" },
+        { trigger: ".o_list_view .o_data_row:first-child .o_data_cell:contains('Discussions')" },
+        { trigger: ".o_list_button_add", run: "click" },
+        // a new chip comes with a colour of its own
+        { trigger: ".o_form_view .o_field_color input:not(:visible)", run() {
+            if (!/^#[0-9a-f]{6}$/i.test(this.anchor.value)) {
+                throw new Error(`The new chip has no colour: "${this.anchor.value}"`);
+            }
+        } },
+        { trigger: ".o_form_view .o_field_widget[name=name] input", run: "edit Quotes" },
+        { trigger: ".o_form_button_save", run: "click" },
+        { trigger: ".o_breadcrumb .o_back_button", run: "click" },
+        { trigger: ".o_list_view .o_data_row:contains('Quotes')" },
+        { trigger: ".o_breadcrumb .o_back_button", run: "click" },
+        // back on the record, the chip is there
+        { trigger: `.o-dwo-messageFilter .o-dwo-filterBadge[data-chip-name='Quotes']` },
+    ],
+});
+
+// Someone who is not an administrator sees the chips but not the link to edit them.
+registry.category("web_tour.tours").add("dwo_chatter_filter_no_edit", {
+    steps: () => [
+        { trigger: `${badge("all")}` },
+        { trigger: ".o-mail-Chatter:not(:has(.o-dwo-filterEdit))" },
     ],
 });
