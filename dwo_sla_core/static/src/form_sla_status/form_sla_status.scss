@@ -1,0 +1,49 @@
+// SLA status chip next to the form pager (light mode only).
+.o_sla_status_chip {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+
+    &.o_sla_status_running  { --sla-chip-fg: #1e7e34; --sla-chip-bg: #e6f4ea; --sla-chip-bar: #28a745; }
+    &.o_sla_status_due_soon { --sla-chip-fg: #8a6100; --sla-chip-bg: #fff4d6; --sla-chip-bar: #ffc107; }
+    &.o_sla_status_paused   { --sla-chip-fg: #7a6a2b; --sla-chip-bg: #fbf6e1; --sla-chip-bar: #e6d58a; }
+    &.o_sla_status_breached { --sla-chip-fg: #a71d2a; --sla-chip-bg: #fde8ea; --sla-chip-bar: #dc3545; }
+    &.o_sla_status_met      { --sla-chip-fg: #4b6b5a; --sla-chip-bg: #eef3f0; --sla-chip-bar: #8fb09f; }
+    &.o_sla_status_missed   { --sla-chip-fg: #8c4a50; --sla-chip-bg: #f7ecec; --sla-chip-bar: #c98a90; }
+
+    color: var(--sla-chip-fg);
+    background: var(--sla-chip-bg);
+    border-color: var(--sla-chip-bar);
+
+    .o_sla_status_bar {
+        display: inline-block;
+        width: 36px;
+        height: 5px;
+        margin-left: 0.5rem;
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .o_sla_status_bar_fill {
+        display: block;
+        height: 100%;
+        background: var(--sla-chip-bar);
+    }
+
+    &.o_sla_status_breached .o_sla_status_bar_fill {
+        background-image: repeating-linear-gradient(
+            45deg, var(--sla-chip-bar), var(--sla-chip-bar) 4px, #f1a1a8 4px, #f1a1a8 8px);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_sla_status_chip .o_sla_status_bar {
+        display: none;
+    }
+}

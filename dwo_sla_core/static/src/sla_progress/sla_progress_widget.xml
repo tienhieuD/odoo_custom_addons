@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="dwo_sla_core.SlaProgressWidget" owl="1">
+        <div class="o_sla_progress_card" t-att-class="'o_sla_progress_card_' + statusMeta.key">
+            <div class="o_sla_progress_head">
+                <span t-attf-class="o_sla_progress_badge badge rounded-pill text-bg-{{statusMeta.color}}">
+                    <i t-attf-class="fa {{statusMeta.icon}} me-1"/>
+                    <t t-esc="statusMeta.label"/>
+                </span>
+                <span t-attf-class="o_sla_progress_percent text-{{statusMeta.color}}">
+                    <t t-esc="headlinePercent"/>%
+                    <small t-if="showPercentOverflow" class="o_sla_progress_over" title="Over the target time">
+                        (+<t t-esc="overPercent"/>%)
+                    </small>
+                    <small t-if="overflowAsMultiplier and overflowMultiplier" class="o_sla_progress_over" title="Business time used, as a multiple of the target">
+                        (<t t-esc="overflowMultiplier"/> over target)
+                    </small>
+                </span>
+            </div>
+
+            <div class="o_sla_progress_track">
+                <div class="o_sla_progress_target_line" title="100% of target"/>
+                <div t-attf-class="o_sla_progress_fill bg-{{statusMeta.color}}"
+                     t-attf-style="width: {{barPercent}}%"/>
+                <div t-if="isOver" class="o_sla_progress_overflow bg-danger" title="Running over target"/>
+            </div>
+
+            <div class="o_sla_progress_milestones">
+                <div class="o_sla_progress_milestone">
+                    <i class="fa fa-flag-checkered text-muted me-1"/>
+                    <span class="o_sla_progress_milestone_label">Start</span>
+                    <t t-if="startMilestone">
+                        <div class="o_sla_progress_milestone_value" t-esc="startMilestone.absolute"/>
+                        <div class="o_sla_progress_milestone_relative text-muted" t-esc="startMilestone.relative"/>
+                    </t>
+                    <div t-else="" class="o_sla_progress_milestone_value text-muted">—</div>
+                </div>
+                <div class="o_sla_progress_milestone">
+                    <i class="fa fa-bullseye text-muted me-1"/>
+                    <span class="o_sla_progress_milestone_label">Deadline</span>
+                    <t t-if="deadlineMilestone">
+                        <div class="o_sla_progress_milestone_value" t-esc="deadlineMilestone.absolute"/>
+                        <div class="o_sla_progress_milestone_relative text-muted" t-esc="deadlineMilestone.relative"/>
+                    </t>
+                    <div t-else="" class="o_sla_progress_milestone_value text-muted">—</div>
+                </div>
+                <div class="o_sla_progress_milestone">
+                    <i class="fa fa-check-square-o text-muted me-1"/>
+                    <span class="o_sla_progress_milestone_label">End</span>
+                    <t t-if="endMilestone">
+                        <div class="o_sla_progress_milestone_value" t-esc="endMilestone.absolute"/>
+                        <div class="o_sla_progress_milestone_relative text-muted" t-esc="endMilestone.relative"/>
+                    </t>
+                    <div t-else="" class="o_sla_progress_milestone_value text-muted">In progress</div>
+                </div>
+            </div>
+
+            <div class="o_sla_progress_foot text-muted">
+                <span class="o_sla_progress_foot_item">
+                    <i class="fa fa-clock-o me-1"/><t t-esc="businessUsedLabel"/> worked
+                </span>
+                <span t-if="hasPause" class="o_sla_progress_foot_item">
+                    <i class="fa fa-pause me-1"/><t t-esc="pauseLabel"/> paused
+                </span>
+                <span class="o_sla_progress_foot_item">
+                    <i class="fa fa-calendar-o me-1"/><t t-esc="calendarLabel"/>
+                </span>
+            </div>
+        </div>
+    </t>
+
+</templates>
