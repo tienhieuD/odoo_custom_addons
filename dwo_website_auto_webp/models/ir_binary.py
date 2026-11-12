@@ -1,4 +1,3 @@
-import base64
 import io
 import logging
 
@@ -96,7 +95,7 @@ class IrBinary(models.AbstractModel):
             # Cache hit: không gọi super(), không resize, không convert
             return Stream(
                 type='data',
-                data=cached.raw,
+                data=cached.raw.content,  # Odoo 20: raw is a BinaryValue
                 mimetype='image/webp',
                 etag=cached.checksum,
                 last_modified=cached.write_date,
@@ -125,7 +124,7 @@ class IrBinary(models.AbstractModel):
                 'name': cache_name,
                 'res_model': record._name,
                 'res_id': record.id,
-                'datas': base64.b64encode(webp),
+                'raw': webp,  # Odoo 20 has no 'datas' field any more
                 'mimetype': 'image/webp',
             }])
         except Exception as e:
@@ -149,7 +148,9 @@ class IrBinary(models.AbstractModel):
         tránh tạo cache entries thừa cho cùng 1 ảnh trên nhiều non-website contexts.
         """
         try:
-            website = self.env['website'].get_current_website()
+            # Odoo 20 has no website.get_current_website(): the website of a frontend route is env.website,
+            # the one of a non-website route (such as /web/image) is in the context key host_id
+            website = self.env.website or self.env['website'].browse(self.env.context.get('host_id'))
             if website and website.exists():
                 if not website.auto_webp:
                     return (0, None)
