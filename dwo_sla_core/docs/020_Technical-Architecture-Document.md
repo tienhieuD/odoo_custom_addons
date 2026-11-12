@@ -2,10 +2,10 @@
 
 ## Cho module `dwo_sla_core` (SLA generic cho Odoo 19)
 
-Version 0.3 (draft)
+Version 0.6 (draft)
 Prepared by hieudt
 DUO-TEK Software Vietnam
-2026-10-12
+2026-11-12
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
@@ -14,13 +14,14 @@ DUO-TEK Software Vietnam
 | 0.3 | 2026-10-12 | hieudt | Đối chiếu với code và SRS 0.4: K-02 ghi thêm `web` (D1); 1.2 và 7.2 sửa ngưỡng REQ-PERF-001 (5%, đã chốt O-01) áp cho model KHÔNG có định nghĩa; 1.2 nhóm TG-01 đến TG-19; 5.1 và 6.1 hook gọi `evaluate(records, now=None, changed)`; AD-06 thêm cờ `cancel_retry_on_stop` và bước xử lý lượt thử lại của task không còn `in_progress`; AD-12 nêu tên 3 tham số cấu hình; tham chiếu Phụ lục 060 dùng tiền tố `TA-`; trỏ `docs/TASKS.md` |
 | 0.4 | 2026-11-07 | hieudt | D12/D13: AD-06 đánh dấu Superseded by AD-14 (bỏ bảng thử lại, giữ phần khóa từng task); thêm AD-14 (bỏ `sla.escalation.retry`, mặc định escalation = email qua `mail.mail`, server action vẫn có cho nâng cao); kịch bản 6.3 và §8.2 viết lại không còn nhánh thử lại. |
 | 0.5 | 2026-11-12 | hieudt | Đợt cải thiện 01 (19.0.1.1.0): thêm mục 5.4 (thành phần mới: `sla.apply.job`, `sla.apply.wizard`, `ir.http`, chip trạng thái và controller form định nghĩa), 6.6 (kịch bản Apply to Existing Records), 8.9 (nâng cấp và tương thích). |
+| 0.6 | 2026-11-12 | hieudt | Đối chiếu danh từ kỹ thuật với code 19.0.1.1.0 (`models/*.py`, `security/`, `views/`, `static/src`, `data/`, `migrations/`): đổi tên theo code (`duration`, `planned_end_time`, `business_duration`, `schedule_*`); K-02 thêm `mail` (D10); 1.1, 4, 5.1 bỏ "bảng thử lại" (đã gỡ ở D12), thêm khối Apply Job và chip trạng thái; `Engine.evaluate(..., definitions=None)`; tên nút theo giao diện (Apply Current Settings, Re-check Conditions, Re-evaluate hàng loạt); 5.4 bổ sung `sla.mixin`, `resource.calendar` (bản sao theo timezone), `res.config.settings`; 8.5 nêu bản sao lịch theo timezone; 8.7 và 3.1 ghi module demo `dwo_sla_demo_ticket` chưa được tạo; tham chiếu SRS 0.7. |
 
 ---
 
 ## 0. Thông tin chung
 
-- **Hệ thống (System of Interest):** `dwo_sla_core`, module Odoo 19 cung cấp SLA dùng chung cho model bất kỳ. Module demo `dwo_sla_demo_ticket` chỉ là một model gốc dùng để test.
-- **SRS tham chiếu:** `010_Software-Requirements-Specification.md`, version 0.4 (REQ-ID trong tài liệu này theo version đó).
+- **Hệ thống (System of Interest):** `dwo_sla_core`, module Odoo 19 cung cấp SLA dùng chung cho model bất kỳ. Module demo `dwo_sla_demo_ticket` (chưa được tạo trong 19.0.1.1.0, REQ-INST-004 còn `draft`) dự kiến chỉ là một model gốc dùng để test; bộ test hiện dùng `res.partner`.
+- **SRS tham chiếu:** `010_Software-Requirements-Specification.md`, version 0.7 (REQ-ID trong tài liệu này theo version đó).
 - **Phạm vi:** kiến trúc của `dwo_sla_core`: hook, engine, tính thời gian, xử lý nền (escalation), mô hình dữ liệu ở mức khối. Không bao gồm: SLO và dashboard (`dwo_sla_analysis`, giai đoạn sau), sản phẩm helpdesk, giao diện chi tiết. Chi tiết bảng và index nằm ở `030_Database-Design.md`.
 
 ---
@@ -38,7 +39,11 @@ Chỉ liệt kê yêu cầu có ảnh hưởng tới kiến trúc:
 | 6 điều kiện, thứ tự ưu tiên, idempotent | REQ-FUNC-006 đến 016 | Engine thuần, test được không cần qua `create`/`write`. |
 | Tính giờ làm việc, pause, resume, snapshot | REQ-FUNC-018, 019, 020, 021, 043, 044, 052 | Lưu thời gian đã trôi (không lưu thời gian còn lại); giao tính lịch cho `resource.calendar`; 3 nguồn lịch và lịch dự phòng. |
 | Retroactive start | REQ-FUNC-017, 041 | Time Service lấy mốc bắt đầu từ field ngày giờ. |
-| Escalation, retry, đúng một lần, không bắn bù | REQ-FUNC-023 đến 028, 053 đến 059 | Xử lý nền theo mốc, khóa từng task, bảng lượt thử lại. |
+| Escalation (email hoặc server action), đúng một lần, không bắn bù | REQ-FUNC-023 đến 026, 053 đến 055, 064, 065 (cơ chế thử lại FUNC-027, 028, 056 đến 059 đã gỡ ở D12) | Xử lý nền theo mốc, khóa từng task; action lỗi ghi `escalate_failed` và coi mốc là xong. |
+| Bật/tắt, `[]` chưa cấu hình, timezone bắt buộc, bảo vệ khi sửa | REQ-FUNC-003, 051, 066, 067, 069 | Định nghĩa mặc định tắt; hook vẫn patch model còn task đang chạy; `calendar_tz_override` luôn thắng, dùng bản sao lịch (`resource.calendar`) khi khác timezone. |
+| Áp dụng cho record có sẵn | REQ-FUNC-068 | Job lưu ở bảng riêng (`sla.apply.job`), xử lý theo lô bằng engine và cron, đánh dấu sẵn mốc escalation đã vượt. |
+| Chip trạng thái và các màn hình mới | REQ-INT-024 đến 029 | RPC không `sudo`, `session_info` mang danh sách model (`ir.http`), asset JS/OWL. |
+| Phân loại, retroactive pause, thời lượng đồng hồ | REQ-FUNC-070 đến 072 | Nhãn phân loại không đổi engine; retroactive pause đọc `mail.tracking.value`. |
 | Engine lỗi không chặn lưu record | REQ-FUNC-030, 031, 040 | Cô lập lỗi bằng savepoint, ghi event `error`. |
 | Báo cáo cơ bản | REQ-FUNC-036, 062, REQ-INT-011 đến 013, 023 | Chỉ mục riêng cho truy vấn tổng hợp (xem 030). |
 | Hiệu năng của hook trên mọi model | REQ-PERF-001 đến 003 | Patch chỉ model có định nghĩa; xử lý theo lô và theo mốc. |
@@ -77,7 +82,7 @@ Chỉ liệt kê yêu cầu có ảnh hưởng tới kiến trúc:
 | ID | Ràng buộc | Loại | Nguồn / Lý do | Link ADR |
 |----|----------|------|---------------|----------|
 | K-01 | Odoo 19 (image `odoo:19.0-20260421`) và PostgreSQL; không vendoring core | Technical | CLAUDE.md của repo; SRS C-01 | AD-01 |
-| K-02 | Chỉ phụ thuộc `base`, `resource` và `web` (D1, cho view); không OCA, không Helpdesk của Odoo | Technical | SRS C-02, REQ-INST-002 | AD-01 |
+| K-02 | Chỉ phụ thuộc `base`, `resource`, `web` (D1, cho view) và `mail` (D10, cho `retroactive_pause` đọc `mail.tracking.value` và chatter của định nghĩa); không OCA, không Helpdesk của Odoo | Technical | SRS C-02, REQ-INST-002 | AD-01 |
 | K-03 | Không thêm cột vào bảng của model được gắn SLA | Technical | SRS C-03, REQ-INST-003 | AD-02 |
 | K-04 | Giờ làm việc tính bằng `resource.calendar`; Datetime lưu UTC | Technical | SRS C-05 | AD-04 |
 | K-05 | Hành vi 6 điều kiện theo ServiceNow đã chốt | Organizational | SRS C-04 | (hành vi ở SRS; engine ở AD-03) |
@@ -94,7 +99,7 @@ Chỉ liệt kê yêu cầu có ảnh hưởng tới kiến trúc:
 ```mermaid
 flowchart LR
   U["Nhân viên nghiệp vụ"] -->|sửa record| ODOO
-  M["SLA Manager"] -->|cấu hình, đánh giá lại, tính lại| ODOO
+  M["SLA Manager"] -->|cấu hình, Re-check Conditions, Apply Current Settings| ODOO
   V["SLA User"] -->|xem task, event, báo cáo| ODOO
   subgraph ODOO["Odoo 19"]
     SLA["dwo_sla_core"]
@@ -104,7 +109,7 @@ flowchart LR
   SLA -->|"đọc tham số"| CP["ir.config_parameter"]
   SLA -->|"SQL qua ORM"| PG[("PostgreSQL")]
   CRON["ir.cron"] -->|"gọi hàm xử lý nền"| SLA
-  DEMO["dwo_sla_demo_ticket"] -. model gốc để test .-> SLA
+  DEMO["dwo_sla_demo_ticket (chưa tạo)"] -. model gốc để test .-> SLA
   ANA["dwo_sla_analysis (sau)"] -. đọc dữ liệu .-> SLA
 ```
 
@@ -129,7 +134,7 @@ Chú giải: mũi tên liền là luồng gọi hoặc dữ liệu trong phiên 
 - Dữ liệu SLA nằm ở **bảng riêng**, liên kết record gốc bằng tên model và id, không đụng bảng của model gốc (AD-02).
 - Engine đánh giá **theo lô**, mỗi điều kiện một lần, chạy lại an toàn và nhận thời điểm làm tham số để test (AD-03).
 - Tính thời gian bằng **lưu thời gian đã trôi** và giao lịch cho `resource.calendar` (chỉ `fully_fixed`); cấu hình được **snapshot lúc attach** (AD-04).
-- **Xử lý nền theo mốc** (`next_due_at` có index một phần), không quét phần trăm (AD-05); escalation chạy bằng server action, **khóa và lưu từng task**, báo tiến độ cho `ir.cron`, có bảng thử lại (AD-06, AD-12).
+- **Xử lý nền theo mốc** (`next_due_at` có index một phần), không quét phần trăm (AD-05); escalation chạy bằng server action, **khóa và lưu từng task**, báo tiến độ cho `ir.cron`, action lỗi ghi `escalate_failed` và không thử lại (AD-06 đã thay bằng AD-14, AD-12).
 - **Lỗi engine bị cô lập bằng savepoint** và ghi event `error`, record vẫn lưu (AD-07); đồng thời được bảo vệ bằng ràng buộc duy nhất (AD-08).
 - Dọn dẹp bằng autovacuum (AD-09); archive không dừng task đang chạy (AD-10); điều kiện là domain literal được kiểm tra khi lưu (AD-11); **quyền ghi hẹp bằng `sudo` ở điểm ghi, cô lập công ty bằng record rule** (AD-13).
 
@@ -146,7 +151,9 @@ flowchart TB
     ENG["Engine"]
     TIME["Time Service"]
     CFG["Configuration (Definition, Escalation)"]
-    DATA["Runtime Data (Task, Event, Retry)"]
+    DATA["Runtime Data (Task, Event, Apply Job)"]
+    APPLY["Apply Job (wizard, cron)"]
+    CHIP["Chip trạng thái (ir.http, OWL)"]
     PROC["Background Processor"]
     MAINT["Maintenance Jobs"]
     UI["UI & Reports"]
@@ -173,22 +180,28 @@ flowchart TB
   PARAM -->|"đọc"| CP
   UI -->|"đọc"| DATA
   UI -->|"sửa"| CFG
-  UI -->|"Đánh giá lại, Tính lại"| ENG
+  UI -->|"Re-check Conditions, Apply Current Settings"| ENG
+  UI -->|"Apply to Existing Records"| APPLY
+  APPLY -->|"evaluate(definitions=...)"| ENG
+  CR -->|"cron ir_cron_sla_apply"| APPLY
+  CHIP -->|"get_record_sla_summary"| DATA
 ```
 
 Chú giải: nhãn mũi tên là cách giao tiếp (gọi hàm Python, SQL qua ORM, đọc tham số). Tất cả khối nằm trong tiến trình Odoo.
 
 | Block | Trách nhiệm | Technology | Interface chính |
 |-------|-------------|-----------|-----------------|
-| Hook (patch động) | Bắt tạo, sửa record và tính lại field compute có lưu của các model có định nghĩa; thoát sớm theo field; đọc giá trị cũ của field theo dõi; gọi Engine sau khi ORM đã ghi; đăng ký lại khi định nghĩa đổi | `_register_hook` của một model của module; `patch` trên class model trong registry | Cài đặt lại `create`, `write`, hàm tính lại field cho model có định nghĩa; gọi `Engine.evaluate(records, now=None, changed)` (hook không truyền `now`, Engine lấy đồng hồ hệ thống) |
-| Engine | Đánh giá 6 điều kiện, áp dụng chuyển trạng thái, ghi event, cô lập lỗi | Model Odoo, Python | `evaluate(records, now=None, changed=None)`; được UI gọi cho "Đánh giá lại" |
+| Hook (patch động) | Bắt tạo, sửa record và tính lại field compute có lưu của các model có định nghĩa; thoát sớm theo field; đọc giá trị cũ của field theo dõi; gọi Engine sau khi ORM đã ghi; đăng ký lại khi định nghĩa đổi | `_register_hook` của một model của module; `patch` trên class model trong registry | Cài đặt lại `create`, `write`, hàm tính lại field cho model có định nghĩa; gọi `Engine.evaluate(records, now=None, changed, definitions=None)` (hook không truyền `now`, Engine lấy đồng hồ hệ thống) |
+| Engine | Đánh giá 6 điều kiện, áp dụng chuyển trạng thái, ghi event, cô lập lỗi | Model Odoo, Python | `evaluate(records, now=None, changed=None, definitions=None)` (tham số `definitions` giới hạn phạm vi cho "Re-check Conditions" và Apply to Existing Records); được UI gọi cho "Re-check Conditions" |
 | Time Service | Xác định lịch (3 nguồn, dự phòng), tính hạn chót, thời gian đã trôi, mốc escalation kế tiếp | Python + `resource.calendar` | `resolve_calendar`, `plan`, `settle`, `next_due_at` |
-| Configuration | Lưu định nghĩa và escalation; kiểm tra khi lưu (domain, model, lịch, mẫu thử lại, field); gọi đăng ký lại hook khi đổi | Model Odoo, constrains | Form và API ORM |
-| Runtime Data | Lưu task, event, lượt thử lại; ràng buộc duy nhất; index | Model Odoo, PostgreSQL | Chỉ Engine, Background Processor và Maintenance ghi |
-| Background Processor | Bắt breach và escalation đến hạn: chọn và khóa từng task, chạy server action trong savepoint, thử lại, báo tiến độ để nhường tài nguyên | `ir.cron` (`_commit_progress`), `try_lock_for_update` | Hàm cron gọi mỗi phút; chạy cho tới khi hết thời gian của lần chạy |
+| Configuration | Lưu định nghĩa và escalation; kiểm tra khi lưu (domain, model, lịch, cấu hình mốc email hoặc server action, field); gọi đăng ký lại hook khi đổi | Model Odoo, constrains | Form và API ORM |
+| Runtime Data | Lưu task, event, job áp dụng thủ công; ràng buộc duy nhất; index | Model Odoo, PostgreSQL | Chỉ Engine, Background Processor và Maintenance ghi |
+| Background Processor | Bắt breach và escalation đến hạn: chọn và khóa từng task, gửi email hoặc chạy server action trong savepoint, báo tiến độ để nhường tài nguyên | `ir.cron` (`_commit_progress`), `try_lock_for_update` | Hàm cron gọi mỗi phút; chạy cho tới khi hết thời gian của lần chạy |
 | Parameter Reader | Đọc và kiểm tra tham số (kích thước lô, số ngày lưu nhật ký, khoảng "Sắp đến hạn") | `ir.config_parameter` | Hàm đọc tham số có kiểm tra giá trị |
-| Maintenance Jobs | Dọn task mồ côi, dọn nhật ký cũ | `@api.autovacuum` | Gọi bởi cron vacuum của Odoo |
-| UI & Reports | Form, danh sách, bộ lọc, pivot, graph, action "SLA", nút Đánh giá lại, Tính lại, đánh giá lại hàng loạt từ event | XML view, window action | Menu và hành động trên form |
+| Apply Job | Gắn SLA cho record có sẵn theo lô: wizard tạo job, lô đầu chạy ngay, phần còn lại do cron; hủy, dọn job cũ | `sla.apply.job`, `sla.apply.wizard`, cron `ir_cron_sla_apply` | `sla.apply.wizard.action_apply`, `sla.apply.job._run_batch`, `_cron_run`, `action_cancel` |
+| Chip trạng thái | Hiện trạng thái SLA của record trên form: RPC tóm tắt không `sudo`, danh sách model qua `session_info` | `models/ir_http.py`, `sla.task.get_record_sla_summary`, `static/src/form_sla_status/` (OWL, `patch(FormController)`) | RPC `get_record_sla_summary(res_model, res_id)`; khóa `dwo_sla_models` trong `session_info` |
+| Maintenance Jobs | Dọn task mồ côi, dọn nhật ký cũ, dọn job áp dụng cũ | `@api.autovacuum` (`_gc_orphan_tasks`, `_gc_old_events`, `_gc_old_jobs`) | Gọi bởi cron vacuum của Odoo |
+| UI & Reports | Form, danh sách, bộ lọc, pivot, graph, action "SLA", nút Re-check Conditions, Apply Current Settings, Enable/Disable, Apply to Existing Records, chip trạng thái trên form record gốc, Re-evaluate hàng loạt từ event lỗi | XML view, window action | Menu và hành động trên form |
 
 Điểm mở rộng (REQ-INT-007, REQ-INT-015 đến REQ-INT-018) là các phương thức của Configuration và Runtime Data mà Engine và Time Service gọi: xác định lịch, thời lượng, mốc bắt đầu, domain điều kiện, và hook sau chuyển trạng thái.
 
@@ -236,11 +249,11 @@ Reset kết thúc task cũ rồi gắn task mới (một trạng thái `[*] --> 
 
 1. Đọc kích thước lô tối đa (số task tối đa trong một lần gọi) từ Parameter Reader.
 2. Lặp: chọn task `in_progress` đến hạn (`next_due_at <= now`) theo thứ tự `next_due_at`; khóa **đúng một task** bằng `try_lock_for_update(limit=1)`; nếu không có thì thoát.
-3. Với task đó, trong savepoint: bật dấu vi phạm và ghi event `breach` nếu `now >= planned_end` (trước mốc từ 100% trở lên); với từng mốc đến hạn: gửi email (mặc định) hoặc chạy server action đúng công ty; ghi `escalate` hoặc `escalate_failed` (không thử lại, D12); tính lại `next_due_at` qua Time Service.
+3. Với task đó, trong savepoint: bật dấu vi phạm và ghi event `breach` nếu `now >= planned_end_time` (trước mốc từ 100% trở lên); với từng mốc đến hạn: gửi email (mặc định) hoặc chạy server action đúng công ty; ghi `escalate` hoặc `escalate_failed` (không thử lại, D12); tính lại `next_due_at` qua Time Service.
 4. Gọi `ir.cron._commit_progress(1, remaining=số task còn đến hạn)`: lưu kết quả, mở khóa, nhận **thời gian còn lại** của lần chạy.
 5. Quay lại bước 2 nếu thời gian còn lại lớn hơn 0 và chưa chạm kích thước lô tối đa; ngược lại thoát.
 
-**Time Service:** `resolve_calendar` (nguồn `none`, `definition`, `record` kèm dự phòng), `plan` (hạn chót bằng `plan_hours`, `compute_leaves=True`), `settle` (cộng thời gian đã trôi giữa hai mốc), `next_due_at` (mốc sớm nhất trong `planned_end` chưa vi phạm, mốc escalation chưa xử lý). Phương thức nào nhận `now` làm tham số để test cố định thời điểm.
+**Time Service:** `resolve_calendar` (nguồn `none`, `definition`, `record` kèm dự phòng), `plan` (hạn chót bằng `plan_hours`, `compute_leaves=True`), `settle` (cộng thời gian đã trôi giữa hai mốc), `next_due_at` (mốc sớm nhất trong `planned_end_time` chưa vi phạm, mốc escalation chưa xử lý). Phương thức nào nhận `now` làm tham số để test cố định thời điểm.
 
 ### 5.4 Whitebox Level 2: Thành phần của đợt cải thiện 01 (19.0.1.1.0)
 
@@ -255,6 +268,13 @@ Reset kết thúc task cũ rồi gắn task mới (một trạng thái `[*] --> 
 | `static/src/definition_form/` | `SlaDefinitionFormController.onWillSaveRecord`: hỏi xác nhận trước khi lưu thay đổi điều kiện (`start/stop/pause/resume/cancel/reset_domain`, `cancel_mode`, `resume_mode`) của định nghĩa đang có task chạy, vì thay đổi áp dụng cho các task đó ở lần đánh giá kế (không snapshot). |
 | `views/sla_apply_views.xml`, `views/sla_definition_views.xml` | Wizard và tab "Manual Apply" (danh sách các lần chạy), nút Enable/Disable, ribbon Disabled, nút Running Tasks, công tắc trên list, tab Note (giới hạn và lỗi thường gặp). |
 | `migrations/19.0.1.1.0/pre-migrate.py` | Điền `calendar_tz_override` và đổi Start `[]` cũ thành `[('id', '!=', 0)]` (xem `030_Database-Design.md` mục 8b). |
+| `models/resource_calendar.py` (`_inherit = resource.calendar`) | Cột `sla_tz_override_source_id` và `_sla_get_tz_variant(source, tz)`: tìm hoặc tạo bản sao lịch theo timezone (unique theo lịch gốc và `tz`), sao chép khung giờ và ngày nghỉ chung. |
+| `models/sla_mixin.py` (`sla.mixin`, AbstractModel, opt-in) | `sla_task_count`, `sla_task_active_count`, `sla_task_breach_count` và `action_view_sla_tasks` cho model gốc muốn có nút số task (REQ-INT-014). |
+| `models/res_config_settings.py` | Bốn tham số Settings: `sla_event_retention_days`, `sla_due_soon_hours`, `sla_batch_size`, `sla_show_form_status` (`ir.config_parameter` `dwo_sla_core.*`). |
+| `static/src/sla_progress/`, `static/src/float_time_unit/` | Widget `sla_progress` (`view_widgets`, thanh tiến độ trên form task) và field `float_time_unit` (`fields`, giống `float_time` HH:MM kèm nhãn đơn vị, ví dụ "04:30 h"). |
+| `static/tests/tours/` | Tour `dwo_sla_definition_confirm_save`, `dwo_sla_form_status_chip`, `dwo_sla_form_status_chip_absent` (bundle `web.assets_tests`). |
+| `data/ir_cron.xml`, `data/mail_templates.xml` | Cron `ir_cron_sla_process_due` (mỗi phút), `ir_cron_sla_apply` (5 phút); mẫu email escalation `mail_template_escalation_default` (có bản dịch `i18n/ja_JP.po`). |
+| `security/` | Nhóm `group_sla_user` ("SLA / Viewer"), `group_sla_manager` ("SLA / Configuration Administrator", kế thừa user), `base.group_system` kế thừa `group_sla_manager`; record rule công ty trên `sla.definition`, `sla.task`, `sla.event`, `sla.apply.job`; ACL ở `ir.model.access.csv`. |
 
 ---
 
@@ -278,7 +298,7 @@ sequenceDiagram
   E->>E: filtered_domain cho 6 điều kiện (mỗi cái một lần)
   E->>D: search task đang hoạt động (một lần cho cả lô)
   alt chưa có task, start khớp, stop và cancel không khớp
-    E->>T: resolve_calendar, plan(target_hours)
+    E->>T: resolve_calendar, plan(duration)
     E->>D: tạo task + event attach
   else có task, pause khớp
     E->>T: settle(now)
@@ -309,7 +329,7 @@ sequenceDiagram
   E-->>H: task kết thúc đúng một lần
 ```
 
-Chỉ xử lý khi field tính lại có `store=True` và nằm trong domain của một định nghĩa; field không lưu và quan hệ xa dựa vào "Đánh giá lại" (REQ-FUNC-042). Test: TG-13.
+Chỉ xử lý khi field tính lại có `store=True` và nằm trong domain của một định nghĩa; field không lưu và quan hệ xa dựa vào "Re-check Conditions" (REQ-FUNC-042). Test: TG-13.
 
 ### 6.3 Kịch bản: xử lý nền và escalation
 
@@ -324,7 +344,7 @@ sequenceDiagram
   C->>P: gọi hàm xử lý nền
   loop đến khi hết thời gian của lần chạy, hết task đến hạn, hoặc chạm kích thước lô tối đa
     P->>D: chọn task đến hạn, khóa đúng một task (try_lock_for_update, bỏ qua task đang bị khóa)
-    P->>P: nếu now >= planned_end: bật dấu vi phạm, ghi event breach (trước các mốc >= 100%)
+    P->>P: nếu now >= planned_end_time: bật dấu vi phạm, ghi event breach (trước các mốc >= 100%)
     P->>A: email qua mail.mail, hoặc run() server action, trong savepoint, đúng công ty của record
     alt thành công
       P->>D: event escalate, đánh dấu mốc xong
@@ -372,7 +392,7 @@ sequenceDiagram
   M->>UI: mở danh sách event, thấy cảnh báo số event lỗi chưa xử lý
   UI->>D: đọc event error chưa xử lý
   M->>M: sửa nguyên nhân (cấu hình, lịch)
-  M->>UI: chọn event, bấm "Đánh giá lại"
+  M->>UI: chọn event, bấm "Re-evaluate"
   UI->>E: evaluate(record liên quan, now) cho từng record còn tồn tại
   E->>D: tạo task thiếu, event mới
   E-->>UI: kết quả từng record
@@ -432,7 +452,7 @@ Tài nguyên (vCPU, RAM, dung lượng): không đổi so với hạ tầng Odoo
 
 ### 8.1 Bảo mật
 
-Xem AD-13. Hai nhóm `group_sla_user` (đọc) và `group_sla_manager` (cấu hình, đánh giá lại, tính lại, xử lý event lỗi). Engine và xử lý nền ghi dữ liệu SLA bằng quyền hệ thống chỉ ở các điểm ghi (`sudo` hẹp), vì người sửa record thường không có quyền ghi vào bảng SLA (REQ-SEC-002); task và event không có thao tác tạo, sửa, xóa tay, ngoại lệ là trạng thái xử lý của event lỗi (REQ-SEC-006). Đọc đường dẫn lịch qua record liên kết bằng quyền hệ thống chỉ để tính (REQ-SEC-005). Đa công ty: record rule theo `company_id` trên task, event và định nghĩa. Server action chạy bằng user của cron trong công ty của record (`with_company`, `allowed_company_ids`), nên user cron phải được cấp quyền các công ty có SLA.
+Xem AD-13. Hai nhóm `group_sla_user` (đọc) và `group_sla_manager` (cấu hình, Re-check Conditions, Apply Current Settings, xử lý event lỗi). Engine và xử lý nền ghi dữ liệu SLA bằng quyền hệ thống chỉ ở các điểm ghi (`sudo` hẹp), vì người sửa record thường không có quyền ghi vào bảng SLA (REQ-SEC-002); task và event không có thao tác tạo, sửa, xóa tay, ngoại lệ là trạng thái xử lý của event lỗi (REQ-SEC-006). Đọc đường dẫn lịch qua record liên kết bằng quyền hệ thống chỉ để tính (REQ-SEC-005). Đa công ty: record rule theo `company_id` trên task, event và định nghĩa. Server action chạy bằng user của cron trong công ty của record (`with_company`, `allowed_company_ids`), nên user cron phải được cấp quyền các công ty có SLA.
 
 ### 8.2 Xử lý lỗi và nhật ký
 
@@ -452,7 +472,7 @@ Odoo chạy ở REPEATABLE READ nên xung đột tuần tự hóa có thể xả
 
 ### 8.5 Thời gian
 
-Datetime lưu UTC (naive là UTC khi gọi `resource.calendar`); giờ làm việc theo `tz` của calendar; chỉ calendar `fully_fixed`. Engine nhận `now` làm tham số nên test đặt thời điểm cụ thể mà không cần đóng băng đồng hồ. Đường qua hook dùng đồng hồ hệ thống; test cho đường này patch hàm lấy thời điểm hiện tại (TA-01 của Phụ lục `060`).
+Datetime lưu UTC (naive là UTC khi gọi `resource.calendar`); giờ làm việc theo timezone của định nghĩa (`calendar_tz_override`, bắt buộc); khi khác `tz` của calendar thì `Time Service._apply_tz_override` dùng bản sao lịch do `resource.calendar._sla_get_tz_variant` tìm hoặc tạo (cột `sla_tz_override_source_id`, unique theo (lịch gốc, tz), sao chép ngày nghỉ chung lúc tạo, không tự đồng bộ); chỉ calendar `fully_fixed`. Engine nhận `now` làm tham số nên test đặt thời điểm cụ thể mà không cần đóng băng đồng hồ. Đường qua hook dùng đồng hồ hệ thống; test cho đường này patch hàm lấy thời điểm hiện tại (TA-01 của Phụ lục `060`).
 
 ### 8.6 Mở rộng
 
@@ -460,7 +480,7 @@ Mọi giá trị engine cần đi qua phương thức nhỏ ghi đè được b�
 
 ### 8.7 Kiểm thử và chú thích mã
 
-Test `TransactionCase` chạy trên `res.partner` (không phụ thuộc model ticket) và một bộ end-to-end trên `demo.ticket`. Mã nguồn PHẢI có comment tại chỗ cài đặt cho các quyết định không hiển nhiên (REQ-MAINT-001): vì sao patch cả `write` lẫn tính lại field, đăng ký lại khi định nghĩa đổi, savepoint và đánh đổi SLA có thể thiếu, đánh giá lại dùng `now` và không sửa ngược task đã kết thúc, vai trò của `sla.event`.
+Test `TransactionCase` chạy trên `res.partner` (không phụ thuộc model ticket), kèm `HttpCase` và tour trình duyệt cho form định nghĩa và chip trạng thái (`static/tests/tours/`); bộ end-to-end trên `demo.ticket` chưa có vì module demo chưa tạo. Mã nguồn PHẢI có comment tại chỗ cài đặt cho các quyết định không hiển nhiên (REQ-MAINT-001): vì sao patch cả `write` lẫn tính lại field, đăng ký lại khi định nghĩa đổi, savepoint và đánh đổi SLA có thể thiếu, đánh giá lại dùng `now` và không sửa ngược task đã kết thúc, vai trò của `sla.event`.
 
 ### 8.8 AI/ML
 
@@ -573,7 +593,7 @@ Chúng tôi chọn phương án A. Bảng ưu tiên: stop, cancel, reset, pause,
 #### Consequences
 - **Positive:** test trực tiếp; gọi lại từ nhiều nơi.
 - **Negative:** hook phải đọc giá trị cũ trước khi ghi.
-- **Neutral:** "Đánh giá lại" và xử lý nền truyền `changed` rỗng nên không kích hoạt reset theo field.
+- **Neutral:** "Re-check Conditions" và xử lý nền truyền `changed` rỗng nên không kích hoạt reset theo field.
 
 ### AD-04: Lưu thời gian đã trôi, giao lịch cho `resource.calendar`, snapshot lúc attach
 
@@ -587,7 +607,7 @@ Pause và resume phải đúng; task đã quá hạn rồi pause và resume vẫ
 #### Options Considered
 | Option | Pros | Cons |
 |--------|------|------|
-| A. Lưu `business_elapsed`, tính hạn bằng `resource.calendar.plan_hours`, snapshot mục tiêu và lịch vào task (chosen) | Giữ mức vượt; không tự viết thuật toán giờ làm; cấu hình đổi không ảnh hưởng task | Phụ thuộc hành vi của `resource.calendar` (`flexible` không đáng tin) |
+| A. Lưu `business_duration`, tính hạn bằng `resource.calendar.plan_hours`, snapshot mục tiêu và lịch vào task (chosen) | Giữ mức vượt; không tự viết thuật toán giờ làm; cấu hình đổi không ảnh hưởng task | Phụ thuộc hành vi của `resource.calendar` (`flexible` không đáng tin) |
 | B. Lưu thời gian còn lại | Công thức đơn giản | Mất mức vượt khi đã quá hạn; mốc trên 100% sai sau pause |
 | C. Tự cài đặt lịch làm việc | Toàn quyền | Trùng lặp chức năng Odoo, dễ sai múi giờ và ngày nghỉ |
 
@@ -599,7 +619,7 @@ Tiêu chí: độ đúng khi pause và resume, tái dùng thành phần chuẩn,
 
 #### Consequences
 - **Positive:** đo đúng qua pause và resume; sửa cấu hình không làm biến động task.
-- **Negative:** cần nút "Tính lại" để áp lịch mới; `plan_hours` trả `False` với lịch rỗng, phải xử lý (REQ-FUNC-030).
+- **Negative:** cần nút "Apply Current Settings" để áp lịch mới; `plan_hours` trả `False` với lịch rỗng, phải xử lý (REQ-FUNC-030).
 - **Neutral:** hành vi `plan_hours` với `Asia/Ho_Chi_Minh` kiểm chứng ở spike.
 
 ### AD-05: Xử lý nền theo `next_due_at` có index một phần
@@ -877,7 +897,7 @@ Chúng tôi chọn phương án A. `sla.escalation.retry` bị xóa; `sla_proces
 | ID | Quality goal | Stimulus | Response | Measure | Trace |
 |----|--------------|----------|----------|---------|-------|
 | QS-01 | Độ đúng | Đánh giá lại record không đổi | Không thay đổi task và event | 0 thay đổi | REQ-FUNC-015 |
-| QS-02 | Độ đúng | Tính hạn qua cuối tuần, ngày nghỉ, múi giờ `Asia/Ho_Chi_Minh` | `planned_end` đúng | Khớp giá trị tính tay ở mọi ca TG-06 | REQ-FUNC-018 |
+| QS-02 | Độ đúng | Tính hạn qua cuối tuần, ngày nghỉ, múi giờ `Asia/Ho_Chi_Minh` | `planned_end_time` đúng | Khớp giá trị tính tay ở mọi ca TG-06 | REQ-FUNC-018 |
 | QS-03 | Không chặn nghiệp vụ | Domain trỏ field đã gỡ khi người dùng lưu | Record lưu, có event `error` | 0 lần lưu thất bại do SLA | REQ-FUNC-030 |
 | QS-04 | Không chặn nghiệp vụ | Xử lý nền chạy server action chậm; người dùng stop **chính task đang được xử lý** | Lần lưu không bị chặn lâu | chờ khóa ≤ 5 giây (p95) | REQ-REL-001 |
 | QS-05 | Overhead thấp | Ghi hàng loạt 1000 `res.partner` không có định nghĩa; và tính lại field compute có lưu trên model không có định nghĩa | Không có chi phí thêm (model không bị patch) | ≤ 105% trung vị (ngưỡng đề xuất, chờ O-01) | REQ-PERF-001 |
@@ -897,8 +917,8 @@ Chúng tôi chọn phương án A. `sla.escalation.retry` bị xóa; `sla_proces
 |----|----------------------|--------|--------------|----------------|
 | R-01 | Patch bị gỡ bởi module khác (`_unregister_hook` của `base_automation` xóa `create`, `write`, `_compute_field_value`), SLA im lặng ngừng hoạt động trên worker đó | Cao | 1, 2 | Spike kiểm chứng (QS-12); tự phát hiện và đăng ký lại; hoặc patch `_write`/`_create`; hoặc quay lại phương án B (AD-01) |
 | R-02 | `_compute_field_value` là hàm nội bộ, chữ ký có thể đổi giữa bản Odoo | Trung | 1 | Spike kiểm chứng; test hồi quy khi nâng cấp Odoo |
-| R-03 | Điều kiện qua quan hệ và field không lưu không kích hoạt khi record liên quan đổi | Trung | 1 | Chấp nhận như Odoo; nút Đánh giá lại; help text (REQ-FUNC-042) |
-| R-04 | Sửa lịch hoặc ngày nghỉ sau khi xếp hạn làm `planned_end` cũ | Trung | 1 | Nút Tính lại (REQ-INT-005) |
+| R-03 | Điều kiện qua quan hệ và field không lưu không kích hoạt khi record liên quan đổi | Trung | 1 | Chấp nhận như Odoo; nút Re-check Conditions; help text (REQ-FUNC-042) |
+| R-04 | Sửa lịch hoặc ngày nghỉ sau khi xếp hạn làm `planned_end_time` cũ | Trung | 1 | Nút Apply Current Settings (REQ-INT-005) |
 | R-05 | `plan_hours` trả `False` vì lịch không có giờ làm | Trung | 1, 2 | Kiểm tra khi lưu định nghĩa (REQ-FUNC-039); lỗi lúc attach ghi `error` (REQ-FUNC-030) |
 | R-06 | Cấu hình start và pause mâu thuẫn làm SLA bị cancel | Trung | 1 | Help text, test TG-05 (REQ-INT-002) |
 | R-07 | SLA thiếu do lỗi engine mà không ai biết | Cao | 1, 2 | Event `error`, cảnh báo, đánh giá lại hàng loạt (AD-07, kịch bản 6.5) |
@@ -922,12 +942,12 @@ Chúng tôi chọn phương án A. `sla.escalation.retry` bị xóa; `sla_proces
 | Engine | Phần đánh giá 6 điều kiện và áp dụng chuyển trạng thái cho task |
 | Task SLA | Một SLA đang hoặc đã chạy trên một record (`sla.task`) |
 | Escalation | Hành động tự động (server action) tại một mốc phần trăm của thời lượng mục tiêu |
-| Breach | Vi phạm: thời gian đã trôi chạm hoặc vượt `planned_end`; dấu vi phạm không tắt lại |
+| Breach | Vi phạm: thời gian đã trôi chạm hoặc vượt `planned_end_time`; dấu vi phạm không tắt lại |
 | Pause, Resume | Tạm dừng và tiếp tục đồng hồ SLA; thời gian paused không tính |
 | Retroactive start | Lấy mốc bắt đầu SLA từ một field ngày giờ của record |
 | Retry | Thử lại escalation theo mẫu danh sách phút khi server action lỗi |
 | `sla.event` | Nhật ký sự kiện SLA, nơi ghi lỗi của engine |
-| Thời gian đã trôi (`business_elapsed`) | Số giờ làm việc đã dùng, cộng dồn qua pause và resume |
+| Thời gian đã trôi (`business_duration`) | Số giờ làm việc đã dùng, cộng dồn qua pause và resume |
 | `next_due_at` | Mốc sớm nhất xử lý nền phải xử lý cho task: breach, mốc escalation hoặc lượt thử lại |
 | Snapshot | Giá trị sao chép vào task lúc attach để cấu hình đổi sau đó không ảnh hưởng |
 | Savepoint | Điểm hoàn tác trong giao dịch cơ sở dữ liệu dùng để cô lập lỗi theo record |
