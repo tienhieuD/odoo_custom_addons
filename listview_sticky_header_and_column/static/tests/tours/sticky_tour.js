@@ -371,6 +371,8 @@ registry.category("web_tour.tours").add("lshc_dialog", {
                 clearKeys();
                 const root = document.querySelector(".modal .o_list_view");
                 await widen(root);
+                // make the rows tall enough for a vertical scroll whatever the demo data / window size
+                root.querySelectorAll(".o_data_row td").forEach((td) => (td.style.paddingBlock = "40px"));
                 const name = root.querySelector("thead th[data-name]").dataset.name;
                 await pin(root, name);
                 const idx = [...root.querySelectorAll("thead tr th")].indexOf(th(root, name));
