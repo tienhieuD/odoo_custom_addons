@@ -21,6 +21,9 @@
         'web.assets_backend': [
             'listview_sticky_header_and_column/static/src/scss/main.scss',
             'listview_sticky_header_and_column/static/src/js/main.js',
+        ],
+        'web.assets_tests': [
+            'listview_sticky_header_and_column/static/tests/tours/**/*',
         ]
     },
     'price': 35.00,
