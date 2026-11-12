@@ -4,7 +4,7 @@ from datetime import timedelta
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
 from odoo.osv import expression
-from odoo.tools import SQL, format_datetime
+from odoo.tools import format_datetime
 
 from ..constants.message import MessageCode, get_message
 
@@ -288,35 +288,6 @@ class SlaTask(models.Model):
                 for spec in rate_specs:
                     row[rate_key(spec)] = False
         return result
-
-    def init(self):
-        super().init()
-        # Odoo 17/18 have no models.Index: the (partial) indexes are created here
-        self._cr.execute(f'CREATE INDEX IF NOT EXISTS {self._table}_res_idx ON {self._table} ' + "(res_model, res_id)")
-        self._cr.execute(f'CREATE INDEX IF NOT EXISTS {self._table}_due_idx ON {self._table} ' + "(next_due_at) WHERE stage = 'in_progress'")
-        self._cr.execute(f'CREATE INDEX IF NOT EXISTS {self._table}_definition_end_idx ON {self._table} ' + "(sla_id, end_time) WHERE stage IN ('achieved','breached')")
-        self._cr.execute(f'CREATE INDEX IF NOT EXISTS {self._table}_breached_active_idx ON {self._table} ' + "(has_breached) WHERE stage IN ('in_progress','paused')")
-        self._cr.execute(f'CREATE UNIQUE INDEX IF NOT EXISTS {self._table}_one_active_uniq ON {self._table} ' + "(sla_id, res_model, res_id) WHERE stage IN ('in_progress','paused')")
-        # Xóa index đầy đủ `next_due_at` còn sót trên DB đã cài từ bản cũ (bản cũ khai báo
-        # `index=True`; Odoo không tự xóa index khi bỏ `index=True`). Refs: REQ-PERF-003, 030 §6
-        self.env.cr.execute("DROP INDEX IF EXISTS sla_task__next_due_at_index")
-
-
-    def _read_group_select(self, aggregate_spec, query):
-        """Trung bình `achieved_rate` chỉ tính task đã kết thúc achieved/breached.
-
-        Logic: cột lưu 0.0 cho task cancelled/đang chạy (Float không có giá trị rỗng),
-        nên phải lọc theo stage; nhóm không có task kết thúc cho kết quả rỗng
-        ("không xác định") thay vì 0% (REQ-FUNC-036).
-        Refs: REQ-FUNC-036
-        """
-        if aggregate_spec == 'achieved_rate:avg':
-            # Odoo 17 returns a pair (SQL, [field names used]) (18+ returns the SQL only)
-            return SQL(
-                "AVG(%s) FILTER (WHERE %s IN ('achieved', 'breached'))",
-                self._field_to_sql(self._table, 'achieved_rate', query),
-                self._field_to_sql(self._table, 'stage', query)), ['achieved_rate', 'stage']
-        return super()._read_group_select(aggregate_spec, query)
 
     @api.depends('stage', 'has_breached')
     def _compute_report_measures(self):
