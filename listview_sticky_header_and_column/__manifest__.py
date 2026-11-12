@@ -13,7 +13,7 @@
     'author': "DUO-TEK Software Vietnam",
     'license': 'LGPL-3',
     'category': 'Extra Tools',
-    'version': '20.0.0.5.0',
+    'version': '20.0.0.6.0',
     'depends': ['base', 'web'],
     'data': [],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],
