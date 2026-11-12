@@ -9,21 +9,13 @@ const FETCH_LIMIT = 30;
 patch(Thread.prototype, {
     setup() {
         super.setup(...arguments);
-        /** The kind of message shown, false for all of them. */
+        /** The id of the chip chosen (the messages it shows are the only ones loaded), false for all. */
         this.dwoFilter = false;
-    },
-
-    // A message that arrives while a kind is chosen (bus) is hidden when it is of another kind.
-    get nonEmptyMessages() {
-        const messages = super.nonEmptyMessages;
-        return this.dwoFilter
-            ? messages.filter((message) => message.dwoCategory === this.dwoFilter)
-            : messages;
     },
 });
 
 patch(ThreadService.prototype, {
-    /** While a kind is chosen, the server only returns that kind (Load more included). */
+    /** While a chip is chosen, the server only returns the messages of that chip (Load more included). */
     async fetchMessages(thread, { after, before } = {}) {
         if (!thread.dwoFilter) {
             return super.fetchMessages(...arguments);
@@ -36,7 +28,7 @@ patch(ThreadService.prototype, {
                 limit: FETCH_LIMIT,
                 after,
                 before,
-                dwo_category: thread.dwoFilter,
+                dwo_filter_id: thread.dwoFilter,
             });
             const messages = this.store.Message.insert(rawMessages.reverse(), { html: true });
             thread.isLoaded = true;
@@ -57,13 +49,19 @@ patch(ThreadService.prototype, {
         thread.loadNewer = false;
     },
 
-    /** Show one kind of message (false: all of them), loaded from the server. */
-    async dwoSetFilter(thread, category) {
-        category = category || false;
-        if (thread.dwoFilter === category) {
+    /** Show the messages of one chip (false: all of them), loaded from the server. */
+    async dwoSetFilter(thread, chipId) {
+        chipId = chipId || false;
+        if (thread.dwoFilter === chipId) {
             return;
         }
-        thread.dwoFilter = category;
+        thread.dwoFilter = chipId;
+        this.dwoForgetMessages(thread);
+        await this.fetchNewMessages(thread);
+    },
+
+    /** Load the messages of the chosen chip again (a message arrived: the server says if it belongs). */
+    async dwoReload(thread) {
         this.dwoForgetMessages(thread);
         await this.fetchNewMessages(thread);
     },
