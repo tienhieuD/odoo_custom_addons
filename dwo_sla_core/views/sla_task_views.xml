@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Danh sách và form chỉ đọc cho task SLA (REQ-INT-004). group_sla_user
+         VÀ group_sla_manager đều có perm_write=0/perm_unlink=0 trên model
+         này (ir.model.access.csv, REQ-SEC-006) nên Odoo tự ẩn mọi control
+         sửa/xóa field; chỉ 2 nút hành động (gọi method, không sửa field
+         trực tiếp) hiện cho group_sla_manager.
+
+         Layout (quyết định với user, 2026-11-06, [ĐỔI 2026-11-07, UX pass]
+         gộp tab Business Time + Wall-clock Time vào Overview): list hiện
+         mọi field, chỉ 8 field "quan trọng" mặc định hiện, còn lại
+         invisible="1". Form chia tab: Overview (chứa hết các field
+         không phải escalation/history, chia 5 nhóm 2 cột: Record/Target/
+         Timeline/Progress (Business Time)/Progress (Wall-clock Time)) /
+         Escalation / History. Điểm tự chọn mặc định: (a) res_model/res_id
+         trên FORM gộp lại thành 1 field "Source Record" duy nhất dùng
+         widget many2one_reference (mở thẳng record gốc, hiện display_name
+         thật thay vì model kỹ thuật + số id thô); list vẫn giữ 2 cột riêng
+         (res_model/res_id) vì cần lọc/group theo model độc lập; (b)
+         business_pause_duration nằm nhóm "Progress (Business Time)"
+         (nhóm theo tiền tố business_, không theo "Progress (Wall-clock
+         Time)"); (c) achieved_rate/breaching_count không đưa vào form,
+         chỉ dùng cho pivot/graph; (d) mọi field thời lượng (Float tính
+         bằng giờ) dùng widget="float_time_unit" (HH:MM + đơn vị "h" ngay
+         sau giá trị, xem static/src/float_time_unit/) thay vì số thập
+         phân thô. -->
+    <record id="view_sla_task_list" model="ir.ui.view">
+        <field name="name">sla.task.list</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <!-- Refs: plan-improvement-sla-01-review §6.15 -->
+            <tree string="SLA Tasks" default_order="id desc" create="0" edit="0" delete="0"
+                  decoration-danger="has_breached or stage == 'breached'" decoration-success="stage == 'achieved'"
+                  decoration-info="stage == 'in_progress'" decoration-warning="stage == 'paused'">
+                <!-- Odoo 13: decorations are per row (the tree element), not per field -->
+                <field name="sla_id"/>
+                <field name="target_duration" widget="float_time_unit"/>
+                <field name="schedule_id"/>
+                <field name="stage"/>
+                <field name="start_time"/>
+                <field name="planned_end_time"/>
+                <field name="end_time" invisible="1"/>
+                <!-- Bản live (đã chốt + đoạn đang chạy) hiện mặc định; hai cột
+                     lưu vẫn có để bật khi cần đối chiếu/báo cáo. -->
+                <field name="business_duration_live" widget="float_time_unit"/>
+                <field name="duration_live" widget="float_time_unit"/>
+                <field name="business_duration" widget="float_time_unit" invisible="1" sum="Total Business Hours"/>
+                <field name="duration" widget="float_time_unit" invisible="1"/>
+                <field name="business_percent_used" string="% Used" widget="progressbar"
+                       options="{'overflow_class': 'bg-danger'}"/>
+
+                <!-- Các field còn lại: mặc định ẩn, người dùng tự bật qua nút cột -->
+                <field name="has_breached" widget="boolean_toggle" readonly="1" invisible="1" />
+                <field name="original_breach_time" invisible="1"/>
+                <field name="breaching_count" invisible="1"/>
+                <field name="pause_time" invisible="1"/>
+                <field name="pause_duration" widget="float_time_unit" invisible="1"/>
+                <field name="business_pause_duration" widget="float_time_unit" invisible="1"/>
+                <field name="display_name" string="Record / Definition" invisible="1"/>
+                <field name="res_model" invisible="1"/>
+                <field name="res_id" string="Record ID" invisible="1"/>
+                <field name="running_since" invisible="1"/>
+                <field name="next_due_at" invisible="1"/>
+                <field name="company_id" invisible="1" groups="base.group_multi_company"/>
+                <field name="achieved_rate" invisible="1"/>
+                <field name="is_due_soon" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_sla_task_form" model="ir.ui.view">
+        <field name="name">sla.task.form</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <form string="SLA Task" class="nev_field_border_container" create="0" edit="0" delete="0">
+                <header>
+                    <!-- Refs: plan-improvement-sla-01-review §6.13 -->
+                    <button name="action_open_source_record" type="object"
+                            string="Open Source Record"
+                            help="Open the record this SLA task is measuring."/>
+                    <!-- Refs: REQ-INT-005 -->
+                    <button name="action_recalculate" type="object" string="Apply Current Settings"
+                            groups="dwo_sla_core.group_sla_manager"
+                           
+                            confirm="Apply the current target time, working calendar and timezone of the SLA definition to this task? A running task gets a new deadline counted from now."
+                            help="Copy the definition's current target time, working calendar and timezone onto this task and recompute its deadline. Time already used is kept." attrs="{'invisible': [('stage', 'not in', ('in_progress', 'paused'))]}"/>
+                    <!-- Refs: REQ-INT-020 -->
+                    <button name="action_reevaluate" type="object" string="Re-check Conditions"
+                            groups="dwo_sla_core.group_sla_manager"
+                            confirm="Check this SLA's six conditions again against the current state of the source record? The task may change stage."
+                            help="Check this SLA's start, cancel, pause, resume, stop and reset conditions again against the source record. Other SLAs on the same record are not touched."/>
+                    <field name="stage" widget="statusbar"
+                           statusbar_visible="in_progress,paused,achieved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="display_name"/></h1>
+                    </div>
+                    <!-- KPI ngoài tab: widget trực quan (badge trạng thái + bar + mốc
+                         Start/Deadline/End), thay cho progressbar thô. Badge đã truyền
+                         tải has_breached/is_due_soon nên 2 field này không lặp lại ở
+                         đây (vẫn còn is_due_soon dùng cho filter/search, has_breached
+                         ở tab Business Time); xem static/src/sla_progress/. -->
+                    <widget name="sla_progress"/>
+                    <field name="is_due_soon" invisible="1"/>
+                    <notebook>
+                        <page string="Overview" name="overview">
+                            <group>
+                                <group string="Record">
+                                    <field name="sla_id"/>
+                                    <!-- 1 field duy nhất, nhãn "Source Record": widget
+                                         many2one_reference hiện display_name thật của
+                                         record gốc (clickable, mở thẳng record) thay vì
+                                         res_model + res_id thô; model kỹ thuật vẫn hiện
+                                         kèm, dạng chữ nhỏ mờ, cùng 1 dòng. -->
+                                    <label for="res_id" string="Source Record"/>
+                                    <div class="d-flex align-items-center flex-wrap column-gap-1 o_dwo_source_record">
+                                        <field name="res_id" nolabel="1"/>
+                                        <span class="text-muted small" attrs="{'invisible': [('res_model', '=', False)]}">(<field name="res_model" nolabel="1" readonly="1" class="text-muted"/>)</span>
+                                    </div>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                </group>
+                                <group string="Target">
+                                    <field name="target_duration" widget="float_time_unit"/>
+                                    <field name="schedule_id"/>
+                                </group>
+                                <group string="Timeline">
+                                    <field name="start_time"/>
+                                    <field name="planned_end_time"/>
+                                    <field name="original_breach_time"/>
+                                    <field name="end_time"/>
+                                </group>
+                                <group string="Progress (Business Time)">
+                                    <field name="running_since"/>
+                                    <field name="business_duration" widget="float_time_unit"/>
+                                    <field name="business_pause_duration" widget="float_time_unit"/>
+                                    <field name="has_breached"/>
+                                </group>
+                                <!-- Cố ý để trống cột bên trái của hàng cuối: không có field
+                                     "wall-clock" nào đi cặp với nó, nhồi thêm field khác vào
+                                     sẽ phá nhóm theo nghĩa field hiện có. -->
+                                <group string="Progress (Wall-clock Time)">
+                                    <field name="pause_time"/>
+                                    <field name="duration" widget="float_time_unit"/>
+                                    <field name="pause_duration" widget="float_time_unit"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Escalation" name="escalation">
+                            <group>
+                                <field name="next_due_at"/>
+                                <field name="done_escalation_ids" widget="many2many_tags"/>
+                            </group>
+                            <!-- Refs: plan-improvement-sla-01-review §6.12 -->
+                            <field name="escalation_event_ids">
+                                <tree>
+                                    <field name="event_dt"/>
+                                    <field name="event"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="History" name="history">
+                            <field name="event_ids">
+                                <tree default_order="event_dt desc">
+                                    <field name="event_dt"/>
+                                    <field name="event"/>
+                                    <field name="note"/>
+                                    <field name="is_resolved" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <!-- Tab Note: HTML tĩnh, giải thích hai nút trên header. Refs:
+                             plan-improvement-sla-01 §3.18.1, REQ-INT-005, REQ-INT-020 -->
+                        <page string="Note" name="note">
+                            <div class="px-3 py-2" style="max-width: 900px;">
+                                <h4>1. The two buttons: what is the difference?</h4>
+                                <table class="table table-sm table-bordered w-auto">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Apply Current Settings</th>
+                                            <th>Re-check Conditions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th>What it changes</th>
+                                            <td>The <b>configuration</b> of the task: target duration, calendar, timezone and deadline.</td>
+                                            <td>The <b>state</b> of the task, following the six conditions.</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Use it when</th>
+                                            <td>You changed the target duration, calendar or timezone of the SLA definition.</td>
+                                            <td>A condition or the data changed, but the source record was not saved again.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <h4>2. Apply Current Settings</h4>
+                                <ul>
+                                    <li>Copies the definition's current target duration, calendar and timezone onto the task, and recomputes the deadline. The time already used is kept.</li>
+                                    <li>It does <b>not</b>:
+                                        <ul>
+                                            <li>touch a task that has already breached (its deadline stays as it is);</li>
+                                            <li>change the deadline of a paused task now: a paused task only gets the new settings, and its deadline is recomputed when it resumes;</li>
+                                            <li>change the original deadline (<code>Original Breach Time</code>);</li>
+                                            <li>check the conditions again.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Example: the target of the SLA changes from 8 hours to 4 hours. On a running task, press the button. The task now has a 4-hour target, and its new deadline is counted <b>from the moment you press the button</b>: the time used so far is kept, and what remains of the 4 hours is added to "now".</li>
+                                </ul>
+
+                                <h4>3. Re-check Conditions</h4>
+                                <ul>
+                                    <li>Checks the Start, Cancel, Pause, Resume, Stop and Reset conditions of <b>this SLA</b> again against the source record as it is now. The task may change stage.</li>
+                                    <li>It does <b>not</b> change the duration or the deadline (that is Apply Current Settings), and it never moves a task to a state the conditions do not describe.</li>
+                                    <li>Example SLA "Resolve a ticket in 8 hours": Start <code>priority = Urgent</code>; Pause <code>stage = Waiting customer</code>; Stop <code>stage = Done</code>. Three real situations:
+                                        <ol>
+                                            <li><b>The conditions of the definition were edited.</b> Ticket T1 is <code>Cancelled</code> but its task is still running, because Stop only had <code>Done</code>. A manager changes Stop to <code>stage in (Done, Cancelled)</code>. T1 was not saved again, so the task would keep running and breach for nothing. Press the button on the task of T1: Stop now matches and the task becomes <code>Achieved</code>.</li>
+                                            <li><b>A condition goes through a relation or a non-stored computed field.</b> Pause uses <code>partner_id.is_vip = True</code>. The customer is made VIP on the customer form; the ticket is not saved, so nothing tells the SLA. Press the button: the task is paused as the condition says.</li>
+                                            <li><b>After fixing an error.</b> The SLA logged an <code>error</code> event because a domain was broken. After you fix the domain, press the button so the task runs correctly again.</li>
+                                        </ol>
+                                    </li>
+                                </ul>
+
+                                <h4>4. Good to know</h4>
+                                <ul>
+                                    <li>Both buttons are for SLA Managers only, and both ask for confirmation.</li>
+                                    <li>Both work on one SLA only: Re-check Conditions never touches the other SLAs of the same record.</li>
+                                    <li>Every change is written in the <b>History</b> tab, with the person who pressed the button and the old and new values.</li>
+                                    <li>A task that is already finished (achieved or breached) or cancelled is never changed by either button.</li>
+                                    <li>If the Reset condition matches, Re-check Conditions closes the current task and creates a <b>new</b> one; the new task is not counted in the message that follows.</li>
+                                    <li>On the task list you can select several tasks and press the same buttons.</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sla_task_search" model="ir.ui.view">
+        <field name="name">sla.task.search</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <search string="SLA Tasks">
+                <field name="res_model"/>
+                <field name="sla_id"/>
+                <filter string="In Progress" name="in_progress" domain="[('stage', '=', 'in_progress')]"/>
+                <filter string="Paused" name="paused" domain="[('stage', '=', 'paused')]"/>
+                <filter string="Has Breached" name="breached" domain="[('has_breached', '=', True)]"/>
+                <filter string="Due Soon" name="due_soon" domain="[('is_due_soon', '=', True)]"/>
+                <separator/>
+                <filter string="Achieved" name="achieved" domain="[('stage', '=', 'achieved')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('stage', '=', 'cancelled')]"/>
+                <group>
+                    <filter string="Definition" name="group_definition" context="{'group_by': 'sla_id'}"/>
+                    <filter string="Model" name="group_model" context="{'group_by': 'res_model'}"/>
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sla_task_pivot" model="ir.ui.view">
+        <field name="name">sla.task.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="SLA Tasks">
+                <field name="sla_id" type="row"/>
+                <field name="stage" type="col"/>
+                <field name="business_duration" type="measure"/>
+                <field name="achieved_rate" type="measure" widget="percentage"/>
+                <field name="breaching_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_task_graph" model="ir.ui.view">
+        <field name="name">sla.task.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="SLA Tasks" type="bar">
+                <field name="sla_id"/>
+                <field name="stage"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_sla_task" model="ir.actions.act_window">
+        <field name="name">SLA Tasks</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="context">{'search_default_in_progress': 1, 'search_default_paused': 1}</field>
+    </record>
+
+    <!-- Odoo 13 and older: a list view has no <header> buttons for the selected rows (14+): the two mass actions
+         are server actions bound to the model, in the Action menu of the list (without the confirmation text).
+         Refs: plan-improvement-sla-01-review §6.17, §6.18 -->
+    <record id="action_sla_task_recalculate" model="ir.actions.server">
+        <field name="name">Apply Current Settings</field>
+        <field name="model_id" ref="model_sla_task"/>
+        <field name="binding_model_id" ref="model_sla_task"/>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('dwo_sla_core.group_sla_manager'))]"/>
+        <field name="code">action = records.action_recalculate()</field>
+    </record>
+    <record id="action_sla_task_reevaluate" model="ir.actions.server">
+        <field name="name">Re-check Conditions</field>
+        <field name="model_id" ref="model_sla_task"/>
+        <field name="binding_model_id" ref="model_sla_task"/>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('dwo_sla_core.group_sla_manager'))]"/>
+        <field name="code">action = records.action_reevaluate()</field>
+    </record>
+</odoo>
