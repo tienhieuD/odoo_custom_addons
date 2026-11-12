@@ -1,0 +1,415 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #15133A;">SLA &amp; Escalation for Odoo</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #15133A;">Service Level Agreements, Operational Level Agreements and escalation chains &mdash; on any model, not just support tickets.</p>
+        <p class="mb-4" style="font-size: 15px;">Define commitments once with point-and-click conditions, and let the engine measure, pause, breach and escalate them automatically, in real working hours, with a full audit trail for every decision.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Most SLA tools only watch one kind of record: a helpdesk ticket. <strong>Enterprise SLA &amp; Escalation Engine</strong> is built differently &mdash; it watches <strong>any model in your Odoo database</strong>. Sales orders stuck in approval, manufacturing orders behind schedule, expense reports awaiting validation, onboarding tasks, vendor commitments: if it is a record in Odoo, you can put a measurable, time-bound commitment on it. Every rule is pure configuration &mdash; domain conditions, a target duration and a working calendar &mdash; so your implementation team defines new SLAs without writing a line of Python. The engine runs in the background, attaches, pauses, resumes, completes and escalates tasks automatically, and keeps a complete, tamper-evident event log explaining every decision it made. Prefer a full walkthrough? Read the <a href="user_guide.html">step-by-step User Guide</a>.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: configure conditions on any model, a record qualifies and a task is created, the clock runs against the working calendar with pause and resume, and multi-stage escalation fires before and at breach" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #15133A;">Why Enterprises Choose This Engine</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2C2A6B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">One Engine, Every Department</h4>
+                    <p class="mb-0" style="font-size: 14px;">Support, sales, procurement, manufacturing, HR &mdash; one SLA engine covers them all instead of a different ad-hoc tool per department.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2C2A6B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Accountability You Can Prove</h4>
+                    <p class="mb-0" style="font-size: 14px;">Every attach, pause, resume, breach and escalation is logged with a timestamp and a reason. When a customer or an auditor asks &ldquo;why was this late?&rdquo;, you have the answer.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2C2A6B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">No-Code Rule Authoring</h4>
+                    <p class="mb-0" style="font-size: 14px;">Business analysts configure start, stop, pause, resume, cancel and reset conditions with Odoo's own domain builder &mdash; the same point-and-click editor used for filters, no developer needed for a new rule.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #15133A;">Key Features &amp; Capabilities</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Model-Agnostic by Design</h4>
+                    <p class="mb-0" style="font-size: 14px;">Point an SLA Definition at <em>any</em> Odoo model through its six conditions: Start, Stop, Pause, Resume, Cancel and Reset. The engine snapshots the rule when a task attaches, so editing a definition later never changes tasks already running.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Enable When You Are Ready</h4>
+                    <p class="mb-0" style="font-size: 14px;">A new definition starts disabled, so you can finish and review it first. One <strong>Enable</strong> button turns it on, <strong>Disable</strong> stops it attaching to new records while running tasks finish, and a ribbon and a list toggle show which is which.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Apply to Existing Records</h4>
+                    <p class="mb-0" style="font-size: 14px;">Turn an SLA on after the fact: <strong>Apply to Existing Records</strong> attaches it to the records that already match, with an optional extra filter. The first batch runs at once, larger sets continue in the background, and every run is listed on the definition.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Real Working-Hour Calculations</h4>
+                    <p class="mb-0" style="font-size: 14px;">Durations are measured against a working calendar (business hours), not the wall clock &mdash; a 4-hour SLA opened Friday at 16:00 does not breach over the weekend. No calendar selected means a straightforward 24/7 clock instead.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">SLA and OLA in One Model</h4>
+                    <p class="mb-0" style="font-size: 14px;">Classify each definition as a customer-facing SLA or an internal Operational Level Agreement, optionally tie it to a Vendor for underpinning contracts, and flag it as an officially published Service Commitment for reporting.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Multi-Stage Escalation, Zero Setup</h4>
+                    <p class="mb-0" style="font-size: 14px;">Chain as many percentage thresholds as you need &mdash; a 75% warning, a 100% breach notice, a 150% director alert. Each stage emails a responsible person out of the box, or runs a standard Odoo Server Action for custom automation.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Retroactive Start &amp; Pause</h4>
+                    <p class="mb-0" style="font-size: 14px;">Backdate the SLA start to a date already on the record (for example its creation time) instead of the moment the rule was configured, and credit any backdated period that was already on hold &mdash; reconstructed from the record's own change history.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Per-Rule Timezone</h4>
+                    <p class="mb-0" style="font-size: 14px;">Every definition has its own timezone, which always wins over the timezone of the working calendar. Reuse one calendar across regions without touching the original: the engine keeps a hidden copy of it in the timezone you chose.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Status On the Record Itself</h4>
+                    <p class="mb-0" style="font-size: 14px;">A status chip in the top bar of every record under an SLA shows the worst running task at a glance: time left, a progress bar and a red state the instant it is breached &mdash; no separate screen to check, no code. An optional smart button adds the count of active and breached tasks.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">See It in Action</h2>
+    <p class="mb-3" style="font-size: 16px;">One engine, many screens &mdash; grouped by what you are trying to do, so you can jump straight to the part that matters to you.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_catalogue" role="tab" aria-controls="dwo_sla_shot_catalogue" aria-selected="true">SLA Catalogue</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_enable" role="tab" aria-controls="dwo_sla_shot_enable" aria-selected="false">Enable &amp; Apply</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_conditions" role="tab" aria-controls="dwo_sla_shot_conditions" aria-selected="false">Any-Model Conditions</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_progress" role="tab" aria-controls="dwo_sla_shot_progress" aria-selected="false">Live Progress</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_smart_button" role="tab" aria-controls="dwo_sla_shot_smart_button" aria-selected="false">Status Chip</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_escalation" role="tab" aria-controls="dwo_sla_shot_escalation" aria-selected="false">Multi-Stage Escalation</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_ola" role="tab" aria-controls="dwo_sla_shot_ola" aria-selected="false">OLAs &amp; Vendors</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_retro_pause" role="tab" aria-controls="dwo_sla_shot_retro_pause" aria-selected="false">Retroactive Pause</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_reporting" role="tab" aria-controls="dwo_sla_shot_reporting" aria-selected="false">Reporting</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_sla_shot_catalogue" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Configure Once, Cover Every Team</h4>
+            <p class="mb-2" style="font-size: 14px;">A full SLA catalogue for one business process: response and resolution targets per priority, a vendor OLA, and retroactive rules &mdash; each one a plain configuration record, no code.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_1.png" alt="SLA Definitions list showing multiple priority tiers, an OLA with a vendor, and retroactive rules, all on the same model" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_enable" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Draft First, Enable When Ready</h4>
+            <p class="mb-2" style="font-size: 14px;">The definition form shows its state: <strong>Enable</strong> or <strong>Disable</strong> at the top, a <strong>Running Tasks</strong> button with the number of tasks, and a <strong>Disabled</strong> ribbon on a draft. The model is locked once a definition has tasks.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_10.png" alt="SLA Definition form with Disable and Apply to Existing Records buttons, a Running Tasks button showing 6, and the Start Condition tab" class="img-fluid rounded shadow"/>
+            </div>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Attach the SLA to Records That Already Exist</h4>
+            <p class="mb-2" style="font-size: 14px;"><strong>Apply to Existing Records</strong> shows how many records it will check, takes an optional extra filter and skips records that already have a task. The first batch runs now; larger sets continue in the background.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_11.png" alt="Apply to Existing Records dialog with an extra filter, the number of records to check and the Apply button" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_conditions" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Point-and-Click Conditions, Any Field</h4>
+            <p class="mb-2" style="font-size: 14px;">Every condition uses Odoo's native domain builder. Combine any field of the target model &mdash; here a Project and a Priority &mdash; with no custom code and no external configuration file.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_2.png" alt="Start Condition tab showing Odoo's domain builder with rules on Project and Priority fields" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_progress" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">See Exactly Where Every Commitment Stands</h4>
+            <p class="mb-2" style="font-size: 14px;">The built-in <strong>SLA Progress</strong> widget gives every task a status badge, a progress bar and the three milestones that matter &mdash; Start, Deadline, End &mdash; so a breach is obvious at a glance, even deep into overtime. The bar stays readable past 100%: the overrun shows as a clear multiplier (&ldquo;70.0&times; over target&rdquo;) instead of an unreadable four-digit percentage, and durations are spelled out in hours and minutes with the unit attached, e.g. <code>04:30 h</code>.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_3.png" alt="SLA Task form with the SLA Progress widget showing a red breaching status, a capped progress bar and Start/Deadline/End milestones" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">Breaching, 70x over its one-hour target: still a readable 100% (70.0x over target), not a four-digit percentage.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_7.png" alt="SLA Task form with the SLA Progress widget showing a green achieved status and the Start/Deadline/End milestone timeline" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">The same widget on a task that finished on time.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_smart_button" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Status on the Record, With No Code</h4>
+            <p class="mb-2" style="font-size: 14px;">Open any record that has an SLA: the form shows a status chip with the time left or the overrun and a progress bar, and it turns red when a task is breached. Hover for each task. It shows to SLA users only, and can be switched off in the settings. Prefer a count on the form itself? Add the optional smart button with a few lines in your own customization.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_12.png" alt="Contact form with a green SLA status chip showing 0 percent used in the top right corner" class="img-fluid rounded shadow"/>
+            </div>
+            <div class="text-center mb-3">
+                <img src="screenshot_9.png" alt="Project Task form with a red SLA smart button showing 2 active tasks, one of them breached" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_escalation" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Multi-Stage Escalation, Configured in Minutes</h4>
+            <p class="mb-2" style="font-size: 14px;">Stack as many thresholds as the process needs. This rule emails the person in a field of the record (here the salesperson) at 75%, then emails a fixed on-call address once the deadline passes. Each percentage fires once.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_4.png" alt="Escalation tab of a definition with two rules: 75% emails the salesperson of the record, 100% emails a fixed on-call address" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_ola" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">OLAs, Vendors and Multi-Region Calendars</h4>
+            <p class="mb-2" style="font-size: 14px;">Track the internal and vendor-side commitments that back a customer SLA. This OLA reuses the standard support calendar but reinterprets its hours in the vendor's own timezone &mdash; the original calendar is never touched.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_5.png" alt="SLA Definition form for a Vendor OLA with Service Commitment ticked and a Timezone override set to Asia/Tokyo" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_retro_pause" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Fair Credit for Time Already on Hold</h4>
+            <p class="mb-2" style="font-size: 14px;">A task backdated to a record's creation time does not have to be penalised for a hold that happened before the rule even existed &mdash; here <strong>5 hours</strong> of a prior hold period are detected from the record's history and credited automatically.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_6.png" alt="SLA Task form for a retroactive-pause scenario showing 05:00 h credited under Total Paused Hours (Business)" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_reporting" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Built-in Reporting, No Extra Setup</h4>
+            <p class="mb-2" style="font-size: 14px;">Pivot and graph views come ready to use: achieved rate and currently-breaching counts, broken down by SLA definition, with Odoo's standard pivot and chart tools &mdash; export to a spreadsheet in one click.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_8.png" alt="Pivot table of SLA Tasks broken down by definition, with Business Duration, Achieved Rate and Currently Breaching columns" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded p-4 my-5" style="border: 2px solid #2C2A6B;">
+        <h2 class="font-weight-bold text-center mt-0 mb-2" style="font-size: 26px; color: #15133A;">How It Works</h2>
+        <p class="text-center mb-4" style="font-size: 16px;">Six conditions, evaluated by a background job every minute &mdash; no polling to configure, nothing to schedule.</p>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2C2A6B;">1. Define</h4>
+                    <p class="mb-0" style="font-size: 13px;">Pick a model and write the Start and Stop Conditions, a target duration and, optionally, a working calendar. A new definition is a draft until you press Enable.</p>
+                </div></div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2C2A6B;">2. Attach</h4>
+                    <p class="mb-0" style="font-size: 13px;">The moment a record matches the Start Condition, a task is created and the clock starts &mdash; immediately, or retroactively from a date on the record. Records that already exist can be attached with Apply to Existing Records.</p>
+                </div></div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2C2A6B;">3. Track</h4>
+                    <p class="mb-0" style="font-size: 13px;">A background job checks every running task once a minute: pause when the Pause Condition matches, resume when it stops matching, and recompute the deadline against the working calendar.</p>
+                </div></div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2C2A6B;">4. Escalate</h4>
+                    <p class="mb-0" style="font-size: 13px;">Each configured percentage threshold emails the right person once, or runs a custom Server Action &mdash; your choice per rule.</p>
+                </div></div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #2C2A6B;">5. Close</h4>
+                    <p class="mb-0" style="font-size: 13px;">When the Stop Condition matches, the task closes as Achieved or Breached; the Cancel and Reset conditions handle records that leave scope or change shape mid-flight.</p>
+                </div></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">Built for Governed Environments</h2>
+    <p class="mb-4" style="font-size: 16px;">Two access groups and a complete read-only audit model, so SLA reporting can be opened up without any risk to the underlying rules.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">SLA User vs. SLA Manager</h4>
+                    <p class="mb-0" style="font-size: 14px;">Users can read tasks and events to answer &ldquo;why is this late?&rdquo;. Only Managers can edit SLA Definitions, trigger a manual re-evaluation or mark an error event resolved.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #3E7CB1;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #15133A;">Every Action Server-Side</h4>
+                    <p class="mb-0" style="font-size: 14px;">Escalation Server Actions always run with the permissions of the background job's own user, never with the permissions of whoever last edited the source record.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">Pure configuration, no external services and no library to install &mdash; the engine runs entirely inside Odoo on the standard <code>base</code>, <code>resource</code>, <code>web</code> and <code>mail</code> modules.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #2C2A6B;">Retroactive Pause reads the target model's own change-tracking history (<code>mail.thread</code>), so it only has an effect on models and fields that already log changes in Odoo &mdash; the configuration screen tells you clearly when that is not the case for a given rule.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #2C2A6B;">The background job runs once a minute as a standard Odoo scheduled action (<code>ir.cron</code>); no cron, queue or worker needs to be set up outside Odoo.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_install" role="tab" aria-controls="dwo_sla_install" aria-selected="true">Install</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_first_rule" role="tab" aria-controls="dwo_sla_first_rule" aria-selected="false">First Rule</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_security" role="tab" aria-controls="dwo_sla_security" aria-selected="false">Access Rights</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_guide" role="tab" aria-controls="dwo_sla_guide" aria-selected="false">Full User Guide</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_upgrade" role="tab" aria-controls="dwo_sla_upgrade" aria-selected="false">Upgrading</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_sla_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Install</h4>
+            <p class="mb-2" style="font-size: 14px;">Copy the module into your addons path and install it like any other Odoo app &mdash; from the Apps list, or from the command line.</p>
+            <pre class="bg-dark text-white p-3 rounded mb-2" style="font-size: 13px;">./odoo-bin -d your_database -i dwo_sla_core --stop-after-init</pre>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_first_rule" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Create your first SLA</h4>
+            <p class="mb-2" style="font-size: 14px;">Go to <strong>SLA &rarr; SLA Definitions &rarr; New</strong>, pick a model, write a Start Condition, a Stop Condition and a Duration, then save and press <strong>Enable</strong>. The next record that matches gets its own SLA Task automatically &mdash; no restart needed. For records that already exist, press <strong>Apply to Existing Records</strong>.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_security" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Grant access</h4>
+            <p class="mb-2" style="font-size: 14px;">Add the users who should only read tasks and events to the <strong>SLA / User</strong> group, and the users who configure rules to <strong>SLA / Manager</strong>, from <strong>Settings &rarr; Users</strong>.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_guide" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Full User Guide</h4>
+            <p class="mb-2" style="font-size: 14px;">Every concept, field and screen in this module, explained in one place: conditions, escalation, retroactive start/pause, the SLA Progress widget, reporting and troubleshooting.</p>
+            <p class="mb-2" style="font-size: 14px;"><a href="user_guide.html"><strong>Open the User Guide &rarr;</strong></a></p>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_upgrade" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Upgrading from the first release</h4>
+            <p class="mb-2" style="font-size: 14px;">An empty condition, including the empty domain, now means &ldquo;not configured&rdquo; and never matches (the domain editor still labels it &ldquo;Match all records&rdquo;). On upgrade, an empty Start Condition is rewritten to <code>[('id', '!=', 0)]</code>, so tasks that were running are not cancelled.</p>
+            <p class="mb-2" style="font-size: 14px;">A definition created from the form now starts disabled; one created by code or import must set <code>active=True</code>. The timezone of a definition is required and always wins over the timezone of the calendar: the upgrade fills it from the fixed calendar, or UTC.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Calendar copies made for a timezone share the public holidays of the original at the time of the copy and do not follow later changes to it.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">Changelog</h2>
+    <p class="mb-3" style="font-size: 16px;">Module releases, newest first.</p>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #2C2A6B;">1.1</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-12</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Enable and Disable, Apply to Existing Records, SLA status chip on the record, Running Tasks button, Due Soon hours per definition, required timezone, empty condition means not configured.</p></div>
+        </div>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #2C2A6B;">1.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-07</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release.</p></div>
+        </div>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Does this only work with Helpdesk tickets?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. An SLA Definition points at any model in your database through its Model field &mdash; sales orders, manufacturing orders, project tasks, expense reports, or a fully custom model. Helpdesk needs no special integration.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">What happens if I edit a rule while tasks are already running?</h4>
+        <p class="mb-0" style="font-size: 14px;">Nothing changes for tasks already attached: the duration, calendar and conditions are captured as a snapshot the moment a task attaches. Only new tasks created after the edit use the new configuration.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Why does a new definition start disabled?</h4>
+        <p class="mb-0" style="font-size: 14px;">So you can finish the conditions and review them before any record is touched. Press Enable when you are ready. Definitions created by code or import must set <code>active=True</code>.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Do records that existed before I enabled the SLA get a task?</h4>
+        <p class="mb-0" style="font-size: 14px;">Not by themselves. Press <strong>Apply to Existing Records</strong> on the definition: it attaches the SLA to the records that match the Start Condition and skips the ones that already have a task.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">What does an empty condition mean?</h4>
+        <p class="mb-0" style="font-size: 14px;">&ldquo;Not configured&rdquo;: it never matches, even though the domain editor labels the empty domain &ldquo;Match all records&rdquo;. To mean every record, write a rule that is always true, for example <code>[('id', '!=', 0)]</code>.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Which timezone is used when the calendar has its own?</h4>
+        <p class="mb-0" style="font-size: 14px;">The one on the definition. It is required and always wins over the timezone of the calendar; when they differ, the engine uses a hidden copy of the calendar in the timezone you chose.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Can one record have more than one SLA at the same time?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. Create one SLA Definition per commitment &mdash; for example a Response SLA and a separate Resolution SLA on the same model &mdash; and a record that matches both gets two independent tasks.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">How is &ldquo;breached&rdquo; decided when there is no working calendar?</h4>
+        <p class="mb-0" style="font-size: 14px;">With no calendar selected, the engine counts plain 24/7 clock time. With a calendar selected, only working hours count towards the target, so time outside business hours never counts against the deadline.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">What does a percentage threshold like 150% actually mean?</h4>
+        <p class="mb-0" style="font-size: 14px;">100% is the exact deadline. A 150% threshold fires once the task has consumed one and a half times its target duration &mdash; useful for a final escalation well after the SLA itself has already breached.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">What happens if an escalation action fails?</h4>
+        <p class="mb-0" style="font-size: 14px;">It is logged once as a failed event with the error message, visible on the Unresolved Error Events screen, so an administrator can fix the configuration. It does not retry automatically.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Is the background processing heavy on the database?</h4>
+        <p class="mb-0" style="font-size: 14px;">The scheduled job only looks at tasks that are due for a check in the next run and locks each row briefly while it updates it, so it scales with the number of currently active SLAs, not with your whole database.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #15133A;">Can I report on SLA performance without building a dashboard?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. SLA Tasks ship with ready-to-use List, Pivot and Graph views, including an Achieved Rate and a Currently Breaching measure, so you can filter, group and export straight away.</p>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #2C2A6B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #2C2A6B;">Give every commitment in Odoo a deadline &mdash; and proof of what happened.</p>
+        <p class="mb-2" style="font-size: 15px;">Configure your first SLA in minutes, on any model, with no code. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DUO-TEK Software Vietnam</p>
+    </div>
+
+</div>
+</section>

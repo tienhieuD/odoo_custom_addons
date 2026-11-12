@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard "Apply to Existing Records": một ô domain duy nhất, giao với
+         Start Condition (plan-improvement-sla-01-review §6.16, Q4). Chỉ SLA
+         Manager (ACL). -->
+    <record id="view_sla_apply_wizard_form" model="ir.ui.view">
+        <field name="name">sla.apply.wizard.form</field>
+        <field name="model">sla.apply.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Apply to Existing Records">
+                <field name="model_name" invisible="1"/>
+                <group>
+                    <field name="definition_id" readonly="1" options="{'no_open': True}"/>
+                </group>
+                <div class="alert alert-info" role="alert">
+                    Only records that match the SLA's Start Condition get a task, and
+                    records that already have one are skipped. The filter below only
+                    narrows that set; leave it without rules to check every matching
+                    record. The first batch runs now; larger sets continue in the
+                    background.
+                </div>
+                <group>
+                    <field name="filter_domain" widget="domain"
+                           options="{'model': 'model_name'}"/>
+                    <field name="match_count"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply"
+                            class="btn-primary" data-hotkey="q"
+                            confirm="Attach this SLA to the matching existing records now?"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
