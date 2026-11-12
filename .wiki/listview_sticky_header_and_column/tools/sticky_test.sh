@@ -1,7 +1,7 @@
 #!/bin/zsh
 # usage: sticky_test.sh <NN> <srcdir> <url> <tourstyle: fn|arr|legacy> <th selector>
 v=$1; src=$2; url=$3; style=$4; sel=${5:-"th[data-name=email]"}
-M=/Users/hieu/Documents/Odoo/myproject/odoo_custom_addons$v/listview_sticky_header_and_column
+M=$HOME/Documents/Project/odoo_appstore/odoo_custom_addons$v/listview_sticky_header_and_column
 mkdir -p $M/tests $M/static/tests
 echo "from . import test_tmp_sticky" > $M/tests/__init__.py
 if [ "$v" = "12" ]; then
@@ -93,8 +93,8 @@ open("$M/__manifest__.py","w").write(m)
 PY
 export WRAP_PORT=82$v
 export ODOO_BROWSER_BIN=/private/tmp/claude-501/-Users-hieu--claude/2c6103e7-e2d6-4a63-9270-126ab80a6cbe/scratchpad/cft/shell/chrome-headless-shell-mac-arm64/chrome-headless-shell
-cd /Users/hieu/Documents/Odoo/$src
-perl -e 'alarm 420; exec @ARGV' ./venv/bin/python ${WRAP:-odoo-bin} -c ../myproject/odoo_custom_addons${v}_conf/odoo.conf -d stick${v}t -i listview_sticky_header_and_column,base $EXTRA --test-tags /listview_sticky_header_and_column --stop-after-init --http-port=82$v > /tmp/stick$v.log 2>&1
+cd $HOME/Documents/Project/odoo_core/$src
+perl -e 'alarm 420; exec @ARGV' ./venv/bin/python ${WRAP:-odoo-bin} -c $HOME/Documents/Project/odoo_appstore/_conf/odoo${v}.conf -d stick${v}t -i listview_sticky_header_and_column,base $EXTRA --test-tags /listview_sticky_header_and_column --stop-after-init --http-port=82$v > /tmp/stick$v.log 2>&1
 echo exit=$?
 grep -nE "tour succeeded|test successful|FAILED|failed at|Error:|TypeError|ERROR.*(Traceback|odoo\.modules)" /tmp/stick$v.log | cut -c1-260 | head -6
 docker exec postgres179 dropdb -U odoo --if-exists stick${v}t

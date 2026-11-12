@@ -3,7 +3,7 @@ import base64, json, os, secrets, subprocess, sys, tempfile, time
 import requests, websocket
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'listing')
-ROOT = '/Users/hieu/Documents/Odoo'
+ROOT = os.path.expanduser('~/Documents/Project')
 SRC = 'odoo-19.0.20260412'
 CHROME = '/private/tmp/claude-501/-Users-hieu--claude/2c6103e7-e2d6-4a63-9270-126ab80a6cbe/scratchpad/cft/shell/chrome-headless-shell-mac-arm64/chrome-headless-shell'
 DB, PORT, CDP = 'concshot19', 8619, 9619
@@ -12,7 +12,7 @@ LOG = []
 # throw-away user of a throw-away database: the password is generated for each run, never stored
 BOB_PASSWORD = secrets.token_urlsafe(16)
 
-conf = open(f'{ROOT}/myproject/odoo_custom_addons19_conf/odoo.conf').read()
+conf = open(f'{ROOT}/odoo_appstore/_conf/odoo19.conf').read()
 conf = '\n'.join(l for l in conf.split('\n') if not l.startswith(('dev_mode', 'http_port', 'xmlrpc_port', 'longpolling_port', 'gevent_port')))
 open('/tmp/concshot.conf', 'w').write(conf)
 os.chdir(f'{ROOT}/{SRC}')
