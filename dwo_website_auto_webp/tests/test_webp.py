@@ -4,6 +4,7 @@ import os
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import psycopg2.errors
 import requests
 from PIL import Image
 
@@ -259,6 +260,21 @@ class TestWebpStream(WebpCommon):
         with patch.object(attach_cls, 'create', side_effect=RuntimeError('disk full')):
             s = self.stream()
         self.assertEqual(s.mimetype, 'image/webp')
+
+    def test_cache_save_readonly_error_bubbles_up(self):
+        # read-only cursor (replica): Odoo must see the error to retry with a read/write cursor
+        attach_cls = type(self.env['ir.attachment'])
+        with patch.object(attach_cls, 'create', side_effect=psycopg2.errors.ReadOnlySqlTransaction('read-only')):
+            with self.assertRaises(psycopg2.errors.ReadOnlySqlTransaction):
+                self.stream()
+        self.assertFalse(self.caches(self.website))
+
+    def test_cache_save_database_error_keeps_transaction_usable(self):
+        attach_cls = type(self.env['ir.attachment'])
+        with patch.object(attach_cls, 'create', side_effect=psycopg2.errors.UniqueViolation('dup')):
+            s = self.stream()
+        self.assertEqual(s.mimetype, 'image/webp')
+        self.env.cr.execute('SELECT 1')  # not 'current transaction is aborted'
 
     def test_convert_helper_quality_range(self):
         binary = self.env['ir.binary']

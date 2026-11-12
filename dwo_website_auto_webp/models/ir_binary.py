@@ -1,6 +1,7 @@
 import io
 import logging
 
+import psycopg2.errors
 from PIL import Image, WebPImagePlugin  # noqa: F401 — force WebP encoder registration
 
 from odoo import models
@@ -61,6 +62,10 @@ class IrBinary(models.AbstractModel):
         """
         try:
             return self._webp_process(record, field_name, **kwargs)
+        except psycopg2.errors.ReadOnlySqlTransaction:
+            # /web/image is a readonly route: with a replica the cache INSERT fails on the read-only cursor.
+            # Let it bubble up so that the dispatcher retries the whole request with a read/write cursor.
+            raise
         except Exception:
             _logger.warning('dwo_website_auto_webp: unexpected error, fallback to original', exc_info=True)
             return super()._get_image_stream_from(record, field_name, **kwargs)
@@ -120,13 +125,17 @@ class IrBinary(models.AbstractModel):
 
         # [6] Lưu cache với res_model/res_id thật để vacuum tìm được
         try:
-            self.env['ir.attachment'].sudo().create([{
-                'name': cache_name,
-                'res_model': record._name,
-                'res_id': record.id,
-                'raw': webp,  # Odoo 20 has no 'datas' field any more
-                'mimetype': 'image/webp',
-            }])
+            # savepoint: any failure leaves the request transaction usable
+            with self.env.cr.savepoint():
+                self.env['ir.attachment'].sudo().create([{
+                    'name': cache_name,
+                    'res_model': record._name,
+                    'res_id': record.id,
+                    'raw': webp,  # Odoo 20 has no 'datas' field any more
+                    'mimetype': 'image/webp',
+                }])
+        except psycopg2.errors.ReadOnlySqlTransaction:
+            raise  # read-only cursor: Odoo retries the request with a read/write cursor
         except Exception as e:
             _logger.debug('WebP cache save failed: %s', e)
 
