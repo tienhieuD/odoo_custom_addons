@@ -126,7 +126,7 @@ Tour (3): `dwo_concurrency_conflict` (dialog hai giá trị, Cancel giữ phần
 ## Quy trình port / cập nhật (chuỗi nguồn)
 
 Bản chuẩn là **19**. 20 và 18 chép từ 19 (xử lý riêng: `ir.access.csv`, `useProps`/`this.`, `_clear_cache_name` ở 20). 17 chép từ 18 rồi `tools/adapt_conc.py 17`. 16 chép từ 17 (viết lại `RecordPatch`/`FormControllerPatch`, `owl="1"`, tour `tour.register`). 15 chép từ 16 (viết lại client legacy; `tools/legacy_py.sh 15`, `legacy_tests.py`). 14 và 13 chép từ 15 bằng `tools/legacy_port.sh <NN>` (+ `legacy_view.py`, `legacy_setup.py`, `legacy_cascade.py` cho 13, `legacy_tour_wait.py`). 12 chép từ 13 (xem phần "12" ở trên).
-`tools/adapt_conc.py` **không idempotent**: nó là bản ghi các sửa đổi đã áp cho bản 17 (từ bản 18) và được viết thêm từng đoạn; đọc nó như tài liệu "cần đổi gì", đừng chạy lại lên module đã port. Các script trong `tools/` ghi sẵn đường dẫn máy của chủ dự án (`/Users/hieu/Documents/Odoo/...`, thư mục scratchpad cho Chrome headless); chỉnh lại khi dùng ở máy khác.
+`tools/adapt_conc.py` **không idempotent**: nó là bản ghi các sửa đổi đã áp cho bản 17 (từ bản 18) và được viết thêm từng đoạn; đọc nó như tài liệu "cần đổi gì", đừng chạy lại lên module đã port. Các script trong `tools/` ghi sẵn đường dẫn máy của chủ dự án (`~/Documents/Project/...`, thư mục scratchpad cho Chrome headless); chỉnh lại khi dùng ở máy khác.
 
 Quy trình nên làm khi sửa một tính năng: sửa ở 19 + chạy test; chép sang 20 và 18 (kiểm tra theo bảng khác biệt); sang 17 rồi 16, rồi nhóm legacy; **chạy test từng bản** (`conc_test.sh`), commit từng bản, cập nhật wiki, chép `.wiki/` sang mọi nhánh.
 
