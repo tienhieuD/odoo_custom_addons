@@ -2,7 +2,7 @@
 
 ## Cho module `dwo_sla_core` (SLA generic cho Odoo 19)
 
-Version 0.7 (draft)
+Version 0.7.1 (draft)
 Prepared by hieudt
 DUO-TEK Software Vietnam
 2026-11-12
@@ -18,6 +18,7 @@ DUO-TEK Software Vietnam
 | hieudt | 2026-11-07 | D12/D13 (xem `docs/TASKS.md`): gỡ bỏ cơ chế retry escalation (FUNC-027, 028, 056 đến 059 → Removed, số ID giữ nguyên không tái sử dụng; FUNC-026/054/055/029 sửa lại không còn nhắc retry), thêm FUNC-064 (loại hành động escalation: email mặc định/server action) và FUNC-065 (3 cách resolve người nhận email); INT-014 mở rộng với `sla_task_active_count`/`sla_task_breach_count` và quy định nút đỏ khi vi phạm (mixin vẫn opt-in, không kèm bridge module). Đổi theo yêu cầu người dùng "logic escalate có retry hơi thừa thãi... có thể tinh gọn được?" và "tư vấn... nên dùng gì?" cho smart button. | 0.5 |
 | hieudt | 2026-11-11 | Đợt cải thiện 01 (`docs/plan-improvement-sla-01*.md`, quyết định Q1–Q4): domain `[]` = chưa cấu hình (FUNC-003, 051); định nghĩa mới mặc định tắt, Enable/Disable (FUNC-066); timezone bắt buộc (FUNC-067); ngưỡng Sắp đến hạn theo định nghĩa (INT-012); hai nút đổi tên "Apply Current Settings"/"Re-check Conditions" và giới hạn phạm vi (INT-005, INT-020, FUNC-032); áp dụng thủ công cho record có sẵn (FUNC-068); bảo vệ khi sửa định nghĩa (FUNC-069); chip trạng thái SLA trên form (INT-024) | 0.6 |
 | hieudt | 2026-11-12 | Bổ sung REQ-ID cho phần đã hiện thực mà SRS chưa có: FUNC-070 (field phân loại type/vendor/service commitment/target), FUNC-071 (retroactive pause), FUNC-072 (`original_breach_time`, thời lượng giờ đồng hồ), INT-025 (nút Running Tasks), INT-026 (tab Escalation, nút Open Source Record), INT-027 (cột mặc định của list task), INT-028 (Duration live), INT-029 (tab Note, chuỗi không lỗi thời, ja_JP). Thêm Acceptance Criteria cho REQ cũ: FUNC-001 (AC4, AC5), FUNC-022 (AC5), FUNC-032 (AC4), FUNC-064 (AC3, AC4), FUNC-065 (AC4 đến AC6, `responsible` nhận x2many), FUNC-066 (AC4 đến AC6), FUNC-067 (AC4 đến AC7), FUNC-068 (AC4 đến AC10), FUNC-069 (AC3), INT-005 (AC5 đến AC7), INT-012 (AC5), INT-020 (AC4, AC5), INT-024 (AC5 đến AC8); FUNC-029 thêm hai loại event `recalculate`, `reevaluate`. Đổi tên field theo code (`planned_end_time`, `start_time`, `end_time`, `business_percent_used`, `duration`, `target_duration`). Ma trận mục 4 sinh lại từ `060` 0.3 (588 test case, 435 hàm test) | 0.7 |
+| hieudt | 2026-11-12 | Chốt AC1 của REQ-FUNC-032: Re-check Conditions chỉ có trên task đã tồn tại; gắn SLA cho record chưa có task dùng Apply Current Settings (REQ-FUNC-068); không thêm nút trên form record gốc; đóng TA-29 | 0.7.1 |
 
 ---
 
@@ -1328,7 +1329,7 @@ N/A — module phần mềm thuần, không giao tiếp thiết bị.
 - **Statement:** Hệ thống PHẢI cho SLA Manager đánh giá lại một task hoặc một lô record theo yêu cầu, áp dụng cùng quy tắc như khi record thay đổi (REQ-FUNC-008), không kích hoạt reset theo field (REQ-FUNC-050), và dùng thời điểm hiện tại. Từ đợt 01, đánh giá lại từ một task chỉ xét đúng định nghĩa của task đó (tham số `definitions` của engine); các lời gọi khác (hook, cron, áp dụng thủ công) không đổi hành vi.
 - **Rationale:** Bù cho REQ-FUNC-042 và cho lỗi cấu hình đã sửa.
 - **Acceptance Criteria:**
-  - AC1: Given start `[('partner_id.country_id','=',VN)]` và country của partner vừa đổi sang VN; When đánh giá lại; Then task được gắn.
+  - AC1: Given start `[('partner_id.country_id','=',VN)]` và country của partner vừa đổi sang VN, record chưa có task; When engine đánh giá record (`Engine.evaluate`, cùng lõi với "Apply Current Settings" của REQ-FUNC-068 và hook); Then task được gắn. Với người dùng: record chưa có task được gắn SLA bằng "Apply Current Settings" trên định nghĩa (REQ-FUNC-068); nút "Re-check Conditions" chỉ có trên task đã tồn tại (quyết định 2026-11-12, đóng TA-29).
   - AC2 (negative): Given đánh giá lại hai lần liên tiếp; Then lần hai không thay đổi gì (REQ-FUNC-015).
   - AC3 (negative): Given người dùng thuộc `group_sla_user`; Then không thực hiện được.
   - AC4: Given `Engine.evaluate(records, definitions=A)`; Then chỉ định nghĩa A được xét (kể cả khi A đã tắt), định nghĩa khác của cùng record không bị gắn; không truyền `definitions` thì xét mọi định nghĩa như trước.
