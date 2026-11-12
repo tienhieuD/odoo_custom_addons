@@ -1,0 +1,3564 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* dwo_sla_core
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260421\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-13 01:54+0000\n"
+"PO-Revision-Date: 2026-10-13 01:54+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+" The company default calendar cannot be used either; the task runs 24x7."
+msgstr " 会社のデフォルトカレンダーも使用できないため、このタスクは24x7で実行されます。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+" Using company '%s' default calendar because the record's calendar cannot be"
+" used."
+msgstr " レコードのカレンダーを使用できないため、会社「%s」のデフォルトカレンダーを使用しています。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_res_config_settings__sla_due_soon_hours
+msgid "\"Due Soon\" Window (hours)"
+msgstr "「期限間近」の期間（時間）"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_breached_check
+msgid "A breached task must have the breach flag set."
+msgstr "違反タスクには違反フラグが設定されている必要があります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__stage__achieved
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Achieved"
+msgstr "達成"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__achieved_rate
+msgid "Achieved Rate"
+msgstr "達成率"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__escalation_ids
+msgid ""
+"Actions fired automatically when a task reaches a percentage of its target "
+"time (above 100% means already breached). Example: 75% notify the assignee, "
+"100% notify the manager."
+msgstr ""
+"タスクが目標期間の一定割合に達すると自動的に実行されるアクションです（100%を超える場合は既に違反）。例: "
+"75%で担当者に通知、100%でマネージャーに通知。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__active
+msgid "Active"
+msgstr "有効"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_achieved_check
+msgid "An achieved task cannot have the breach flag set."
+msgstr "達成済みのタスクに違反フラグを設定することはできません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__attach
+msgid "Attach"
+msgstr "適用"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_res_config_settings__sla_batch_size
+msgid "Background Processing Batch Size"
+msgstr "バックグラウンド処理バッチサイズ"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Background processing batch size must be greater than 0."
+msgstr "バックグラウンド処理のバッチサイズは0より大きい値を指定してください。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Background processing error: %s"
+msgstr "バックグラウンド処理エラー: %s"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Batch evaluation error (before the per-record loop): %s"
+msgstr "バッチ評価エラー（レコード単位のループ前）: %s"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__breach
+msgid "Breach"
+msgstr "違反"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__has_breached
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__stage__breached
+msgid "Breached"
+msgstr "違反"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__calendar_id
+msgid "Calendar"
+msgstr "カレンダー"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Calendar '%s' cannot be used (flexible type or no working hours)."
+msgstr "カレンダー「%s」は使用できません（フレキシブル型、または業務時間が未設定）。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Calendar '%s' has no working hours configured for any day of the week; it "
+"cannot be used for SLA."
+msgstr "カレンダー「%s」は曜日ごとの業務時間が一つも設定されていないため、SLAには使用できません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__calendar_path
+msgid "Calendar Path on Record"
+msgstr "レコード上のカレンダーパス"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__calendar_source
+msgid "Calendar Source"
+msgstr "カレンダーの取得元"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Calendar path '%s' is empty or the calendar cannot be used."
+msgstr "カレンダーパス「%s」が空か、カレンダーを使用できません。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Calendar path '%s' must end at model 'resource.calendar', not '%s'."
+msgstr "カレンダーパス「%s」は、モデル「resource.calendar」で終わる必要があります（「%s」ではなく）。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__calendar_source__record
+msgid "Calendar read from the record"
+msgstr "レコードから取得したカレンダー"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_calendar_definition_check
+msgid "Calendar source 'definition' requires a fixed calendar to be selected."
+msgstr "カレンダー取得元「definition」の場合は、固定カレンダーを選択する必要があります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_calendar_record_check
+msgid "Calendar source 'record' requires a path to be entered."
+msgstr "カレンダー取得元「record」の場合は、パスを入力する必要があります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__cancel
+msgid "Cancel"
+msgstr "キャンセル"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__cancel_domain
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Cancel Condition"
+msgstr "キャンセル条件"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__cancel_mode
+msgid "Cancel Mode"
+msgstr "キャンセルモード"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__reset_action__cancel
+msgid "Cancel the previous task"
+msgstr "前のタスクをキャンセル"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__stage__cancelled
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Cancelled"
+msgstr "キャンセル"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Cannot attach SLA to model '%s': the model belongs to an excluded group "
+"(sla.*, ir.*, mail.*)."
+msgstr "モデル「%s」にSLAを適用できません: このモデルは除外グループ（sla.*、ir.*、mail.*）に属しています。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Cannot attach SLA to model '%s': the model is transient, abstract, or has no"
+" dedicated table."
+msgstr "モデル「%s」にSLAを適用できません: このモデルは一時モデル、抽象モデル、または専用テーブルを持たないモデルです。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Cannot delete an SLA definition that still has referenced tasks. Archive it "
+"instead of deleting."
+msgstr "参照されているタスクが残っているSLA定義は削除できません。削除の代わりにアーカイブしてください。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Changed fields: %s"
+msgstr "変更されたフィールド: %s"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_list
+msgid ""
+"Check the SLA again for the records linked to the selected error events."
+msgstr "選択したエラーイベントに紐づくレコードのSLAを再チェックしてください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__company_id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__company_id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__company_id
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_search
+msgid "Company"
+msgstr "会社"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__company_id
+msgid ""
+"Company of the source record when the task was created; used for company "
+"access rules. Example: \"Sojitz Vietnam\"."
+msgstr "タスク作成時点でのソースレコードの会社。会社単位のアクセスルールに使用されます。例: 「Sojitz Vietnam」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__company_id
+msgid ""
+"Company of the task or record concerned; used for company access rules. "
+"Example: \"Sojitz Vietnam\"."
+msgstr "タスクまたは対象レコードの会社。会社単位のアクセスルールに使用されます。例: 「Sojitz Vietnam」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__complete
+msgid "Complete"
+msgstr "完了"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__reset_action__complete
+msgid "Complete the previous task"
+msgstr "前のタスクを完了"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Condition '%s' is not a valid domain literal: %s"
+msgstr "条件「%s」は有効なドメインリテラルではありません: %s"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Condition '%s' is not valid for model '%s': %s"
+msgstr "条件「%s」はモデル「%s」に対して有効ではありません: %s"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_res_config_settings
+msgid "Config Settings"
+msgstr "構成設定"
+
+#. module: dwo_sla_core
+#: model:ir.ui.menu,name:dwo_sla_core.menu_sla_config
+msgid "Configuration"
+msgstr "設定"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Could not plan a deadline within the supported range (fully covered by non-"
+"working time)."
+msgstr "サポート範囲内で期限を計画できませんでした（すべてが非業務時間に含まれています）。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.actions.act_window,help:dwo_sla_core.action_sla_definition
+msgid "Create your first SLA definition"
+msgstr "最初のSLA定義を作成"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__create_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__create_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__create_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__create_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__create_uid
+msgid "Created by"
+msgstr "作成者"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__create_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__create_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__create_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__create_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__create_date
+msgid "Created on"
+msgstr "作成日時"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__breaching_count
+msgid "Currently Breaching"
+msgstr "現在違反中"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__retroactive_field_id
+msgid ""
+"Datetime field of the model used as the SLA start time when Retroactive "
+"Start is on. If the field is empty, the current time is used and a note is "
+"logged. Example: \"Created on\"."
+msgstr ""
+"遡及開始が有効な場合に、SLAの開始時刻として使用するモデルの日時フィールド。フィールドが空の場合は現在時刻が使用され、メモが記録されます。例: "
+"「作成日時」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__definition_id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__definition_id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__definition_id
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Definition"
+msgstr "定義"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_engine__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_mixin__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_processor__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__display_name
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_time__display_name
+msgid "Display Name"
+msgstr "表示名"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__sequence
+msgid ""
+"Display order of definitions in lists; lower numbers come first. It does not"
+" change how SLAs are evaluated. Example: 10 for the response SLA, 20 for the"
+" resolution SLA."
+msgstr "一覧での定義の表示順。小さい番号が先に表示されます。SLAの評価方法は変わりません。例: 応答SLAは10、解決SLAは20。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__is_due_soon
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Due Soon"
+msgstr "期限間近"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_business_elapsed_check
+msgid "Elapsed time cannot be negative."
+msgstr "経過時間を負の値にすることはできません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__end_dt
+msgid "End"
+msgstr "終了"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__error
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_search
+msgid "Error"
+msgstr "エラー"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__escalate
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_search
+msgid "Escalate"
+msgstr "エスカレーション"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__escalate_failed
+msgid "Escalate Failed"
+msgstr "エスカレーション失敗"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Escalation"
+msgstr "エスカレーション"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__escalation_id
+msgid "Escalation Rule"
+msgstr "エスカレーションルール"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Escalation Rules"
+msgstr "エスカレーションルール"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__escalation_ids
+msgid "Escalations"
+msgstr "エスカレーション"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__done_escalation_ids
+msgid "Escalations Done"
+msgstr "完了したエスカレーション"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__done_escalation_ids
+msgid ""
+"Escalations already processed for this task, so each one runs only once. "
+"Example: the 75% and 100% rules after both have fired."
+msgstr "このタスクで処理済みのエスカレーション。各エスカレーションは一度しか実行されません。例: 75%と100%のルールが両方実行された後。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__event_ids
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Event Log"
+msgstr "イベントログ"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__event
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_search
+msgid "Event Type"
+msgstr "イベント種別"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Event log retention (days) must be greater than 0."
+msgstr "イベントログの保持期間（日数）は0より大きい値を指定してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__note
+msgid ""
+"Extra detail about the event, such as why a fallback calendar was used, "
+"which fields triggered a reset or the error message. It never contains "
+"values of the record's fields. Example: \"Calendar path unusable, company "
+"calendar used\"."
+msgstr ""
+"イベントに関する補足情報。例: "
+"代替カレンダーが使用された理由、リセットをトリガーしたフィールド、エラーメッセージなど。レコードのフィールドの値は含まれません。例: "
+"「カレンダーパスが使用不可のため、会社のカレンダーを使用」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__calendar_id
+msgid "Fixed Calendar"
+msgstr "固定カレンダー"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__calendar_source__definition
+msgid "Fixed calendar on the definition"
+msgstr "定義で指定した固定カレンダー"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Has Breached"
+msgstr "違反あり"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__event_ids
+msgid ""
+"History of what happened to this task: attach, pause, resume, breach, "
+"escalations and errors, each with its time. Example: attach, pause, resume, "
+"complete."
+msgstr "このタスクの経過履歴: 適用、一時停止、再開、違反、エスカレーション、エラーなど、それぞれの時刻付き。例: 適用、一時停止、再開、完了。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__resume_mode
+msgid ""
+"How a paused task restarts. When the resume condition matches: use the "
+"Resume Condition. When pause no longer matches: resume as soon as the Pause "
+"Condition stops matching. Example: choose the second option so you only "
+"maintain a Pause Condition."
+msgstr ""
+"一時停止中のタスクの再開方法。再開条件に一致したとき: 再開条件を使用します。一時停止条件に一致しなくなったとき: "
+"一時停止条件が一致しなくなった時点で再開します。例: 2番目の選択肢を選ぶと、一時停止条件だけを保守すれば済みます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__cancel_mode
+msgid ""
+"How cancellation is decided. When start no longer matches: cancel as soon as"
+" the record leaves the Start Condition. When the cancel condition matches: "
+"use the Cancel Condition. Never cancel: running tasks are never cancelled. "
+"Example: pick \"Never cancel\" to keep measuring even if the ticket is "
+"edited."
+msgstr ""
+"キャンセルの判定方法。開始条件に一致しなくなったとき: レコードが開始条件から外れた時点でキャンセルします。キャンセル条件に一致したとき: "
+"キャンセル条件を使用します。キャンセルしない: 実行中のタスクは決してキャンセルされません。例: "
+"チケットを編集しても計測を続けたい場合は「キャンセルしない」を選択します。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "How many days SLA events are kept before being deleted automatically."
+msgstr "SLAイベントを自動削除するまでに保持する日数。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_res_config_settings__sla_event_retention_days
+msgid ""
+"How many days SLA events are kept before being deleted automatically. Must "
+"be greater than 0. Example: 365 keeps one year of history."
+msgstr "SLAイベントを自動削除するまでに保持する日数。0より大きい値を指定してください。例: 365は1年分の履歴を保持します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_res_config_settings__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_engine__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_mixin__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_processor__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_time__id
+msgid "ID"
+msgstr "ID"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__res_id
+msgid ""
+"Id of the record this task measures; together with the model it identifies "
+"the source record. Example: 42."
+msgstr "このタスクが計測するレコードのID。モデルと合わせて、ソースレコードを特定します。例: 42。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__res_id
+msgid ""
+"Id of the related record, used together with the model for error events that"
+" have no task. Example: 42."
+msgstr "関連レコードのID。タスクを持たないエラーイベントで、モデルと合わせて使用されます。例: 42。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__stage__in_progress
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "In Progress"
+msgstr "進行中"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_cancel_mode_check
+msgid "Invalid Cancel Mode."
+msgstr "キャンセルモードが無効です。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_reset_action_check
+msgid "Invalid Reset Action."
+msgstr "リセット時の動作が無効です。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_resume_mode_check
+msgid "Invalid Resume Mode."
+msgstr "再開モードが無効です。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Invalid calendar path '%s': '%s' is not a Many2one field on model '%s'."
+msgstr "無効なカレンダーパス「%s」: 「%s」はモデル「%s」のMany2oneフィールドではありません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_event_event_check
+msgid "Invalid event type."
+msgstr "イベント種別が無効です。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_stage_check
+msgid "Invalid task stage."
+msgstr "タスクのステージが無効です。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__write_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__write_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__write_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__write_uid
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__write_uid
+msgid "Last Updated by"
+msgstr "最終更新者"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__write_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__write_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__write_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__write_date
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__write_date
+msgid "Last Updated on"
+msgstr "最終更新日時"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_list
+msgid "Mark Resolved"
+msgstr "解決済みにする"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_res_config_settings__sla_batch_size
+msgid ""
+"Maximum number of tasks the background process handles per run, so a large "
+"backlog is worked off over several runs without blocking the server. Must be"
+" greater than 0. Example: 50."
+msgstr ""
+"バックグラウンド処理が1回の実行で処理するタスクの最大数。大量の未処理タスクは、サーバーをブロックせず複数回の実行に分けて処理されます。0より大きい値を指定してください。例: "
+"50。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "Maximum number of tasks the background process handles per run."
+msgstr "バックグラウンド処理が1回の実行で処理するタスクの最大数。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__model_id
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Model"
+msgstr "モデル"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__model_name
+msgid "Model Technical Name"
+msgstr "モデル技術名"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__start_dt
+msgid ""
+"Moment the SLA clock started (UTC); may be in the past with a retroactive "
+"start. Example: 2026-03-02 02:00:00."
+msgstr "SLAの計測が開始された時刻（UTC）。遡及開始の場合は過去の時刻になることがあります。例: 2026-03-02 02:00:00。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__end_dt
+msgid ""
+"Moment the task finished or was cancelled; empty while it is still active. "
+"Example: 2026-03-02 05:30:00."
+msgstr "タスクが終了またはキャンセルされた時刻。タスクがまだ有効な間は空。例: 2026-03-02 05:30:00。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__paused_since
+msgid ""
+"Moment the task was paused (UTC); only set while it is Paused. Example: "
+"2026-03-02 03:00:00."
+msgstr "タスクが一時停止された時刻（UTC）。一時停止中の間のみ設定されます。例: 2026-03-02 03:00:00。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__name
+msgid "Name"
+msgstr "名前"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__name
+msgid ""
+"Name of the SLA rule, shown in lists and on every task it creates. Use "
+"something that tells users what is measured. Example: \"Ticket Response - "
+"Priority 1\"."
+msgstr ""
+"SLAルールの名前。一覧や、このルールが作成するすべてのタスクに表示されます。計測内容が分かる名前を使用してください。例: 「Ticket "
+"Response - Priority 1」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__cancel_mode__never
+msgid "Never cancel"
+msgstr "キャンセルしない"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__next_due_at
+msgid "Next Background Processing Due"
+msgstr "次回バックグラウンド処理期限"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__calendar_source__none
+msgid "No calendar (24x7)"
+msgstr "カレンダーなし（24x7）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__note
+msgid "Note"
+msgstr "メモ"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_next_due_at_check
+msgid "Only a running task can have a next background-processing due date."
+msgstr "実行中のタスクのみ、次回バックグラウンド処理期限を持つことができます。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Only an SLA Manager can mark SLA events as resolved."
+msgstr "SLA管理者のみがSLAイベントを解決済みにできます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__is_resolved
+msgid ""
+"Only meaningful for error events. An SLA Manager ticks it once the problem "
+"has been looked at, so unresolved errors stay easy to find. Example: tick "
+"after fixing a broken condition and re-evaluating."
+msgstr ""
+"エラーイベントでのみ意味を持ちます。SLA管理者は問題を確認した後にチェックを付けます。これにより未解決のエラーを見つけやすくなります。例: "
+"壊れた条件を修正して再評価した後にチェックを付ける。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__sequence
+msgid ""
+"Order used when several escalations are due at the same moment; lower "
+"numbers run first. Example: 10 for the warning, 20 for the manager alert."
+msgstr "同じ時刻に複数のエスカレーションが期限を迎えた場合の実行順序。小さい番号が先に実行されます。例: 警告は10、マネージャーへのアラートは20。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__pause
+msgid "Pause"
+msgstr "一時停止"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__pause_domain
+msgid "Pause Condition"
+msgstr "一時停止条件"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Pause/Resume Condition"
+msgstr "一時停止/再開条件"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__stage__paused
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Paused"
+msgstr "一時停止"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__paused_since
+msgid "Paused Since"
+msgstr "一時停止開始時刻"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__percent
+msgid "Percent"
+msgstr "パーセント"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Percent '%s' is not an integer. Enter a positive integer, e.g. 75 or 100."
+msgstr "パーセント「%s」は整数ではありません。正の整数を入力してください（例: 75 または 100）。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_escalation_percent_check
+msgid "Percent must be greater than 0."
+msgstr "パーセントは0より大きい値を指定してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__percent
+msgid ""
+"Percentage of the target time at which the action runs. Must be a whole "
+"number greater than 0; values above 100 fire after the deadline. Example: 75"
+" fires after 3 of 4 hours; 120 fires 48 minutes after the deadline."
+msgstr ""
+"アクションが実行される、目標期間に対する割合。0より大きい整数を指定してください。100を超える値は期限を過ぎてから実行されます。例: "
+"75は4時間のうち3時間経過後に実行、120は期限の48分後に実行。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.actions.act_window,help:dwo_sla_core.action_sla_definition
+msgid ""
+"Pick a model, declare the conditions and escalation rules\n"
+"                to attach an SLA to any model."
+msgstr ""
+"モデルを選択し、条件とエスカレーションルールを定義して\n"
+"                任意のモデルにSLAを適用します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__planned_end
+msgid "Planned End"
+msgstr "予定終了"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_planned_end_check
+msgid "Planned end cannot be before the start date."
+msgstr "予定終了は開始日より前にすることはできません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_list
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Re-evaluate"
+msgstr "再評価"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__display_name
+msgid ""
+"Readable name of the task made of the definition name and the source record."
+" Example: \"Ticket Response - res.partner#42\"."
+msgstr "定義名とソースレコードから作成される、タスクの読みやすい名前。例: 「Ticket Response - res.partner#42」。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid "Record / Definition"
+msgstr "レコード / 定義"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid "Record ID"
+msgstr "レコードID"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__res_id
+msgid "Related Record Id"
+msgstr "関連レコードID"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__res_model
+msgid "Related Record Model"
+msgstr "関連レコードモデル"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__achieved_rate
+msgid ""
+"Report measure: 1 when the task ended on time, 0 when it ended breached, "
+"empty for tasks still running or cancelled. Its average over a group is the "
+"share of tasks achieved, e.g. 0.8 means 80%; a group without ended tasks has"
+" no value."
+msgstr ""
+"レポート用の指標: "
+"タスクが期限内に終了した場合は1、違反して終了した場合は0、実行中またはキャンセル済みのタスクは空。グループ単位の平均は達成したタスクの割合になります（例: "
+"0.8は80%）。終了したタスクがないグループには値がありません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__breaching_count
+msgid ""
+"Report measure: 1 while the task is running or paused and already past its "
+"deadline, otherwise 0. Its sum over a group is the number of SLAs currently "
+"in breach (ended breached tasks are not counted)."
+msgstr ""
+"レポート用の指標: "
+"実行中または一時停止中で、既に期限を過ぎているタスクは1、それ以外は0。グループ単位の合計は、現在違反中のSLA数になります（終了した違反タスクは含まれません）。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__reset
+msgid "Reset"
+msgstr "リセット"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__reset_action
+msgid "Reset Action"
+msgstr "リセット時の動作"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__reset_domain
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Reset Condition"
+msgstr "リセット条件"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__reset_field_ids
+msgid ""
+"Reset only happens when one of these fields has just changed value. Leave "
+"empty to reset every time the Reset Condition is met. Example: select "
+"\"Priority\" so a reset occurs only when the priority is edited."
+msgstr ""
+"これらのフィールドのいずれかの値が変わったときにのみリセットされます。空欄の場合は、リセット条件に一致するたびにリセットされます。例: "
+"「優先度」を選択すると、優先度が編集されたときのみリセットされます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__reset_field_ids
+msgid "Reset-Trigger Fields"
+msgstr "リセットトリガーフィールド"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Reset-trigger field '%s' must belong to model '%s'."
+msgstr "リセットトリガーフィールド「%s」はモデル「%s」に属している必要があります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__is_resolved
+msgid "Resolved"
+msgstr "解決済み"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__company_id
+msgid ""
+"Restricts the SLA to records of one company. Leave empty to apply to records"
+" of every company. Example: set \"Sojitz Vietnam\" so tickets of other "
+"companies never get this SLA."
+msgstr ""
+"SLAを1つの会社のレコードに限定します。空欄の場合はすべての会社のレコードに適用されます。例: 「Sojitz "
+"Vietnam」を設定すると、他社のチケットにはこのSLAが適用されません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__resume
+msgid "Resume"
+msgstr "再開"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__resume_domain
+msgid "Resume Condition"
+msgstr "再開条件"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__resume_mode
+msgid "Resume Mode"
+msgstr "再開モード"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__retroactive_start
+msgid "Retroactive Start"
+msgstr "遡及開始"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__running_since
+msgid "Running Since"
+msgstr "実行開始時刻"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid ""
+"Running tasks that are not yet breached and are due within this many hours "
+"appear in the \"Due Soon\" filter."
+msgstr "まだ違反していない実行中のタスクのうち、この時間数以内に期限を迎えるものが「期限間近」フィルターに表示されます。"
+
+#. module: dwo_sla_core
+#: model:ir.module.category,name:dwo_sla_core.module_category_sla
+#: model:ir.ui.menu,name:dwo_sla_core.menu_sla_root
+#: model:res.groups.privilege,name:dwo_sla_core.privilege_sla
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "SLA"
+msgstr "SLA"
+
+#. module: dwo_sla_core
+#: model:res.groups,name:dwo_sla_core.group_sla_manager
+msgid "SLA / Configuration Administrator"
+msgstr "SLA / 設定管理者"
+
+#. module: dwo_sla_core
+#: model:res.groups,name:dwo_sla_core.group_sla_user
+msgid "SLA / Viewer"
+msgstr "SLA / 閲覧者"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_processor
+msgid "SLA Background Processor"
+msgstr "SLAバックグラウンド処理"
+
+#. module: dwo_sla_core
+#: model:ir.actions.act_window,name:dwo_sla_core.action_sla_config_settings
+msgid "SLA Configuration"
+msgstr "SLA設定"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_definition
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "SLA Definition"
+msgstr "SLA定義"
+
+#. module: dwo_sla_core
+#: model:ir.actions.act_window,name:dwo_sla_core.action_sla_definition
+#: model:ir.ui.menu,name:dwo_sla_core.menu_sla_definition
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_list
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_search
+msgid "SLA Definitions"
+msgstr "SLA定義"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_engine
+msgid "SLA Engine"
+msgstr "SLAエンジン"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_escalation
+msgid "SLA Escalation Rule"
+msgstr "SLAエスカレーションルール"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_event
+msgid "SLA Event Log"
+msgstr "SLAイベントログ"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_res_config_settings__sla_event_retention_days
+msgid "SLA Event Log Retention (days)"
+msgstr "SLAイベントログ保持期間（日数）"
+
+#. module: dwo_sla_core
+#: model:ir.actions.act_window,name:dwo_sla_core.action_sla_event
+#: model:ir.ui.menu,name:dwo_sla_core.menu_sla_event
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_list
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_search
+msgid "SLA Events"
+msgstr "SLAイベント"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_mixin
+msgid "SLA Mixin"
+msgstr "SLAミックスイン"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "SLA Operations"
+msgstr "SLA運用"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_task
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "SLA Task"
+msgstr "SLAタスク"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_mixin__sla_task_count
+msgid "SLA Task Count"
+msgstr "SLAタスク数"
+
+#. module: dwo_sla_core
+#: model:ir.actions.act_window,name:dwo_sla_core.action_sla_task
+#: model:ir.ui.menu,name:dwo_sla_core.menu_sla_task
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_graph
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_pivot
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "SLA Tasks"
+msgstr "SLAタスク"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__definition_id
+msgid ""
+"SLA definition involved in the event, if any. Example: \"Ticket Response - "
+"Priority 1\"."
+msgstr "イベントに関係するSLA定義（ある場合）。例: 「Ticket Response - Priority 1」。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "SLA definition name"
+msgstr "SLA定義名"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__task_id
+msgid ""
+"SLA task the event belongs to. Empty for error events that could not be "
+"linked to a task. Example: the task of a ticket that was paused."
+msgstr "イベントが属するSLAタスク。タスクに紐づけられなかったエラーイベントの場合は空。例: 一時停止されたチケットのタスク。"
+
+#. module: dwo_sla_core
+#: model:ir.actions.server,name:dwo_sla_core.ir_cron_sla_process_due_ir_actions_server
+msgid "SLA: process due breaches and escalations"
+msgstr "SLA: 期限を迎えた違反とエスカレーションを処理"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Scope"
+msgstr "スコープ"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__sequence
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__sequence
+msgid "Sequence"
+msgstr "シーケンス"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__action_id
+msgid "Server Action"
+msgstr "サーバーアクション"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__action_id
+msgid ""
+"Server action executed on the SLA's source record when the percentage is "
+"reached, on the same model as the definition. Example: an action that posts "
+"a note or emails the team leader."
+msgstr ""
+"割合に達したときに、SLAのソースレコード（定義と同じモデル）に対して実行されるサーバーアクション。例: "
+"メモを投稿する、またはチームリーダーにメールを送信するアクション。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__has_breached
+msgid ""
+"Set when the deadline passes while the task is active and never cleared "
+"afterwards, even after pauses. Example: a task paused after being late is "
+"still marked breached."
+msgstr ""
+"タスクが有効な間に期限を過ぎたときに設定され、その後は一時停止を経ても解除されません。例: "
+"遅延後に一時停止されたタスクは、引き続き違反とマークされます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_res_config_settings__sla_due_soon_hours
+msgid ""
+"Size of the \"Due Soon\" window in hours: running, not yet breached tasks "
+"whose deadline falls within this window appear in the Due Soon filter. "
+"Example: 4 lists tasks due within 4 hours."
+msgstr ""
+"「期限間近」の期間（時間）。この期間内に期限を迎える、実行中かつ未違反のタスクが「期限間近」フィルターに表示されます。例: "
+"4の場合、4時間以内に期限を迎えるタスクを表示。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Source Record"
+msgstr "ソースレコード"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__res_id
+msgid "Source Record Id"
+msgstr "ソースレコードID"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__res_model
+msgid "Source Record Model"
+msgstr "ソースレコードモデル"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__stage
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+msgid "Stage"
+msgstr "ステージ"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__start_dt
+msgid "Start"
+msgstr "開始"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__start_domain
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Start Condition"
+msgstr "開始条件"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__running_since
+msgid ""
+"Start of the current running period (UTC); only set while the task is In "
+"Progress. Used to add the time since this moment to the elapsed time. "
+"Example: 2026-03-02 03:00:00."
+msgstr ""
+"現在の実行期間の開始時刻（UTC）。タスクが進行中の間のみ設定されます。この時刻からの経過時間を、経過時間に加算するために使用されます。例: "
+"2026-03-02 03:00:00。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__retroactive_field_id
+msgid "Start-Marker Field"
+msgstr "開始マーカーフィールド"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Start-marker field '%s' is empty; using the current time instead."
+msgstr "開始マーカーフィールド「%s」が空のため、代わりに現在時刻を使用します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__stop_domain
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Stop Condition"
+msgstr "停止条件"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Target"
+msgstr "目標"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_target_hours_check
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_target_hours_check
+msgid "Target duration cannot be negative."
+msgstr "目標期間を負の値にすることはできません。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Target duration is negative (%s); task was not created."
+msgstr "目標期間が負の値です（%s）。タスクは作成されませんでした。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation_retry__task_id
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__task_id
+msgid "Task"
+msgstr "タスク"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__res_model
+msgid ""
+"Technical name of the model of the record this task measures. Example: "
+"res.partner."
+msgstr "このタスクが計測するレコードのモデルの技術名。例: res.partner。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__res_model
+msgid ""
+"Technical name of the model of the related record, used for error events "
+"that have no task. Example: res.partner."
+msgstr "関連レコードのモデルの技術名。タスクを持たないエラーイベントで使用されます。例: res.partner。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__model_name
+msgid ""
+"Technical name of the selected model, filled in automatically from Model. "
+"Used internally for fast lookups; do not edit. Example: res.partner."
+msgstr "選択したモデルの技術名。「モデル」から自動的に入力されます。内部で高速な検索に使用されるため、編集しないでください。例: res.partner。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "The \"due soon\" window must be greater than 0 hours."
+msgstr "「期限間近」の期間は0時間より大きい値を指定してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__definition_id
+msgid ""
+"The SLA definition that created this task. Example: \"Ticket Response - "
+"Priority 1\"."
+msgstr "このタスクを作成したSLA定義。例: 「Ticket Response - Priority 1」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__definition_id
+msgid ""
+"The SLA definition this escalation belongs to. Example: \"Ticket Response - "
+"Priority 1\"."
+msgstr "このエスカレーションが属するSLA定義。例: 「Ticket Response - Priority 1」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__model_id
+msgid ""
+"The business model whose records are measured by this SLA. Every record of "
+"that model that meets the Start Condition gets its own SLA task. Example: "
+"\"Helpdesk Ticket\" or \"Contact\"."
+msgstr ""
+"このSLAによって計測されるレコードの対象モデル。このモデルのレコードのうち開始条件に一致するものにはそれぞれ独自のSLAタスクが作成されます。例: "
+"「Helpdesk Ticket」または「Contact」。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"The definition's fixed calendar must be of type 'fully_fixed' (REQ-INT-009)."
+msgstr "定義の固定カレンダーは 'fully_fixed' 型である必要があります（REQ-INT-009）。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"The server action belongs to model '%s' but the definition belongs to model "
+"'%s'."
+msgstr "サーバーアクションはモデル「%s」に属していますが、定義はモデル「%s」に属しています。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "The start-marker field must be of type Datetime."
+msgstr "開始マーカーフィールドは日時（Datetime）型である必要があります。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "The start-marker field must belong to model '%s'."
+msgstr "開始マーカーフィールドはモデル「%s」に属している必要があります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_one_active_uniq
+msgid "This record already has an active SLA for this definition."
+msgstr "このレコードには、この定義の有効なSLAが既に存在します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__retroactive_start
+msgid ""
+"Tick to take the SLA start time from a date field on the record instead of "
+"the moment the SLA is attached. A start in the past can make the task "
+"breached immediately. Example: start counting from the ticket's creation "
+"time rather than when the rule was applied."
+msgstr ""
+"SLAが適用された時点ではなく、レコードの日付フィールドからSLAの開始時刻を取得する場合はチェックします。過去の開始時刻を指定すると、タスクが即座に違反になることがあります。例: "
+"ルールが適用された時点ではなく、チケットの作成日時から計測を開始する。"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_time
+msgid "Time Service SLA"
+msgstr "時間サービスSLA"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__target_hours
+msgid ""
+"Time allowed to finish, in hours. With a working calendar it counts working "
+"hours only, otherwise clock hours (24x7). 0 is accepted and means the "
+"deadline is the start time. Example: 4 means the SLA is breached 4 working "
+"hours after it starts."
+msgstr ""
+"完了までに許容される時間（時間単位）。業務カレンダーがある場合は業務時間のみを計算し、ない場合は実時間（24x7）で計算します。0も指定でき、その場合は開始時刻が期限になります。例: "
+"4の場合、SLAは開始から業務時間4時間後に違反になります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_event__event_dt
+msgid "Timestamp"
+msgstr "タイムスタンプ"
+
+#. module: dwo_sla_core
+#: model:ir.actions.act_window,name:dwo_sla_core.action_sla_event_error_unresolved
+#: model:ir.ui.menu,name:dwo_sla_core.menu_sla_event_error_unresolved
+msgid "Unresolved Error Events"
+msgstr "未解決のエラーイベント"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_event_search
+msgid "Unresolved Errors"
+msgstr "未解決のエラー"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__reset_action
+msgid ""
+"What happens to the previous task when a reset occurs. Cancel: it is "
+"discarded. Complete: it is closed as Achieved or Breached according to the "
+"deadline. Example: use \"Complete\" to keep a result for each time a ticket "
+"was reopened."
+msgstr ""
+"リセットが発生したときの前のタスクの扱い。キャンセル: 破棄されます。完了: 期限に応じて達成または違反として終了します。例: "
+"チケットが再オープンされるたびに結果を残すには「完了」を使用します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__resume_mode__pause_unmatched
+msgid "When pause no longer matches"
+msgstr "一時停止条件に一致しなくなったとき"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__cancel_mode__start_unmatched
+msgid "When start no longer matches"
+msgstr "開始条件に一致しなくなったとき"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__cancel_mode__condition
+msgid "When the cancel condition matches"
+msgstr "キャンセル条件に一致したとき"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__event_dt
+msgid "When the event happened (UTC). Example: 2026-03-02 05:00:00."
+msgstr "イベントが発生した時刻（UTC）。例: 2026-03-02 05:00:00。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__resume_mode__condition
+msgid "When the resume condition matches"
+msgstr "再開条件に一致したとき"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__stage
+msgid ""
+"Where the task is in its life. In Progress: clock running. Paused: clock "
+"stopped. Achieved: finished on time. Breached: finished or still running "
+"after the deadline. Cancelled: discarded. Example: use the Breached filter "
+"to find late tickets."
+msgstr ""
+"タスクのライフサイクル上の位置。進行中: 計測中。一時停止: 計測停止中。達成: 期限内に終了。違反: 期限後に終了、または実行中。キャンセル: "
+"破棄。例: 「違反」フィルターで遅延したチケットを探す。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__calendar_source
+msgid ""
+"Where the working calendar comes from. No calendar: time runs 24x7. Fixed "
+"calendar on the definition: always use the calendar selected below. Calendar"
+" read from the record: follow a calendar found on the record itself. "
+"Example: choose \"Calendar read from the record\" when each customer has its"
+" own support hours."
+msgstr ""
+"業務カレンダーの取得元。カレンダーなし: 時間は24x7で進みます。定義で指定した固定カレンダー: "
+"常に下で選択したカレンダーを使用します。レコードから取得したカレンダー: レコード自体に設定されたカレンダーに従います。例: "
+"顧客ごとに個別のサポート時間がある場合は「レコードから取得したカレンダー」を選択します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__calendar_id
+msgid ""
+"Working calendar used to count time for this task, copied at start; empty "
+"means 24x7. Example: \"Standard 40 hours/week\"."
+msgstr "このタスクの時間計算に使用される業務カレンダー（開始時にコピー）。空の場合は24x7。例: 「Standard 40 hours/week」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__calendar_id
+msgid ""
+"Working calendar used when Calendar Source is \"Fixed calendar on the "
+"definition\". It must be a fixed-hours calendar with at least one working "
+"period. Example: \"Standard 40 hours/week (Mon-Fri 08:00-17:00)\"."
+msgstr ""
+"カレンダーの取得元が「定義で指定した固定カレンダー」の場合に使用される業務カレンダー。少なくとも1つの業務時間帯を持つ、固定時間のカレンダーである必要があります。例: "
+"「Standard 40 hours/week (Mon-Fri 08:00-17:00)」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__business_elapsed
+msgid ""
+"Working hours consumed so far, accumulated across pauses; may exceed the "
+"target when late. It is updated when the task pauses, resumes or completes. "
+"Example: 4.4 hours on a 4-hour target."
+msgstr ""
+"これまでに消費された業務時間（一時停止をまたいで累計）。遅延した場合は目標を超えることがあります。タスクが一時停止、再開、または完了したときに更新されます。例: "
+"目標4時間に対して4.4時間。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_running_since_check
+msgid "running_since only has a value when stage = in_progress."
+msgstr "running_since は stage = in_progress の場合にのみ値を持ちます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__business_percent_used
+msgid "% Duration Used (Business)"
+msgstr "使用率（稼働時間、%）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid "% Used"
+msgstr "使用率"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/definition_form/definition_form_controller.js:0
+msgid ""
+"%(count)s task(s) are running or paused under this SLA. The new conditions "
+"apply to them at their next evaluation, so some may be stopped, cancelled or"
+" paused."
+msgstr "このSLAでは%(count)s件のタスクが実行中または一時停止中です。新しい条件は次回の評価時に適用されるため、一部のタスクが停止・キャンセル・一時停止される場合があります。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "%s record(s) processed, %s task(s) created, %s error(s). %s"
+msgstr "%s件のレコードを処理し、%s件のタスクを作成しました。エラーは%s件です。%s"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "%s task(s) checked, %s changed stage."
+msgstr "%s件のタスクを確認し、%s件のステージが変わりました。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "%s task(s) updated, %s skipped."
+msgstr "%s件のタスクを更新し、%s件をスキップしました。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "'%s' is required for this escalation rule's action type."
+msgstr "このエスカレーションルールのアクション種別には「%s」が必要です。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "1. The two buttons: what is the difference?"
+msgstr "1. 2つのボタンの違い"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "1. Turning the SLA on and off"
+msgstr "1. SLAの有効化と無効化"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "100% of target"
+msgstr "目標の100%"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "2. Apply Current Settings"
+msgstr "2. 現在の設定を適用"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "2. Conditions (Start, Cancel, Pause, Resume, Stop, Reset)"
+msgstr "2. 条件（開始、キャンセル、一時停止、再開、停止、リセット）"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.js:0
+msgid "24/7 (no calendar)"
+msgstr "24時間365日（カレンダーなし）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "3. Re-check Conditions"
+msgstr "3. 条件を再確認"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "3. Stopping an SLA the right way"
+msgstr "3. SLAを正しく止める方法"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "4. Good to know"
+msgstr "4. 知っておくと便利なこと"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "4. Timezone and calendar"
+msgstr "4. タイムゾーンとカレンダー"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "5. Due Soon"
+msgstr "5. 期限間近"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "6. Editing and deleting a definition, escalation rules"
+msgstr "6. 定義の編集と削除、エスカレーションルール"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "7. When the source record is deleted"
+msgstr "7. ソースレコードを削除したとき"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "8. Records that already exist"
+msgstr "8. すでに存在するレコード"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "9. What you see on screen"
+msgstr "9. 画面に表示されるもの"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"<b>% Used</b> is calculated when a view loads and does not refresh by "
+"itself. It cannot be sorted, filtered or grouped on."
+msgstr "<b>使用率</b>は画面を読み込んだ時点で計算され、自動では更新されません。並べ替え、絞り込み、グループ化はできません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"<b>A condition goes through a relation or a non-stored computed field.</b> "
+"Pause uses <code>partner_id.is_vip = True</code>. The customer is made VIP "
+"on the customer form; the ticket is not saved, so nothing tells the SLA. "
+"Press the button: the task is paused as the condition says."
+msgstr "<b>条件がリレーションまたは非保存の計算フィールドを経由している場合。</b>一時停止条件が <code>partner_id.is_vip = True</code> だとします。顧客フォームで顧客をVIPにしても、チケットは保存されないためSLAには伝わりません。ボタンを押すと、条件のとおりにタスクが一時停止されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"<b>After fixing an error.</b> The SLA logged an <code>error</code> event "
+"because a domain was broken. After you fix the domain, press the button so "
+"the task runs correctly again."
+msgstr "<b>エラーを修正した後。</b>ドメインが壊れていたためSLAが <code>error</code> イベントを記録しました。ドメインを修正したら、ボタンを押してタスクを正しく動かし直します。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"<b>Applied immediately</b> to running tasks at their next evaluation: the "
+"six conditions, Cancel Mode, Resume Mode and the escalation rules. A change "
+"to the conditions can stop, cancel or pause many tasks at once, so saving "
+"asks for confirmation when tasks are running."
+msgstr "<b>実行中のタスクに次回の評価時に即時適用</b>されるもの：6つの条件、キャンセルモード、再開モード、エスカレーションルール。条件を変更すると多数のタスクが一度に停止・キャンセル・一時停止されることがあるため、実行中のタスクがある場合は保存時に確認が表示されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"<b>Copied to the task when it starts</b>, so editing the definition does not"
+" change running tasks: the target duration, the calendar and the timezone. "
+"Use <b>Apply Current Settings</b> on a task to apply the new values."
+msgstr "<b>タスクの開始時にタスクへコピー</b>されるもの：目標期間、カレンダー、タイムゾーン。そのため定義を編集しても実行中のタスクは変わりません。新しい値を反映するには、タスクで<b>現在の設定を適用</b>を使います。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"<b>Disable</b> only stops attaching the SLA to <b>new</b> records. Tasks "
+"that are already running keep running, can still breach and escalate, and "
+"finish normally. Nothing is cancelled when you disable."
+msgstr "<b>無効化</b>は、<b>新しい</b>レコードへのSLAの付与を止めるだけです。すでに実行中のタスクは動き続け、違反やエスカレーションも発生し、通常どおり完了します。無効化してもキャンセルされるものはありません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"<b>Due Soon (hours)</b> is the window before the deadline in which a running"
+" task counts as \"due soon\". Leave it empty or 0 to use the value from "
+"Settings."
+msgstr "<b>期限間近（時間）</b>は、実行中のタスクが「期限間近」とみなされる、期限までの時間です。空または0にすると設定の値を使います。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"<b>The conditions of the definition were edited.</b> Ticket T1 is "
+"<code>Cancelled</code> but its task is still running, because Stop only had "
+"<code>Done</code>. A manager changes Stop to <code>stage in (Done, "
+"Cancelled)</code>. T1 was not saved again, so the task would keep running "
+"and breach for nothing. Press the button on the task of T1: Stop now matches"
+" and the task becomes <code>Achieved</code>."
+msgstr "<b>定義の条件を編集した場合。</b>チケットT1は <code>Cancelled</code> ですが、停止条件が <code>Done</code> のみだったためタスクはまだ実行中です。管理者が停止条件を <code>stage in (Done, Cancelled)</code> に変更しました。T1は再保存されていないため、タスクは動き続け、何もしていないのに違反になってしまいます。T1のタスクでボタンを押すと、停止条件が一致し、タスクは <code>Achieved</code> になります。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "<p>SLA \"%s\" reached %s%% on %s.</p>"
+msgstr "<p>SLA「%s」は%s%%に達しました（%s）。</p>"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A Pause Condition that is a <b>subset</b> of the Start Condition: the task "
+"attaches paused and is cancelled as soon as the pause ends."
+msgstr "一時停止条件が開始条件の<b>部分集合</b>になっている：タスクが一時停止状態で付与され、一時停止が終わった時点でキャンセルされます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A Server Action escalation runs with the permissions of the user assigned to"
+" the SLA background job, not the permissions of the user who edits the "
+"source record."
+msgstr "サーバーアクションによるエスカレーションは、ソースレコードを編集したユーザーの権限ではなく、SLAのバックグラウンド処理に割り当てられたユーザーの権限で実行されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A Start Condition that is a <b>subset</b> of the Stop Condition: the SLA "
+"never attaches."
+msgstr "開始条件が停止条件の<b>部分集合</b>になっている：SLAは付与されません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A Stop condition left empty never completes the task; a Pause condition left"
+" empty never pauses it."
+msgstr "空の停止条件ではタスクは完了せず、空の一時停止条件ではタスクは一時停止しません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A condition of <code>[]</code> (or empty) means <b>not configured and never "
+"matches</b>. The domain editor shows \"Match all records\" for it; that "
+"label does not apply here."
+msgstr "<code>[]</code>（または空）の条件は<b>未設定で、決して一致しません</b>。ドメインエディタには「全レコードに一致」と表示されますが、ここではその表示は当てはまりません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"A condition or the data changed, but the source record was not saved again."
+msgstr "条件またはデータが変わったが、ソースレコードが再保存されていない。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A condition with no rule is not configured and never\n"
+"                                    matches, even though the editor shows \"Match all records\"."
+msgstr "ルールのない条件は未設定であり、エディタに「全レコードに一致」と表示されても決して一致しません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A definition that has tasks cannot be deleted. Use <b>Disable</b> instead. "
+"Changes to the important fields are recorded in the chatter."
+msgstr "タスクのある定義は削除できません。代わりに<b>無効化</b>してください。重要なフィールドの変更はチャターに記録されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A new definition starts <b>disabled</b> (a draft). Finish configuring it, "
+"then press <b>Enable</b>."
+msgstr "新しい定義は<b>無効</b>（下書き）の状態で始まります。設定が終わったら<b>有効化</b>を押してください。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"A new escalation rule does not fire retroactively: running tasks already "
+"past its percentage are marked as done for that rule."
+msgstr "新しいエスカレーションルールは遡って実行されません。すでにそのパーセンテージを超えている実行中のタスクは、このルールについて処理済みとして扱われます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"A task that is already finished (achieved or breached) or cancelled is never"
+" changed by either button."
+msgstr "すでに完了した（達成または違反）タスクやキャンセル済みのタスクは、どちらのボタンでも変更されません。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.js:0
+msgid "Achieved on time"
+msgstr "期限内に達成"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__display_name
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Action"
+msgstr "アクション"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_needaction
+msgid "Action Needed"
+msgstr "要対応"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__action_type
+msgid "Action Type"
+msgstr "アクション種別"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_mixin__sla_task_active_count
+msgid "Active SLA Tasks"
+msgstr "有効なSLAタスク"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Applied to existing records"
+msgstr "既存レコードに適用しました"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_apply_wizard_form
+msgid "Apply"
+msgstr "適用"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid "Apply Current Settings"
+msgstr "現在の設定を適用"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_apply_wizard
+msgid "Apply SLA to Existing Records"
+msgstr "既存レコードにSLAを適用"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid ""
+"Apply the current target time, working calendar and timezone of each "
+"selected task's SLA definition? Running tasks get a new deadline counted "
+"from now."
+msgstr "選択した各タスクのSLA定義の現在の目標時間、稼働カレンダー、タイムゾーンを適用しますか？実行中のタスクは、現在時刻から数えた新しい期限になります。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Apply the current target time, working calendar and timezone of the SLA "
+"definition to this task? A running task gets a new deadline counted from "
+"now."
+msgstr "SLA定義の現在の目標時間、稼働カレンダー、タイムゾーンをこのタスクに適用しますか？実行中のタスクは、現在時刻から数えた新しい期限になります。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_apply_wizard_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Apply to Existing Records"
+msgstr "既存レコードに適用"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Attach this SLA to records that already exist and match the Start Condition."
+msgstr "すでに存在し、開始条件に一致するレコードにこのSLAを付与します。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_apply_wizard_form
+msgid "Attach this SLA to the matching existing records now?"
+msgstr "一致する既存レコードに、今このSLAを付与しますか？"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_attachment_count
+msgid "Attachment Count"
+msgstr "添付ファイル数"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "Background Batch Size (tasks)"
+msgstr "バックグラウンド処理のバッチサイズ（タスク数）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Both buttons are for SLA Managers only, and both ask for confirmation."
+msgstr "どちらのボタンもSLAマネージャー専用で、どちらも確認が表示されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Both work on one SLA only: Re-check Conditions never touches the other SLAs "
+"of the same record."
+msgstr "どちらも1つのSLAだけを対象とします。条件を再確認しても、同じレコードの他のSLAには触れません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_mixin__sla_task_breach_count
+msgid "Breached SLA Tasks"
+msgstr "違反したSLAタスク"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.js:0
+msgid "Breaching now"
+msgstr "現在違反中"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__business_duration
+msgid "Business Duration"
+msgstr "稼働時間"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "Business time used, as a multiple of the target"
+msgstr "使用した稼働時間（目標に対する倍率）"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Cannot change the model of an SLA definition that already has tasks. Create "
+"a new definition for the other model instead."
+msgstr "すでにタスクがあるSLA定義のモデルは変更できません。別のモデルには新しい定義を作成してください。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/definition_form/definition_form_controller.js:0
+msgid "Change conditions?"
+msgstr "条件を変更しますか？"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid ""
+"Check each selected task's six conditions again against its source record? "
+"Tasks may change stage."
+msgstr "選択した各タスクの6つの条件をソースレコードに対して再確認しますか？タスクのステージが変わる場合があります。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Check this SLA's six conditions again against the current state of the "
+"source record? The task may change stage."
+msgstr "このSLAの6つの条件をソースレコードの現在の状態に対して再確認しますか？タスクのステージが変わる場合があります。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Check this SLA's start, cancel, pause, resume, stop and reset conditions "
+"again against the source record. Other SLAs on the same record are not "
+"touched."
+msgstr "このSLAの開始・キャンセル・一時停止・再開・停止・リセットの各条件をソースレコードに対して再確認します。同じレコードの他のSLAには影響しません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Checks the Start, Cancel, Pause, Resume, Stop and Reset conditions of "
+"<b>this SLA</b> again against the source record as it is now. The task may "
+"change stage."
+msgstr "ソースレコードの現在の状態に対して、<b>このSLA</b>の開始、キャンセル、一時停止、再開、停止、リセットの各条件を再確認します。タスクのステージが変わる場合があります。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Classification"
+msgstr "分類"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Common mistakes to avoid:"
+msgstr "避けるべきよくある間違い："
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.js:0
+msgid "Completed late"
+msgstr "遅れて完了"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__cancel_domain
+msgid ""
+"Condition that cancels the running SLA when Cancel Mode is \"When the cancel"
+" condition matches\". A cancelled SLA is discarded and not counted as "
+"achieved or breached. Example: [('stage_id.name', '=', 'Cancelled')]. See "
+"the Note tab for limits and common mistakes."
+msgstr "キャンセルモードが「キャンセル条件に一致したとき」の場合に、実行中のSLAをキャンセルする条件です。キャンセルされたSLAは破棄され、達成にも違反にも数えられません。例：[('stage_id.name', '=', 'Cancelled')]。制限事項とよくある間違いについては「メモ」タブを参照してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__stop_domain
+msgid ""
+"Condition that completes the SLA. The task becomes Achieved, or Breached if "
+"the deadline had already passed. Example: [('state', 'in', ['resolved', "
+"'closed'])]. See the Note tab for limits and common mistakes."
+msgstr "SLAを完了させる条件です。タスクは達成になり、すでに期限を過ぎていた場合は違反になります。例：[('state', 'in', ['resolved', 'closed'])]。制限事項とよくある間違いについては「メモ」タブを参照してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__start_domain
+msgid ""
+"Condition that makes a record start being measured. Written as a domain "
+"list. An empty rule list [] means \"not configured\" and never matches; to "
+"match every record write [('id', '!=', 0)]. Example: [('priority', '=', "
+"'3')] starts the SLA for urgent tickets. See the Note tab for limits and "
+"common mistakes."
+msgstr "レコードの測定を開始する条件です。ドメインリストで記述します。ルールのない空のリスト [] は「未設定」を意味し、決して一致しません。全レコードに一致させるには [('id', '!=', 0)] と書きます。例：[('priority', '=', '3')] は緊急チケットでSLAを開始します。制限事項とよくある間違いについては「メモ」タブを参照してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__pause_domain
+msgid ""
+"Condition that pauses the clock while it matches, for example while waiting "
+"for the customer. The paused time is not counted against the target. "
+"Example: [('state', '=', 'waiting_customer')]. See the Note tab for limits "
+"and common mistakes."
+msgstr "一致している間、時計を一時停止する条件です。たとえば顧客の返答待ちの間などに使います。一時停止していた時間は目標に数えられません。例：[('state', '=', 'waiting_customer')]。制限事項とよくある間違いについては「メモ」タブを参照してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__resume_domain
+msgid ""
+"Condition that restarts a paused clock when Resume Mode is \"When the resume"
+" condition matches\". Example: [('state', '=', 'in_progress')]. See the Note"
+" tab for limits and common mistakes."
+msgstr "再開モードが「再開条件に一致したとき」の場合に、一時停止していた時計を再開する条件です。例：[('state', '=', 'in_progress')]。制限事項とよくある間違いについては「メモ」タブを参照してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__reset_domain
+msgid ""
+"Condition that, together with the Start Condition, ends the current SLA and "
+"starts a fresh one, for example when a ticket is reopened. Combine with "
+"Reset-Trigger Fields to react only to real changes. Example: [('state', '=',"
+" 'reopened')]. See the Note tab for limits and common mistakes."
+msgstr "開始条件と合わせて、現在のSLAを終了し新しいSLAを開始する条件です。たとえばチケットが再オープンされたときに使います。実際の変更にだけ反応させるには、リセットトリガーフィールドと組み合わせます。例：[('state', '=', 'reopened')]。制限事項とよくある間違いについては「メモ」タブを参照してください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__reevaluate
+msgid "Conditions Re-checked"
+msgstr "条件を再確認しました"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Conditions re-checked"
+msgstr "条件を再確認しました"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Conditions re-checked by %s. No change (stage: %s)."
+msgstr "%sが条件を再確認しました。変更なし（ステージ：%s）。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Conditions re-checked by %s. Stage: %s -> %s."
+msgstr "%sが条件を再確認しました。ステージ：%s -> %s。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Copies the definition's current target duration, calendar and timezone onto "
+"the task, and recomputes the deadline. The time already used is kept."
+msgstr "定義の現在の目標期間、カレンダー、タイムゾーンをタスクにコピーし、期限を再計算します。すでに使用した時間は保持されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Copy the definition's current target time, working calendar and timezone "
+"onto this task and recompute its deadline. Time already used is kept."
+msgstr "定義の現在の目標時間、稼働カレンダー、タイムゾーンをこのタスクにコピーし、期限を再計算します。すでに使用した時間は保持されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Created"
+msgstr "作成日時"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Current settings applied"
+msgstr "現在の設定を適用しました"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Current settings applied by %s. Target: %s -> %s. Calendar: %s -> %s. "
+"Deadline: %s -> %s."
+msgstr "%sが現在の設定を適用しました。目標：%s -> %s。カレンダー：%s -> %s。期限：%s -> %s。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__apply_retention_days
+msgid ""
+"Days after which finished manual apply runs are removed automatically; it "
+"follows the event log retention in Settings. Example: 365."
+msgstr "完了した手動適用の実行が自動的に削除されるまでの日数です。設定のイベントログ保持期間に連動します。例：365。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "Deadline"
+msgstr "期限"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__planned_end_time
+msgid ""
+"Deadline (UTC) computed from the start, the target time and the calendar; "
+"recomputed when the task resumes from a pause. Example: start 09:00 with 4 "
+"working hours gives 13:00."
+msgstr "開始、目標時間、カレンダーから計算された期限（UTC）です。一時停止から再開したときに再計算されます。例：9:00に開始し、稼働時間4時間なら13:00になります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__original_breach_time
+msgid ""
+"Deadline as first computed when the task attached, before any pause/resume "
+"recalculation. Set once and never changed afterwards, unlike Planned End. "
+"Example: a task resumed twice still shows the deadline promised at the very "
+"start here."
+msgstr "タスクが付与されたときに最初に計算された期限で、一時停止・再開による再計算の前の値です。一度だけ設定され、予定終了と異なり、その後は変更されません。例：2回再開したタスクでも、ここには最初に約束した期限が表示されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_list
+msgid "Disable"
+msgstr "無効化"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_list
+msgid ""
+"Disable this SLA? No new tasks will be created; running tasks keep being "
+"tracked."
+msgstr "このSLAを無効にしますか？新しいタスクは作成されませんが、実行中のタスクは引き続き追跡されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_search
+msgid "Disabled"
+msgstr "無効"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_apply_job__state__done
+msgid "Done"
+msgstr "完了"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/form_sla_status/form_sla_status.js:0
+msgid "Due"
+msgstr "期限"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__due_soon_hours
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "Due Soon (hours)"
+msgstr "期限間近（時間）"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/form_sla_status/form_sla_status.js:0
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.js:0
+msgid "Due soon"
+msgstr "期限間近"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__duration
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__duration
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Duration"
+msgstr "期間"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_duration_check
+msgid "Duration (clock) cannot be negative."
+msgstr "期間（実時間）を負の値にすることはできません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_target_hours_check
+msgid "Duration cannot be negative."
+msgstr "期間を負の値にすることはできません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__next_due_at
+msgid ""
+"Earliest moment (UTC) the background process must look at this task: the "
+"deadline or the next escalation threshold. Empty when the task is not "
+"running. Example: 2026-03-02 05:00:00."
+msgstr "バックグラウンド処理がこのタスクを確認すべき最も早い時刻（UTC）です。期限または次のエスカレーションのしきい値です。タスクが実行中でないときは空です。例：2026-03-02 05:00:00。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_escalation__email_recipient_type__field
+msgid "Email Field on Record"
+msgstr "レコード上のメールフィールド"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__email_template_id
+msgid "Email Template"
+msgstr "メールテンプレート"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__email_fixed_address
+msgid ""
+"Email address always notified by this rule. Example: \"support-"
+"team@example.com\"."
+msgstr "このルールが常に通知するメールアドレスです。例：「support-team@example.com」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__email_template_id
+msgid ""
+"Email template used for the subject and body, rendered on the SLA Task (so "
+"it can reference the SLA name, percentage, deadline, etc.). The \"To\" "
+"address is always the one resolved by Notify above, regardless of what the "
+"template itself specifies. Leave empty to send a short built-in message "
+"instead of using a template."
+msgstr "件名と本文に使うメールテンプレートです。SLAタスクに対して描画されるため、SLA名、パーセンテージ、期限などを参照できます。「宛先」は、テンプレートの指定にかかわらず、上の「通知先」で決まったものが常に使われます。空にすると、テンプレートの代わりに短い組み込みメッセージを送信します。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_list
+msgid "Enable"
+msgstr "有効化"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Enable the SLA definition before applying it to existing records."
+msgstr "既存レコードに適用する前に、SLA定義を有効にしてください。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_list
+msgid "Enable this SLA? It will start attaching to matching records."
+msgstr "このSLAを有効にしますか？一致するレコードへの付与が始まります。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Enabled, but nothing will start"
+msgstr "有効にしましたが、何も開始されません"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Enabling with an empty Start Condition shows a warning (nothing will start) "
+"but is not blocked."
+msgstr "開始条件が空のまま有効化すると警告（何も開始されません）が表示されますが、有効化自体は妨げられません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__note
+msgid ""
+"Error detail when the run failed. Example: \"Manual apply stopped by an "
+"unexpected error: ...\"."
+msgstr "実行が失敗したときのエラー詳細です。例：「Manual apply stopped by an unexpected error: ...」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__error_count
+msgid ""
+"Error events logged for the processed records; details are in the SLA "
+"Events. Example: 0."
+msgstr "処理したレコードについて記録されたエラーイベントの数です。詳細はSLAイベントにあります。例：0。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__error_count
+msgid "Errors"
+msgstr "エラー"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__escalation_event_ids
+msgid "Escalation History"
+msgstr "エスカレーション履歴"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "Event Log Retention (days)"
+msgstr "イベントログの保持期間（日数）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Every change is written in the <b>History</b> tab, with the person who "
+"pressed the button and the old and new values."
+msgstr "すべての変更は、ボタンを押した人と変更前後の値とともに<b>履歴</b>タブに記録されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Example SLA \"Resolve a ticket in 8 hours\": Start <code>priority = "
+"Urgent</code>; Pause <code>stage = Waiting customer</code>; Stop <code>stage"
+" = Done</code>. Three real situations:"
+msgstr "SLA「チケットを8時間以内に解決」の例：開始 <code>priority = Urgent</code>、一時停止 <code>stage = Waiting customer</code>、停止 <code>stage = Done</code>。実際に起こりうる3つの状況："
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"Example: the target of the SLA changes from 8 hours to 4 hours. On a running"
+" task, press the button. The task now has a 4-hour target, and its new "
+"deadline is counted <b>from the moment you press the button</b>: the time "
+"used so far is kept, and what remains of the 4 hours is added to \"now\"."
+msgstr "例：SLAの目標が8時間から4時間に変更されたとします。実行中のタスクでボタンを押すと、タスクの目標は4時間になり、新しい期限は<b>ボタンを押した時点から</b>数えられます。それまでに使った時間は保持され、4時間のうち残りの時間が「現在」に加算されます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__vendor_id
+msgid ""
+"External vendor this commitment is measured against, when this SLA/OLA is "
+"tied to an Underpinning Contract. Label only, for reporting -- does not "
+"change engine behaviour. Example: the ISP whose uptime commitment this OLA "
+"tracks."
+msgstr "このSLA/OLAが下請契約（Underpinning Contract）に紐づく場合に、このコミットメントの測定対象となる外部ベンダーです。報告用のラベルのみで、エンジンの動作は変わりません。例：このOLAが追跡する稼働率コミットメントのISP。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__filter_domain
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_wizard__filter_domain
+msgid "Extra Filter"
+msgstr "追加フィルター"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_apply_job__state__failed
+msgid "Failed"
+msgstr "失敗"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"Field '%s' is not usable here; it must be a %s field on the definition's "
+"model."
+msgstr "フィールド「%s」はここでは使用できません。定義のモデル上の%sフィールドである必要があります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__email_field_id
+msgid ""
+"Field on the SLA's model read to find the recipient: a User/Partner field "
+"(Many2one, or One2many/Many2many for several people, e.g. Followers) for "
+"\"Responsible\", or a text field holding an email address for \"Email "
+"Field\". Example: \"Assigned to\" or \"Customer Email\"."
+msgstr "受信者を特定するために読み取る、SLAのモデル上のフィールドです。「担当者」ではユーザー/パートナーのフィールド（Many2one、または複数人向けのOne2many/Many2many、例：フォロワー）、「メールフィールド」ではメールアドレスを保持するテキストフィールドを指定します。例：「Assigned to」または「Customer Email」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__schedule_path
+msgid ""
+"Field on the record that leads to a calendar, picked with the same field "
+"chooser used in Automation Rules and Mail Templates -- click it, then "
+"navigate through relations (for example Customer) to the calendar field at "
+"the end. If any step is empty or the calendar is unusable, the company "
+"calendar (then 24x7) is used instead. Example: "
+"partner_id.resource_calendar_id."
+msgstr "カレンダーにたどり着くレコード上のフィールドです。自動化ルールやメールテンプレートと同じフィールドセレクターで選択します。クリックしてリレーション（例：顧客）をたどり、最後にカレンダーのフィールドを選びます。途中が空の場合やカレンダーを使用できない場合は、会社のカレンダー（それも使えなければ24時間365日）を使用します。例：partner_id.resource_calendar_id。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__end_time
+msgid "Finished"
+msgstr "終了"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__email_fixed_address
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_escalation__email_recipient_type__fixed
+msgid "Fixed Email Address"
+msgstr "固定メールアドレス"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_follower_ids
+msgid "Followers"
+msgstr "フォロワー"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "フォロワー（パートナー）"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_ir_http
+msgid "HTTP Routing"
+msgstr "HTTPルーティング"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__has_message
+msgid "Has Message"
+msgstr "メッセージあり"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "History"
+msgstr "履歴"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__apply_job_ids
+msgid ""
+"History of \"Apply to Existing Records\" runs for this SLA, newest first. "
+"Example: a run that created 112 tasks."
+msgstr "このSLAの「既存レコードに適用」の実行履歴です（新しい順）。例：112件のタスクを作成した実行。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__due_soon_hours
+msgid ""
+"Hours before the deadline when a running task counts as \"Due Soon\" for "
+"this SLA. Leave empty or 0 to use the global value in Settings. Must not be "
+"negative. Example: 2 on a 4-hour SLA flags tasks in their last 2 hours; 24 "
+"on a 3-day SLA flags the last day."
+msgstr "実行中のタスクがこのSLAで「期限間近」とみなされる、期限までの時間です。空または0にすると設定のグローバル値を使います。負の値は指定できません。例：4時間のSLAで2なら最後の2時間のタスクが対象、3日間のSLAで24なら最後の1日が対象になります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_wizard__match_count
+msgid ""
+"How many records match the Start Condition and the extra filter right now. "
+"Records that already have a task are counted but get no new one. Example: "
+"120."
+msgstr "現在、開始条件と追加フィルターに一致するレコード数です。すでにタスクがあるレコードも数えますが、新たなタスクは作成されません。例：120。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__display_name
+msgid ""
+"Human-readable summary of this rule: who gets emailed, or which Server "
+"Action runs. Example: \"Send Email to the 'Assigned to' of Project Task\"."
+msgstr "このルールの分かりやすい要約です（誰にメールを送るか、どのサーバーアクションを実行するか）。例：「Send Email to the 'Assigned to' of Project Task」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__last_id
+msgid ""
+"Id of the last source record processed; the next batch continues after it. "
+"Example: 4210."
+msgstr "最後に処理したソースレコードのIDです。次のバッチはその続きから処理します。例：4210。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "チェックすると、新しいメッセージに対応が必要です。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "チェックすると、一部のメッセージに配信エラーがあります。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"If the Reset condition matches, Re-check Conditions closes the current task "
+"and creates a <b>new</b> one; the new task is not counted in the message "
+"that follows."
+msgstr "リセット条件が一致した場合、条件を再確認すると現在のタスクが終了し、<b>新しい</b>タスクが作成されます。新しいタスクは、その後に表示されるメッセージの件数には含まれません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"If the record changed but was not saved again, or you changed a condition, "
+"use <b>Re-check Conditions</b> on the task."
+msgstr "レコードが変更されたのに再保存されていない場合や、条件を変更した場合は、タスクで<b>条件を再確認</b>を使ってください。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "In progress"
+msgstr "進行中"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_resource_calendar__sla_tz_override_source_id
+msgid ""
+"Internal: set only on a calendar auto-created by Source Code Protector's SLA"
+" module as a timezone variant of another calendar (same working hours, "
+"different timezone). Deleting the source calendar deletes this variant too. "
+"Leave empty on every normal calendar."
+msgstr "内部用：別のカレンダーのタイムゾーン違い（稼働時間は同じでタイムゾーンのみ異なる）として、SLAモジュールが自動作成したカレンダーにのみ設定されます。元のカレンダーを削除すると、この複製も削除されます。通常のカレンダーでは空のままにしてください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_type_check
+msgid "Invalid Type."
+msgstr "種別が正しくありません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_is_follower
+msgid "Is Follower"
+msgstr "フォロワーである"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"It does <b>not</b> change the duration or the deadline (that is Apply "
+"Current Settings), and it never moves a task to a state the conditions do "
+"not describe."
+msgstr "期間や期限は変更<b>しません</b>（それは「現在の設定を適用」の役割です）。また、条件が示していない状態にタスクを移すこともありません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "It does <b>not</b>:"
+msgstr "次のことは<b>行いません</b>："
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Its tasks are removed by the daily clean-up, within about 24 hours. The "
+"<b>measurement history of that record is lost</b>."
+msgstr "そのタスクは毎日のクリーンアップによって約24時間以内に削除されます。<b>そのレコードの測定履歴は失われます</b>。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/definition_form/definition_form_controller.js:0
+msgid "Keep editing"
+msgstr "編集を続ける"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__last_id
+msgid "Last Record Id"
+msgstr "最後のレコードID"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/form_sla_status/form_sla_status.js:0
+msgid "Late"
+msgstr "遅延"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Leave empty to apply to every company"
+msgstr "空のままにすると、すべての会社に適用されます"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Limits: for non-stored computed fields, and for conditions that go through a"
+" relation (for example <code>partner_id.country_id</code>) when only the "
+"related record changes, the SLA is <b>not</b> re-evaluated automatically. "
+"Use <b>Re-check Conditions</b> on the task to get a result that matches the "
+"current data."
+msgstr "制限事項：非保存の計算フィールドや、リレーションを経由する条件（例：<code>partner_id.country_id</code>）で、関連レコードだけが変更された場合、SLAは自動では再評価<b>されません</b>。現在のデータに合った結果にするには、タスクで<b>条件を再確認</b>を使ってください。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Manual Apply"
+msgstr "手動適用"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__apply_job_ids
+msgid "Manual Apply Runs"
+msgstr "手動適用の実行"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Manual apply stopped by an unexpected error: %s"
+msgstr "予期しないエラーにより手動適用が停止しました：%s"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_has_error
+msgid "Message Delivery error"
+msgstr "メッセージ配信エラー"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_ids
+msgid "Messages"
+msgstr "メッセージ"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/form_sla_status/form_sla_status.js:0
+msgid "Met"
+msgstr "達成"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Not configured yet"
+msgstr "未設定"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__email_recipient_type
+msgid "Notify"
+msgstr "通知先"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_needaction_counter
+msgid "Number of Actions"
+msgstr "アクション数"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_mixin__sla_task_active_count
+msgid ""
+"Number of SLA tasks currently running or paused on this record; shown as the"
+" number on the smart button. Example: 2 when both a response and a "
+"resolution SLA are in progress."
+msgstr "このレコードで現在実行中または一時停止中のSLAタスクの数です。スマートボタンの数字として表示されます。例：応答SLAと解決SLAの両方が進行中なら2。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_mixin__sla_task_breach_count
+msgid ""
+"Number of active SLA tasks on this record already past their deadline; a "
+"positive value turns the smart button red. Example: 1 when the resolution "
+"SLA is late."
+msgstr "このレコードで、すでに期限を過ぎている有効なSLAタスクの数です。正の値になるとスマートボタンが赤くなります。例：解決SLAが遅れていれば1。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__message_has_error_counter
+msgid "Number of errors"
+msgstr "エラー数"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "要対応メッセージ数"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "配信エラーのメッセージ数"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__total
+msgid ""
+"Number of records that matched when the run was created; only a progress "
+"indicator, it can drift if data changes meanwhile. Example: 500."
+msgstr "実行の作成時に一致したレコード数です。進捗の目安であり、その間にデータが変わるとずれることがあります。例：500。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__running_task_count
+msgid ""
+"Number of tasks of this SLA that are in progress or paused. Shown on the "
+"smart button and used to warn before saving changes that affect running "
+"tasks. Example: 12 means 12 records are being measured right now."
+msgstr "このSLAのタスクのうち、進行中または一時停止中のものの数です。スマートボタンに表示され、実行中のタスクに影響する変更を保存する前の警告にも使われます。例：12なら、現在12件のレコードを測定中です。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__type__ola
+msgid "OLA"
+msgstr "OLA"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"On the task list you can select several tasks and press the same buttons."
+msgstr "タスク一覧では、複数のタスクを選択して同じボタンを押すことができます。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.js:0
+msgid "On track"
+msgstr "順調"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Only an SLA Manager can use the \"Apply Current Settings\" action."
+msgstr "「現在の設定を適用」アクションを使えるのはSLAマネージャーのみです。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Only an SLA Manager can use the \"Re-check Conditions\" action."
+msgstr "「条件を再確認」アクションを使えるのはSLAマネージャーのみです。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_resource_calendar_sla_tz_override_uniq
+msgid "Only one timezone-variant calendar per (source calendar, timezone)."
+msgstr "（元のカレンダー、タイムゾーン）の組み合わせごとに、タイムゾーン違いのカレンダーは1つだけです。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_apply_wizard_form
+msgid ""
+"Only records that match the SLA's Start Condition get a task, and\n"
+"                    records that already have one are skipped. The filter below only\n"
+"                    narrows that set; leave it without rules to check every matching\n"
+"                    record. The first batch runs now; larger sets continue in the\n"
+"                    background."
+msgstr "SLAの開始条件に一致するレコードだけがタスクを受け取り、すでにタスクがあるレコードはスキップされます。下のフィルターはその対象をさらに絞り込むだけです。一致するすべてのレコードを確認するには、ルールを空のままにしてください。最初のバッチは今すぐ実行され、大きな対象は引き続きバックグラウンドで処理されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Only the light colour scheme is supported."
+msgstr "ライトカラーのみに対応しています。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Open Source Record"
+msgstr "ソースレコードを開く"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Open the record this SLA task is measuring."
+msgstr "このSLAタスクが測定しているレコードを開きます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__target
+msgid ""
+"Optional classification of what this SLA measures, for filtering and "
+"grouping reports. Leave empty if not classified. Does not change how the 6 "
+"conditions behave -- a \"Response\" and a \"Resolution\" SLA on the same "
+"record are still two separate definitions. Example: tag the definition that "
+"stops on first reply as \"Response\"."
+msgstr "このSLAが何を測定するかの任意の分類で、レポートの絞り込みやグループ化に使います。分類しない場合は空のままにしてください。6つの条件の動作は変わりません。同じレコード上の「応答」SLAと「解決」SLAは、引き続き別々の定義です。例：最初の返信で停止する定義に「Response」を設定します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__filter_domain
+msgid ""
+"Optional domain that narrows the records considered, combined with the Start"
+" Condition (never replacing it). Empty or [] adds no filter. Example: "
+"[('id', '<', 1000)] to only look at the oldest records."
+msgstr "対象とするレコードを絞り込む任意のドメインで、開始条件と組み合わされます（開始条件の代わりにはなりません）。空または [] なら追加のフィルターはありません。例：[('id', '<', 1000)] で最も古いレコードだけを対象にします。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_wizard__filter_domain
+msgid ""
+"Optional rules that narrow the records considered. They are combined with "
+"the Start Condition, never replace it. Empty or no rule means no extra "
+"filter. Example: Created on before 2026-01-01."
+msgstr "対象とするレコードを絞り込む任意のルールで、開始条件と組み合わされます（開始条件の代わりにはなりません）。空またはルールなしなら追加のフィルターはありません。例：2026-01-01より前に作成。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__original_breach_time
+msgid "Original Breach Time"
+msgstr "元の違反時刻"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "Over the target time"
+msgstr "目標時間超過"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Overview"
+msgstr "概要"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__percent_display
+msgid "Percent (display)"
+msgstr "パーセント（表示用）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__percent_display
+msgid "Percent formatted with a % sign for the list view."
+msgstr "一覧表示用に%記号を付けたパーセントです。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__processed
+msgid "Processed"
+msgstr "処理済み"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Progress"
+msgstr "進捗"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Progress (Business Time)"
+msgstr "進捗（稼働時間）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Progress (Wall-clock Time)"
+msgstr "進捗（実時間）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_apply_job__state__queued
+msgid "Queued"
+msgstr "待機中"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__state
+msgid ""
+"Queued: waiting for the first batch. Running: more batches are left for the "
+"background job. Done: every record was looked at. Cancelled: stopped by a "
+"manager. Failed: stopped by an unexpected error (see Note). Example: Running"
+" with 120 of 500 processed."
+msgstr "待機中：最初のバッチを待っています。実行中：バックグラウンド処理に残りのバッチがあります。完了：すべてのレコードを確認しました。キャンセル：マネージャーが停止しました。失敗：予期しないエラーで停止しました（メモを参照）。例：500件中120件を処理した実行中の状態。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid "Re-check Conditions"
+msgstr "条件を再確認"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Record"
+msgstr "レコード"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_escalation__email_field_id
+msgid "Record Field"
+msgstr "レコードのフィールド"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__processed
+msgid "Records already looked at by the engine. Example: 120."
+msgstr "エンジンがすでに確認したレコード数です。例：120。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_wizard__match_count
+msgid "Records to Check"
+msgstr "確認対象のレコード"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__target__resolution
+msgid "Resolution"
+msgstr "解決"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_resource_calendar
+msgid "Resource Working Time"
+msgstr "リソースの稼働時間"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_definition__target__response
+msgid "Response"
+msgstr "応答"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_escalation__email_recipient_type__responsible
+msgid "Responsible User/Partner on Record"
+msgstr "レコード上の担当ユーザー/パートナー"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__email_recipient_type
+msgid ""
+"Responsible: read a user or partner field on the source record and use that "
+"person's email, e.g. Assignee or Customer. Email Field: read a plain email "
+"address field on the record. Fixed: always the same address, e.g. a team "
+"distribution list."
+msgstr "担当者：ソースレコード上のユーザーまたはパートナーのフィールド（例：担当者、顧客）を読み取り、その人のメールを使います。メールフィールド：レコード上のメールアドレスのフィールドを読み取ります。固定：常に同じアドレス（例：チームの配信リスト）。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__retroactive_pause
+msgid "Retroactive Pause"
+msgstr "遡及一時停止"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__retroactive_pause_warning
+msgid "Retroactive Pause Warning"
+msgstr "遡及一時停止の警告"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Retroactive Pause only works when the model keeps a change history "
+"(<code>mail.thread</code>) and every field used in the Pause Condition is "
+"tracked. A warning appears under the option when this is not the case."
+msgstr "遡及一時停止は、モデルが変更履歴（<code>mail.thread</code>）を保持し、一時停止条件で使うすべてのフィールドが追跡されている場合にのみ機能します。そうでない場合は、このオプションの下に警告が表示されます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__apply_retention_days
+msgid "Run History Retention"
+msgstr "実行履歴の保持"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_escalation__action_type__server_action
+msgid "Run Server Action"
+msgstr "サーバーアクションを実行"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Run Server Action: %s"
+msgstr "サーバーアクションを実行：%s"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_apply_job__state__running
+msgid "Running"
+msgstr "実行中"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__running_task_count
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Running Tasks"
+msgstr "実行中のタスク"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "Running over target"
+msgstr "目標超過で実行中"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Runs started with \"Apply to Existing Records\". Finished\n"
+"                                runs are removed automatically after"
+msgstr "「既存レコードに適用」で開始した実行です。完了した実行は、"
+
+#. module: dwo_sla_core
+#: model:mail.template,subject:dwo_sla_core.mail_template_escalation_default
+msgid ""
+"SLA Alert: {{ object.sla_id.name }} reached {{ '%d' % "
+"object.business_percent_used }}%"
+msgstr "SLAアラート：{{ object.sla_id.name }} が {{ '%d' % object.business_percent_used }}% に達しました"
+
+#. module: dwo_sla_core
+#: model:mail.template,name:dwo_sla_core.mail_template_escalation_default
+msgid "SLA Escalation Notification"
+msgstr "SLAエスカレーション通知"
+
+#. module: dwo_sla_core
+#: model:ir.model,name:dwo_sla_core.model_sla_apply_job
+msgid "SLA Manual Apply Run"
+msgstr "SLA手動適用の実行"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__definition_id
+msgid ""
+"SLA definition this run applies to existing records. Example: \"Ticket "
+"Response - Priority 1\"."
+msgstr "この実行が既存レコードに適用するSLA定義です。例：「Ticket Response - Priority 1」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_wizard__definition_id
+msgid ""
+"SLA definition to apply to records that already exist. Example: \"Ticket "
+"Response - Priority 1\"."
+msgstr "すでに存在するレコードに適用するSLA定義です。例：「Ticket Response - Priority 1」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__attached
+msgid ""
+"SLA tasks created by this run. Records that already had a task create none. "
+"Example: 112."
+msgstr "この実行で作成されたSLAタスクの数です。すでにタスクがあるレコードでは作成されません。例：112。"
+
+#. module: dwo_sla_core
+#: model:ir.actions.server,name:dwo_sla_core.ir_cron_sla_apply_ir_actions_server
+msgid "SLA: apply to existing records"
+msgstr "SLA：既存レコードに適用"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__type
+msgid ""
+"SLA: commitment measured directly with an external customer. OLA: internal "
+"commitment between teams supporting a larger SLA, not shown to the customer "
+"directly. Label only -- the 6 conditions behave identically for both. "
+"Example: a \"ticket response\" definition is usually SLA; a \"warehouse prep"
+" step\" definition feeding into it is usually OLA."
+msgstr "SLA：外部の顧客に対して直接測定されるコミットメント。OLA：より大きなSLAを支えるチーム間の内部コミットメントで、顧客には直接表示されません。ラベルのみで、6つの条件の動作はどちらも同じです。例：「チケット応答」の定義は通常SLA、それに寄与する「倉庫の準備工程」の定義は通常OLAです。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/definition_form/definition_form_controller.js:0
+msgid "Save"
+msgstr "保存"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_escalation__action_type__email
+msgid "Send Email"
+msgstr "メールを送信"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Send Email to %s"
+msgstr "%sにメールを送信"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Send Email to the '%s' field on %s"
+msgstr "%sの「%s」フィールドのアドレスにメールを送信"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Send Email to the '%s' of %s"
+msgstr "%sの「%s」にメールを送信"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_escalation__action_type
+msgid ""
+"Send Email: notify someone directly, no setup beyond this rule. Run Server "
+"Action: execute a custom automation rule (Settings > Technical > Server "
+"Actions) for advanced cases."
+msgstr "メールを送信：このルール以外の設定なしで、直接誰かに通知します。サーバーアクションを実行：高度なケース向けに、カスタムの自動化ルール（設定 > 技術 > サーバーアクション）を実行します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__service_commitment
+msgid "Service Commitment"
+msgstr "サービスコミットメント"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_event__event__recalculate
+msgid "Settings Applied"
+msgstr "設定を適用しました"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__business_percent_used
+msgid ""
+"Share of the target time already consumed, counted in WORKING hours (elapsed"
+" divided by target, rounded down); can exceed 100. Example: 110 means 10% "
+"over the target."
+msgstr "すでに消費した目標時間の割合です。稼働時間で数えます（経過時間÷目標、小数点以下切り捨て）。100を超えることがあります。例：110は目標を10%超過していることを示します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_res_config_settings__sla_show_form_status
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid "Show SLA Status on Form View"
+msgstr "フォームビューにSLAステータスを表示"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_res_config_settings__sla_show_form_status
+msgid ""
+"Show a small SLA status chip next to the pager on the form of every record "
+"that is measured by an SLA. Example: turn it off to hide the chip on all "
+"forms."
+msgstr "SLAで測定されるすべてのレコードのフォームで、ページャーの横に小さなSLAステータスチップを表示します。例：オフにすると、すべてのフォームでチップが非表示になります。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.res_config_settings_view_form
+msgid ""
+"Show an SLA status chip next to the pager on the form of records that are "
+"measured by an SLA."
+msgstr "SLAで測定されるレコードのフォームで、ページャーの横にSLAステータスチップを表示します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__retroactive_pause_warning
+msgid ""
+"Shown when Retroactive Pause cannot have any effect for this definition: the"
+" model is not change-tracked, or some field used in the Pause Condition is "
+"not tracked."
+msgstr "遡及一時停止がこの定義で効果を持たない場合に表示されます。モデルが変更追跡されていないか、一時停止条件で使うフィールドの一部が追跡されていません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_resource_calendar__sla_tz_override_source_id
+msgid "Sla Tz Override Source"
+msgstr "SLAタイムゾーン違いの元"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Source record no longer exists."
+msgstr "ソースレコードは存在しません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Start and Pause Conditions that are <b>mutually exclusive</b>: the task is "
+"cancelled before it can pause."
+msgstr "開始条件と一時停止条件が<b>互いに排他的</b>になっている：一時停止できる前にタスクがキャンセルされます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__start_time
+msgid "Started"
+msgstr "開始"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__user_id
+msgid "Started By"
+msgstr "開始者"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__state
+msgid "Status"
+msgstr "ステータス"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Stop this run? Records already processed keep their tasks."
+msgstr "この実行を停止しますか？すでに処理したレコードのタスクは保持されます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__target_duration
+msgid "Target Duration"
+msgstr "目標期間"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__attached
+msgid "Tasks Created"
+msgstr "作成されたタスク"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Tasks created this way do not trigger old escalation steps: steps already "
+"passed are marked as done."
+msgstr "この方法で作成したタスクは、過去のエスカレーションの段階を発動しません。すでに通過した段階は処理済みとして扱われます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Tasks keep the calendar (and so the timezone) they had when they started. "
+"Changing the timezone of the definition does not move the deadline of "
+"running tasks; use <b>Apply Current Settings</b> on a task to bring it up to"
+" date."
+msgstr "タスクは、開始時のカレンダー（つまりタイムゾーン）を保持します。定義のタイムゾーンを変更しても、実行中のタスクの期限は動きません。最新の状態にするには、タスクで<b>現在の設定を適用</b>を使います。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_wizard__model_name
+msgid "Technical name of the measured model. Example: helpdesk.ticket."
+msgstr "測定対象モデルの技術名です。例：helpdesk.ticket。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_definition_due_soon_hours_check
+msgid "The \"due soon\" hours cannot be negative."
+msgstr "「期限間近」の時間を負の値にすることはできません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"The <b>Timezone</b> is required and is always the timezone used to read "
+"working hours, whatever timezone the calendar itself has. It is filled in "
+"for you: the fixed calendar's timezone when you pick one (only while the "
+"field is empty, an existing value is never overwritten), otherwise your own."
+msgstr "<b>タイムゾーン</b>は必須で、カレンダー自体のタイムゾーンに関係なく、常に稼働時間を読み取るタイムゾーンとして使われます。自動で入力されます：固定カレンダーを選ぶとそのカレンダーのタイムゾーン（フィールドが空のときのみで、既存の値は上書きされません）、それ以外はご自身のタイムゾーンです。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"The <b>configuration</b> of the task: target duration, calendar, timezone "
+"and deadline."
+msgstr "タスクの<b>設定</b>：目標期間、カレンダー、タイムゾーン、期限。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "The <b>state</b> of the task, following the six conditions."
+msgstr "6つの条件に従った、タスクの<b>状態</b>。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "The Model cannot be changed once the definition has tasks."
+msgstr "定義にタスクができた後は、モデルを変更できません。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"The SLA is not attached to old records by itself. Use <b>Apply to Existing "
+"Records</b> (the Manual Apply tab lists every run). Only records that match "
+"the Start Condition get a task, and records that already have one are "
+"skipped."
+msgstr "SLAは古いレコードに自動では付与されません。<b>既存レコードに適用</b>を使ってください（手動適用タブにすべての実行が一覧されます）。開始条件に一致するレコードだけがタスクを受け取り、すでにタスクがあるレコードはスキップされます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"The SLA status chip next to the pager of a record's form appears only for "
+"models that have an enabled SLA. After you create the first definition for a"
+" new model, reload the page to see the chip. It can be turned off in "
+"Settings."
+msgstr "レコードのフォームでページャーの横に表示されるSLAステータスチップは、有効なSLAがあるモデルにのみ表示されます。新しいモデルに最初の定義を作成した後は、ページを再読み込みするとチップが表示されます。設定でオフにすることもできます。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"The Start Condition has no rule, so no record will get an SLA task. Add a "
+"rule to the Start Condition."
+msgstr "開始条件にルールがないため、どのレコードにもSLAタスクが付与されません。開始条件にルールを追加してください。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"The copy contains the working hours and the public holidays <b>as they were "
+"when the copy was made</b>. It is <b>not</b> kept in sync: later changes to "
+"the original calendar do not reach the copy."
+msgstr "複製には、複製を作成した時点の稼働時間と祝日が含まれます。同期は<b>されません</b>：元のカレンダーを後から変更しても、複製には反映されません。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "The remaining records continue in the background."
+msgstr "残りのレコードはバックグラウンドで処理が続きます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "The status chip on the form of the source record uses the same rule."
+msgstr "ソースレコードのフォームのステータスチップも同じルールを使います。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"There are no buttons to pause, resume or cancel a task by hand. A task's "
+"state is always derived from the source record, so a manual change would be "
+"overwritten the next time the record is saved and would distort the KPIs."
+msgstr "タスクを手動で一時停止・再開・キャンセルするボタンはありません。タスクの状態は常にソースレコードから導かれるため、手動で変更しても次にレコードが保存されたときに上書きされ、KPIが歪んでしまいます。"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid ""
+"This SLA already has a manual apply run that is queued or running. Wait for "
+"it to finish or cancel it first."
+msgstr "このSLAには、待機中または実行中の手動適用がすでにあります。完了を待つか、先にキャンセルしてください。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__service_commitment
+msgid ""
+"Tick when this is an officially published commitment reported on a service "
+"contract, as opposed to an internal-only measure. Label only, for reporting "
+"-- does not change engine behaviour."
+msgstr "サービス契約で報告される公式なコミットメントの場合にチェックします（社内限りの指標ではない場合）。報告用のラベルのみで、エンジンの動作は変わりません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__target_duration
+msgid ""
+"Time allowed for this task, copied from the definition when it started. "
+"Changing the definition later does not change running tasks unless Apply "
+"Current Settings is used. Example: 4.0."
+msgstr "このタスクに許された時間で、開始時に定義からコピーされます。後から定義を変更しても、「現在の設定を適用」を使わない限り実行中のタスクは変わりません。例：4.0。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/float_time_unit/float_time_unit_field.js:0
+msgid "Time with unit"
+msgstr "単位付きの時間"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Timeline"
+msgstr "タイムライン"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__escalation_event_ids
+msgid ""
+"Times this task ran an escalation, including failed attempts, newest first. "
+"It does not say which rule ran; see Escalations Done for that. Example: one "
+"\"Escalated\" line at 75% and one \"Escalation failed\" line when the email "
+"could not be sent."
+msgstr "このタスクがエスカレーションを実行した履歴です（失敗した試行を含む、新しい順）。どのルールが実行されたかは分かりません。それは「完了したエスカレーション」を参照してください。例：75%で「Escalated」が1行、メールを送信できなかったときの「Escalation failed」が1行。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__calendar_tz_override
+msgid "Timezone"
+msgstr "タイムゾーン"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__calendar_tz_override
+msgid ""
+"Timezone in which the working hours of the calendar are read and the SLA "
+"clock runs; it always wins over the calendar's own timezone. Filled in for "
+"you. Example: \"America/New_York\". See the Note tab for how calendar copies"
+" work."
+msgstr "カレンダーの稼働時間を読み取り、SLAの時計が動くタイムゾーンです。カレンダー自体のタイムゾーンより常に優先されます。自動で入力されます。例：「America/New_York」。カレンダーの複製の仕組みについては「メモ」タブを参照してください。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"To apply an SLA to every record, use an always-true rule such as "
+"<code>[('id', '!=', 0)]</code>."
+msgstr "SLAを全レコードに適用するには、<code>[('id', '!=', 0)]</code> のような常に真になるルールを使います。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"To hold the clock, add a field on the source record (for example an \"On "
+"hold\" checkbox, or a status such as \"Waiting customer\") and use it in the"
+" <b>Pause Condition</b>. Change the record, and the task follows."
+msgstr "時計を止めたいときは、ソースレコードにフィールド（例：「保留」チェックボックスや「顧客返答待ち」などのステータス）を追加し、それを<b>一時停止条件</b>で使います。レコードを変更すれば、タスクもそれに従います。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_apply_job__total
+msgid "Total"
+msgstr "合計"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_list
+msgid "Total Business Hours"
+msgstr "稼働時間の合計"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__business_pause_duration
+msgid "Total Paused Hours (Business)"
+msgstr "一時停止時間の合計（稼働時間）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__pause_duration
+msgid "Total Paused Hours (Clock)"
+msgstr "一時停止時間の合計（実時間）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__business_pause_duration
+msgid ""
+"Total WORKING hours this task has spent paused; for information and "
+"reporting only. Example: 2.5."
+msgstr "このタスクが一時停止していた稼働時間の合計です。参考および報告用のみです。例：2.5。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_mixin__sla_task_count
+msgid ""
+"Total number of SLA tasks ever run on this record (any stage). Example: 3 "
+"across several past tickets reopened."
+msgstr "このレコードで実行されたSLAタスクの総数です（すべてのステージ）。例：再オープンされた複数のチケットにわたって3。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_pause_duration_check
+msgid "Total paused hours (business) cannot be negative."
+msgstr "一時停止時間の合計（稼働時間）を負の値にすることはできません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_pause_duration_clock_check
+msgid "Total paused hours (clock) cannot be negative."
+msgstr "一時停止時間の合計（実時間）を負の値にすることはできません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__duration
+msgid ""
+"Total real (wall-clock) hours elapsed since Start, NOT excluding non-working"
+" time/holidays -- unlike Business Duration. Equal to Business Duration when "
+"this task runs 24x7 (no calendar). Example: a task paused for a full weekend"
+" shows +48h here but +0h on Business Duration."
+msgstr "開始から経過した実時間の合計です。稼働時間と異なり、非稼働時間や祝日も除外しません。このタスクが24時間365日（カレンダーなし）で動く場合は稼働時間と同じです。例：週末をまるごと一時停止したタスクは、ここでは+48時間、稼働時間では+0時間になります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__pause_duration
+msgid ""
+"Total real (wall-clock) hours this task has spent paused, NOT excluding non-"
+"working time -- unlike Total Paused Hours (Business). Equal to it when this "
+"task runs 24x7 (no calendar). For information and reporting only."
+msgstr "このタスクが一時停止していた実時間の合計です。一時停止時間の合計（稼働時間）と異なり、非稼働時間も除外しません。24時間365日（カレンダーなし）で動く場合はそれと同じです。参考および報告用のみです。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__type
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_search
+msgid "Type"
+msgstr "種別"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_event__event
+msgid ""
+"Type of event: Attach (SLA started), Pause, Resume, Complete, Reset, Cancel,"
+" Breach (deadline passed), Escalate, Escalate Failed, Error, Settings "
+"Applied (a manager pushed the current settings onto the task), Conditions "
+"Re-checked (a manager ran the conditions again). Example: filter on Error to"
+" find problems."
+msgstr "イベントの種別：付与（SLA開始）、一時停止、再開、完了、リセット、キャンセル、違反（期限超過）、エスカレーション、エスカレーション失敗、エラー、設定を適用（マネージャーが現在の設定をタスクに反映）、条件を再確認（マネージャーが条件を再実行）。例：エラーで絞り込むと問題を見つけられます。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/float_time_unit/float_time_unit_field.js:0
+msgid "Unit label"
+msgstr "単位ラベル"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "Until the clean-up runs, those tasks still count in reports."
+msgstr "クリーンアップが実行されるまでは、それらのタスクも引き続きレポートに数えられます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "Use it when"
+msgstr "使うタイミング"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__user_id
+msgid "User who started the run. Example: \"Mitchell Admin\"."
+msgstr "実行を開始したユーザーです。例：「Mitchell Admin」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__vendor_id
+msgid "Vendor"
+msgstr "ベンダー"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"Warning: if it is equal to or longer than the Duration, every task is "
+"flagged Due Soon from the moment it starts. Example: 8 hours of Due Soon on "
+"a 4-hour SLA."
+msgstr "警告：期間と同じかそれより長い場合、すべてのタスクが開始した瞬間から期限間近になります。例：4時間のSLAに対して期限間近が8時間。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "What it changes"
+msgstr "変更されるもの"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__retroactive_pause
+msgid ""
+"When Retroactive Start is on and the SLA start time is backdated, subtract "
+"from the elapsed time any period in that backdated window where the Pause "
+"Condition was already true, instead of counting the whole backdated window "
+"as running time. Only has an effect when the model and the fields used in "
+"the Pause Condition are change-tracked (see the warning below if not); "
+"otherwise the backdated window is always counted as running, same as when "
+"this is off."
+msgstr "遡及開始がオンで、SLAの開始時刻が過去に遡る場合に、遡った期間のうち一時停止条件がすでに真だった期間を、期間全体を実行中として数える代わりに経過時間から差し引きます。モデルと一時停止条件で使うフィールドが変更追跡されている場合にのみ効果があります（そうでない場合は下の警告を参照）。そうでなければ、オフのときと同様に、遡った期間は常に実行中として数えられます。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__start_time
+msgid "When the first batch ran (UTC). Example: 2026-03-02 05:00:00."
+msgstr "最初のバッチを実行した時刻（UTC）です。例：2026-03-02 05:00:00。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"When the record's calendar cannot be used, the fallback order is: the "
+"record's company default working calendar, then 24x7 if that cannot be used "
+"either."
+msgstr "レコードのカレンダーを使用できない場合の代替順序：レコードの会社のデフォルト稼働カレンダー、それも使用できなければ24時間365日。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_apply_job__end_time
+msgid ""
+"When the run reached a final status (UTC). Example: 2026-03-02 05:10:00."
+msgstr "実行が最終ステータスに達した時刻（UTC）です。例：2026-03-02 05:10:00。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"When the timezone differs from the calendar's own, a hidden <b>copy</b> of "
+"the calendar with that timezone is created and reused; the original calendar"
+" is never changed."
+msgstr "タイムゾーンがカレンダー自体のものと異なる場合、そのタイムゾーンを持つカレンダーの非表示の<b>複製</b>が作成され、再利用されます。元のカレンダーは変更されません。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_definition__active
+msgid ""
+"Whether this SLA is enabled. A new definition starts disabled so you can "
+"finish configuring it; press Enable when ready. Disabling stops attaching "
+"this SLA to new records, while tasks that are already running keep being "
+"tracked until they finish. Example: disable an old SLA after replacing it "
+"with a new one instead of deleting it."
+msgstr "このSLAが有効かどうかです。新しい定義は無効の状態で始まるため、設定を終えてから有効化を押してください。無効化すると、新しいレコードへの付与は止まりますが、すでに実行中のタスクは完了するまで引き続き追跡されます。例：古いSLAを新しいものに置き換えた後は、削除せずに無効化します。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid ""
+"With Calendar Source \"Calendar of each record\", every calendar that has a "
+"different timezone gets its own hidden copy."
+msgstr "カレンダーの取得元が「各レコードのカレンダー」の場合、タイムゾーンが異なるカレンダーごとに、それぞれ非表示の複製が作成されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"You changed the target duration, calendar or timezone of the SLA definition."
+msgstr "SLA定義の目標期間、カレンダー、タイムゾーンを変更した。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid ""
+"change the deadline of a paused task now: a paused task only gets the new "
+"settings, and its deadline is recomputed when it resumes;"
+msgstr "一時停止中のタスクの期限を今すぐ変更すること：一時停止中のタスクは新しい設定を受け取るだけで、期限は再開時に再計算されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "change the original deadline (<code>Original Breach Time</code>);"
+msgstr "元の期限（<code>Original Breach Time</code>）の変更；"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "check the conditions again."
+msgstr "条件の再確認。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "days."
+msgstr "日後に自動的に削除されます。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. 10"
+msgstr "例：10"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. 2 (0 = use Settings)"
+msgstr "例：2（0 = 設定の値を使用）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. 4"
+msgstr "例：4"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. 75"
+msgstr "例：75"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Asia/Ho_Chi_Minh"
+msgstr "例：Asia/Ho_Chi_Minh"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Assigned to, Customer Email"
+msgstr "例：Assigned to、Customer Email"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Created on"
+msgstr "例：作成日"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Helpdesk Ticket, Contact"
+msgstr "例：ヘルプデスクチケット、連絡先"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Notify Manager"
+msgstr "例：マネージャーに通知"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Priority, Stage"
+msgstr "例：優先度、ステージ"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Response, Resolution"
+msgstr "例：応答、解決"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. Standard 40 hours/week"
+msgstr "例：標準 週40時間"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. support-team@example.com"
+msgstr "例：support-team@example.com"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
+msgid "e.g. your ISP or telecom vendor"
+msgstr "例：ご利用のISPや通信事業者"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_end_dt_check
+msgid "end_time only has a value once the task has ended."
+msgstr "終了時刻は、タスクが終了した後にのみ値を持ちます。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/float_time_unit/float_time_unit_field.js:0
+msgid "h"
+msgstr "時間"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__is_due_soon
+msgid ""
+"in_progress, not breached, planned_end_time within the next X hours; X is "
+"read from the dwo_sla_core.due_soon_hours setting."
+msgstr "進行中で、違反しておらず、予定終了が今後X時間以内。Xは設定 dwo_sla_core.due_soon_hours から読み取られます。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/form_sla_status/form_sla_status.js:0
+msgid "late"
+msgstr "件遅延"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/form_sla_status/form_sla_status.js:0
+msgid "missed"
+msgstr "件未達成"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "over target)"
+msgstr "目標超過）"
+
+#. module: dwo_sla_core
+#: model:ir.model.constraint,message:dwo_sla_core.constraint_sla_task_paused_since_check
+msgid "pause_time only has a value when stage = paused."
+msgstr "一時停止時刻は、ステージが一時停止のときにのみ値を持ちます。"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "paused"
+msgstr "一時停止中"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/form_sla_status/form_sla_status.js:0
+msgid "tomorrow"
+msgstr "明日"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_form
+msgid "touch a task that has already breached (its deadline stays as it is);"
+msgstr "すでに違反したタスクへの変更（その期限はそのまま維持されます）；"
+
+#. module: dwo_sla_core
+#. odoo-javascript
+#: code:addons/dwo_sla_core/static/src/sla_progress/sla_progress_widget.xml:0
+msgid "worked"
+msgstr "稼働"
+
+#. module: dwo_sla_core
+#. odoo-python
+#: code:addons/dwo_sla_core/constants/message.py:0
+msgid "Only an SLA Manager can re-evaluate SLA error events."
+msgstr "SLAのエラーイベントを再評価できるのはSLAマネージャーのみです。"
+
+#. module: dwo_sla_core
+#: model:mail.template,body_html:dwo_sla_core.mail_template_escalation_default
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5; color: #333333;\">\n"
+"                <p>Hello,</p>\n"
+"                <p>\n"
+"                    The SLA <strong t-out=\"object.sla_id.name\">SLA name</strong> on\n"
+"                    <strong t-out=\"object.display_name\">Record</strong> has reached\n"
+"                    <strong><t t-out=\"'%d' % object.business_percent_used\">75</t>%</strong>\n"
+"                    of its target duration.\n"
+"                </p>\n"
+"                <table style=\"width: 100%; border-collapse: collapse; margin: 16px 0;\">\n"
+"                    <tr>\n"
+"                        <td style=\"padding: 6px 12px; color: #777777; width: 160px;\">Stage</td>\n"
+"                        <td style=\"padding: 6px 12px; font-weight: 600;\" t-out=\"dict(object._fields['stage'].selection).get(object.stage)\">In Progress</td>\n"
+"                    </tr>\n"
+"                    <tr style=\"background-color: #f6f6f6;\">\n"
+"                        <td style=\"padding: 6px 12px; color: #777777;\">Deadline</td>\n"
+"                        <td style=\"padding: 6px 12px; font-weight: 600;\" t-out=\"format_datetime(object.planned_end_time, dt_format='medium', lang_code=object.env.lang)\">March 2, 2026, 5:00:00 AM</td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding: 6px 12px; color: #777777;\">Target Duration</td>\n"
+"                        <td style=\"padding: 6px 12px; font-weight: 600;\" t-out=\"'%.1f hours' % object.target_duration\">4.0 hours</td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"                <!-- N&#250;t m&#7903; th&#7859;ng RECORD G&#7888;C (res_model/res_id c&#7911;a task), KH&#212;NG\n"
+"                     ph&#7843;i sla.task: ng&#432;&#7901;i nh&#7853;n (Responsible/assignee tr&#234;n record\n"
+"                     g&#7889;c) th&#432;&#7901;ng kh&#244;ng thu&#7897;c nh&#243;m SLA n&#234;n kh&#244;ng m&#7903; &#273;&#432;&#7907;c sla.task\n"
+"                     (ACL group_sla_user/manager), nh&#432;ng g&#7847;n nh&#432; lu&#244;n c&#243; quy&#7873;n\n"
+"                     tr&#234;n ch&#237;nh record h&#7885; ph&#7909; tr&#225;ch. URL d&#249;ng route chung\n"
+"                     /odoo/<model>/<id> c&#7911;a web client (Odoo 17+, kh&#244;ng c&#7847;n bi&#7871;t\n"
+"                     action id c&#7909; th&#7875; c&#7911;a model &#273;&#237;ch). -->\n"
+"                <div style=\"margin: 20px 0;\">\n"
+"                    <a t-att-href=\"object.get_base_url() + '/odoo/' + object.res_model + '/' + str(object.res_id)\" style=\"background-color: #2C2A6B; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 4px; font-weight: 600; display: inline-block; font-size: 14px;\">\n"
+"                        Open Record\n"
+"                    </a>\n"
+"                </div>\n"
+"                <p>Please follow up on this record before the deadline passes.</p>\n"
+"            </div>\n"
+"        "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5; color: #333333;\">\n"
+"                <p>お疲れ様です。</p>\n"
+"                <p>\n"
+"                    <strong t-out=\"object.display_name\">Record</strong> の SLA <strong t-out=\"object.sla_id.name\">SLA name</strong> が、\n"
+"                    目標期間の <strong><t t-out=\"'%d' % object.business_percent_used\">75</t>%</strong> に達しました。\n"
+"                </p>\n"
+"                <table style=\"width: 100%; border-collapse: collapse; margin: 16px 0;\">\n"
+"                    <tr>\n"
+"                        <td style=\"padding: 6px 12px; color: #777777; width: 160px;\">ステージ</td>\n"
+"                        <td style=\"padding: 6px 12px; font-weight: 600;\" t-out=\"dict(object._fields['stage'].selection).get(object.stage)\">In Progress</td>\n"
+"                    </tr>\n"
+"                    <tr style=\"background-color: #f6f6f6;\">\n"
+"                        <td style=\"padding: 6px 12px; color: #777777;\">期限</td>\n"
+"                        <td style=\"padding: 6px 12px; font-weight: 600;\" t-out=\"format_datetime(object.planned_end_time, dt_format='medium', lang_code=object.env.lang)\">March 2, 2026, 5:00:00 AM</td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding: 6px 12px; color: #777777;\">目標期間</td>\n"
+"                        <td style=\"padding: 6px 12px; font-weight: 600;\" t-out=\"'%.1f 時間' % object.target_duration\">4.0 hours</td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"                <!-- N&#250;t m&#7903; th&#7859;ng RECORD G&#7888;C (res_model/res_id c&#7911;a task), KH&#212;NG\n"
+"                     ph&#7843;i sla.task: ng&#432;&#7901;i nh&#7853;n (Responsible/assignee tr&#234;n record\n"
+"                     g&#7889;c) th&#432;&#7901;ng kh&#244;ng thu&#7897;c nh&#243;m SLA n&#234;n kh&#244;ng m&#7903; &#273;&#432;&#7907;c sla.task\n"
+"                     (ACL group_sla_user/manager), nh&#432;ng g&#7847;n nh&#432; lu&#244;n c&#243; quy&#7873;n\n"
+"                     tr&#234;n ch&#237;nh record h&#7885; ph&#7909; tr&#225;ch. URL d&#249;ng route chung\n"
+"                     /odoo/<model>/<id> c&#7911;a web client (Odoo 17+, kh&#244;ng c&#7847;n bi&#7871;t\n"
+"                     action id c&#7909; th&#7875; c&#7911;a model &#273;&#237;ch). -->\n"
+"                <div style=\"margin: 20px 0;\">\n"
+"                    <a t-att-href=\"object.get_base_url() + '/odoo/' + object.res_model + '/' + str(object.res_id)\" style=\"background-color: #2C2A6B; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 4px; font-weight: 600; display: inline-block; font-size: 14px;\">\n"
+"                        レコードを開く\n"
+"                    </a>\n"
+"                </div>\n"
+"                <p>期限が過ぎる前に、このレコードの対応をお願いします。</p>\n"
+"            </div>\n"
+"        "
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__business_duration_live
+msgid "Business Duration (live)"
+msgstr "稼働時間（リアルタイム）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__duration_live
+msgid "Duration (live)"
+msgstr "経過時間（リアルタイム）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__duration_live
+msgid ""
+"Real (wall-clock) hours elapsed up to now: Duration plus the period "
+"currently running. Computed when the view is loaded, so it cannot be sorted,"
+" filtered or grouped; reports use Duration. Example: 50.0 on a task running "
+"over a weekend."
+msgstr ""
+"現在までに経過した実時間（壁時計）：期間に、現在進行中の区間を加えたものです。画面の読み込み時に計算されるため、並べ替え・絞り込み・グループ化はできません。レポートでは期間を使用します。例：週末をまたいで実行中のタスクで"
+" 50.0。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__business_duration_live
+msgid ""
+"Working hours consumed up to now: Business Duration plus the period "
+"currently running. Computed when the view is loaded, so it cannot be sorted,"
+" filtered or grouped; reports use Business Duration. Example: 2.5 on a "
+"running task whose stored Business Duration is still 1.0."
+msgstr ""
+"現在までに消費した稼働時間：稼働時間に、現在進行中の区間を加えたものです。画面の読み込み時に計算されるため、並べ替え・絞り込み・グループ化はできません。レポートでは稼働時間を使用します。例：保存済みの稼働時間が"
+" 1.0 のまま実行中のタスクで 2.5。"
