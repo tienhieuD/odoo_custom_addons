@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template email mặc định cho escalation kiểu "Send Email" (D12, scope-add
+         "email template"). Model là sla.task (không phải model của record gốc),
+         vì mọi field tham chiếu trong subject/body đều là field của task: SLA
+         name, phần trăm, hạn chót, record gốc dạng display_name; nên dùng được
+         với MỌI model của định nghĩa mà không cần 1 template riêng cho từng model.
+         `email_layout_xmlid=mail.mail_notification_light`: layout chuẩn của Odoo
+         (header/footer, logo công ty) cho giao diện chuyên nghiệp, không tự vẽ
+         layout riêng. "To" luôn bị override bởi email_values ở
+         sla_processor._send_escalation_email, template KHÔNG set recipient. -->
+    <record id="mail_template_escalation_default" model="mail.template">
+        <field name="name">SLA Escalation Notification</field>
+        <field name="model_id" ref="model_sla_task"/>
+        <field name="subject">SLA Alert: {{ object.sla_id.name }} reached {{ '%d' % object.business_percent_used }}%</field>
+        <field name="email_layout_xmlid">mail.mail_notification_light</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5; color: #333333;">
+                <p>Hello,</p>
+                <p>
+                    The SLA <strong t-out="object.sla_id.name">SLA name</strong> on
+                    <strong t-out="object.display_name">Record</strong> has reached
+                    <strong><t t-out="'%d' % object.business_percent_used">75</t>%</strong>
+                    of its target duration.
+                </p>
+                <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+                    <tr>
+                        <td style="padding: 6px 12px; color: #777777; width: 160px;">Stage</td>
+                        <td style="padding: 6px 12px; font-weight: 600;"
+                            t-out="dict(object._fields['stage'].selection).get(object.stage)">In Progress</td>
+                    </tr>
+                    <tr style="background-color: #f6f6f6;">
+                        <td style="padding: 6px 12px; color: #777777;">Deadline</td>
+                        <td style="padding: 6px 12px; font-weight: 600;"
+                            t-out="format_datetime(object.planned_end_time, dt_format='medium', lang_code=object.env.lang)">March 2, 2026, 5:00:00 AM</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 12px; color: #777777;">Target Duration</td>
+                        <td style="padding: 6px 12px; font-weight: 600;"
+                            t-out="'%.1f hours' % object.target_duration">4.0 hours</td>
+                    </tr>
+                </table>
+                <!-- Nút mở thẳng RECORD GỐC (res_model/res_id của task), KHÔNG
+                     phải sla.task: người nhận (Responsible/assignee trên record
+                     gốc) thường không thuộc nhóm SLA nên không mở được sla.task
+                     (ACL group_sla_user/manager), nhưng gần như luôn có quyền
+                     trên chính record họ phụ trách. URL dùng route chung
+                     /web#id=<id>&model=<model>&view_type=form của web client (17, không cần biết
+                     action id cụ thể của model đích). -->
+                <div style="margin: 20px 0;">
+                    <a t-att-href="object.get_base_url() + '/web#id=' + str(object.res_id) + '&amp;model=' + object.res_model + '&amp;view_type=form'"
+                       style="background-color: #2C2A6B; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 4px; font-weight: 600; display: inline-block; font-size: 14px;">
+                        Open Record
+                    </a>
+                </div>
+                <p>Please follow up on this record before the deadline passes.</p>
+            </div>
+        </field>
+    </record>
+</odoo>

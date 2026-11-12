@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Xử lý nền SLA: chạy mỗi phút, gọi process_due (T7); tự khóa và lưu
+         từng task, dừng theo ngân sách thời gian của ir.cron
+         (REQ-REL-002, TAD AD-12). -->
+    <record id="ir_cron_sla_process_due" model="ir.cron">
+        <field name="name">SLA: process due breaches and escalations</field>
+        <field name="model_id" ref="model_sla_processor"/>
+        <field name="state">code</field>
+        <field name="code">model.process_due()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Apply thủ công cho record có sẵn: xử lý tiếp các job còn lô chưa chạy
+         (lô đầu chạy ngay trong wizard); wizard cũng `_trigger()` cron này khi
+         còn việc (plan-improvement-sla-01-review §6.16). -->
+    <record id="ir_cron_sla_apply" model="ir.cron">
+        <field name="name">SLA: apply to existing records</field>
+        <field name="model_id" ref="model_sla_apply_job"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_run()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

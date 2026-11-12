@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form định nghĩa SLA (REQ-INT-001). group_sla_user chỉ có perm_read
+         trên model này (ir.model.access.csv) nên Odoo tự chuyển form sang
+         chỉ đọc và ẩn nút Lưu cho nhóm đó, không cần logic view riêng
+         (REQ-INT-001 AC2). -->
+    <record id="view_sla_definition_form" model="ir.ui.view">
+        <field name="name">sla.definition.form</field>
+        <field name="model">sla.definition</field>
+        <field name="arch" type="xml">
+            <form string="SLA Definition" class="nev_field_border_container"
+                  js_class="sla_definition_form">
+                <!-- Refs: plan-improvement-sla-01-review §6.3 -->
+                <header>
+                    <button name="action_enable" type="object" string="Enable"
+                            class="btn-primary" invisible="active"
+                            groups="dwo_sla_core.group_sla_manager"
+                            confirm="Enable this SLA? It will start attaching to matching records."/>
+                    <button name="action_disable" type="object" string="Disable"
+                            invisible="not active"
+                            groups="dwo_sla_core.group_sla_manager"
+                            confirm="Disable this SLA? No new tasks will be created; running tasks keep being tracked."/>
+                    <!-- Refs: plan-improvement-sla-01-review §6.16 -->
+                    <button name="action_open_apply_wizard" type="object"
+                            string="Apply to Existing Records"
+                            invisible="not active"
+                            groups="dwo_sla_core.group_sla_manager"
+                            help="Attach this SLA to records that already exist and match the Start Condition."/>
+                </header>
+                <sheet>
+                    <!-- Refs: plan-improvement-sla-01-review §6.7 -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_tasks" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                groups="dwo_sla_core.group_sla_user">
+                            <field name="running_task_count" widget="statinfo"
+                                   string="Running Tasks"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Disabled" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <!-- Refs: plan-improvement-sla-01-review §6.14: form JS
+                         đọc số này để hỏi xác nhận trước khi lưu. -->
+                    <field name="running_task_count" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="SLA definition name"/></h1>
+                    </div>
+                    <!-- 4 nhóm nhỏ trong 1 group ngoài -> lưới 2x2 gọn gàng,
+                         không khối nào chạy hết chiều rộng trang (và không
+                         để trống ô nào, khác với thử 3 nhóm trước đó). Duration
+                         tách khỏi Calendar vì Calendar có 2 banner dài
+                         (colspan=2 trong chính nhóm của nó) không hợp đứng
+                         cạnh nhóm nhỏ Duration trong cùng 1 ô. -->
+                    <group>
+                        <group string="Scope">
+                            <field name="model_id"
+                                   placeholder="e.g. Helpdesk Ticket, Contact"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="model_name" invisible="1"/>
+                            <!-- Refs: REQ-SEC-003 -->
+                            <field name="company_id"
+                                   placeholder="Leave empty to apply to every company"/>
+                            <field name="sequence" placeholder="e.g. 10"/>
+                        </group>
+                        <!-- Metadata ServiceNow (scope-add): không ảnh hưởng
+                             engine, tách riêng khỏi Scope để người cấu hình
+                             phân biệt rõ "cái gì" (Scope) với "nhãn/phân
+                             loại" (Classification). -->
+                        <group string="Classification">
+                            <field name="type"/>
+                            <field name="target" placeholder="e.g. Response, Resolution"/>
+                            <field name="vendor_id" invisible="type != 'ola'"
+                                   placeholder="e.g. your ISP or telecom vendor"/>
+                            <field name="service_commitment"/>
+                        </group>
+                        <group string="Duration">
+                            <field name="duration" widget="float_time_unit"
+                                   placeholder="e.g. 4"/>
+                            <!-- Refs: plan-improvement-sla-01-review §6.10 -->
+                            <field name="due_soon_hours"
+                                   placeholder="e.g. 2 (0 = use Settings)"/>
+                        </group>
+                        <!-- Đổi tiêu đề nhóm từ "Schedule" sang "Calendar":
+                             cả 4 field bên trong đều có label bắt đầu bằng
+                             "Calendar"/"Timezone" (Calendar Source/Fixed
+                             Calendar/Calendar Path on Record/Timezone), tên
+                             nhóm "Schedule" trước đó lệch với các label này. -->
+                        <group string="Calendar">
+                            <field name="schedule_source"/>
+                            <field name="schedule_id"
+                                   invisible="schedule_source != 'definition'"
+                                   required="schedule_source == 'definition'"
+                                   placeholder="e.g. Standard 40 hours/week"/>
+                            <!-- Field chooser giống Automation Rules/Mail
+                                 Template (widget="field_selector"), chỉ chọn
+                                 ĐÚNG 1 chuỗi field kết thúc ở 1 field duy
+                                 nhất, khác domain builder bên các tab điều
+                                 kiện vốn cho nhiều mệnh đề. Validate model
+                                 cuối = resource.calendar vẫn ở Python
+                                 (`_check_calendar` trong sla_definition.py),
+                                 widget chỉ hỗ trợ chọn, không thay validate. -->
+                            <!-- Odoo 17 và cũ hơn không có widget field_selector cho ô Char: người dùng gõ
+                                 đường dẫn (ví dụ partner_id.x_calendar_id), Python vẫn kiểm tra. -->
+                            <field name="schedule_path"
+                                   placeholder="e.g. partner_id.resource_calendar_id"
+                                   invisible="schedule_source != 'record'"
+                                   required="schedule_source == 'record'"/>
+                            <!-- Refs: scope-add "calendar_tz_override", label
+                                 Python đổi thành "Timezone" (ngắn gọn theo
+                                 yêu cầu user); bắt buộc, được điền sẵn bởi
+                                 onchange (plan-improvement-sla-01-review §6.5).
+                                 Giải thích bản sao calendar: tab Note. -->
+                            <field name="calendar_tz_override"
+                                   placeholder="e.g. Asia/Ho_Chi_Minh"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Start Condition" name="start_condition">
+                            <group>
+                                <!-- Refs: plan-improvement-sla-01-review §6.8 -->
+                                <div class="text-muted small" colspan="2">
+                                    A condition with no rule is not configured and never
+                                    matches, even though the editor shows "Match all records".
+                                </div>
+                                <field name="start_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                                <field name="retroactive"/>
+                                <!-- Refs: REQ-FUNC-017 -->
+                                <field name="start_field_id"
+                                       invisible="not retroactive"
+                                       required="retroactive"
+                                       placeholder="e.g. Created on"
+                                       domain="[('model', '=', model_name), ('ttype', '=', 'datetime')]"/>
+                            </group>
+                        </page>
+                        <page string="Stop Condition" name="stop_condition">
+                            <group>
+                                <field name="stop_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                            </group>
+                        </page>
+                        <page string="Pause/Resume Condition" name="pause_resume_condition">
+                            <group>
+                                <field name="pause_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                                <field name="resume_mode"/>
+                                <field name="resume_domain"
+                                       widget="domain" options="{'model': 'model_name'}"
+                                       invisible="resume_mode != 'condition'"/>
+                                <!-- Refs: scope-add "retroactive_pause" -->
+                                <field name="retroactive_pause"/>
+                                <div class="alert alert-warning mb-0" colspan="2"
+                                     invisible="not retroactive_pause_warning" role="alert">
+                                    <field name="retroactive_pause_warning" nolabel="1" readonly="1"/>
+                                </div>
+                            </group>
+                        </page>
+                        <page string="Cancel Condition" name="cancel_condition">
+                            <group>
+                                <field name="cancel_mode"/>
+                                <field name="cancel_domain"
+                                       widget="domain" options="{'model': 'model_name'}"
+                                       invisible="cancel_mode != 'condition'"/>
+                            </group>
+                        </page>
+                        <page string="Reset Condition" name="reset_condition">
+                            <group>
+                                <field name="reset_domain"
+                                       widget="domain" options="{'model': 'model_name'}"/>
+                                <field name="reset_action"/>
+                                <!-- Refs: REQ-FUNC-013 -->
+                                <field name="reset_field_ids" widget="many2many_tags"
+                                       placeholder="e.g. Priority, Stage"
+                                       domain="[('model', '=', model_name)]"/>
+                            </group>
+                        </page>
+                        <page string="Escalation" name="escalations">
+                            <!-- List chỉ hiện 2 cột gọn (percent_display,
+                                 display_name, cả 2 computed, xem
+                                 sla_escalation.py); không còn `editable`
+                                 nên "Add a line" và bấm vào dòng đều mở
+                                 form bên dưới dạng dialog để cấu hình đủ
+                                 field, field nào ẩn/hiện/bắt buộc theo đúng
+                                 action_type/email_recipient_type. -->
+                            <field name="escalation_ids">
+                                <tree string="Escalation Rules">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="percent_display" string="Percent"/>
+                                    <field name="display_name" string="Action"/>
+                                </tree>
+                                <form string="Escalation Rule">
+                                    <group>
+                                        <field name="percent" placeholder="e.g. 75"/>
+                                        <field name="action_type"/>
+                                        <field name="action_id"
+                                               domain="[('model_id', '=', parent.model_id)]"
+                                               invisible="action_type != 'server_action'"
+                                               required="action_type == 'server_action'"
+                                               placeholder="e.g. Notify Manager"/>
+                                        <field name="email_recipient_type"
+                                               invisible="action_type != 'email'"/>
+                                        <field name="email_field_id"
+                                               domain="[('model_id', '=', parent.model_id)]"
+                                               invisible="action_type != 'email' or email_recipient_type == 'fixed'"
+                                               required="action_type == 'email' and email_recipient_type != 'fixed'"
+                                               placeholder="e.g. Assigned to, Customer Email"/>
+                                        <field name="email_fixed_address"
+                                               invisible="action_type != 'email' or email_recipient_type != 'fixed'"
+                                               required="action_type == 'email' and email_recipient_type == 'fixed'"
+                                               placeholder="e.g. support-team@example.com"/>
+                                        <!-- Refs: scope-add "email template", mặc định đã
+                                             trỏ sẵn template dựng trong module (default ở
+                                             Python), hiện cho mọi recipient_type vì đây là
+                                             nội dung email, không phải người nhận. -->
+                                        <field name="email_template_id"
+                                               invisible="action_type != 'email'"
+                                               options="{'no_create': True}"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <!-- Refs: plan-improvement-sla-01-review §6.16 -->
+                        <page string="Manual Apply" name="manual_apply"
+                              groups="dwo_sla_core.group_sla_manager">
+                            <p class="text-muted">
+                                Runs started with "Apply to Existing Records". Finished
+                                runs are removed automatically after
+                                <field name="apply_retention_days" class="oe_inline"/> days.
+                            </p>
+                            <field name="apply_job_ids">
+                                <tree create="0" edit="0" delete="0">
+                                    <field name="create_date" string="Created"/>
+                                    <field name="user_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'done'"
+                                           decoration-info="state in ('queued', 'running')"
+                                           decoration-warning="state == 'cancelled'"
+                                           decoration-danger="state == 'failed'"/>
+                                    <field name="processed" string="Progress" widget="progressbar"
+                                           options="{'max_value': 'total'}"/>
+                                    <field name="attached"/>
+                                    <field name="error_count"/>
+                                    <field name="filter_domain" optional="hide"/>
+                                    <field name="note" optional="hide"/>
+                                    <button name="action_cancel" type="object" string="Cancel"
+                                            icon="fa-times"
+                                            invisible="state not in ('queued', 'running')"
+                                            confirm="Stop this run? Records already processed keep their tasks."
+                                            groups="dwo_sla_core.group_sla_manager"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <!-- Tab Note: HTML tĩnh (dịch được qua i18n), gom mọi lưu ý/cảnh báo
+                             của form definition theo nhóm vấn đề. Refs:
+                             plan-improvement-sla-01 §3.4, review §6.4; REQ-FUNC-016, 020, 042,
+                             REQ-SEC-004, REQ-INT-002, REQ-INT-003 -->
+                        <page string="Note" name="note">
+                            <div class="px-3 py-2" style="max-width: 900px;">
+                                <h4>1. Turning the SLA on and off</h4>
+                                <ul>
+                                    <li>A new definition starts <b>disabled</b> (a draft). Finish configuring it, then press <b>Enable</b>.</li>
+                                    <li><b>Disable</b> only stops attaching the SLA to <b>new</b> records. Tasks that are already running keep running, can still breach and escalate, and finish normally. Nothing is cancelled when you disable.</li>
+                                    <li>Enabling with an empty Start Condition shows a warning (nothing will start) but is not blocked.</li>
+                                </ul>
+
+                                <h4>2. Conditions (Start, Cancel, Pause, Resume, Stop, Reset)</h4>
+                                <ul>
+                                    <li>A condition of <code>[]</code> (or empty) means <b>not configured and never matches</b>. The domain editor shows "Match all records" for it; that label does not apply here.
+                                        <ul>
+                                            <li>To apply an SLA to every record, use an always-true rule such as <code>[('id', '!=', 0)]</code>.</li>
+                                            <li>A Stop condition left empty never completes the task; a Pause condition left empty never pauses it.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Common mistakes to avoid:
+                                        <ul>
+                                            <li>A Start Condition that is a <b>subset</b> of the Stop Condition: the SLA never attaches.</li>
+                                            <li>A Pause Condition that is a <b>subset</b> of the Start Condition: the task attaches paused and is cancelled as soon as the pause ends.</li>
+                                            <li>Start and Pause Conditions that are <b>mutually exclusive</b>: the task is cancelled before it can pause.</li>
+                                        </ul>
+                                    </li>
+                                    <li>Limits: for non-stored computed fields, and for conditions that go through a relation (for example <code>partner_id.country_id</code>) when only the related record changes, the SLA is <b>not</b> re-evaluated automatically. Use <b>Re-check Conditions</b> on the task to get a result that matches the current data.</li>
+                                    <li>Retroactive Pause only works when the model keeps a change history (<code>mail.thread</code>) and every field used in the Pause Condition is tracked. A warning appears under the option when this is not the case.</li>
+                                </ul>
+
+                                <h4>3. Stopping an SLA the right way</h4>
+                                <ul>
+                                    <li>There are no buttons to pause, resume or cancel a task by hand. A task's state is always derived from the source record, so a manual change would be overwritten the next time the record is saved and would distort the KPIs.</li>
+                                    <li>To hold the clock, add a field on the source record (for example an "On hold" checkbox, or a status such as "Waiting customer") and use it in the <b>Pause Condition</b>. Change the record, and the task follows.</li>
+                                    <li>If the record changed but was not saved again, or you changed a condition, use <b>Re-check Conditions</b> on the task.</li>
+                                </ul>
+
+                                <h4>4. Timezone and calendar</h4>
+                                <ul>
+                                    <li>The <b>Timezone</b> is required and is always the timezone used to read working hours, whatever timezone the calendar itself has. It is filled in for you: the fixed calendar's timezone when you pick one (only while the field is empty, an existing value is never overwritten), otherwise your own.</li>
+                                    <li>When the timezone differs from the calendar's own, a hidden <b>copy</b> of the calendar with that timezone is created and reused; the original calendar is never changed.
+                                        <ul>
+                                            <li>The copy contains the working hours and the public holidays <b>as they were when the copy was made</b>. It is <b>not</b> kept in sync: later changes to the original calendar do not reach the copy.</li>
+                                            <li>With Calendar Source "Calendar of each record", every calendar that has a different timezone gets its own hidden copy.</li>
+                                        </ul>
+                                    </li>
+                                    <li>When the record's calendar cannot be used, the fallback order is: the record's company default working calendar, then 24x7 if that cannot be used either.</li>
+                                    <li>Tasks keep the calendar (and so the timezone) they had when they started. Changing the timezone of the definition does not move the deadline of running tasks; use <b>Apply Current Settings</b> on a task to bring it up to date.</li>
+                                </ul>
+
+                                <h4>5. Due Soon</h4>
+                                <ul>
+                                    <li><b>Due Soon (hours)</b> is the window before the deadline in which a running task counts as "due soon". Leave it empty or 0 to use the value from Settings.</li>
+                                    <li>Warning: if it is equal to or longer than the Duration, every task is flagged Due Soon from the moment it starts. Example: 8 hours of Due Soon on a 4-hour SLA.</li>
+                                    <li>The status chip on the form of the source record uses the same rule.</li>
+                                </ul>
+
+                                <h4>6. Editing and deleting a definition, escalation rules</h4>
+                                <ul>
+                                    <li><b>Copied to the task when it starts</b>, so editing the definition does not change running tasks: the target duration, the calendar and the timezone. Use <b>Apply Current Settings</b> on a task to apply the new values.</li>
+                                    <li><b>Applied immediately</b> to running tasks at their next evaluation: the six conditions, Cancel Mode, Resume Mode and the escalation rules. A change to the conditions can stop, cancel or pause many tasks at once, so saving asks for confirmation when tasks are running.</li>
+                                    <li>A new escalation rule does not fire retroactively: running tasks already past its percentage are marked as done for that rule.</li>
+                                    <li>The Model cannot be changed once the definition has tasks.</li>
+                                    <li>A definition that has tasks cannot be deleted. Use <b>Disable</b> instead. Changes to the important fields are recorded in the chatter.</li>
+                                    <li>A Server Action escalation runs with the permissions of the user assigned to the SLA background job, not the permissions of the user who edits the source record.</li>
+                                </ul>
+
+                                <h4>7. When the source record is deleted</h4>
+                                <ul>
+                                    <li>Its tasks are removed by the daily clean-up, within about 24 hours. The <b>measurement history of that record is lost</b>.</li>
+                                    <li>Until the clean-up runs, those tasks still count in reports.</li>
+                                </ul>
+
+                                <h4>8. Records that already exist</h4>
+                                <ul>
+                                    <li>The SLA is not attached to old records by itself. Use <b>Apply to Existing Records</b> (the Manual Apply tab lists every run). Only records that match the Start Condition get a task, and records that already have one are skipped.</li>
+                                    <li>Tasks created this way do not trigger old escalation steps: steps already passed are marked as done.</li>
+                                </ul>
+
+                                <h4>9. What you see on screen</h4>
+                                <ul>
+                                    <li><b>% Used</b> is calculated when a view loads and does not refresh by itself. It cannot be sorted, filtered or grouped on.</li>
+                                    <li>The SLA status chip next to the pager of a record's form appears only for models that have an enabled SLA. After you create the first definition for a new model, reload the page to see the chip. It can be turned off in Settings.</li>
+                                    <li>Only the light colour scheme is supported.</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Refs: plan-improvement-sla-01-review §6.14 -->
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sla_definition_list" model="ir.ui.view">
+        <field name="name">sla.definition.list</field>
+        <field name="model">sla.definition</field>
+        <field name="arch" type="xml">
+            <!-- Refs: plan-improvement-sla-01-review §6.6 -->
+            <tree string="SLA Definitions" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="type"/>
+                <field name="duration" widget="float_time_unit"/>
+                <field name="schedule_source"/>
+                <field name="calendar_tz_override"/>
+                <field name="target" optional="hide"/>
+                <field name="schedule_id" optional="hide"/>
+                <field name="due_soon_hours" optional="hide"/>
+                <field name="service_commitment" optional="hide"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="active" column_invisible="True"/>
+                <button name="action_enable" type="object" icon="fa-toggle-off"
+                        title="Enable" invisible="active"
+                        groups="dwo_sla_core.group_sla_manager"
+                        confirm="Enable this SLA? It will start attaching to matching records."/>
+                <button name="action_disable" type="object" icon="fa-toggle-on"
+                        title="Disable" invisible="not active"
+                        groups="dwo_sla_core.group_sla_manager"
+                        confirm="Disable this SLA? No new tasks will be created; running tasks keep being tracked."/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_sla_definition_search" model="ir.ui.view">
+        <field name="name">sla.definition.search</field>
+        <field name="model">sla.definition</field>
+        <field name="arch" type="xml">
+            <search string="SLA Definitions">
+                <field name="name"/>
+                <field name="model_id"/>
+                <filter string="Disabled" name="inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Model" name="group_model" context="{'group_by': 'model_id'}"/>
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sla_definition" model="ir.actions.act_window">
+        <field name="name">SLA Definitions</field>
+        <field name="res_model">sla.definition</field>
+        <field name="view_mode">tree,form</field>
+        <!-- Refs: plan-improvement-sla-01-review §6.6: domain nhắc tới `active`
+             nên Odoo không tự lọc bản ghi inactive; hiện cả bản nháp/đã tắt. -->
+        <field name="domain">['|', ('active', '=', True), ('active', '=', False)]</field>
+        <!-- Ghi tường minh {} vì bỏ field khỏi XML không xoá context cũ trong DB khi nâng cấp. -->
+        <field name="context">{}</field>
+        <!-- Refs: REQ-FUNC-001 -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first SLA definition
+            </p>
+            <p>
+                Pick a model, declare the conditions and escalation rules
+                to attach an SLA to any model.
+            </p>
+        </field>
+    </record>
+</odoo>
