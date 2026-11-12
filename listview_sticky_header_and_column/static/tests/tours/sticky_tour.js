@@ -2,6 +2,7 @@ import { registry } from "@web/core/registry";
 
 const KEY = "listview_sticky_header_and_column";
 const LIST = ".o_action_manager .o_list_view";
+const NAME_COL = "complete_name"; // first named column of the res.partner list
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function assert(cond, msg) {
@@ -199,8 +200,7 @@ registry.category("web_tour.tours").add("lshc_unpin_column", {
                 assert(getComputedStyle(cell()).position === "sticky", "column not pinned");
                 await pin(root, "email"); // second click = unpin
                 assert(pinStyles().length === 0, "style node still present after unpin");
-                const key = lshcKeys()[0];
-                assert(Number(localStorage.getItem(key)) === -1, `saved index after unpin: ${localStorage.getItem(key)}`);
+                assert(lshcKeys().length === 0, `localStorage keys left after unpin: ${lshcKeys()}`);
                 assert(getComputedStyle(cell()).position !== "sticky", "td still sticky after unpin");
                 assert(!root.querySelector("thead th:first-child") ||
                     getComputedStyle(root.querySelector("thead th:first-child")).left === "auto" ||
@@ -316,16 +316,16 @@ registry.category("web_tour.tours").add("lshc_o2m_form", {
                 clearKeys();
                 const root = document.querySelector(".o_field_widget[name=user_ids] .o_list_renderer, .o_field_widget[name=users] .o_list_renderer");
                 assert(root, "embedded list not found");
-                // not the first column: index 0 cannot be pinned (see report: saved index 0 == "nothing saved")
-                const name = root.querySelectorAll("thead th[data-name]")[1].dataset.name;
+                // the very first column (index 0: an embedded list has no checkbox column)
+                const name = root.querySelector("thead th[data-name]").dataset.name;
+                assert(root.querySelector("thead tr th") === th(root, name), "first th is not a named column");
                 await pin(root, name);
                 const keys = lshcKeys();
                 assert(keys.length === 1 && /__field_(user_ids|users)$/.test(keys[0]), `localStorage keys: ${keys}`);
-                const cell = root.querySelector(".o_data_row td:nth-child(2)");
-                const idx = [...root.querySelectorAll("thead tr th")].indexOf(th(root, name));
-                const pinned = root.querySelector(`.o_data_row td:nth-child(${idx + 1})`);
-                assert(getComputedStyle(pinned).position === "sticky", `embedded column not pinned: ${name} idx=${idx} pos=${getComputedStyle(pinned).position} styles=${pinStyles().length} id=${root.dataset.lshcId} cls=${root.className} css=${pinStyles().map((n) => n.textContent.slice(0, 120)).join("|")}`);
-                assert(cell, "cell");
+                assert(localStorage.getItem(keys[0]) === "0", `saved index: ${localStorage.getItem(keys[0])}`);
+                const pinned = root.querySelector(".o_data_row td:nth-child(1)");
+                assert(getComputedStyle(pinned).position === "sticky", `first embedded column not pinned: pos=${getComputedStyle(pinned).position} styles=${pinStyles().length}`);
+                assert(getComputedStyle(th(root, name)).position === "sticky", "first embedded th not sticky");
                 // the embedded list keeps its own scrollbar (form does not scroll it)
                 assert(getComputedStyle(root).overflowX !== "visible", "embedded list lost its overflow");
             },
@@ -365,17 +365,46 @@ registry.category("web_tour.tours").add("lshc_dialog", {
         },
         { trigger: ".modal .o_list_view .o_data_row" },
         {
-            content: "pin a column inside the dialog: no error, list stays usable",
+            content: "pin a column inside the dialog: it stays put on horizontal scroll, header sticky",
             trigger: ".modal .o_list_view .o_data_row",
             run: async () => {
                 clearKeys();
                 const root = document.querySelector(".modal .o_list_view");
-                const btn = await waitFor(() => root.querySelector("thead th[data-name] .js_pin_this_column"), "pin button in dialog");
-                btn.click();
-                await sleep(700);
-                // rules are scoped to `.o_content`, a dialog has none: nothing may be broken
-                assert(getComputedStyle(root.querySelector("thead")).position === "sticky" ||
-                    getComputedStyle(root.querySelector("thead th")).position === "sticky", "dialog header lost its sticky");
+                await widen(root);
+                // make the rows tall enough for a vertical scroll whatever the demo data / window size
+                root.querySelectorAll(".o_data_row td").forEach((td) => (td.style.paddingBlock = "40px"));
+                const name = root.querySelector("thead th[data-name]").dataset.name;
+                await pin(root, name);
+                const idx = [...root.querySelectorAll("thead tr th")].indexOf(th(root, name));
+                const styles = pinStyles();
+                assert(styles.length === 2, `style nodes in dialog: ${styles.length}`);
+                const cell = root.querySelector(`.o_data_row td:nth-child(${idx + 1})`);
+                const head = th(root, name);
+                assert(getComputedStyle(cell).position === "sticky", "pinned dialog td not sticky");
+                assert(getComputedStyle(head).position === "sticky", "pinned dialog th not sticky");
+                const free = root.querySelector(`.o_data_row td:nth-child(${idx + 3})`);
+                assert(getComputedStyle(free).position !== "sticky", "unpinned dialog td must not be sticky");
+                const sx = scroller(root.querySelector("table"), "x");
+                assert(sx && sx.closest(".modal"), "no horizontal scroll area inside the dialog");
+                const left0 = rect(cell).left - rect(sx).left;
+                const freeX0 = rect(free).left;
+                sx.scrollLeft = 300;
+                await sleep(300);
+                assert(sx.scrollLeft > 100, `dialog did not scroll horizontally (${sx.scrollLeft})`);
+                near(rect(cell).left - rect(sx).left, left0, 1.5, "pinned dialog td moved on horizontal scroll");
+                near(rect(head).left - rect(sx).left, left0, 1.5, "pinned dialog th moved on horizontal scroll");
+                assert(freeX0 - rect(free).left > 100, "unpinned dialog column should move with the scroll");
+                // header stays on top of the dialog scroll area while scrolling down
+                const sy = scroller(root.querySelector("table"), "y");
+                assert(sy && sy.closest(".modal"), "no vertical scroll area inside the dialog");
+                sy.scrollTop = 200;
+                await sleep(300);
+                assert(sy.scrollTop > 50, `dialog did not scroll vertically (${sy.scrollTop})`);
+                near(rect(root.querySelector("thead")).top, rect(sy).top, 2, "dialog header top after scroll");
+                near(rect(head).top, rect(sy).top, 2, "pinned dialog th top after scroll");
+                sx.scrollLeft = 0;
+                sy.scrollTop = 0;
+                clearKeys();
             },
         },
         {
@@ -398,5 +427,104 @@ registry.category("web_tour.tours").add("lshc_dialog", {
             run: "click",
         },
         { trigger: "body:not(:has(.o_form_status_indicator .o_form_button_save))" },
+    ],
+});
+
+registry.category("web_tour.tours").add("lshc_pin_first_column", {
+    steps: () => [
+        { trigger: ".o_form_view .o_notebook" },
+        {
+            content: "open the Users tab",
+            trigger: ".o_notebook .nav-link[name=user_ids], .o_notebook .nav-link[name=users]",
+            run: "click",
+        },
+        { trigger: ".o_field_widget[name=user_ids] .o_data_row, .o_field_widget[name=users] .o_data_row" },
+        {
+            content: "pin the first column (index 0), then unpin it",
+            trigger: ".o_field_widget[name=user_ids] .o_data_row, .o_field_widget[name=users] .o_data_row",
+            run: async () => {
+                clearKeys();
+                const root = document.querySelector(".o_field_widget[name=user_ids] .o_list_renderer, .o_field_widget[name=users] .o_list_renderer");
+                const name = root.querySelector("thead th[data-name]").dataset.name;
+                assert(root.querySelector("thead tr th") === th(root, name), "first th is not a named column");
+                const cell = () => root.querySelector(".o_data_row td:nth-child(1)");
+                assert(getComputedStyle(cell()).position !== "sticky", "first column pinned before any click");
+                await pin(root, name);
+                assert(getComputedStyle(cell()).position === "sticky", "first column (index 0) not pinned");
+                near(parseFloat(getComputedStyle(cell()).left), 0, 0.5, "first column left");
+                assert(pinStyles().length === 2, `style nodes after pin: ${pinStyles().length}`);
+                const key = lshcKeys()[0];
+                assert(localStorage.getItem(key) === "0", `saved index: ${localStorage.getItem(key)}`);
+                await pin(root, name); // second click = unpin
+                assert(getComputedStyle(cell()).position !== "sticky", "first column still pinned after unpin");
+                assert(pinStyles().length === 0, `style nodes after unpin: ${pinStyles().length}`);
+                assert(lshcKeys().length === 0, `localStorage keys left after unpin: ${lshcKeys()}`);
+                await pin(root, name); // and it can be pinned again
+                assert(getComputedStyle(cell()).position === "sticky", "first column not pinned again");
+                clearKeys();
+            },
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("lshc_unpin_remount", {
+    steps: () => [
+        { trigger: `${LIST} .o_data_row` },
+        {
+            content: "pin then unpin a column",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                clearKeys();
+                const root = document.querySelector(LIST);
+                await pin(root, NAME_COL);
+                const key = lshcKeys()[0];
+                assert(key, "nothing saved after pin");
+                await pin(root, NAME_COL);
+                assert(lshcKeys().length === 0, `keys left after unpin: ${lshcKeys()}`);
+                // an old version left "-1" behind after an unpin: it must not count as pinned
+                localStorage.setItem(key, "-1");
+            },
+        },
+        {
+            content: "open a record",
+            trigger: `${LIST} .o_data_row:first-child .o_data_cell[name=${NAME_COL}]`,
+            run: "click",
+        },
+        { trigger: ".o_form_view" },
+        {
+            content: "back to the list",
+            trigger: ".o_control_panel .breadcrumb-item:not(.active), .o_control_panel .o_back_button",
+            run: "click",
+        },
+        { trigger: `${LIST} .o_data_row` },
+        {
+            content: "no leftover pin style, header still sticky, nothing pinned",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                await sleep(800);
+                const root = document.querySelector(LIST);
+                await waitFor(() => pinBtn(root, NAME_COL), "pin button after remount");
+                assert(pinStyles().length === 0, `style nodes after remount: ${pinStyles().length}`);
+                assert(lshcKeys().length === 0, `legacy -1 key not cleaned: ${lshcKeys()}`);
+                const idx = [...root.querySelectorAll("thead tr th")].indexOf(th(root, NAME_COL));
+                assert(getComputedStyle(root.querySelector(`.o_data_row td:nth-child(${idx + 1})`)).position !== "sticky", "column pinned after unpin");
+                assert(getComputedStyle(root.querySelector("thead th:first-child")).left === "auto" ||
+                    getComputedStyle(root.querySelector("thead th:first-child")).position !== "sticky" ||
+                    getComputedStyle(root.querySelector("thead th:first-child")).zIndex !== "10", "th still pinned after unpin");
+                // the sticky header (from the core list) still works
+                const thead = root.querySelector("thead");
+                const sc = scroller(thead, "y");
+                assert(sc, "no vertical scroll area");
+                sc.scrollTop = 400;
+                await sleep(300);
+                near(rect(thead).top, rect(sc).top, 2, "header top after remount + scroll");
+                sc.scrollTop = 0;
+                // and pinning still works after the unpin / remount
+                await widen(root);
+                await pin(root, NAME_COL);
+                assert(getComputedStyle(root.querySelector(`.o_data_row td:nth-child(${idx + 1})`)).position === "sticky", "cannot pin again after remount");
+                clearKeys();
+            },
+        },
     ],
 });
