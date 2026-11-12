@@ -52,7 +52,7 @@ class SlaEvent(models.Model):
               'settings onto the task), Conditions Re-checked (a manager '
               'ran the conditions again). Example: filter on Error to find '
               'problems.'))
-    event_dt = fields.Datetime(string="Timestamp", required=True,
+    event_dt = fields.Datetime(string="Timestamp", required=True, index=True,
         help='When the event happened (UTC). Example: 2026-03-02 05:00:00.')
     note = fields.Text(
         string="Note",
