@@ -6,7 +6,10 @@ registerPatch({
     name: 'ThreadCache',
     fields: {
         /**
-         * A message that arrives while a kind is chosen (bus) is hidden when it is of another kind.
+         * Odoo 16 shows in the main cache every message of the thread that is in the store, next to the ones
+         * it fetched. While a chip is chosen only the messages the server returned for that chip are shown:
+         * the browser cannot tell by itself which ones the chip would show. A message that arrives is asked
+         * for again (see DwoMessageFilter) and shows up if the chip holds it.
          * @override
          */
         messages: {
@@ -15,7 +18,7 @@ registerPatch({
                 if (!this.thread || !this.thread.dwoFilter || !messages) {
                     return messages;
                 }
-                return messages.filter(message => message.dwoCategory === this.thread.dwoFilter);
+                return messages.filter(message => this.rawFetchedMessages.includes(message));
             },
         },
     },

@@ -2,23 +2,32 @@
 
 import { registerMessagingComponent } from '@mail/utils/messaging_component';
 import { _lt } from '@web/core/l10n/translation';
+import { session } from '@web/session';
 import { useService } from '@web/core/utils/hooks';
 
 const { Component, onMounted, onPatched, onWillUnmount, useState } = owl;
 
-// Each kind has its own colour (a Bootstrap contextual colour, and purple, defined in the stylesheet): outlined when off, filled when chosen.
-const KINDS = [
-    { id: 'discussion', label: _lt('Discussions'), color: 'primary' },
-    { id: 'email', label: _lt('Emails'), color: 'info' },
-    { id: 'activity', label: _lt('Activities'), color: 'purple' },
-    { id: 'note', label: _lt('Notes'), color: 'warning' },
-    { id: 'tracking', label: _lt('Tracking'), color: 'success' },
-    { id: 'other', label: _lt('Other'), color: 'danger' },
-];
+const ALL_COLOR = '#212529';
+
+/** Relative luminance (WCAG) of a colour given as #rrggbb. */
+function luminance(hex) {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+        const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** The text of a chip that is filled with that colour: white or black, whichever reads better. */
+export function textColorOn(hex) {
+    const L = luminance(hex);
+    return 1.05 / (L + 0.05) >= (L + 0.05) / 0.05 ? '#ffffff' : '#000000';
+}
 
 /**
- * The badges at the top of the chatter: All, Discussions, Emails, Activities, Notes, Tracking, Other, each with its
- * number of messages. One at a time; a click shows only that kind. Closing the record forgets the choice.
+ * The chips at the top of the chatter: All, then the chips the administrator made (see the model
+ * dwo.chatter.filter), each with its number of messages. One at a time; a click shows only the messages of
+ * that chip. Closing the record forgets the choice. The administrators have a link to edit the chips.
  * The record of the component is the chatter.
  */
 export class DwoMessageFilter extends Component {
@@ -26,17 +35,22 @@ export class DwoMessageFilter extends Component {
     setup() {
         super.setup();
         this.orm = useService('orm');
-        this.state = useState({ counts: null });
+        this.action = useService('action');
+        this.isAdmin = Boolean(session.is_admin);
+        this.state = useState({ data: null });
         this.timer = null;
         this.watched = null;
-        onMounted(() => this._loadCounts());
-        // a message arrived (bus) or was posted: the numbers follow
+        onMounted(() => this._loadChips());
+        // a message arrived (bus) or was posted: the numbers follow, and the list if a chip is chosen
         onPatched(() => {
             const key = this.thread && this.thread.id + ':' + (this.thread.lastMessage ? this.thread.lastMessage.id : 0);
             if (key !== this.watched) {
+                const first = this.watched === null;
                 this.watched = key;
-                clearTimeout(this.timer);
-                this.timer = setTimeout(() => this._loadCounts(), 400);
+                if (!first) {
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(() => this._onNewMessage(), 400);
+                }
             }
         });
         onWillUnmount(() => {
@@ -55,9 +69,9 @@ export class DwoMessageFilter extends Component {
     }
 
     get items() {
-        const counts = this.state.counts || {};
-        return [{ id: false, label: this.env._t('All'), color: 'dark', count: counts.all || 0 }].concat(
-            KINDS.map((kind) => ({ ...kind, label: kind.label.toString(), count: counts[kind.id] || 0 }))
+        const data = this.state.data || { all: 0, chips: [] };
+        return [{ id: false, label: this.env._t('All'), color: ALL_COLOR, count: data.all }].concat(
+            data.chips.map((chip) => ({ id: chip.id, label: chip.name, color: chip.color, count: chip.count }))
         );
     }
 
@@ -65,18 +79,42 @@ export class DwoMessageFilter extends Component {
         return ((this.thread && this.thread.dwoFilter) || false) === item.id;
     }
 
-    async _loadCounts() {
+    isDisabled(item) {
+        return Boolean(item.id) && !this.isActive(item) && !item.count;
+    }
+
+    chipStyle(item) {
+        return `--dwo-chip: ${item.color}; --dwo-chip-text: ${textColorOn(item.color)}`;
+    }
+
+    async _loadChips() {
         const thread = this.thread;
         if (!thread || !thread.id || this.unmounted) {
             return;
         }
         try {
-            const counts = await this.orm.call('mail.message', 'dwo_filter_counts', [thread.model, thread.id]);
-            if (!this.unmounted) {
-                this.state.counts = counts;
+            const data = await this.orm.call('mail.message', 'dwo_filter_chips', [thread.model, thread.id]);
+            if (this.unmounted) {
+                return;
+            }
+            this.state.data = data;
+            // the chip that is chosen was archived or deleted meanwhile: back to all the messages
+            if (thread.dwoFilter && !data.chips.some((chip) => chip.id === thread.dwoFilter)) {
+                thread.dwoSetFilter(false);
             }
         } catch (_e) {
-            // the badges are a convenience: without numbers they stay hidden
+            // the chips are a convenience: without them the row stays hidden
+        }
+    }
+
+    async _onNewMessage() {
+        if (this.unmounted) {
+            return;
+        }
+        await this._loadChips();
+        // the server decides which messages a chip shows: ask it again when a new message came
+        if (this.thread && this.thread.exists() && this.thread.dwoFilter && !this.unmounted) {
+            this.thread.dwoReload();
         }
     }
 
@@ -84,6 +122,10 @@ export class DwoMessageFilter extends Component {
         if (this.thread) {
             this.thread.dwoSetFilter(item.id);
         }
+    }
+
+    edit() {
+        this.action.doAction('dwo_chatter_filter.action_dwo_chatter_filter');
     }
 }
 

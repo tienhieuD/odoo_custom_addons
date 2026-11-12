@@ -7,17 +7,17 @@ import { clear } from '@mail/model/model_field_command';
 registerPatch({
     name: 'Thread',
     fields: {
-        /** The kind of message shown, false for all of them. */
+        /** The id of the chip chosen (the messages it shows are the only ones loaded), false for all. */
         dwoFilter: attr({ default: false }),
         /**
-         * While a kind is chosen, the server only returns that kind (Load more included).
+         * While a chip is chosen, the server only returns the messages of that chip (Load more included).
          * @override
          */
         fetchMessagesParams: {
             compute() {
                 const params = this._super();
                 if (this.dwoFilter) {
-                    return { ...params, dwo_category: this.dwoFilter };
+                    return { ...params, dwo_filter_id: this.dwoFilter };
                 }
                 return params;
             },
@@ -25,16 +25,22 @@ registerPatch({
     },
     recordMethods: {
         /**
-         * Show one kind of message (false: all of them): the messages are loaded again from the server.
+         * Show the messages of one chip (false: all of them): they are loaded again from the server.
          *
-         * @param {string|false} category
+         * @param {number|false} chipId
          */
-        dwoSetFilter(category) {
-            category = category || false;
-            if (this.dwoFilter === category) {
+        dwoSetFilter(chipId) {
+            chipId = chipId || false;
+            if (this.dwoFilter === chipId) {
                 return;
             }
-            this.update({ dwoFilter: category });
+            this.update({ dwoFilter: chipId });
+            this._dwoReloadMainCache();
+        },
+        /**
+         * Load the messages of the chosen chip again (a message arrived: the server says if it belongs).
+         */
+        dwoReload() {
             this._dwoReloadMainCache();
         },
         /**

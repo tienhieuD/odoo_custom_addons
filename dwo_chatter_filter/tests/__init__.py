@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 from . import test_filter
+from . import test_chips
 from . import test_filter_tour
