@@ -305,22 +305,22 @@ registry.category("web_tour.tours").add("lshc_o2m_form", {
         { trigger: ".o_form_view .o_notebook" },
         {
             content: "open the Users tab",
-            trigger: ".o_notebook .nav-link[name=user_ids]",
+            trigger: ".o_notebook .nav-link[name=user_ids], .o_notebook .nav-link[name=users]",
             run: "click",
         },
-        { trigger: ".o_field_widget[name=user_ids] .o_data_row" },
+        { trigger: ".o_field_widget[name=user_ids] .o_data_row, .o_field_widget[name=users] .o_data_row" },
         {
             content: "pin a column of the embedded list",
-            trigger: ".o_field_widget[name=user_ids] .o_data_row",
+            trigger: ".o_field_widget[name=user_ids] .o_data_row, .o_field_widget[name=users] .o_data_row",
             run: async () => {
                 clearKeys();
-                const root = document.querySelector(".o_field_widget[name=user_ids] .o_list_renderer");
+                const root = document.querySelector(".o_field_widget[name=user_ids] .o_list_renderer, .o_field_widget[name=users] .o_list_renderer");
                 assert(root, "embedded list not found");
                 // not the first column: index 0 cannot be pinned (see report: saved index 0 == "nothing saved")
                 const name = root.querySelectorAll("thead th[data-name]")[1].dataset.name;
                 await pin(root, name);
                 const keys = lshcKeys();
-                assert(keys.length === 1 && keys[0].endsWith("__field_user_ids"), `localStorage keys: ${keys}`);
+                assert(keys.length === 1 && /__field_(user_ids|users)$/.test(keys[0]), `localStorage keys: ${keys}`);
                 const cell = root.querySelector(".o_data_row td:nth-child(2)");
                 const idx = [...root.querySelectorAll("thead tr th")].indexOf(th(root, name));
                 const pinned = root.querySelector(`.o_data_row td:nth-child(${idx + 1})`);
