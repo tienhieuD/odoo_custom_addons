@@ -37,7 +37,7 @@
                                    string="Running Tasks"/>
                         </button>
                     </div>
-                    <widget name="web_ribbon" title="Disabled" bg_color="text-bg-danger"
+                    <widget name="web_ribbon" title="Disabled" bg_color="bg-danger"
                             invisible="active"/>
                     <field name="active" invisible="1"/>
                     <!-- Refs: plan-improvement-sla-01-review §6.14: form JS

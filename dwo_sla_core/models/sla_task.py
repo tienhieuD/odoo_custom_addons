@@ -205,14 +205,14 @@ class SlaTask(models.Model):
     # Refs: REQ-FUNC-036, REQ-FUNC-062
     achieved_rate = fields.Float(
         string="Achieved Rate", compute='_compute_report_measures', store=True,
-        aggregator='avg', digits=(16, 4),
+        group_operator='avg', digits=(16, 4),
         help=('Report measure: 1 when the task ended on time, 0 when it ended '
               'breached, empty for tasks still running or cancelled. Its average '
               'over a group is the share of tasks achieved, e.g. 0.8 means 80%; '
               'a group without ended tasks has no value.'))
     breaching_count = fields.Integer(
         string="Currently Breaching", compute='_compute_report_measures', store=True,
-        aggregator='sum',
+        group_operator='sum',
         help=('Report measure: 1 while the task is running or paused and already past '
               'its deadline, otherwise 0. Its sum over a group is the number of SLAs '
               'currently in breach (ended breached tasks are not counted).'))
