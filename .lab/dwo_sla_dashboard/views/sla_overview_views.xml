@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- SLA Overview (task 006 C3): client action OWL, chỉ đọc. Menu đầu tiên
+         của app SLA (sequence 1 < SLA Tasks 10), cùng nhóm với menu gốc. -->
+    <record id="action_sla_overview" model="ir.actions.client">
+        <field name="name">SLA Overview</field>
+        <field name="tag">dwo_sla_dashboard.overview</field>
+    </record>
+
+    <menuitem id="menu_sla_overview" name="Overview"
+              parent="dwo_sla_core.menu_sla_root"
+              action="action_sla_overview" sequence="1"
+              groups="dwo_sla_core.group_sla_user"/>
+</odoo>
