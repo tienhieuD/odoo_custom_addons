@@ -90,13 +90,15 @@ class WebpHelper(models.AbstractModel):
 
         if record:
             try:
-                self.env['ir.attachment'].sudo().create({
-                    'name': cache_name,
-                    'res_model': record._name,
-                    'res_id': record.id,
-                    'datas': base64.b64encode(webp),
-                    'mimetype': 'image/webp',
-                })
+                # savepoint: a database error here leaves the request transaction usable
+                with self.env.cr.savepoint():
+                    self.env['ir.attachment'].sudo().create({
+                        'name': cache_name,
+                        'res_model': record._name,
+                        'res_id': record.id,
+                        'datas': base64.b64encode(webp),
+                        'mimetype': 'image/webp',
+                    })
             except Exception as e:
                 _logger.debug('WebP cache save failed: %s', e)
         return self._webp_set_response(response, webp)
