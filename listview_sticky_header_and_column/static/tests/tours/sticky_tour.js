@@ -578,3 +578,59 @@ tour.register("lshc_unpin_remount", { test: true }, expandAsync([
             },
         },
 ]));
+
+// The row being edited (inline, e.g. a one2many) must stay above the pinned header cells and the pinned
+// cells of the other rows: its Many2one dropdown is a child of the pinned cell and opens over them.
+tour.register("lshc_edit_row_on_top", { test: true }, expandAsync([
+        { trigger: ".o_form_view .o_notebook", run: () => {} },
+        { content: "Access Rights tab", trigger: ".o_notebook .nav-link[name=access_rights]", run: "click" },
+        { trigger: ".o_field_widget[name=access_ids] .o_data_row", run: () => {} },
+        {
+            content: "pin Group, edit a row, open its Many2one dropdown and measure what is on top",
+            trigger: ".o_field_widget[name=access_ids] .o_data_row",
+            run: async () => {
+                clearKeys();
+                const fld = document.querySelector(".o_field_widget[name=access_ids]");
+                const root = fld.querySelector(".o_list_renderer");
+                await widen(root);
+                await pin(root, "group_id");
+                const idx = [...root.querySelectorAll("thead tr th")].indexOf(th(root, "group_id"));
+                const sx = scroller(root.querySelector("table"), "x");
+                sx.scrollLeft = 200;
+                await sleep(300);
+                root.querySelector(".o_data_row:nth-child(3) td[name=name]").click();
+                const sel = await waitFor(() => root.querySelector(".o_selected_row"), "edited row");
+                await sleep(500);
+                const z = (el) => parseInt(getComputedStyle(el).zIndex, 10);
+                const selCell = sel.querySelector(`td:nth-child(${idx + 1})`);
+                assert(getComputedStyle(selCell).position === "sticky", "edited pinned cell not sticky");
+                const otherCells = [...root.querySelectorAll(`.o_data_row:not(.o_selected_row) td:nth-child(${idx + 1})`)];
+                assert(otherCells.length >= 3, "not enough other rows");
+                otherCells.forEach((c) => assert(z(selCell) > z(c), `edited pinned cell z-index ${z(selCell)} <= other row's ${z(c)}`));
+                assert(z(selCell) > z(th(root, "group_id")), `edited pinned cell z-index ${z(selCell)} <= pinned header's ${z(th(root, "group_id"))}`);
+                // open the Many2one dropdown of the pinned cell and check what is really painted on top of it
+                const input = selCell.querySelector("input");
+                assert(input, "no Many2one input in the edited pinned cell");
+                input.focus();
+                input.value = "a";
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+                const dd = await waitFor(() => document.querySelector(".o-autocomplete--dropdown-menu"), "dropdown");
+                await sleep(500);
+                // only the items really visible inside the (scrollable) menu can be checked
+                const items = [...dd.querySelectorAll(".o-autocomplete--dropdown-item")].filter((it) => rect(it).bottom <= rect(dd).bottom + 1 && rect(it).top >= rect(dd).top - 1);
+                assert(items.length > 3, `dropdown items: ${items.length}`);
+                const head = rect(root.querySelector("thead"));
+                let overHeader = 0;
+                items.forEach((it) => {
+                    const r = rect(it);
+                    const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                    if (r.top < head.bottom && r.bottom > head.top) {
+                        overHeader++;
+                    }
+                    assert(el && dd.contains(el), `dropdown item "${it.textContent.trim()}" is covered by <${el && el.tagName} class="${el && el.className}">`);
+                });
+                assert(overHeader || rect(dd).top > head.bottom, "the dropdown does not overlap the header: nothing measured");
+                clearKeys();
+            },
+        },
+]));

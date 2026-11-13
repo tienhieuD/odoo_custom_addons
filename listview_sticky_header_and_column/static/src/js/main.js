@@ -272,6 +272,12 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
                     top: 0;
                     z-index: 10;
                 }
+                /* The row being edited keeps its pinned cells above the other rows' pinned cells and the
+                   pinned header: a Many2one dropdown opened in it is a child of that cell and would
+                   otherwise be painted under them (same selector, declared later so it wins). */
+                ${scope} table tbody tr.o_selected_row td:nth-child(${cssNthChildIndex}) {
+                    z-index: 20;
+                }
             `;
         }).join('');
 
