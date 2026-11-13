@@ -20,7 +20,7 @@ Requires only the standard base, resource, web, mail and mail_tracking modules.
     'support': 'hello@duotek.io.vn',
 
     'category': 'Services',
-    'version': '20.0.1.2.2',
+    'version': '20.0.1.2.3',
     'installable': True,
     'application': False,
     'license': 'OPL-1',

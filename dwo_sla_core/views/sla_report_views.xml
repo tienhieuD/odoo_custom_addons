@@ -11,7 +11,7 @@
         <field name="name">sla.task.report.trend.graph</field>
         <field name="model">sla.task</field>
         <field name="arch" type="xml">
-            <graph string="Compliance Trend" type="line">
+            <graph string="Compliance Trend" type="line" stacked="0">
                 <field name="end_time" interval="week"/>
                 <field name="sla_id"/>
                 <field name="achieved_rate" type="measure" widget="percentage"/>
@@ -208,7 +208,7 @@
         <field name="name">sla.task.report.heatmap.graph</field>
         <field name="model">sla.task</field>
         <field name="arch" type="xml">
-            <graph string="Source Heatmap" type="line">
+            <graph string="Source Heatmap" type="line" stacked="0">
                 <field name="start_time" interval="month"/>
                 <field name="res_model"/>
                 <field name="achieved_rate" type="measure"/>
