@@ -130,6 +130,13 @@ registry.category("web_tour.tours").add("dwo_sla_graph_colors", {
                 if (text !== "50%") {
                     throw new Error("axis label: " + text);
                 }
+                // task 029: lines are not stacked (no cumulated rates, axis up to 100%)
+                if (y.stacked) {
+                    throw new Error("trend lines are stacked");
+                }
+                if (chart.scales.y.max > 1.0001) {
+                    throw new Error("rate axis above 100%: " + chart.scales.y.max);
+                }
             },
         },
     ],
