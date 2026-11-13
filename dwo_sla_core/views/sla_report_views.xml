@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Báo cáo (task 006 C2): menu SLA > Reporting. Mọi màn hình chỉ đọc, dùng
+         field lưu của sla.task (outcome, usage_bucket...) và của sla.event;
+         group_sla_user đọc được theo ir.model.access có sẵn. Không dùng
+         source_name trong view chung (chỉ SLA Manager đọc được). Graph chuẩn
+         của Odoo chỉ có MỘT measure, nên so sánh hai measure (R7, R10) dùng
+         pivot. -->
+
+    <record id="view_sla_report_trend_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.trend.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Compliance Trend" type="line">
+                <field name="end_time" interval="week"/>
+                <field name="sla_id"/>
+                <field name="achieved_rate" type="measure" widget="percentage"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_trend_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.trend.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Compliance Trend" display_quantity="1">
+                <field name="sla_id" type="row"/>
+                <field name="end_time" interval="week" type="col"/>
+                <field name="achieved_rate" type="measure" widget="percentage"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_report_distribution_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.distribution.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Response Time Distribution" type="bar" stacked="1">
+                <field name="sla_id"/>
+                <field name="usage_bucket"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_distribution_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.distribution.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Response Time Distribution" display_quantity="1">
+                <field name="sla_id" type="row"/>
+                <field name="usage_bucket" type="col"/>
+                <field name="final_percent_used" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_report_status_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.status.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Status Mix" type="pie">
+                <field name="outcome"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_status_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.status.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Status Mix" display_quantity="1">
+                <field name="outcome" type="row"/>
+                <field name="sla_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_report_backlog_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.backlog.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Open Backlog &amp; Ageing" display_quantity="1">
+                <field name="sla_id" type="row"/>
+                <field name="res_model" type="row"/>
+                <field name="planned_end_time" interval="week" type="col"/>
+                <field name="breaching_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_report_backlog_list" model="ir.ui.view">
+        <field name="name">sla.task.report.backlog.list</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <tree string="Open Backlog &amp; Ageing" default_order="planned_end_time asc, id asc"
+                  create="0" edit="0" delete="0" decoration-danger="has_breached">
+                <field name="sla_id"/>
+                <field name="res_model"/>
+                <!-- source_name: chỉ SLA Manager đọc được (TC-SEC-017). -->
+                <field name="source_name" groups="dwo_sla_core.group_sla_manager"/>
+                <field name="stage" widget="badge"
+                       decoration-info="stage == 'in_progress'"
+                       decoration-warning="stage == 'paused'"/>
+                <field name="start_time" optional="hide"/>
+                <field name="planned_end_time"/>
+                <field name="business_percent_used" string="% Used" widget="progressbar"
+                       options="{'overflow_class': 'bg-danger'}"/>
+                <field name="has_breached" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_sla_report_performance_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.performance.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Performance by Definition" type="bar" stacked="1">
+                <field name="sla_id"/>
+                <field name="outcome"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_performance_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.performance.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Performance by Definition and Source" display_quantity="1">
+                <field name="sla_id" type="row"/>
+                <field name="res_model" type="row"/>
+                <field name="outcome" type="col"/>
+                <field name="overdue_duration" type="measure"/>
+                <field name="final_percent_used" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_report_source_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.source.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Performance by Source" type="bar" stacked="1">
+                <field name="res_model"/>
+                <field name="outcome"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_pause_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.pause.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Pause Analysis" type="bar">
+                <field name="sla_id"/>
+                <field name="business_pause_duration" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_pause_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.pause.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Pause Analysis" display_quantity="1">
+                <field name="sla_id" type="row"/>
+                <field name="business_pause_duration" type="measure"/>
+                <field name="pause_duration" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_event_graph" model="ir.ui.view">
+        <field name="name">sla.event.graph</field>
+        <field name="model">sla.event</field>
+        <field name="arch" type="xml">
+            <graph string="Escalation Activity" type="bar" stacked="1">
+                <field name="event_dt" interval="week"/>
+                <field name="event"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_event_pivot" model="ir.ui.view">
+        <field name="name">sla.event.pivot</field>
+        <field name="model">sla.event</field>
+        <field name="arch" type="xml">
+            <pivot string="Escalation Activity" display_quantity="1">
+                <field name="event" type="row"/>
+                <field name="definition_id" type="row"/>
+                <field name="event_dt" interval="week" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_report_heatmap_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.heatmap.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Source Heatmap" display_quantity="1">
+                <field name="res_model" type="row"/>
+                <field name="start_time" interval="month" type="col"/>
+                <field name="achieved_rate" type="measure" widget="percentage"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sla_report_heatmap_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.heatmap.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Source Heatmap" type="line">
+                <field name="start_time" interval="month"/>
+                <field name="res_model"/>
+                <field name="achieved_rate" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_calendar_graph" model="ir.ui.view">
+        <field name="name">sla.task.report.calendar.graph</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <graph string="Calendar Impact" type="bar">
+                <field name="sla_id"/>
+                <field name="business_duration" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sla_report_calendar_pivot" model="ir.ui.view">
+        <field name="name">sla.task.report.calendar.pivot</field>
+        <field name="model">sla.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Calendar Impact" display_quantity="1">
+                <field name="sla_id" type="row"/>
+                <field name="duration" type="measure"/>
+                <field name="business_duration" type="measure"/>
+                <field name="pause_duration" type="measure"/>
+                <field name="business_pause_duration" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_sla_report_trend" model="ir.actions.act_window">
+        <field name="name">Compliance Trend</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[('stage', 'in', ('achieved', 'breached'))]</field>
+        <field name="context">{'search_default_last_30': 1}</field>
+    </record>
+    <record id="action_sla_report_trend_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_trend_graph"/>
+        <field name="act_window_id" ref="action_sla_report_trend"/>
+    </record>
+    <record id="action_sla_report_trend_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_trend_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_trend"/>
+    </record>
+
+    <record id="action_sla_report_distribution" model="ir.actions.act_window">
+        <field name="name">Response Time Distribution</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[('stage', 'in', ('achieved', 'breached'))]</field>
+        <field name="context">{'search_default_response': 1}</field>
+    </record>
+    <record id="action_sla_report_distribution_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_distribution_graph"/>
+        <field name="act_window_id" ref="action_sla_report_distribution"/>
+    </record>
+    <record id="action_sla_report_distribution_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_distribution_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_distribution"/>
+    </record>
+
+    <record id="action_sla_report_status" model="ir.actions.act_window">
+        <field name="name">Status Mix</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_status_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_status_graph"/>
+        <field name="act_window_id" ref="action_sla_report_status"/>
+    </record>
+    <record id="action_sla_report_status_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_status_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_status"/>
+    </record>
+
+    <record id="action_sla_report_backlog" model="ir.actions.act_window">
+        <field name="name">Open Backlog &amp; Ageing</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[('stage', 'in', ('in_progress', 'paused'))]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_backlog_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_backlog_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_backlog"/>
+    </record>
+    <record id="action_sla_report_backlog_list" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_sla_report_backlog_list"/>
+        <field name="act_window_id" ref="action_sla_report_backlog"/>
+    </record>
+
+    <record id="action_sla_report_performance" model="ir.actions.act_window">
+        <field name="name">Performance by Definition and Source</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[('outcome', 'in', ('on_time', 'late', 'breached_open'))]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_performance_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_performance_graph"/>
+        <field name="act_window_id" ref="action_sla_report_performance"/>
+    </record>
+    <record id="action_sla_report_performance_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_performance_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_performance"/>
+    </record>
+
+    <record id="action_sla_report_source" model="ir.actions.act_window">
+        <field name="name">Performance by Source</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[('outcome', 'in', ('on_time', 'late', 'breached_open'))]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_source_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_source_graph"/>
+        <field name="act_window_id" ref="action_sla_report_source"/>
+    </record>
+    <record id="action_sla_report_source_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_performance_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_source"/>
+    </record>
+
+    <record id="action_sla_report_pause" model="ir.actions.act_window">
+        <field name="name">Pause Analysis</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_pause_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_pause_graph"/>
+        <field name="act_window_id" ref="action_sla_report_pause"/>
+    </record>
+    <record id="action_sla_report_pause_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_pause_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_pause"/>
+    </record>
+
+    <record id="action_sla_report_escalation" model="ir.actions.act_window">
+        <field name="name">Escalation Activity</field>
+        <field name="res_model">sla.event</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="search_view_id" ref="view_sla_event_search"/>
+        <field name="domain">[('event', 'in', ('breach', 'escalate', 'escalate_failed'))]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_escalation_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_event_graph"/>
+        <field name="act_window_id" ref="action_sla_report_escalation"/>
+    </record>
+    <record id="action_sla_report_escalation_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_event_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_escalation"/>
+    </record>
+
+    <record id="action_sla_report_heatmap" model="ir.actions.act_window">
+        <field name="name">Source Heatmap</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_heatmap_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_heatmap_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_heatmap"/>
+    </record>
+    <record id="action_sla_report_heatmap_graph" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_heatmap_graph"/>
+        <field name="act_window_id" ref="action_sla_report_heatmap"/>
+    </record>
+
+    <record id="action_sla_report_calendar" model="ir.actions.act_window">
+        <field name="name">Calendar Impact</field>
+        <field name="res_model">sla.task</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sla_task_search"/>
+        <field name="domain">[('stage', 'in', ('achieved', 'breached'))]</field>
+        <field name="context">{}</field>
+    </record>
+    <record id="action_sla_report_calendar_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_sla_report_calendar_graph"/>
+        <field name="act_window_id" ref="action_sla_report_calendar"/>
+    </record>
+    <record id="action_sla_report_calendar_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_sla_report_calendar_pivot"/>
+        <field name="act_window_id" ref="action_sla_report_calendar"/>
+    </record>
+
+</odoo>

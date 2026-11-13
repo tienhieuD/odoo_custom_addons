@@ -2,6 +2,18 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 17.0.1.2.2: màn hình báo cáo R2-R10, màu biểu đồ theo ý nghĩa, trục phần trăm (task 006 C5a-2, task 023)
+
+Port từ 19.0.1.2.0 phần C2 và 19.0.1.2.2 (task 023) sang bản 17. Không đổi model/field/migration (field báo cáo đã có từ 17.0.1.2.1). Chi tiết từng màn hình, bộ lọc, đánh đổi: xem mục 19.0.1.2.0 phần C2 và 19.0.1.2.2 ở changelog bản 19 (cùng nội dung). Dashboard Overview (C5b) chưa port.
+
+### Có trong bản này
+- Menu SLA > Reporting với 10 màn hình (`views/sla_report_views.xml`, view `<tree>`, `view_mode` `tree`, `column_invisible="1"`, graph/pivot cú pháp 17); `sla.event` có view graph/pivot; bộ lọc và group-by mới trong search view `sla.task` và `sla.event`; `source_name` chỉ SLA Manager; ja_JP (35 chuỗi); group_sla_user đọc được.
+- Patch JS `static/src/graph_colors/sla_graph_colors.js` vá `GraphRenderer`: màu cố định theo giá trị outcome/stage/usage_bucket/event, thứ tự xếp chồng theo selection, pie sắp theo selection. Bundle: `web.assets_backend` (Odoo 17 không có bundle lazy; graph nằm trong bundle backend). Graph 17 KHÔNG đọc `widget` của measure nên patch thêm `formatValue` (dùng `formatPercentage`) cho `achieved_rate` của `sla.task` (trục và tooltip); `widget="percentage"` vẫn để trong arch cho pivot và cho 18+.
+- Trục phần trăm của `achieved_rate` ở graph Compliance Trend.
+
+### Test
+Mới: `tests/test_tg34_reporting_views.py` (16 test + tour `dwo_sla_reporting_menu`, `dwo_sla_graph_colors`) và `tests/test_tg36_graph_colors.py` (4 test); toàn module 475 test xanh (455 trước). Khác 19: Odoo 17 chưa có `formatted_read_group` (test dùng helper `_fgroup` trên `_read_group`), Float dùng `group_operator` (không phải `aggregator`), view `<tree>`/`tree`, tour có `/** @odoo-module **/` và `run: () => {}` cho bước chờ, `start_tour('/web', ...)`, tour test dùng `SlaHttpCase`. Đo thật trên DB 17 có dữ liệu: pie đúng màu và thứ tự, trục tuần 50%.
+
 ## 2026-11-12 - 17.0.1.2.1 (nhóm 1.2.0), phần C1: field lưu cho báo cáo (task 006)
 
 Bản 17 (port từ 19, task 006 C5a-1; version 17.0.1.2.1 gồm cả bản sửa reset task 025). Chưa có view/menu (giai đoạn C2). Không đổi hành vi engine.
