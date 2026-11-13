@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_sla_dashboard.Overview">
+        <div class="o_action o_sla_overview">
+            <div class="o_sla_ov_scroll">
+                <!-- Filters -->
+                <div class="o_sla_ov_filters">
+                    <div class="o_sla_ov_title">
+                        <i class="fa fa-tachometer me-2"/>SLA Overview
+                    </div>
+                    <div class="o_sla_ov_filter_row">
+                        <div class="btn-group btn-group-sm o_sla_period" role="group">
+                            <button t-foreach="periods" t-as="p" t-key="p" type="button"
+                                    class="btn btn-outline-secondary"
+                                    t-att-class="{'active': state.period === p}"
+                                    t-att-data-period="p"
+                                    t-on-click="() => this.setPeriod(p)">
+                                <t t-out="p"/> days
+                            </button>
+                        </div>
+                        <div class="btn-group btn-group-sm o_sla_type" role="group">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    t-att-class="{'active': state.sla_type === 'sla'}"
+                                    t-on-click="() => this.setType('sla')">SLA</button>
+                            <button type="button" class="btn btn-outline-secondary"
+                                    t-att-class="{'active': state.sla_type === 'ola'}"
+                                    t-on-click="() => this.setType('ola')">OLA</button>
+                        </div>
+                        <div class="btn-group btn-group-sm o_sla_target" role="group">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    t-att-class="{'active': state.sla_target === 'response'}"
+                                    t-on-click="() => this.setTarget('response')">Response</button>
+                            <button type="button" class="btn btn-outline-secondary"
+                                    t-att-class="{'active': state.sla_target === 'resolution'}"
+                                    t-on-click="() => this.setTarget('resolution')">Resolution</button>
+                        </div>
+                        <Dropdown menuClass="'o_sla_def_menu'">
+                            <button type="button" class="btn btn-sm btn-outline-secondary o_sla_def_toggle"
+                                    t-att-class="{'active': state.sla_ids.length}">
+                                <t t-out="definitionLabel"/>
+                            </button>
+                            <t t-set-slot="content">
+                                <DropdownItem t-if="state.sla_ids.length" closingMode="'none'"
+                                              onSelected="() => this.clearDefinitions()">
+                                    <i class="fa fa-times me-2"/>Clear selection
+                                </DropdownItem>
+                                <DropdownItem t-foreach="state.data.definitions" t-as="d" t-key="d.id"
+                                              closingMode="'none'"
+                                              onSelected="() => this.toggleDefinition(d.id)">
+                                    <i class="fa me-2"
+                                       t-att-class="state.sla_ids.includes(d.id) ? 'fa-check-square-o' : 'fa-square-o'"/>
+                                    <t t-out="d.name"/>
+                                </DropdownItem>
+                            </t>
+                        </Dropdown>
+                    </div>
+                </div>
+
+                <div t-if="state.loading" class="o_sla_ov_empty">
+                    <i class="fa fa-circle-o-notch fa-spin fa-2x"/>
+                </div>
+                <t t-elif="!state.data.has_data">
+                    <div class="o_sla_ov_empty o_sla_ov_nodata">
+                        <i class="fa fa-line-chart fa-3x mb-3"/>
+                        <h4>No SLA data yet</h4>
+                        <p>Once definitions are enabled and records match them, their results show up here.</p>
+                    </div>
+                </t>
+                <t t-else="">
+                    <!-- KPI cards -->
+                    <div class="o_sla_kpis">
+                        <button t-foreach="kpiCards" t-as="card" t-key="card.key" type="button"
+                                class="o_sla_kpi" t-att-class="'o_sla_kpi_' + card.key + ' tone_' + card.cls"
+                                t-att-title="card.hint"
+                                t-on-click="() => this.openKpi(card.key)">
+                            <span class="o_sla_kpi_icon"><i class="fa" t-att-class="card.icon"/></span>
+                            <span class="o_sla_kpi_label" t-out="card.label"/>
+                            <span class="o_sla_kpi_value" t-out="card.value"/>
+                            <span class="o_sla_kpi_trend" t-att-class="'trend_' + card.trendCls">
+                                <t t-if="card.delta !== null">
+                                    <i class="fa me-1" t-att-class="card.trend === 'up' ? 'fa-arrow-up' : card.trend === 'down' ? 'fa-arrow-down' : 'fa-minus'"/>
+                                    <t t-out="card.delta"/>
+                                    <span class="o_sla_kpi_vs"> vs previous</span>
+                                </t>
+                                <span t-else="" class="o_sla_kpi_vs">No previous data</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div t-if="!hasChartData" class="o_sla_ov_empty o_sla_ov_nodata">
+                        <i class="fa fa-search fa-2x mb-2"/>
+                        <h5>Nothing matches these filters in the period</h5>
+                    </div>
+                    <t t-else="">
+                        <div class="o_sla_grid">
+                            <!-- Donut -->
+                            <section class="o_sla_card o_sla_donut_card">
+                                <h5>Outcomes</h5>
+                                <div class="o_sla_donut_wrap">
+                                    <svg viewBox="0 0 42 42" class="o_sla_donut" role="img">
+                                        <circle class="o_sla_donut_bg" cx="21" cy="21" r="15.9155"/>
+                                        <circle t-foreach="donutSlices" t-as="s" t-key="s.key"
+                                                class="o_sla_slice" t-att-class="'out_' + outcomeClass(s.key)"
+                                                t-att-data-outcome="s.key"
+                                                cx="21" cy="21" r="15.9155"
+                                                t-att-stroke-dasharray="s.dash"
+                                                t-att-stroke-dashoffset="s.offset"
+                                                t-on-click="() => this.openOutcome(s.key)">
+                                            <title><t t-out="s.label"/>: <t t-out="s.count"/> (<t t-out="s.pct"/>%)</title>
+                                        </circle>
+                                        <text x="21" y="21.5" class="o_sla_donut_total" text-anchor="middle"><t t-out="donutTotal"/></text>
+                                        <text x="21" y="26" class="o_sla_donut_sub" text-anchor="middle">tasks</text>
+                                    </svg>
+                                    <ul class="o_sla_legend">
+                                        <li t-foreach="donutSlices" t-as="s" t-key="s.key"
+                                            class="o_sla_legend_item" t-att-data-outcome="s.key"
+                                            t-on-click="() => this.openOutcome(s.key)">
+                                            <span class="o_sla_dot" t-att-class="'out_' + outcomeClass(s.key)"/>
+                                            <span class="flex-grow-1" t-out="s.label"/>
+                                            <b t-out="s.count"/>
+                                            <span class="text-muted ms-1">(<t t-out="s.pct"/>%)</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </section>
+
+                            <!-- Stacked bars -->
+                            <section class="o_sla_card o_sla_bars_card">
+                                <h5>Results by definition</h5>
+                                <div class="o_sla_bar_legend">
+                                    <span><span class="o_sla_dot out_ok"/>On time</span>
+                                    <span><span class="o_sla_dot out_warn"/>Late</span>
+                                    <span><span class="o_sla_dot out_bad"/>Breached</span>
+                                </div>
+                                <div t-if="!barRows.length" class="text-muted py-3">No finished or breached tasks yet.</div>
+                                <div t-foreach="barRows" t-as="row" t-key="row.id" class="o_sla_bar_row">
+                                    <a class="o_sla_bar_name" href="#" t-att-title="row.name"
+                                       t-on-click.prevent="() => this.openBarRow(row)" t-out="row.name"/>
+                                    <div class="o_sla_bar_track">
+                                        <button t-foreach="row.segments" t-as="seg" t-key="seg.key" type="button"
+                                                class="o_sla_seg" t-att-class="'out_' + outcomeClass(seg.key)"
+                                                t-att-data-outcome="seg.key"
+                                                t-attf-style="width: #{seg.width}%"
+                                                t-att-title="seg.label + ': ' + seg.count"
+                                                t-on-click="() => this.openBar(row, seg)">
+                                            <t t-out="seg.count"/>
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Weekly line -->
+                            <section class="o_sla_card o_sla_line_card">
+                                <h5>Achieved rate per week</h5>
+                                <div t-if="!state.data.weekly.length" class="text-muted py-3">No finished tasks in the period.</div>
+                                <svg t-else="" viewBox="0 0 600 200" class="o_sla_line" role="img" preserveAspectRatio="xMidYMid meet">
+                                    <g t-foreach="lineChart.grid" t-as="g" t-key="g.v">
+                                        <line class="o_sla_grid_line" t-att-x1="g.x1" t-att-x2="g.x2" t-att-y1="g.y" t-att-y2="g.y"/>
+                                        <text class="o_sla_axis" x="30" t-att-y="g.y + 3" text-anchor="end"><t t-out="g.v"/>%</text>
+                                    </g>
+                                    <polygon t-foreach="lineChart.areas" t-as="a" t-key="a_index" class="o_sla_area" t-att-points="a"/>
+                                    <polyline t-foreach="lineChart.lines" t-as="l" t-key="l_index" class="o_sla_path" t-att-points="l"/>
+                                    <g t-foreach="lineChart.points" t-as="p" t-key="p_index">
+                                        <circle t-if="p.y !== null" class="o_sla_point" t-att-cx="p.x" t-att-cy="p.y" r="4">
+                                            <title><t t-out="p.label"/>: <t t-out="p.rate"/>% (<t t-out="p.count"/>)</title>
+                                        </circle>
+                                        <text class="o_sla_axis" t-att-x="p.x" t-att-y="lineChart.baseY + 16" text-anchor="middle" t-out="p.label"/>
+                                    </g>
+                                </svg>
+                            </section>
+
+                            <!-- Attention -->
+                            <section class="o_sla_card o_sla_attention_card">
+                                <div class="d-flex align-items-center">
+                                    <h5 class="flex-grow-1 mb-0">Needs attention</h5>
+                                    <a href="#" class="small" t-if="state.data.attention.length"
+                                       t-on-click.prevent="() => this.openAttention()">See all</a>
+                                </div>
+                                <div t-if="!attentionRows.length" class="text-muted py-3">
+                                    <i class="fa fa-smile-o me-1"/>Nothing is breached or about to be.
+                                </div>
+                                <ul class="o_sla_attention" t-else="">
+                                    <li t-foreach="attentionRows" t-as="row" t-key="row.id"
+                                        class="o_sla_att_row" t-on-click="() => this.openTask(row)">
+                                        <div class="o_sla_att_main">
+                                            <div class="o_sla_att_def" t-out="row.definition"/>
+                                            <div class="o_sla_att_sub">
+                                                <t t-out="row.model"/>
+                                                <t t-if="row.source_name"> - <span class="o_sla_att_src" t-out="row.source_name"/></t>
+                                            </div>
+                                        </div>
+                                        <div class="o_sla_att_meter">
+                                            <div class="o_sla_progress"><div class="o_sla_progress_bar" t-att-class="'tone_' + row.cls" t-attf-style="width: #{row.barWidth}%"/></div>
+                                            <div class="o_sla_att_due" t-att-class="'tone_' + row.cls">
+                                                <b><t t-out="row.percent"/>%</b> - <t t-out="row.due"/>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </section>
+                        </div>
+                    </t>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

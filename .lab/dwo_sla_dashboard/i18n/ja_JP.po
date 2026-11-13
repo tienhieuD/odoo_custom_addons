@@ -1,0 +1,248 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* dwo_sla_dashboard
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260421\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-13 00:00+0000\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: dwo_sla_dashboard
+#: model:ir.actions.client,name:dwo_sla_dashboard.action_sla_overview
+msgid "SLA Overview"
+msgstr "SLA概要"
+
+#. module: dwo_sla_dashboard
+#: model:ir.ui.menu,name:dwo_sla_dashboard.menu_sla_overview
+msgid "Overview"
+msgstr "概要"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "days"
+msgstr "日"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "SLA"
+msgstr "SLA"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "OLA"
+msgstr "OLA"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Response"
+msgstr "応答"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Resolution"
+msgstr "解決"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Clear selection"
+msgstr "選択を解除"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "No SLA data yet"
+msgstr "SLAデータはまだありません"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Once definitions are enabled and records match them, their results show up here."
+msgstr "定義が有効になり、レコードが一致すると、結果がここに表示されます。"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "vs previous"
+msgstr "前期比"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "No previous data"
+msgstr "前期のデータなし"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Nothing matches these filters in the period"
+msgstr "この期間にこの条件に一致するものはありません"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Outcomes"
+msgstr "結果の内訳"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "tasks"
+msgstr "件"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Results by definition"
+msgstr "定義別の結果"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "On time"
+msgstr "期限内"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Late"
+msgstr "遅延"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Breached"
+msgstr "違反"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "No finished or breached tasks yet."
+msgstr "完了または違反したタスクはまだありません。"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Achieved rate per week"
+msgstr "週ごとの達成率"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "No finished tasks in the period."
+msgstr "この期間に完了したタスクはありません。"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Needs attention"
+msgstr "要対応"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "See all"
+msgstr "すべて表示"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.xml:0
+msgid "Nothing is breached or about to be."
+msgstr "違反または期限間近のものはありません。"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "All definitions"
+msgstr "すべての定義"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "1 definition"
+msgstr "1件の定義"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "%s definitions"
+msgstr "%s件の定義"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Running"
+msgstr "実行中"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Due soon"
+msgstr "期限間近"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Achieved rate"
+msgstr "達成率"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Tasks with the clock running now"
+msgstr "現在タイマーが動いているタスク"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Running tasks close to their deadline"
+msgstr "期限が近い実行中のタスク"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Open tasks already past their deadline"
+msgstr "すでに期限を過ぎている未完了のタスク"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Share of tasks finished on time in the period"
+msgstr "期間内に期限内で完了したタスクの割合"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Tasks finished after their deadline in the period"
+msgstr "期間内に期限後に完了したタスク"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Finished in the period"
+msgstr "期間内に完了"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Late since %s"
+msgstr "%s から遅延"
+
+#. module: dwo_sla_dashboard
+#. odoo-javascript
+#: code:addons/dwo_sla_dashboard/static/src/overview/overview.js:0
+msgid "Due %s"
+msgstr "期限 %s"
