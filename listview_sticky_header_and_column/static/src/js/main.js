@@ -54,6 +54,10 @@ import localStorage from 'web.local_storage';
         _renderHeaderCell: function (node) {
             var self = this;
             var $cell = this._super.apply(this, arguments);
+            // every data header gets a pin button, but not the handle (drag to reorder) nor button columns
+            if (node.tag === 'button' || $cell.hasClass('o_handle_cell') || $cell.hasClass('o_list_button')) {
+                return $cell;
+            }
             $('<span>', {class: 'display-on-hover ' + PIN_CLASS})
                 .html('<i class="fa fa-thumb-tack"></i>')
                 .on('click', function (e) {
