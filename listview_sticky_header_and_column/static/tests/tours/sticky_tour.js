@@ -5,8 +5,11 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
 
     // Odoo 16 tour manager does not await an async "run": split each async step in two (run, then wait for the flag)
     const ASYNC_DONE = "o-lshc-asyncDone";
+    const ASYNC_FAILED = "o-lshc-asyncFailed";
     const isAsync = (fn) => typeof fn === "function" && fn.constructor.name === "AsyncFunction";
-    const expandAsync = (steps) =>
+    // strict (Odoo 12 only): the tour manager of 12 swallows an error thrown by a step, so a failed assertion would leave the tour
+    // green. With strict, the step after the async one never matches when the assertion failed, so the tour (and the test) fails.
+    const expandAsync = (steps, strict) =>
         steps.flatMap((step) => {
             if (!isAsync(step.run)) {
                 return [step];
@@ -16,17 +19,21 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                 {
                     ...step,
                     run: function (helper) {
-                        document.body.classList.remove(ASYNC_DONE);
+                        document.body.classList.remove(ASYNC_DONE, ASYNC_FAILED);
                         window.__lshcAsyncError = null;
                         run.call(this, helper)
                             .catch((error) => {
                                 window.__lshcAsyncError = error;
+                                console.log("[lshc] step failed: " + (error && error.message));
+                                if (strict) {
+                                    document.body.classList.add(ASYNC_FAILED);
+                                }
                             })
                             .then(() => document.body.classList.add(ASYNC_DONE));
                     },
                 },
                 {
-                    trigger: "body." + (ASYNC_DONE),
+                    trigger: "body." + (ASYNC_DONE) + (strict ? ":not(." + (ASYNC_FAILED) + ")" : ""),
                     in_modal: false,
                     isCheck: true,
                     run: () => {
@@ -579,4 +586,63 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                 },
             },
     ]));
+
+    // The row being edited (inline, e.g. a one2many) must stay above the pinned header cells and the pinned
+    // cells of the other rows: its Many2one dropdown is a child of the pinned cell and opens over them.
+    tour.register("lshc_edit_row_on_top", { test: true }, expandAsync([
+            { trigger: ".o_form_view .o_notebook", run: () => {} },
+            { content: "edit mode (the form of Odoo 15 opens read-only)", trigger: ".o_form_button_edit", run: "click" },
+            { trigger: ".o_form_view.o_form_editable", run: () => {} },
+            { content: "Access Rights tab", trigger: ".o_notebook .nav-link:contains('Access Rights')", run: "click" },
+            { trigger: ".o_field_widget[name=access_ids] .o_data_row", run: () => {} },
+            {
+                content: "pin Group, edit a row, open its Many2one dropdown and measure what is on top",
+                trigger: ".o_field_widget[name=access_ids] .o_data_row",
+                run: async () => {
+                    clearKeys();
+                    const root = document.querySelector(".o_field_widget[name=access_ids] .table-responsive");
+                    assert(root, "embedded list not found");
+                    await widen(root);
+                    await pin(root, "group_id");
+                    const idx = [...root.querySelectorAll("thead tr th")].indexOf(th(root, "group_id"));
+                    const sx = scroller(root.querySelector("table"), "x");
+                    sx.scrollLeft = 200;
+                    await sleep(300);
+                    root.querySelector(".o_data_row:nth-child(3) td.o_data_cell:first-child").click(); // 14: data cells have no [name]
+                    const sel = await waitFor(() => root.querySelector(".o_selected_row"), "edited row");
+                    await sleep(500);
+                    const z = (el) => parseInt(getComputedStyle(el).zIndex, 10);
+                    const selCell = sel.querySelector("td:nth-child(" + (idx + 1) + ")");
+                    assert(getComputedStyle(selCell).position === "sticky", "edited pinned cell not sticky");
+                    const otherCells = [...root.querySelectorAll(".o_data_row:not(.o_selected_row) td:nth-child(" + (idx + 1) + ")")];
+                    assert(otherCells.length >= 3, "not enough other rows");
+                    otherCells.forEach((c) => assert(z(selCell) > z(c), "edited pinned cell z-index " + z(selCell) + " <= other row's " + z(c)));
+                    assert(z(selCell) > z(th(root, "group_id")), "edited pinned cell z-index " + z(selCell) + " <= pinned header's " + z(th(root, "group_id")));
+                    // open the Many2one dropdown of the pinned cell and check what is really painted on top of it
+                    const input = selCell.querySelector("input");
+                    assert(input, "no Many2one input in the edited pinned cell");
+                    input.focus();
+                    input.value = "a";
+                    input.dispatchEvent(new Event("input", { bubbles: true }));
+                    input.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "a", which: 65, keyCode: 65 }));
+                    const dd = await waitFor(() => [...document.querySelectorAll(".ui-autocomplete")].find((m) => m.offsetParent && m.querySelector("li")), "dropdown");
+                    await sleep(500);
+                    // only the items really visible inside the (scrollable) menu can be checked
+                    const items = [...dd.querySelectorAll("li.ui-menu-item")].filter((it) => rect(it).bottom <= rect(dd).bottom + 1 && rect(it).top >= rect(dd).top - 1);
+                    assert(items.length > 3, "dropdown items: " + items.length);
+                    const head = rect(root.querySelector("thead"));
+                    let overHeader = 0;
+                    items.forEach((it) => {
+                        const r = rect(it);
+                        const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                        if (r.top < head.bottom && r.bottom > head.top) {
+                            overHeader++;
+                        }
+                        assert(el && dd.contains(el), "dropdown item '" + it.textContent.trim() + "' is covered by <" + (el && el.tagName) + " class='" + (el && el.className) + "'>");
+                    });
+                    assert(overHeader || rect(dd).top > head.bottom, "the dropdown does not overlap the header: nothing measured");
+                    clearKeys();
+                },
+            },
+    ], true));
 });

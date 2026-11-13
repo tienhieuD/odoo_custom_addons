@@ -48,3 +48,12 @@ class TestStickyTour(HttpCase):
 
     def test_unpin_then_reopen_list(self):
         self._run_tour(PARTNER_LIST, 'lshc_unpin_remount')
+
+    def test_edited_row_above_pinned_cells_and_header(self):
+        model = self.env['ir.model'].create({'name': 'Lshc sticky', 'model': 'x_lshc_sticky'})
+        for i in range(6):
+            self.env['ir.model.access'].create({
+                'name': 'access %d' % i, 'model_id': model.id,
+                'group_id': self.env.ref('base.group_user').id, 'perm_read': True,
+            })
+        self._run_tour('/web#action=base.action_model_model&view_type=form&id=%d' % model.id, 'lshc_edit_row_on_top')
