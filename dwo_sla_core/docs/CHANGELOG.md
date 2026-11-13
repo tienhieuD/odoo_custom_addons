@@ -2,6 +2,22 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 19.0.1.2.3: hook không cài hai lớp, reset không bắn hai lần (task 027)
+
+Chỉ bản 19. Sửa lỗi, không đổi field/view/migration.
+
+### Điều kiện tái hiện
+Định nghĩa SLA được tạo/sửa TRONG LÚC nạp module (data/demo XML của một module cài hoặc nâng cấp, ví dụ `dwo_sla_demo` cài lên `dwo_sla_core`): `_register_sla_hook` (gỡ rồi cài lại) chạy giữa chừng, rồi STEP 9 của `load_modules` gọi `_register_hook` của mọi model MỘT LẦN NỮA mà không gỡ trước (chỉ registry đã `ready` mới gỡ trước). Lần cài thứ hai lấy `getattr(Model, 'write')` (đã là patch của ta) làm `origin`, nên `create`, `write`, `_compute_field_value` có hai lớp hook chồng nhau. Với sale.order ở S4 (`reset_field_ids = validity_date`, reset trên trạng thái sent): MỘT lệnh `order.write({'validity_date': ...})` ra 2 lần `sla.engine._reset` (lớp trong đánh giá sau khi ghi; lớp ngoài thấy lại thay đổi vì giá trị cũ đọc trước khi ghi), 3 task (in_progress, cancelled, cancelled) thay vì 2. Không liên quan onchange/Form/nhiều tầng write của sale.order, và không phải lỗi chờ tính lại của 021. Server khởi động lại (không có data định nghĩa trong lúc nạp) thì chỉ một lớp, nên lỗi hiện ở DB vừa cài/nâng cấp tới khi registry nạp lại.
+
+### Nguyên nhân
+`_register_hook` không idempotent: `patch()` lấy `origin = getattr(model_class, name)` mà không bóc lớp patch của chính ta.
+
+### Sửa
+Trong `patch()` (`models/sla_hook.py`) bóc mọi lớp có `sla_patch` khỏi `origin` trước khi gán; luôn còn đúng một lớp dù `_register_hook` chạy bao nhiêu lần (và cả khi lớp cha đã patch). Không đổi Engine, không đổi tg04/tg35 (hai thay đổi thật vẫn hai reset).
+
+### Test
+`tests/test_tg35_reset_writable_compute.py`: `test_rst_008` (mỗi hàm đúng một lớp sau `_register_hook` lần hai), `test_rst_009` (một lần sửa field reset: 1 reset, 2 task). Đỏ khi bỏ bản sửa.
+
 ## 2026-11-13 - 19.0.1.2.2: màu biểu đồ theo ý nghĩa và trục phần trăm (task 023)
 
 Chỉ bản 19. Không đổi field, model, dữ liệu hay migration.
