@@ -3567,3 +3567,318 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
 msgid "e.g. partner_id.resource_calendar_id"
 msgstr "例：partner_id.resource_calendar_id"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__outcome
+msgid "Outcome"
+msgstr "結果"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__outcome
+msgid "One-word result for reports. On Time: achieved within the target. Late: finished after the deadline had passed. Breached (Open): still running or paused and already past the deadline. Running / Paused: active and not yet breached. Cancelled: discarded. Example: group by Outcome to see the share of late tasks."
+msgstr "レポート用の結果です。期限内：目標内に達成。遅延：期限を過ぎてから完了。違反（未完了）：実行中または一時停止中で、すでに期限を過ぎています。実行中／一時停止：稼働中で未違反。キャンセル：破棄済み。例：結果でグループ化すると遅延タスクの割合が分かります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__final_percent_used
+msgid "% Used (Final)"
+msgstr "消費率（最終）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__final_percent_used
+msgid "Share of the target time consumed in working hours, as of the last stored value (at completion for finished tasks; for active tasks the value saved at the last pause or breach). Never below 100 once the task has breached. The average over a group counts finished tasks only. Example: 112.5 means 12.5% over target."
+msgstr "目標時間のうち消費した割合（稼働時間ベース）で、最後に保存された値です（完了したタスクは完了時点、稼働中のタスクは最後の一時停止または違反時点）。違反後は100未満になりません。グループの平均は完了したタスクのみが対象です。例：112.5 は目標を12.5%超過したことを示します。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__usage_bucket
+msgid "Usage Range"
+msgstr "消費率の区分"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__usage_bucket
+msgid "Range of % Used (Final): below 50, 50 to below 75, 75 to below 100, 100 to 150 included, above 150. Used to chart how close to the deadline tasks are handled. Example: a task that used 100% of its target is in 100-150%."
+msgstr "消費率（最終）の区分：50未満、50以上75未満、75以上100未満、100以上150以下、150超。期限にどれだけ近く対応しているかをグラフにするために使います。例：目標の100%を使い切ったタスクは100-150%に入ります。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__overdue_duration
+msgid "Overdue Hours"
+msgstr "超過時間"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__overdue_duration
+msgid "Working hours beyond the target for a task that has breached; 0 when it has not. For active tasks this is the last stored value. The average over a group counts finished tasks only. Example: 1.5 for a task that used 5.5 hours on a 4-hour target."
+msgstr "違反したタスクの、目標を超過した稼働時間です。未違反は0です。稼働中のタスクは最後に保存された値です。グループの平均は完了したタスクのみが対象です。例：目標4時間に対して5.5時間使った場合は1.5。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__source_name
+msgid "Source Name"
+msgstr "元レコード名"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__source_name
+msgid "Display name of the source record when the task was attached, kept so lists and pivots stay readable. It is not renamed automatically when the record is renamed; Apply Current Settings refreshes it. Example: \"Azure Interior\"."
+msgstr "タスクを紐付けた時点の元レコードの表示名で、一覧やピボットを読みやすくするために保存します。元レコードの名称変更では自動更新されません。「現在の設定を適用」で更新されます。例：「Azure Interior」。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__sla_type
+msgid "SLA Type"
+msgstr "SLA種別"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__sla_type
+msgid "Copy of the definition Type (SLA or OLA) kept on the task so reports can group by it. Example: OLA."
+msgstr "定義の種別（SLAまたはOLA）をタスクに保存したもので、レポートのグループ化に使います。例：OLA。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,field_description:dwo_sla_core.field_sla_task__sla_target
+msgid "SLA Target"
+msgstr "SLA対象"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields,help:dwo_sla_core.field_sla_task__sla_target
+msgid "Copy of the definition Target (Response or Resolution) kept on the task so reports can group by it. Example: Response."
+msgstr "定義の対象（応答または解決）をタスクに保存したもので、レポートのグループ化に使います。例：応答。"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__outcome__on_time
+msgid "On Time"
+msgstr "期限内"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__outcome__breached_open
+msgid "Breached (Open)"
+msgstr "違反（未完了）"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__usage_bucket__0_50
+msgid "0-50%"
+msgstr "0-50%"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__usage_bucket__50_75
+msgid "50-75%"
+msgstr "50-75%"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__usage_bucket__75_100
+msgid "75-100%"
+msgstr "75-100%"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__usage_bucket__100_150
+msgid "100-150%"
+msgstr "100-150%"
+
+#. module: dwo_sla_core
+#: model:ir.model.fields.selection,name:dwo_sla_core.selection__sla_task__usage_bucket__150_plus
+msgid ">150%"
+msgstr "150%超"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Reporting"
+msgstr "レポート"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Compliance Trend"
+msgstr "遵守率の推移"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Response Time Distribution"
+msgstr "対応時間の分布"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Status Mix"
+msgstr "ステータス構成"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Open Backlog & Ageing"
+msgstr "未完了バックログと経過"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Performance by Definition and Source"
+msgstr "定義・ソース別パフォーマンス"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Performance by Definition"
+msgstr "定義別パフォーマンス"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Performance by Source"
+msgstr "ソース別パフォーマンス"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Pause Analysis"
+msgstr "一時停止の分析"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Escalation Activity"
+msgstr "エスカレーション活動"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Source Heatmap"
+msgstr "ソース別ヒートマップ"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Calendar Impact"
+msgstr "カレンダーの影響"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Open"
+msgstr "未完了"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Breached Open"
+msgstr "違反（未完了）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Last 30 Days"
+msgstr "過去30日"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "This Week"
+msgstr "今週"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Due This Week"
+msgstr "今週が期限"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Response SLAs"
+msgstr "応答SLA"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Resolution SLAs"
+msgstr "解決SLA"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Type (SLA/OLA)"
+msgstr "種別（SLA/OLA）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Target (Response/Resolution)"
+msgstr "対象（応答/解決）"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Start: Week"
+msgstr "開始：週"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Start: Month"
+msgstr "開始：月"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "End: Week"
+msgstr "終了：週"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "End: Month"
+msgstr "終了：月"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Deadline: Day"
+msgstr "期限：日"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Deadline: Week"
+msgstr "期限：週"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Week"
+msgstr "週"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Month"
+msgstr "月"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Running or paused tasks."
+msgstr "実行中または一時停止中のタスク。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Tasks still open that are already past the deadline."
+msgstr "未完了で、すでに期限を過ぎているタスク。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Tasks that finished after the deadline."
+msgstr "期限を過ぎてから完了したタスク。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Tasks that started in the last 30 days."
+msgstr "過去30日以内に開始したタスク。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Tasks that started this week (Monday to Sunday)."
+msgstr "今週（月曜〜日曜）に開始したタスク。"
+
+#. module: dwo_sla_core
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_task_search
+#: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_report_trend_graph
+msgid "Open tasks whose deadline falls this week (Monday to Sunday)."
+msgstr "期限が今週（月曜〜日曜）にある未完了タスク。"

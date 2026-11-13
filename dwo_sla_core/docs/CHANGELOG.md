@@ -2,6 +2,22 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 14.0.1.2.2: báo cáo (field lưu C1, 10 màn hình C2, màu và trục % task 023, đường không xếp chồng task 029) (task 006 C5c-1)
+
+Port từ bản 15/16 sang bản 14. Chưa có dashboard Overview và CHƯA port bản sửa hook task 027. Chi tiết field/màn hình/bộ lọc/đánh đổi: xem changelog bản 17, 19 và 16.
+
+### Có trong bản này
+- Field lưu mới trên `sla.task`: `outcome`, `final_percent_used`, `usage_bucket`, `overdue_duration`, `source_name` (chỉ SLA Manager), `sla_type`, `sla_target`; `migrations/14.0.1.2.0/post-migrate.py` (SQL + ORM theo lô, idempotent; `flush()`/`invalidate_cache()`; thư mục giữ tên 14.0.1.2.0 để chạy khi nâng từ 1.1.x). Trung bình `final_percent_used`/`overdue_duration` chỉ tính task đã kết thúc: trong `read_group` ghi đè sẵn có.
+- Menu SLA > Reporting 10 màn hình (`views/sla_report_views.xml`), view graph/pivot cho `sla.event`, bộ lọc và group-by mới, ja_JP.
+- `static/src/graph_colors/sla_graph_colors.js` (khai báo trong `views/assets.xml`, `odoo.define`): graph 14 là widget legacy (`web.GraphRenderer`); `GraphRenderer.include` ghi đè `_prepareData` (sắp series/lát pie theo thứ tự selection, nhớ màu theo chỉ số), `_getColor(index)` (trả màu cố định theo giá trị outcome/stage/usage_bucket/event) và `_formatValue` (phần trăm cho `achieved_rate`, graph 14 không đọc `widget`). Nhận diện field theo tên + tập khoá selection vì renderer legacy không biết model.
+
+### Khác biệt API
+- Nhãn lát pie của graph legacy là mảng (một phần tử mỗi group-by), tour phải `join`. Apps menu 14: `.o_menu_apps a.full`; tour `odoo.define` + `web_tour.tour`, biểu đồ qua `Chart.instances` (Chart.js 2.9).
+- Không có `get_views`/`flush_all`/`invalidate_recordset`: test dùng `fields_view_get`, `env['base'].flush()`, `invalidate_cache()`; `_fgroup` dùng `read_group(..., lazy=False)`. Assets qua `views/assets.xml` (test kiểm file này thay vì manifest).
+
+### Test
+`tests/test_tg33_reporting_fields.py` (13), `test_tg34_reporting_views.py` (16 + tour `dwo_sla_reporting_menu`, `dwo_sla_graph_colors`), `test_tg36_graph_colors.py` (5). Toàn module 476 test xanh; migration thật `sla_migration_check_120.py 14` PASS 15/15; thử tay Playwright (tz Europe/Brussels, 96 task seed): pie và bar đúng màu và thứ tự, trục 0-100%.
+
 ## 2026-11-13 - 14.0.1.1.1: reset theo field lưu ghi được không bắn hai lần (task 025)
 
 Bản 14 (port từ 19.0.1.2.1, task 025). Sửa lỗi, không đổi field/view/migration.
