@@ -276,6 +276,21 @@ class TestWebpStream(WebpCommon):
         self.assertEqual(s.mimetype, 'image/webp')
         self.env.cr.execute('SELECT 1')  # not 'current transaction is aborted'
 
+    def test_cache_save_real_database_error_keeps_transaction_usable(self):
+        # a real failing INSERT (NOT NULL violation) aborts the PostgreSQL transaction unless it runs in a savepoint
+        cr = self.env.cr
+
+        def failing_create(*args, **kwargs):
+            cr.execute('INSERT INTO ir_attachment (name) VALUES (NULL)')
+
+        attach_cls = type(self.env['ir.attachment'])
+        with patch.object(attach_cls, 'create', side_effect=failing_create):
+            s = self.stream()
+        self.assertEqual(s.mimetype, 'image/webp')
+        self.assertEqual(s.data[8:12], b'WEBP')
+        cr.execute('SELECT 1')  # not 'current transaction is aborted'
+        self.assertFalse(self.caches(self.website))
+
     def test_convert_helper_quality_range(self):
         binary = self.env['ir.binary']
         raw = make_image(noisy=True, size=(64, 64))
