@@ -1,6 +1,6 @@
 {
     'name': 'Source Code Protector',
-    'version': '15.0.2.1.0',
+    'version': '15.0.2.1.1',
     'summary': 'Protect your Odoo module source code: compile business logic to native binaries',
     'description': 'Upload a module .zip and get back the same module with its business logic '
                     'compiled to native binaries. Requires the jprotect and pyzipper Python '
