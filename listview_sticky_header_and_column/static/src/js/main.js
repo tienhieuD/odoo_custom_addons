@@ -9,7 +9,13 @@ import {
 
 // Constants
 const MODULE_KEY = 'listview_sticky_header_and_column';
-const TOOLTIP_DELAY_ATTR = 'data-tooltip-delay="1000"';
+// Every data header: field columns (`data-name`, `data-tooltip-delay`) and, defensively, any labelled header (`tabindex`).
+// Excluded by class below: record selector (checkbox), handle, button columns and optional-columns cells.
+const PIN_TARGET_SELECTOR = 'thead tr th[data-name], thead tr th[tabindex]';
+const PIN_EXCLUDED_CLASSES = [
+    'o_list_record_selector', 'o_list_controller', 'o_list_actions_header',
+    'o_list_open_form_view', 'o_list_button', 'o_handle_cell',
+];
 const PIN_BUTTON_CLASS = 'display-on-hover js_pin_this_column';
 const PIN_ICON_HTML = '<i class="fa fa-thumb-tack"></i>';
 const SLEEP_DELAY = 300;
@@ -113,8 +119,9 @@ patch(ListRenderer.prototype, "listview_sticky_header_and_column.ListRenderer", 
     lshcAddPinButtons() {
         const el = this.lshcGetRootElement();
         if (!el) return;
-        const thElements = el.querySelectorAll(`th[${TOOLTIP_DELAY_ATTR}]`);
+        const thElements = el.querySelectorAll(PIN_TARGET_SELECTOR);
         thElements.forEach(th => {
+            if (PIN_EXCLUDED_CLASSES.some(cls => th.classList.contains(cls))) return;
             if (!th.querySelector(`.${PIN_BUTTON_CLASS.split(' ')[1]}`)) {
                 const span = document.createElement('span');
                 span.className = PIN_BUTTON_CLASS;
