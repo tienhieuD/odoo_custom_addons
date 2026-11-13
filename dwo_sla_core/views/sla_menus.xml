@@ -7,6 +7,32 @@
     <menuitem id="menu_sla_task" name="SLA Tasks" parent="menu_sla_root"
               action="action_sla_task" sequence="10"/>
 
+
+    <!-- Reporting (task 006 C2): chỉ đọc, group_sla_user thấy. R1 Overview
+         thêm ở giai đoạn C3 (sequence 1). -->
+    <menuitem id="menu_sla_reporting" name="Reporting" parent="menu_sla_root"
+              sequence="15"/>
+    <menuitem id="menu_sla_report_trend" name="Compliance Trend" parent="menu_sla_reporting"
+              action="action_sla_report_trend" sequence="10"/>
+    <menuitem id="menu_sla_report_distribution" name="Response Time Distribution" parent="menu_sla_reporting"
+              action="action_sla_report_distribution" sequence="20"/>
+    <menuitem id="menu_sla_report_status" name="Status Mix" parent="menu_sla_reporting"
+              action="action_sla_report_status" sequence="30"/>
+    <menuitem id="menu_sla_report_backlog" name="Open Backlog &amp; Ageing" parent="menu_sla_reporting"
+              action="action_sla_report_backlog" sequence="40"/>
+    <menuitem id="menu_sla_report_performance" name="Performance by Definition and Source" parent="menu_sla_reporting"
+              action="action_sla_report_performance" sequence="50"/>
+    <menuitem id="menu_sla_report_source" name="Performance by Source" parent="menu_sla_reporting"
+              action="action_sla_report_source" sequence="60"/>
+    <menuitem id="menu_sla_report_pause" name="Pause Analysis" parent="menu_sla_reporting"
+              action="action_sla_report_pause" sequence="70"/>
+    <menuitem id="menu_sla_report_escalation" name="Escalation Activity" parent="menu_sla_reporting"
+              action="action_sla_report_escalation" sequence="80"/>
+    <menuitem id="menu_sla_report_heatmap" name="Source Heatmap" parent="menu_sla_reporting"
+              action="action_sla_report_heatmap" sequence="90"/>
+    <menuitem id="menu_sla_report_calendar" name="Calendar Impact" parent="menu_sla_reporting"
+              action="action_sla_report_calendar" sequence="100"/>
+
     <menuitem id="menu_sla_event" name="SLA Events" parent="menu_sla_root"
               action="action_sla_event" sequence="20"/>
 
