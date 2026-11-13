@@ -2,6 +2,23 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 12.0.1.2.4: báo cáo (field lưu C1, 10 màn hình C2; KHÔNG có màu/trục % graph) (task 006 C5c-2)
+
+Port từ bản 13 sang bản 12. Chưa có dashboard Overview và CHƯA port bản sửa hook task 027. Chi tiết field/màn hình/bộ lọc/đánh đổi: xem changelog bản 19, 17, 14 và 13.
+
+### Có trong bản này
+- Field lưu mới trên `sla.task`: `outcome`, `final_percent_used`, `usage_bucket`, `overdue_duration`, `source_name` (chỉ SLA Manager), `sla_type`, `sla_target`; `migrations/12.0.1.2.0/post-migrate.py` (SQL + ORM theo lô, idempotent; không `flush()`; thư mục giữ tên 12.0.1.2.0). Trung bình `final_percent_used`/`overdue_duration` chỉ tính task đã kết thúc: trong `read_group` ghi đè sẵn có.
+- Menu SLA > Reporting 10 màn hình (`views/sla_report_views.xml`), view graph/pivot cho `sla.event`, bộ lọc và group-by mới, ja_JP.
+
+### Giản lược so với bản 13/14 (đánh đổi)
+- KHÔNG có màu cố định theo ý nghĩa (task 023), thứ tự xếp chồng theo selection, trục phần trăm của `achieved_rate` trong graph: graph Odoo 12 là nvd3/d3 (màu theo vị trí bằng `d3.scale.category10`), không có Chart.js/`GraphRenderer._getColor`; vá cần ghi đè cả hàm dựng biểu đồ. Pivot vẫn dùng `widget="percentage"` nếu client hỗ trợ. Test `test_palette_covers_every_selection_value` và `test_asset_registered` bị skip có lý do; tour `dwo_sla_graph_colors` không chạy.
+- Đường (R2, R9) không xếp chồng (task 029): arch ghi `stacked="0"` nhưng graph 12 chỉ hiểu `stacked="False"`; biểu đồ đường nvd3 vốn không xếp chồng nên không cần vá.
+- View: `<tree>` không có `optional`, không widget `badge` (màu theo hàng bằng `decoration-*` ở thẻ `<tree>`).
+- Tour menu: không template literal (bộ nén bundle của 12 xoá khoảng trắng trong backtick), chờ breadcrumb của từng màn hình.
+
+### Test
+`tests/test_tg33_reporting_fields.py`, `test_tg34_reporting_views.py` (+ tour `dwo_sla_reporting_menu`), `test_tg36_graph_colors.py` (2 test skip có lý do).
+
 ## 2026-11-13 - 12.0.1.1.1: hook không cài hai lớp (task 028; task 025 không áp dụng cho 12)
 
 Sửa lỗi, không đổi field/view/migration.

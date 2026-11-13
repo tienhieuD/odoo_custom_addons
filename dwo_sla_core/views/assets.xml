@@ -7,6 +7,7 @@
             <!-- Odoo 12 has no web.assets_tests bundle: the tours (a few KB) are in the backend bundle -->
             <script type="text/javascript" src="/dwo_sla_core/static/tests/tours/definition_form_tour.js"/>
             <script type="text/javascript" src="/dwo_sla_core/static/tests/tours/form_sla_status_tour.js"/>
+            <script type="text/javascript" src="/dwo_sla_core/static/tests/tours/reporting_tour.js"/>
             <link rel="stylesheet" type="text/scss" href="/dwo_sla_core/static/src/sla_progress/sla_progress_widget.scss"/>
             <link rel="stylesheet" type="text/scss" href="/dwo_sla_core/static/src/form_sla_status/form_sla_status.scss"/>
         </xpath>
