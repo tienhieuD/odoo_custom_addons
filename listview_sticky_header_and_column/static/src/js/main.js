@@ -182,6 +182,9 @@ import localStorage from 'web.local_storage';
                     return cells + ' { position: sticky !important; left: ' + left + 'px; z-index: 1;' +
                             (last ? ' box-shadow: -1px 0 0 #dee2e6 inset;' : '') + ' }\n' +
                         scope + ' table thead tr th:nth-child(' + n + ') { top: 0; z-index: 10; }\n' +
+                        // the row being edited keeps its pinned cells above the other rows' pinned cells and the
+                        // pinned header: a Many2one dropdown opened in it is a child of that cell
+                        scope + ' table tbody tr.o_selected_row td:nth-child(' + n + ') { z-index: 20; }\n' +
                         scope + ' table tbody tr.o_data_row:nth-of-type(odd) td:nth-child(' + n + ') { ' + tint(oddBg) + ' }\n' +
                         scope + ' table tbody tr.o_data_row:nth-of-type(even) td:nth-child(' + n + ') { ' + tint(evenBg) + ' }\n' +
                         scope + ' table tfoot tr td:nth-child(' + n + ') { background-color: ' + baseBg + '; }\n' +
