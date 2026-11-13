@@ -28,7 +28,7 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Header stays in view</h4>
-                    <p class="mb-0" style="font-size: 14px;">While columns are pinned, the header row also stays visible when you scroll down a long list.</p>
+                    <p class="mb-0" style="font-size: 14px;">While columns are pinned, the header row also stays visible when you scroll down a long list. In a list embedded in a form only the frozen columns stay (see Limitations).</p>
                 </div>
             </div>
         </div>
@@ -79,7 +79,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card h-100"><div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">2. Click the pin</h4>
-                    <p class="mb-0" style="font-size: 13px;">The column and all columns to its left are frozen; the header row stays visible too.</p>
+                    <p class="mb-0" style="font-size: 13px;">The column and all columns to its left are frozen; in a full-page list the header row stays visible too.</p>
                 </div></div>
             </div>
             <div class="col-md-4 mb-3">
@@ -101,6 +101,184 @@
     <p class="mb-4" style="font-size: 16px;">Lists embedded in a form, such as the order lines of an order, can be pinned as well. Each list remembers its own pinned column.</p>
     <div class="text-center mb-4">
         <img src="screenshot_2.png" alt="Order lines list inside a sales order form with the Product column pinned" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Works with your list views</h2>
+    <p class="mb-4" style="font-size: 16px;">The pin button is added to the list views you already use, not only to one screen. Here is what has been checked.</p>
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Standard lists</h4>
+                    <p class="mb-0" style="font-size: 14px;">Plain list views, including lists with many columns that scroll sideways and lists with a record selection checkbox.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Optional columns</h4>
+                    <p class="mb-0" style="font-size: 14px;">Columns you switch on from the optional-columns menu can be pinned like any other column.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Lists inside forms</h4>
+                    <p class="mb-0" style="font-size: 14px;">One2many and many2many lists, such as the order lines of a sales order, each keep their own pin.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Lists in dialogs</h4>
+                    <p class="mb-0" style="font-size: 14px;">Lists opened in a dialog, for example from <em>Search More&hellip;</em> on a field, can be pinned too.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Inline editing: row on top</h4>
+                    <p class="mb-0" style="font-size: 14px;">Lists where a new row is added at the top and edited in place (<code>editable=&quot;top&quot;</code>).</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Inline editing: row at the bottom</h4>
+                    <p class="mb-0" style="font-size: 14px;">Lists where rows are added at the bottom and edited in place (<code>editable=&quot;bottom&quot;</code>), such as order lines.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Grouped lists</h4>
+                    <p class="mb-0" style="font-size: 14px;">Lists grouped by a field, with the totals row under the table. Frozen columns and the header keep working.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #5B8DB8;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Wide lists</h4>
+                    <p class="mb-0" style="font-size: 14px;">Pin the right-most column you want to keep and scroll the rest of the table freely.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">One module, many kinds of list</h2>
+    <p class="mb-4" style="font-size: 16px;">A standard list, a grouped list with totals, inline editing, order lines in a form, a list in a dialog and a list scrolled in both directions. The inline editing example with a new row on top is an illustrative example (sample data, shown with a demo list), not a screen that ships with the module.</p>
+    <div class="text-center mb-4">
+        <img src="compat_overview.png" alt="Six list views with pinned columns: a standard list, a grouped list with totals, inline editing with a new row on top, order lines being edited, a list in a dialog and a list scrolled both ways" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Before and after</h2>
+    <p class="mb-4" style="font-size: 16px;">The same list at the same scroll position. Without a pinned column the order number scrolls out of sight; with the Number column pinned you always know which row you are reading.</p>
+    <div class="text-center mb-4">
+        <img src="compat_before_after.png" alt="The same orders list scrolled to the right, without a pinned column and with the Number column pinned" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Inline editing</h2>
+    <p class="mb-4" style="font-size: 16px;">Editing a row does not break the frozen columns. In the order lines below the Description column is pinned, the table is scrolled sideways and the quantity of one line is being edited in place: the pinned column and the header row stay where they are.</p>
+    <div class="text-center mb-4">
+        <img src="compat_editable_bottom.png" alt="Order lines of a sales order with the Description column pinned while a row is being edited and the table is scrolled sideways" class="img-fluid rounded shadow"/>
+    </div>
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100"><div class="card-body">
+                <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Edited row stays on top</h4>
+                <p class="mb-0" style="font-size: 14px;">The frozen cells of the row you are editing are drawn above the frozen cells of the other rows and above the pinned header, so nothing covers the field you are typing in.</p>
+            </div></div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100"><div class="card-body">
+                <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Header and pinned column stay</h4>
+                <p class="mb-0" style="font-size: 14px;">The header row and the frozen columns keep their place while you click into rows, type and save.</p>
+            </div></div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100"><div class="card-body">
+                <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Nothing to switch on</h4>
+                <p class="mb-0" style="font-size: 14px;">It works the same for lists with a new row on top and lists with the new row at the bottom.</p>
+            </div></div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Dropdowns open on top of frozen columns</h2>
+    <p class="mb-4" style="font-size: 16px;">A many2one field in a frozen column, such as the product on an order line, opens its dropdown above the frozen cells of the other rows instead of behind them.</p>
+    <div class="text-center mb-4">
+        <img src="compat_editable_dropdown.png" alt="A product dropdown opened in the pinned Description cell of the row being edited, drawn above the frozen cells of the rows below" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Inline editing with a new row on top</h2>
+    <p class="mb-4" style="font-size: 16px;">Illustrative example (sample data): a demo list of shipments, not part of the module. A new row is added at the top and typed in place while the table is scrolled sideways and the first column stays pinned.</p>
+    <div class="text-center mb-4">
+        <img src="compat_editable_top.png" alt="A wide list of shipments with the first column pinned, a new row being typed at the top and the table scrolled to the right" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Inline editing in motion</h2>
+    <p class="mb-4" style="font-size: 16px;">Illustrative example (sample data): a demo list of shipments. Scroll sideways, click a cell, type, scroll further and save; the pinned column stays in place the whole time.</p>
+    <div class="text-center mb-4">
+        <img src="editable_flow.gif" alt="Animation: a wide list is scrolled sideways, a cell is edited in place, the list is scrolled down and right while the pinned column stays, and the row is saved" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Limitations</h2>
+    <p class="mb-4" style="font-size: 16px;">What to expect, so there are no surprises.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Pin freezes everything to its left</h4>
+                    <p class="mb-0" style="font-size: 14px;">Pinning a column also freezes every column to its left, up to the first column of the table. You cannot freeze a column in the middle on its own.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Grouped lists</h4>
+                    <p class="mb-0" style="font-size: 14px;">In a grouped list the group names and the group totals scroll sideways with the table; only the frozen columns of the records stay in place.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Totals row</h4>
+                    <p class="mb-0" style="font-size: 14px;">The totals row under a list scrolls with the rows; it does not stay fixed at the bottom of the screen.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Lists embedded in a form</h4>
+                    <p class="mb-0" style="font-size: 14px;">The frozen columns stay in place, but the header row scrolls away with the form when you scroll the form down. A full-page list keeps its header visible.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Header needs a pin</h4>
+                    <p class="mb-0" style="font-size: 14px;">The header row stays in view once at least one column is pinned in that list.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Stored in your browser</h4>
+                    <p class="mb-0" style="font-size: 14px;">Pins are remembered in the browser you used, per list; they are not shared with other users or devices.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
