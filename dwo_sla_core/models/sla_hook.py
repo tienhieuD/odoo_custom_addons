@@ -205,7 +205,15 @@ class SlaDefinitionHook(models.Model):
             if key in patched:
                 return
             patched.add(key)
-            method.origin = getattr(model_class, name)
+            origin = getattr(model_class, name)
+            # Idempotent (task 028): `_register_hook` có thể chạy khi lớp đã mang patch của ta,
+            # vd. định nghĩa SLA tạo trong lúc nạp module (data/demo) gọi `_register_sla_hook`,
+            # rồi bước cuối của `load_modules` gọi `_register_hook` lần nữa mà không gỡ trước. Nếu
+            # lấy patch cũ làm `origin` thì `write` chạy hai lớp hook -> reset bắn 2 lần. Bóc mọi
+            # lớp patch của ta để chỉ còn đúng một lớp.
+            while getattr(origin, 'sla_patch', False):
+                origin = origin.origin
+            method.origin = origin
             method.sla_patch = True  # dấu đánh dấu cho _ensure_hook_registered (D9/R-01)
             setattr(model_class, name, method)
 
