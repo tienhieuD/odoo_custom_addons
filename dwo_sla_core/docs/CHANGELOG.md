@@ -2,6 +2,22 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 19.0.1.2.4: biểu đồ đường không xếp chồng (task 029)
+
+Chỉ đổi arch graph; không đổi field, model, dữ liệu hay migration.
+
+### Nguyên nhân
+Graph Odoo mặc định `stacked=true`; ở chế độ line, các đường được cộng dồn. Compliance Trend (R2, một đường mỗi định nghĩa) cộng các tỷ lệ đạt của nhiều định nghĩa nên trục lên tới 300% và mất ý nghĩa.
+
+### Sửa
+`stacked="0"` trên hai graph `type="line"` của module: `view_sla_report_trend_graph` (R2 Compliance Trend: mỗi định nghĩa một đường, trục 0-100%) và `view_sla_report_heatmap_graph` (R9 Source Heatmap: mỗi nguồn một đường). Các graph bar xếp chồng (Response Time Distribution, Performance by Definition/Source, Escalation Activity) giữ `stacked="1"` đúng ý; Status Mix là pie, Pause/Calendar/SLA Tasks là bar một nhóm. Người dùng vẫn bật xếp chồng bằng nút trên graph nếu muốn.
+
+### Test
+`tests/test_tg36_graph_colors.py::test_line_graphs_are_not_stacked` (arch R2/R9 có `stacked="0"`, bar outcome không); tour `dwo_sla_graph_colors` kiểm `chart.options.scales.y.stacked` là sai và trục y tối đa không quá 100%. Tổng 478 test xanh.
+
+### Ảnh demo
+Ảnh 04 (Compliance Trend) của `_demo/dwo_sla_demo` chụp lại.
+
 ## 2026-11-13 - 19.0.1.2.3: hook không cài hai lớp, reset không bắn hai lần (task 027)
 
 Chỉ bản 19. Sửa lỗi, không đổi field/view/migration.
