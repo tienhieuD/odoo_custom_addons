@@ -2,6 +2,19 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 18.0.1.2.3: biểu đồ đường không xếp chồng (task 029)
+
+Chỉ đổi arch graph; không đổi field, model, dữ liệu hay migration. Port từ 19.0.1.2.4. Bản 18 CHƯA có bản sửa task 027 (hook không cài hai lớp); không port ở đây.
+
+### Nguyên nhân
+Graph Odoo mặc định `stacked=true`; ở chế độ line, các đường được cộng dồn. Compliance Trend (R2, một đường mỗi định nghĩa) cộng các tỷ lệ đạt nên trục lên tới 300%.
+
+### Sửa
+`stacked="0"` trên `view_sla_report_trend_graph` (R2, trục 0-100%, mỗi định nghĩa một đường) và `view_sla_report_heatmap_graph` (R9, mỗi nguồn một đường). Các graph bar xếp chồng (Distribution, Performance, Source, Escalation) giữ `stacked="1"`.
+
+### Test
+`tests/test_tg36_graph_colors.py::test_line_graphs_are_not_stacked`; tour `dwo_sla_graph_colors` kiểm trục y không xếp chồng và tối đa 100%.
+
 ## 2026-11-13 - 18.0.1.2.2: màn hình báo cáo R2-R10, màu biểu đồ theo ý nghĩa, trục phần trăm (task 006 C5a-2, task 023)
 
 Port từ 19.0.1.2.0 phần C2 và 19.0.1.2.2 (task 023) sang bản 18. Không đổi model/field/migration (field báo cáo đã có từ 18.0.1.2.1). Chi tiết từng màn hình, bộ lọc, đánh đổi: xem mục 19.0.1.2.0 phần C2 và 19.0.1.2.2 ở changelog bản 19 (cùng nội dung). Dashboard Overview (C5b) chưa port.
