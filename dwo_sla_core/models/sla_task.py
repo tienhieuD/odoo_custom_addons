@@ -217,6 +217,70 @@ class SlaTask(models.Model):
               'its deadline, otherwise 0. Its sum over a group is the number of SLAs '
               'currently in breach (ended breached tasks are not counted).'))
 
+    # Refs: task 006 C1 (báo cáo) -- field lưu để nhóm/lọc/pivot; tính lại tự động
+    # khi Engine đổi stage / has_breached / business_duration (mọi chỗ ghi stage
+    # đều đi qua task.write nên các @api.depends bên dưới đủ, không cần hook riêng).
+    outcome = fields.Selection(
+        [
+            ('on_time', "On Time"),
+            ('late', "Late"),
+            ('breached_open', "Breached (Open)"),
+            ('running', "Running"),
+            ('paused', "Paused"),
+            ('cancelled', "Cancelled"),
+        ],
+        string="Outcome", compute='_compute_outcome', store=True, index=True,
+        help=('One-word result for reports. On Time: achieved within the '
+              'target. Late: finished after the deadline had passed. Breached '
+              '(Open): still running or paused and already past the deadline. '
+              'Running / Paused: active and not yet breached. Cancelled: '
+              'discarded. Example: group by Outcome to see the share of late '
+              'tasks.'))
+    final_percent_used = fields.Float(
+        string="% Used (Final)", compute='_compute_usage', store=True,
+        group_operator='avg', digits=(16, 2),
+        help=('Share of the target time consumed in working hours, as of the '
+              'last stored value (at completion for finished tasks; for active '
+              'tasks the value saved at the last pause or breach). Never below '
+              '100 once the task has breached. The average over a group counts '
+              'finished tasks only. Example: 112.5 means 12.5% over target.'))
+    usage_bucket = fields.Selection(
+        [
+            ('0_50', "0-50%"),
+            ('50_75', "50-75%"),
+            ('75_100', "75-100%"),
+            ('100_150', "100-150%"),
+            ('150_plus', ">150%"),
+        ],
+        string="Usage Range", compute='_compute_usage_bucket', store=True,
+        help=('Range of % Used (Final): below 50, 50 to below 75, 75 to below '
+              '100, 100 to 150 included, above 150. Used to chart how close to '
+              'the deadline tasks are handled. Example: a task that used 100% '
+              'of its target is in 100-150%.'))
+    overdue_duration = fields.Float(
+        string="Overdue Hours", compute='_compute_usage', store=True,
+        group_operator='avg',
+        help=('Working hours beyond the target for a task that has breached; '
+              '0 when it has not. For active tasks this is the last stored '
+              'value. The average over a group counts finished tasks only. '
+              'Example: 1.5 for a task that used 5.5 hours on a 4-hour '
+              'target.'))
+    source_name = fields.Char(
+        string="Source Name", compute='_compute_source_name', store=True,
+        groups='dwo_sla_core.group_sla_manager',
+        help=('Display name of the source record when the task was attached, '
+              'kept so lists and pivots stay readable. It is not renamed '
+              'automatically when the record is renamed; Apply Current '
+              'Settings refreshes it. Example: "Azure Interior".'))
+    sla_type = fields.Selection(
+        related='sla_id.type', string="SLA Type", store=True, index=True,
+        help=('Copy of the definition Type (SLA or OLA) kept on the task so '
+              'reports can group by it. Example: OLA.'))
+    sla_target = fields.Selection(
+        related='sla_id.target', string="SLA Target", store=True, index=True,
+        help=('Copy of the definition Target (Response or Resolution) kept on '
+              'the task so reports can group by it. Example: Response.'))
+
     # Một task hoạt động duy nhất cho mỗi (định nghĩa, record), kể cả hai giao
     # dịch đồng thời cùng cố gắng gắn (REQ-FUNC-014, AD-08); vi phạm là lỗi cô
     # lập được Engine bắt trong savepoint (AD-07).
@@ -266,6 +330,14 @@ class SlaTask(models.Model):
                 "AVG(%s) FILTER (WHERE %s IN ('achieved', 'breached'))",
                 self._field_to_sql(self._table, 'achieved_rate', query),
                 self._field_to_sql(self._table, 'stage', query)), ['achieved_rate', 'stage']
+        if aggregate_spec in ('final_percent_used:avg', 'overdue_duration:avg'):
+            # Chỉ task đã kết thúc (achieved/breached); task đang chạy giữ giá trị cũ,
+            # cancelled không có ý nghĩa, nên không được kéo trung bình.
+            field_name = aggregate_spec.split(':')[0]
+            return SQL(
+                "AVG(%s) FILTER (WHERE %s IN ('achieved', 'breached'))",
+                self._field_to_sql(self._table, field_name, query),
+                self._field_to_sql(self._table, 'stage', query)), [field_name, 'stage']
         return super()._read_group_select(aggregate_spec, query)
 
     @api.depends('stage', 'has_breached')
@@ -281,6 +353,97 @@ class SlaTask(models.Model):
             task.achieved_rate = 1.0 if task.stage == 'achieved' else 0.0
             task.breaching_count = int(
                 task.stage in ('in_progress', 'paused') and task.has_breached)
+
+    @api.depends('stage', 'has_breached')
+    def _compute_outcome(self):
+        """Gộp stage và dấu vi phạm thành một kết quả cho báo cáo.
+
+        Logic: dấu vi phạm của task còn mở (in_progress/paused) thắng stage để
+        "đang vi phạm" khớp `breaching_count`; achieved -> on_time, breached
+        (đã kết thúc sau hạn) -> late.
+        Refs: task 006 C1
+        """
+        for task in self:
+            stage = task.stage
+            if stage == 'achieved':
+                task.outcome = 'on_time'
+            elif stage == 'breached':
+                task.outcome = 'late'
+            elif stage == 'cancelled':
+                task.outcome = 'cancelled'
+            elif task.has_breached:
+                task.outcome = 'breached_open'
+            else:
+                task.outcome = 'paused' if stage == 'paused' else 'running'
+
+    @api.depends('business_duration', 'target_duration', 'has_breached')
+    def _compute_usage(self):
+        """% thời hạn đã dùng và số giờ trễ, từ `business_duration` đã lưu.
+
+        Logic: cùng quy ước `_compute_percent_used` (target 0 -> 100% nếu có
+        thời gian trôi) nhưng KHÔNG làm tròn và không cộng đoạn đang chạy (field
+        lưu). Task đã vi phạm không bao giờ dưới 100% (giá trị lưu có thể cũ
+        trước khi pause/complete chốt lại). Giờ trễ = phần vượt mục tiêu, 0 nếu
+        chưa vi phạm.
+        Refs: task 006 C1
+        """
+        for task in self:
+            elapsed, target = task.business_duration, task.target_duration
+            if target:
+                percent = elapsed / target * 100.0
+            else:
+                percent = 100.0 if elapsed else 0.0
+            if task.has_breached:
+                percent = max(percent, 100.0)
+                task.overdue_duration = max(elapsed - target, 0.0)
+            else:
+                task.overdue_duration = 0.0
+            task.final_percent_used = percent
+
+    @api.depends('final_percent_used')
+    def _compute_usage_bucket(self):
+        """Xếp `final_percent_used` vào nhóm: <50, <75, <100, <=150, >150."""
+        for task in self:
+            percent = task.final_percent_used
+            if percent < 50:
+                task.usage_bucket = '0_50'
+            elif percent < 75:
+                task.usage_bucket = '50_75'
+            elif percent < 100:
+                task.usage_bucket = '75_100'
+            elif percent <= 150:
+                task.usage_bucket = '100_150'
+            else:
+                task.usage_bucket = '150_plus'
+
+    @api.depends('res_model', 'res_id')
+    def _compute_source_name(self):
+        """Tên hiển thị của record nguồn, đọc theo lô cho mỗi model.
+
+        Logic: sudo vì người đọc báo cáo có thể không có quyền đọc record nguồn
+        (đánh đổi đã ghi ở CHANGELOG); model đã gỡ hoặc record đã xoá thì dùng
+        "model#id". Lỗi khi đọc tên không được làm hỏng việc tạo task.
+        Refs: task 006 C1
+        """
+        by_model = {}
+        for task in self:
+            by_model.setdefault(task.res_model, set()).add(task.res_id)
+        names = {}
+        for model, ids in by_model.items():
+            if model in self.env:
+                try:
+                    with self.env.cr.savepoint():
+                        for rec in self.env[model].sudo().browse(sorted(ids)).exists():
+                            names[(model, rec.id)] = rec.display_name
+                except Exception:  # noqa: BLE001 -- model lạ, không được chặn engine
+                    pass
+        for task in self:
+            task.source_name = (names.get((task.res_model, task.res_id))
+                                or "%s#%s" % (task.res_model, task.res_id))
+
+    def _refresh_source_names(self):
+        """Tính lại `source_name` ngay (sau khi record nguồn đổi tên)."""
+        self.sudo()._compute_source_name()
 
     @api.depends('business_duration', 'target_duration', 'stage', 'running_since',
                  'schedule_id')
@@ -526,6 +689,7 @@ class SlaTask(models.Model):
                     'definition_id': task.sla_id.id,
                     'company_id': task.company_id.id,
                 })
+        self._refresh_source_names()
         if events:
             self.env['sla.event'].sudo().create(events)
         return self._result_notification(
