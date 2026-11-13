@@ -528,3 +528,97 @@ registry.category("web_tour.tours").add("lshc_unpin_remount", {
         },
     ],
 });
+
+// ---- Order Lines (sale): headers of a `<column>` group have no data-name -------------------------------
+const OL = ".o_field_widget[name=order_line]";
+const labelOf = (t) => t.innerText.trim();
+// by text, or by data-name (Odoo 19 labels the product column "Product" or "product_id" depending on the groups; the field is product_id or product_template_id)
+const olHead = (root, label) => [...root.querySelectorAll("thead tr th")].find((t) => labelOf(t) === label || t.dataset.name === label || (label === "product_id" && /^product_(template_)?id$/.test(t.dataset.name || "")));
+
+registry.category("web_tour.tours").add("lshc_order_lines", {
+    steps: () => [
+        { trigger: `${OL} .o_data_row` },
+        {
+            content: "every data header of Order Lines has exactly one pin button (also those without data-name)",
+            trigger: `${OL} .o_data_row`,
+            run: async () => {
+                clearKeys();
+                const root = document.querySelector(`${OL} .o_list_renderer`);
+                await waitFor(() => olHead(root, "Quantity")?.querySelector(".js_pin_this_column"), "pin button on Quantity");
+                const ths = [...root.querySelectorAll("thead tr th")];
+                let labelled = 0;
+                for (const label of ["product_id", "Quantity", "Unit Price"]) {
+                    const t = olHead(root, label);
+                    assert(t, `no header ${label}`);
+                    assert(t.querySelectorAll(".js_pin_this_column").length === 1, `${label}: pin buttons = ${t.querySelectorAll(".js_pin_this_column").length}`);
+                }
+                for (const t of ths) {
+                    const n = t.querySelectorAll(".js_pin_this_column").length;
+                    const excluded = t.matches(".o_handle_cell, .o_list_record_selector, .o_list_controller, .o_list_actions_header, .o_list_button, .o_list_open_form_view");
+                    if (excluded || !labelOf(t) && !t.dataset.name) {
+                        assert(n === 0, `pin button on a non-data header (class="${t.className}")`);
+                    } else {
+                        labelled++;
+                        assert(n === 1, `header "${labelOf(t)}": ${n} pin buttons`);
+                    }
+                }
+                assert(labelled >= 4, `only ${labelled} pinnable headers`);
+                assert(getComputedStyle(olHead(root, "Quantity").querySelector(".js_pin_this_column")).display === "none", "pin button should be hidden until hover");
+                // the (absolute) button is positioned against its header, as for named columns
+                assert(getComputedStyle(olHead(root, "Unit Price")).position !== "static", "header is not a positioning context for the button");
+            },
+        },
+        {
+            content: "pin Description, Quantity, Unit Price in turn: that column and all on its left stay, scrolling horizontally",
+            trigger: `${OL} .o_data_row`,
+            run: async () => {
+                const root = document.querySelector(`${OL} .o_list_renderer`);
+                await widen(root);
+                for (const label of ["product_id", "Quantity", "Unit Price"]) {
+                    const heads = () => [...root.querySelectorAll("thead tr th")];
+                    const idx = heads().indexOf(olHead(root, label));
+                    assert(idx >= 1, `${label} index ${idx}`);
+                    olHead(root, label).querySelector(".js_pin_this_column").click();
+                    await sleep(700);
+                    const keys = lshcKeys();
+                    assert(keys.length === 1 && /__field_order_line$/.test(keys[0]), `localStorage keys: ${keys}`);
+                    assert(Number(localStorage.getItem(keys[0])) === idx, `${label}: saved index ${localStorage.getItem(keys[0])} != ${idx}`);
+                    heads().slice(0, idx + 1).forEach((h, i) => assert(getComputedStyle(h).position === "sticky" && getComputedStyle(h).zIndex === "10", `${label}: th ${i} not pinned`));
+                    const cell = root.querySelector(`.o_data_row td:nth-child(${idx + 1})`);
+                    const first = root.querySelector(".o_data_row td:nth-child(1)");
+                    assert(getComputedStyle(cell).position === "sticky", `${label}: pinned td not sticky`);
+                    const free = root.querySelector(`.o_data_row td:nth-child(${idx + 3})`);
+                    assert(getComputedStyle(free).position !== "sticky", `${label}: column ${idx + 3} must not be pinned`);
+                    const sx = scroller(root.querySelector("table"), "x");
+                    assert(sx, "no horizontal scroll area");
+                    const l0 = rect(cell).left - rect(sx).left, f0 = rect(first).left, x0 = rect(free).left;
+                    sx.scrollLeft = 300;
+                    await sleep(300);
+                    assert(sx.scrollLeft > 100, `did not scroll (${sx.scrollLeft})`);
+                    near(rect(cell).left - rect(sx).left, l0, 1.5, `${label}: pinned td moved`);
+                    near(rect(first).left, f0, 1.5, `${label}: columns on the left of the pinned one moved`);
+                    near(rect(heads()[idx]).left - rect(sx).left, l0, 1.5, `${label}: pinned th moved`);
+                    assert(x0 - rect(free).left > 100, `${label}: unpinned column should move`);
+                    sx.scrollLeft = 0;
+                    await sleep(200);
+                    // pinning another column replaces the first pin (never two pins)
+                    assert(pinStyles().length === 2, `${label}: style nodes ${pinStyles().length}`);
+                }
+            },
+        },
+        {
+            content: "second click on the pinned column unpins it",
+            trigger: `${OL} .o_data_row`,
+            run: async () => {
+                const root = document.querySelector(`${OL} .o_list_renderer`);
+                olHead(root, "Unit Price").querySelector(".js_pin_this_column").click();
+                await sleep(700);
+                assert(pinStyles().length === 0, "style nodes left after unpin");
+                assert(lshcKeys().length === 0, `localStorage keys left: ${lshcKeys()}`);
+                const idx = [...root.querySelectorAll("thead tr th")].indexOf(olHead(root, "Unit Price"));
+                assert(getComputedStyle(root.querySelector(`.o_data_row td:nth-child(${idx + 1})`)).position !== "sticky", "td still sticky");
+                clearKeys();
+            },
+        },
+    ],
+});
