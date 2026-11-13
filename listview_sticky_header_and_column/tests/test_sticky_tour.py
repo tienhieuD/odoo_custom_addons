@@ -49,3 +49,16 @@ class TestStickyTour(HttpCase):
                 'group_id': self.env.ref('base.group_user').id, 'perm_read': True,
             })
         self.start_tour('/web#action=base.action_model_model&view_type=form&id=%d' % model.id, 'lshc_edit_row_on_top', login='admin')
+
+    def test_pin_every_column_of_sale_order_lines(self):
+        """Order Lines: every data header has one pin button (none on the handle); pinning works on each."""
+        if 'sale.order' not in self.env:
+            self.skipTest('needs the sale module (run with listview_sticky_header_and_column,sale)')
+        partner = self.env['res.partner'].create({'name': 'Lshc customer'})
+        products = self.env['product.product'].search([('sale_ok', '=', True)], limit=6)
+        self.assertGreaterEqual(len(products), 3, 'sale demo products needed')
+        order = self.env['sale.order'].create({
+            'partner_id': partner.id,
+            'order_line': [(0, 0, {'product_id': p.id, 'product_uom_qty': 2}) for p in products],
+        })
+        self.start_tour('/web#action=sale.action_quotations_with_onboarding&view_type=form&id=%d' % order.id, 'lshc_order_lines', login='admin')
