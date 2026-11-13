@@ -75,23 +75,23 @@
                             Always install using the <strong>exact Python that runs Odoo</strong> (venv or system), then restart Odoo.
                         </p>
                         <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active" href="#webp_tab_linux" data-toggle="tab" role="tab">Linux</a>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#webp_tab_linux" data-toggle="tab" role="tab" aria-controls="webp_tab_linux">Linux</a>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" href="#webp_tab_docker" data-toggle="tab" role="tab">Docker</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#webp_tab_docker" data-toggle="tab" role="tab" aria-controls="webp_tab_docker">Docker</a>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" href="#webp_tab_windows" data-toggle="tab" role="tab">Windows</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#webp_tab_windows" data-toggle="tab" role="tab" aria-controls="webp_tab_windows">Windows</a>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" href="#webp_tab_macos_intel" data-toggle="tab" role="tab">macOS (Intel)</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#webp_tab_macos_intel" data-toggle="tab" role="tab" aria-controls="webp_tab_macos_intel">macOS (Intel)</a>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" href="#webp_tab_macos_arm" data-toggle="tab" role="tab">macOS (Apple Silicon)</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#webp_tab_macos_arm" data-toggle="tab" role="tab" aria-controls="webp_tab_macos_arm">macOS (Apple Silicon)</a>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" href="#webp_tab_verify" data-toggle="tab" role="tab">Verify</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#webp_tab_verify" data-toggle="tab" role="tab" aria-controls="webp_tab_verify">Verify</a>
                             </li>
                         </ul>
                         <div class="tab-content">
