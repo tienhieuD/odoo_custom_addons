@@ -2,6 +2,19 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 18.0.1.2.4: hook không cài hai lớp, reset không bắn hai lần (task 028, port từ 19.0.1.2.3)
+
+Sửa lỗi, không đổi field/view/migration.
+
+### Lỗi và nguyên nhân
+Định nghĩa SLA tạo/sửa TRONG LÚC nạp module (data/demo của module cài hoặc nâng cấp): `_register_sla_hook` chạy giữa chừng, rồi bước cuối `load_modules` gọi `_register_hook` MỘT LẦN NỮA mà không gỡ trước. `patch()` (`models/sla_hook.py`) lấy `origin = getattr(model_class, name)` mà không bóc lớp patch của ta, nên `create`, `write`, `_compute_field_value` bị hai lớp hook chồng nhau: một lần `write` field reset ra 2 lần `sla.engine._reset` (3 task thay vì 2). Khởi động lại server thì chỉ một lớp.
+
+### Sửa
+Trong `patch()` bóc mọi lớp có `sla_patch` khỏi `origin` trước khi gán (vòng `while`, Python thuần, không phụ thuộc API). Không đổi Engine.
+
+### Test
+`tests/test_tg35_reset_writable_compute.py`: `test_rst_008` (mỗi hàm đúng một lớp sau `_register_hook` lần hai), `test_rst_009` (một lần sửa field reset: 1 reset, 2 task). Chạy trước khi sửa: đỏ cả hai; sau khi sửa: xanh.
+
 ## 2026-11-13 - 18.0.1.2.3: biểu đồ đường không xếp chồng (task 029)
 
 Chỉ đổi arch graph; không đổi field, model, dữ liệu hay migration. Port từ 19.0.1.2.4. Bản 18 CHƯA có bản sửa task 027 (hook không cài hai lớp); không port ở đây.

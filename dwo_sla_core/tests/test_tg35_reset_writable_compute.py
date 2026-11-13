@@ -96,3 +96,36 @@ class TestResetWritableCompute(SlaCase):
     def test_rst_007_pending_recompute_still_resets_once(self):
         """Chỉ field nguồn đổi rồi flush: tính lại vẫn gây đúng một reset."""
         self.assertEqual(self.run_two({'x_weight': 7}, {'x_stage': 'sent'}), (2, 1))
+
+    # --- task 027: hook cài hai lớp (framework gọi _register_hook khi lớp đã patch) ---
+
+    def layers(self, name):
+        """Số lớp patch của ta chồng lên nhau ở `name` của model thử."""
+        func, count = getattr(self.registry[MODEL], name), 0
+        while getattr(func, 'sla_patch', False):
+            count, func = count + 1, func.origin
+        return count
+
+    def register_again(self):
+        """Như STEP 9 của `load_modules` sau khi định nghĩa tạo lúc nạp module: không gỡ trước."""
+        self.addCleanup(self.env['sla.definition']._register_sla_hook)
+        self.env['sla.definition']._register_hook()
+
+    def test_rst_008_register_hook_twice_keeps_one_layer(self):
+        """Gọi `_register_hook` lần hai khi đã patch: mỗi hàm vẫn đúng một lớp."""
+        self.make_def()
+        self.env['sla.definition']._register_sla_hook()
+        self.register_again()
+        self.assertEqual([self.layers(n) for n in ('create', 'write', '_compute_field_value')], [1, 1, 1])
+
+    def test_rst_009_register_hook_twice_resets_once(self):
+        """Hồi quy 027: hook cài hai lớp làm một lần sửa field reset bắn 2 reset, 3 task."""
+        self.make_def()
+        self.env['sla.definition']._register_sla_hook()
+        self.register_again()
+        with self.at(T0):
+            rec = self.env[MODEL].create({'x_stage': 'sent', 'x_weight': 5})
+        with self.at(T0 + hours(1)):
+            rec.write({'x_due': 99})
+            self.env.flush_all()
+        self.assertEqual(self.counts(rec, self.Definition.search([('name', '=', 'DEF-RST')])), (2, 1))

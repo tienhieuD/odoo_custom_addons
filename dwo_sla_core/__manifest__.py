@@ -20,7 +20,7 @@ Requires only the standard base, resource, web and mail modules.
     'support': 'hello@duotek.io.vn',
 
     'category': 'Services',
-    'version': '18.0.1.2.3',
+    'version': '18.0.1.2.4',
     'installable': True,
     'application': False,
     'license': 'OPL-1',
