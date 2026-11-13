@@ -2,6 +2,23 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 13.0.1.2.4: báo cáo (field lưu C1, 10 màn hình C2, màu và trục % task 023, đường không xếp chồng task 029) (task 006 C5c-2)
+
+Port từ bản 14 sang bản 13. Chưa có dashboard Overview và CHƯA port bản sửa hook task 027. Chi tiết field/màn hình/bộ lọc/đánh đổi: xem changelog bản 19, 17 và 14.
+
+### Có trong bản này
+- Field lưu mới trên `sla.task`: `outcome`, `final_percent_used`, `usage_bucket`, `overdue_duration`, `source_name` (chỉ SLA Manager), `sla_type`, `sla_target`; `migrations/13.0.1.2.0/post-migrate.py` (SQL + ORM theo lô, idempotent; thư mục giữ tên 13.0.1.2.0 để chạy khi nâng từ 1.1.x). Trung bình `final_percent_used`/`overdue_duration` chỉ tính task đã kết thúc: trong `read_group` ghi đè sẵn có.
+- Menu SLA > Reporting 10 màn hình (`views/sla_report_views.xml`), view graph/pivot cho `sla.event`, bộ lọc và group-by mới, ja_JP.
+- `static/src/graph_colors/sla_graph_colors.js` (như bản 14: `GraphRenderer.include` ghi đè `_prepareData`, `_getColor`, `_formatValue`; graph legacy 13 giống 14).
+
+### Khác biệt so với bản 14
+- Cột trạng thái của list Backlog không có widget `badge` ở 13: màu theo hàng (`decoration-*` ở thẻ `<tree>`).
+- Không có `ir.actions.actions._for_xml_id`: test dùng `browse(id).read()`.
+- Tour: mỗi màn hình chờ breadcrumb của chính nó trước khi coi là đã hiển thị (tránh rời trang khi đang tải action).
+
+### Test
+`tests/test_tg33_reporting_fields.py`, `test_tg34_reporting_views.py` (+ tour `dwo_sla_reporting_menu`, `dwo_sla_graph_colors`), `test_tg36_graph_colors.py`.
+
 ## 2026-11-13 - 13.0.1.1.1: reset không bắn hai lần (task 025 + task 028, port từ 14.0.1.1.1/14.0.1.2.4)
 
 Sửa hai lỗi, không đổi field/view/migration.

@@ -31,9 +31,18 @@
                 <filter string="Unresolved Errors" name="error_unresolved"
                         domain="[('event', '=', 'error'), ('is_resolved', '=', False)]"/>
                 <filter string="Escalate" name="escalate" domain="[('event', '=', 'escalate')]"/>
+                <filter string="Escalation Activity" name="escalation_activity"
+                        domain="[('event', 'in', ('breach', 'escalate', 'escalate_failed'))]"/>
+                <separator/>
+                <filter string="Last 30 Days" name="last_30"
+                        domain="[('event_dt', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
                 <group>
                     <filter string="Definition" name="group_definition" context="{'group_by': 'definition_id'}"/>
                     <filter string="Event Type" name="group_event" context="{'group_by': 'event'}"/>
+                    <filter string="Model" name="group_model" context="{'group_by': 'res_model'}"/>
+                    <separator/>
+                    <filter string="Week" name="group_week" context="{'group_by': 'event_dt:week'}"/>
+                    <filter string="Month" name="group_month" context="{'group_by': 'event_dt:month'}"/>
                 </group>
             </search>
         </field>

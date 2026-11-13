@@ -20,7 +20,7 @@ Requires only the standard base, resource, web and mail modules.
     'support': 'hello@duotek.io.vn',
 
     'category': 'Services',
-    'version': '13.0.1.1.1',
+    'version': '13.0.1.2.4',
     'installable': True,
     'application': False,
     'license': 'OPL-1',
@@ -51,6 +51,7 @@ Requires only the standard base, resource, web and mail modules.
         'views/sla_definition_views.xml',
         'views/sla_task_views.xml',
         'views/sla_event_views.xml',
+        'views/sla_report_views.xml',
         'views/sla_apply_views.xml',
         'views/res_config_settings_views.xml',
         'views/sla_menus.xml',

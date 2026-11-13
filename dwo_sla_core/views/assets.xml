@@ -4,6 +4,7 @@
     <template id="assets_backend" name="SLA &amp; Escalation assets" inherit_id="web.assets_backend">
         <xpath expr="//script[last()]" position="after">
             <script type="text/javascript" src="/dwo_sla_core/static/src/js/sla_legacy.js"/>
+            <script type="text/javascript" src="/dwo_sla_core/static/src/graph_colors/sla_graph_colors.js"/>
             <link rel="stylesheet" type="text/scss" href="/dwo_sla_core/static/src/sla_progress/sla_progress_widget.scss"/>
             <link rel="stylesheet" type="text/scss" href="/dwo_sla_core/static/src/form_sla_status/form_sla_status.scss"/>
         </xpath>
@@ -13,6 +14,7 @@
         <xpath expr="." position="inside">
             <script type="text/javascript" src="/dwo_sla_core/static/tests/tours/definition_form_tour.js"/>
             <script type="text/javascript" src="/dwo_sla_core/static/tests/tours/form_sla_status_tour.js"/>
+            <script type="text/javascript" src="/dwo_sla_core/static/tests/tours/reporting_tour.js"/>
         </xpath>
     </template>
 </odoo>
