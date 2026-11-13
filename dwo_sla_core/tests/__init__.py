@@ -33,3 +33,4 @@ from . import test_tg30_form_status
 from . import test_tg31_notes_i18n
 from . import test_tg32_duration_live
 from . import test_tg35_reset_writable_compute
+from . import test_tg33_reporting_fields
