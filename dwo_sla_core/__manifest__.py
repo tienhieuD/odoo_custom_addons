@@ -20,7 +20,7 @@ Requires only the standard base, resource, web, mail and mail_tracking modules.
     'support': 'hello@duotek.io.vn',
 
     'category': 'Services',
-    'version': '20.0.1.2.1',
+    'version': '20.0.1.2.2',
     'installable': True,
     'application': False,
     'license': 'OPL-1',
@@ -52,6 +52,7 @@ Requires only the standard base, resource, web, mail and mail_tracking modules.
         'views/sla_definition_views.xml',
         'views/sla_task_views.xml',
         'views/sla_event_views.xml',
+        'views/sla_report_views.xml',
         'views/sla_apply_views.xml',
         'views/res_config_settings_views.xml',
         'views/sla_menus.xml',
@@ -70,6 +71,7 @@ Requires only the standard base, resource, web, mail and mail_tracking modules.
             'dwo_sla_core/static/src/form_sla_status/form_sla_status.xml',
             'dwo_sla_core/static/src/form_sla_status/form_sla_status.scss',
         ],
+        'web.assets_backend_lazy': ['dwo_sla_core/static/src/graph_colors/sla_graph_colors.js'],
         'web.assets_tests': ['dwo_sla_core/static/tests/**/*'],
     },
 }

@@ -2,6 +2,18 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 20.0.1.2.2: màn hình báo cáo R2-R10, màu biểu đồ theo ý nghĩa, trục phần trăm (task 006 C5a-2, task 023)
+
+Port từ 19.0.1.2.0 phần C2 và 19.0.1.2.2 (task 023) sang bản 20. Không đổi model/field/migration (field báo cáo đã có từ 20.0.1.2.1). Chi tiết từng màn hình, bộ lọc, đánh đổi: xem mục 19.0.1.2.0 phần C2 và 19.0.1.2.2 ở changelog bản 19 (cùng nội dung). Dashboard Overview (C5b) chưa port.
+
+### Có trong bản này
+- Menu SLA > Reporting với 10 màn hình (`views/sla_report_views.xml`, view `<list>`, graph/pivot như 19); `sla.event` có view graph/pivot; bộ lọc và group-by mới trong search view `sla.task` và `sla.event`; `source_name` chỉ SLA Manager; ja_JP (35 chuỗi); group_sla_user đọc được.
+- Patch JS `static/src/graph_colors/sla_graph_colors.js` vá `GraphRenderer`: màu cố định theo giá trị outcome/stage/usage_bucket/event, thứ tự xếp chồng theo selection, pie sắp theo selection. Bundle: `web.assets_backend_lazy` (graph/pivot nằm trong bundle lazy).
+- Trục phần trăm của `achieved_rate` ở graph Compliance Trend.
+
+### Test
+Mới: `tests/test_tg34_reporting_views.py` (16 test + tour `dwo_sla_reporting_menu` và `dwo_sla_graph_colors`) và `tests/test_tg36_graph_colors.py` (4 test); toàn module 477 test xanh (457 trước). Tour: bước chờ chỉ có `trigger` (không có `run`; hàm rỗng bị từ chối ở 20), mỗi màn hình đợi breadcrumb mang tên màn hình trước khi đọc canvas (không thì tour đọc nhầm biểu đồ của màn hình trước). Đo thật trên DB 20 có dữ liệu: pie đúng màu và thứ tự, trục tuần 50%.
+
 ## 2026-11-12 - 20.0.1.2.1 (nhóm 1.2.0), phần C1: field lưu cho báo cáo (task 006)
 
 Bản 20 (port từ 19, task 006 C5a-1; version 20.0.1.2.1 gồm cả bản sửa reset task 025). Chưa có view/menu (giai đoạn C2). Không đổi hành vi engine.

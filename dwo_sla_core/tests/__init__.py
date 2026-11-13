@@ -34,3 +34,5 @@ from . import test_tg31_notes_i18n
 from . import test_tg32_duration_live
 from . import test_tg35_reset_writable_compute
 from . import test_tg33_reporting_fields
+from . import test_tg34_reporting_views
+from . import test_tg36_graph_colors
