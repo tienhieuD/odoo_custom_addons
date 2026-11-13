@@ -265,10 +265,48 @@
                 <separator/>
                 <filter string="Achieved" name="achieved" domain="[('stage', '=', 'achieved')]"/>
                 <filter string="Cancelled" name="cancelled" domain="[('stage', '=', 'cancelled')]"/>
+                <!-- Bộ lọc cho báo cáo (task 006 C2). Mốc thời gian theo ngày
+                     của người dùng (context_today). -->
+                <separator/>
+                <filter string="Open" name="open" domain="[('stage', 'in', ('in_progress', 'paused'))]"
+                        help="Running or paused tasks."/>
+                <filter string="Breached Open" name="breached_open" domain="[('outcome', '=', 'breached_open')]"
+                        help="Tasks still open that are already past the deadline."/>
+                <filter string="Late" name="late" domain="[('outcome', '=', 'late')]"
+                        help="Tasks that finished after the deadline."/>
+                <separator/>
+                <filter string="Last 30 Days" name="last_30"
+                        domain="[('start_time', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"
+                        help="Tasks that started in the last 30 days."/>
+                <filter string="This Week" name="this_week"
+                        domain="[('start_time', '&gt;=', (context_today() + relativedelta(weekday=0, days=-6)).strftime('%Y-%m-%d')),
+                                 ('start_time', '&lt;', (context_today() + relativedelta(weekday=0, days=1)).strftime('%Y-%m-%d'))]"
+                        help="Tasks that started this week (Monday to Sunday)."/>
+                <filter string="Due This Week" name="due_this_week"
+                        domain="[('stage', 'in', ('in_progress', 'paused')),
+                                 ('planned_end_time', '&gt;=', (context_today() + relativedelta(weekday=0, days=-6)).strftime('%Y-%m-%d')),
+                                 ('planned_end_time', '&lt;', (context_today() + relativedelta(weekday=0, days=1)).strftime('%Y-%m-%d'))]"
+                        help="Open tasks whose deadline falls this week (Monday to Sunday)."/>
+                <separator/>
+                <filter string="Response SLAs" name="response" domain="[('sla_target', '=', 'response')]"/>
+                <filter string="Resolution SLAs" name="resolution" domain="[('sla_target', '=', 'resolution')]"/>
+                <filter string="SLA" name="type_sla" domain="[('sla_type', '=', 'sla')]"/>
+                <filter string="OLA" name="type_ola" domain="[('sla_type', '=', 'ola')]"/>
                 <group>
                     <filter string="Definition" name="group_definition" context="{'group_by': 'sla_id'}"/>
                     <filter string="Model" name="group_model" context="{'group_by': 'res_model'}"/>
                     <filter string="Stage" name="group_stage" context="{'group_by': 'stage'}"/>
+                    <filter string="Outcome" name="group_outcome" context="{'group_by': 'outcome'}"/>
+                    <filter string="Usage Range" name="group_usage_bucket" context="{'group_by': 'usage_bucket'}"/>
+                    <filter string="Type (SLA/OLA)" name="group_sla_type" context="{'group_by': 'sla_type'}"/>
+                    <filter string="Target (Response/Resolution)" name="group_sla_target" context="{'group_by': 'sla_target'}"/>
+                    <separator/>
+                    <filter string="Start: Week" name="group_start_week" context="{'group_by': 'start_time:week'}"/>
+                    <filter string="Start: Month" name="group_start_month" context="{'group_by': 'start_time:month'}"/>
+                    <filter string="End: Week" name="group_end_week" context="{'group_by': 'end_time:week'}"/>
+                    <filter string="End: Month" name="group_end_month" context="{'group_by': 'end_time:month'}"/>
+                    <filter string="Deadline: Day" name="group_planned_end_day" context="{'group_by': 'planned_end_time:day'}"/>
+                    <filter string="Deadline: Week" name="group_planned_end_week" context="{'group_by': 'planned_end_time:week'}"/>
                 </group>
             </search>
         </field>

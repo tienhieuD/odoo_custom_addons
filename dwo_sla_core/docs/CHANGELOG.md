@@ -33,3 +33,45 @@ Không có `responsible_id` (người dùng đã bỏ).
 
 ### Test
 `tests/test_tg33_reporting_fields.py` (tag `tg_33`, 13 test): từng kết quả (đúng hạn, trễ, vi phạm đang mở, đang chạy, tạm dừng, huỷ), biên bucket, target 0, cập nhật khi pause/resume/complete, nhóm theo `outcome` và trung bình, `source_name`/`sla_type`/`sla_target`, migration tính lại trên task đã xoá giá trị (gọi trực tiếp hàm `migrate`, hai lần).
+
+## 2026-11-13 - 19.0.1.2.0 (1.2.0), phần C2: màn hình báo cáo R2-R10 (task 006)
+
+Chỉ bản 19, version giữ 19.0.1.2.0. Không đổi model/field/engine; chỉ view, menu, i18n, test. R1 Overview (OWL) là giai đoạn C3.
+
+### Menu SLA > Reporting (nhóm `group_sla_user` thấy, chỉ đọc)
+`menu_sla_reporting` (sequence 15) với 10 mục, mỗi mục là một `ir.actions.act_window` trong `views/sla_report_views.xml` (view riêng gắn qua `ir.actions.act_window.view`):
+
+| Màn hình (action `action_sla_report_<key>`) | Model | View | Group-by / đo | Domain / lọc mặc định |
+|---|---|---|---|---|
+| R2 Compliance Trend (`trend`) | sla.task | graph line, pivot | `end_time:week` x `sla_id`; `achieved_rate` | task đã xong; lọc Last 30 Days |
+| R3 Response Time Distribution (`distribution`) | sla.task | graph bar xếp chồng, pivot | `sla_id` x `usage_bucket`; đếm | task đã xong; lọc Response SLAs mặc định |
+| R4 Status Mix (`status`) | sla.task | graph pie, pivot | `outcome` | không |
+| R5 Open Backlog & Ageing (`backlog`) | sla.task | pivot, list | hàng `sla_id` > `res_model`, cột `planned_end_time:week`; list theo `planned_end_time` tăng dần, cột `% Used` (progressbar) | stage in_progress/paused |
+| R6 Performance by Definition and Source (`performance`) và Performance by Source (`source`) | sla.task | graph bar xếp chồng, pivot | `sla_id` (hoặc `res_model`) x `outcome`; pivot có `overdue_duration`, `final_percent_used` | outcome on_time/late/breached_open |
+| R7 Pause Analysis (`pause`) | sla.task | graph bar, pivot | `sla_id`; `business_pause_duration`, `pause_duration` | không |
+| R8 Escalation Activity (`escalation`) | sla.event | graph bar xếp chồng, pivot, list | `event_dt:week` x `event`; pivot `event` > `definition_id` x tuần | event breach/escalate/escalate_failed |
+| R9 Source Heatmap (`heatmap`) | sla.task | pivot, graph line | hàng `res_model`, cột `start_time:month`; `achieved_rate` + đếm | không |
+| R10 Calendar Impact (`calendar`) | sla.task | graph bar, pivot | `sla_id`; pivot đặt cạnh nhau `duration`, `business_duration`, hai loại pause | task đã xong |
+
+Mục được bổ sung: `sla.event` có thêm view graph (`view_sla_event_graph`) và pivot (`view_sla_event_pivot`); không dùng `responsible_id`.
+
+### Bộ lọc mới
+- `sla.task` (search view): Open, Breached Open, Late, Last 30 Days (theo `start_time`), This Week (theo `start_time`, thứ Hai đến Chủ Nhật), Due This Week (task đang mở có `planned_end_time` trong tuần), Response SLAs, Resolution SLAs, SLA, OLA. Group by: Outcome, Usage Range, Type (SLA/OLA), Target (Response/Resolution), Start/End theo tuần và tháng, Deadline theo ngày và tuần. Các bộ lọc cũ giữ nguyên.
+- `sla.event`: thêm lọc Escalation Activity (breach/escalate/escalate_failed), Last 30 Days; group by Model, Week, Month.
+
+### Đánh đổi
+- Graph chuẩn của Odoo chỉ có MỘT measure và measure lấy theo aggregator của field (sum hoặc avg đã khai báo): R7 (tổng và trung bình pause) và R10 (so sánh `duration` với `business_duration`) hiển thị tổng trong graph, còn so sánh hai measure cạnh nhau nằm ở pivot. Không có trung bình pause (field có aggregator sum); trung bình = tổng / số task trong pivot.
+- R9 không tô nền ô theo ngưỡng (pivot chuẩn không hỗ trợ); chỉ có bảng và biểu đồ đường.
+- R3, R2, R10 mặc định chỉ lấy task đã xong (achieved/breached) vì giá trị lưu của task đang chạy chưa chốt.
+- `source_name` chỉ xuất hiện trong list backlog (R5) và chỉ SLA Manager thấy (`groups`); các view chung nhóm theo `res_model`/định nghĩa.
+- Ngày trong bộ lọc theo ngày của người dùng (`context_today`), so với `Datetime` ở mốc 00:00.
+
+### i18n
+`i18n/ja_JP.po`: thêm 35 chuỗi (menu Reporting, tên 10 màn hình, bộ lọc, nhóm theo, help).
+
+### Test
+`tests/test_tg34_reporting_views.py` (tag `tg_34`, 16 test): mọi action mở được với SLA User và Manager (`get_views` và `formatted_read_group` đúng groupby/measure suy ra từ arch), đặc tính action, `source_name` chỉ Manager, menu hiển thị đúng nhóm, đếm R4/R3/R6/R2/R5/R7/R9/R10, R8 trên event, từng bộ lọc (đánh giá domain của search view), nhóm theo, bản ghi rỗng, có ja_JP; tour `dwo_sla_reporting_menu` (`static/tests/tours/reporting_tour.js`) mở app SLA và từng màn hình.
+
+### Việc kiểm kèm theo (C1 còn dở)
+- Migration chạy thật: `odoo_appstore/_tools/sla_migration_check_120.py 19` dựng DB 1.1.0 (bỏ 7 cột mới, `latest_version` = 19.0.1.1.0), `-u dwo_sla_core`, 15/15 kiểm tra đạt (outcome, bucket, % dùng, trễ, sla_type/target, source_name được tính lại cho task cũ).
+- `SLA_PERF=1` tg18: gắn 300 ticket x 30 định nghĩa 2.46s / 725 query (trước C1) so với 2.70s / 905 query (sau); `source_name` thêm khoảng 10% thời gian gắn hàng loạt (tính theo lô mỗi model), chấp nhận được.
