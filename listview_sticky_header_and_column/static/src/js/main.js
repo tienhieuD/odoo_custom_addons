@@ -10,7 +10,14 @@ import {
 // Constants
 const MODULE_KEY = 'listview_sticky_header_and_column';
 // Odoo 20: sortable/label column headers (the 19.0 `data-tooltip-delay` attribute is gone)
-const PIN_TARGET_SELECTOR = 'th[data-name]';
+// Every data header: `th[data-name]` (field columns) AND the header of a `<column>` group (Order Lines:
+// Description, Quantity, Unit Price...), which has a label and `tabindex` but no `data-name`.
+// Excluded below by class: record selector (checkbox), handle, button columns, open-form and optional-columns cells.
+const PIN_TARGET_SELECTOR = 'thead tr th[data-name], thead tr th[tabindex]';
+const PIN_EXCLUDED_CLASSES = [
+    'o_list_record_selector', 'o_list_controller', 'o_list_actions_header',
+    'o_list_open_form_view', 'o_list_button', 'o_handle_cell',
+];
 const PIN_BUTTON_CLASS = 'display-on-hover js_pin_this_column';
 const PIN_ICON_HTML = '<i class="oi oi-fw" data-icon="push_pin"></i>';
 const SLEEP_DELAY = 300;
@@ -93,6 +100,7 @@ patch(ListRenderer.prototype, {
         if (!el) return;
         const thElements = el.querySelectorAll(PIN_TARGET_SELECTOR);
         thElements.forEach(th => {
+            if (PIN_EXCLUDED_CLASSES.some(cls => th.classList.contains(cls))) return;
             if (!th.querySelector(`.${PIN_BUTTON_CLASS.split(' ')[1]}`)) {
                 const span = document.createElement('span');
                 span.className = PIN_BUTTON_CLASS;
