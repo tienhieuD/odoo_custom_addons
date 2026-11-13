@@ -37,6 +37,7 @@ odoo.define('listview_sticky_header_and_column.ListRenderer', function (require)
             return this._super.apply(this, arguments).then(function (result) {
                 // the table is rebuilt on every render: remove the stale style and freeze again
                 self._lshcRemoveOldStyle();
+                self._lshcMarkStickyHead();
                 setTimeout(function () {
                     if (self.isDestroyed && self.isDestroyed()) {
                         return;
@@ -53,6 +54,10 @@ odoo.define('listview_sticky_header_and_column.ListRenderer', function (require)
         _renderHeaderCell: function (node) {
             var self = this;
             var $cell = this._super.apply(this, arguments);
+            // every data header gets a pin button, but not the handle (drag to reorder) nor button columns
+            if (node.tag === 'button' || (node.attrs && node.attrs.widget === 'handle') || $cell.hasClass('o_handle_cell') || $cell.hasClass('o_list_button')) {
+                return $cell;
+            }
             $('<span>', {class: 'display-on-hover ' + PIN_CLASS})
                 .html('<i class="fa fa-thumb-tack"></i>')
                 .on('click', function (e) {
@@ -74,6 +79,15 @@ odoo.define('listview_sticky_header_and_column.ListRenderer', function (require)
             var parent = this.getParent();
             var field = (parent && parent.attrs && parent.name) ? '__field_' + parent.name : '';
             return MODULE_KEY + '__model_' + (this.state && this.state.model) + field;
+        },
+
+        /** Always-sticky header (even with no pinned column): class read by main.scss. Not for an x2many list in a form. */
+        _lshcMarkStickyHead: function () {
+            var parent = this.getParent();
+            if (parent && parent.attrs && parent.name) {
+                return;
+            }
+            this._lshcGetWrapper().addClass('lshc-sticky-head');
         },
 
         /** Saved column index; null when no column is pinned (0 is a valid index: the first column). */

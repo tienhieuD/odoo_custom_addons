@@ -7,9 +7,9 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
     const ASYNC_DONE = "o-lshc-asyncDone";
     const ASYNC_FAILED = "o-lshc-asyncFailed";
     const isAsync = (fn) => typeof fn === "function" && fn.constructor.name === "AsyncFunction";
-    // strict (Odoo 12 only): the tour manager of 12 swallows an error thrown by a step, so a failed assertion would leave the tour
+    // strict (default, every tour): the tour manager of 12 swallows an error thrown by a step, so a failed assertion would leave the tour
     // green. With strict, the step after the async one never matches when the assertion failed, so the tour (and the test) fails.
-    const expandAsync = (steps, strict) =>
+    const expandAsync = (steps, strict = true) =>
         steps.flatMap((step) => {
             if (!isAsync(step.run)) {
                 return [step];
@@ -111,7 +111,7 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
     async function widen(root) {
         tbl(root).style.minWidth = "2600px";
         // only 6 demo customers in 12: make the page taller so that a vertical scroll exists
-        tbl(root).style.marginBottom = "1500px";
+        tbl(root).style.height = "2000px";
         await sleep(200);
     }
     const rect = (el) => el.getBoundingClientRect();
@@ -125,7 +125,7 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                     clearKeys();
                     const root = document.querySelector(LIST);
                     assert(lshcKeys().length === 0 && pinStyles().length === 0, "a column is pinned: not the state to measure");
-                    tbl(root).style.marginBottom = "1500px"; // only 6 demo customers in 12: force a vertical scroll
+                    tbl(root).style.height = "2000px"; // only 6 demo customers in 12: force a vertical scroll
                     const thead = root.querySelector("thead");
                     assert(getComputedStyle(thead).position === "sticky", "thead not position: sticky (" + (getComputedStyle(thead).position) + ")");
                     assert(!/rgba\(.*,\s*0\)$|^transparent$/.test(getComputedStyle(thead).backgroundColor), "sticky thead must be opaque");
@@ -139,7 +139,7 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                     near(rect(thead).top, rect(sc).top, 2, "header top after scroll");
                     assert(rect(row0).bottom <= rect(thead).bottom + 1, "first row should have scrolled under the header");
                     sc.scrollTop = 0;
-                    tbl(root).style.marginBottom = "";
+                    tbl(root).style.height = "";
                 },
             },
     ]));
@@ -152,7 +152,7 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                 run: async () => {
                     clearKeys();
                     const root = document.querySelector(LIST);
-                    tbl(root).style.marginBottom = "1500px"; // only 6 demo customers in 12: force a vertical scroll
+                    tbl(root).style.height = "2000px"; // only 6 demo customers in 12: force a vertical scroll
                     await pin(root, "email");
                     const thead = root.querySelector("thead");
                     const cell = root.querySelector("thead th:not(.o_list_record_selector)");
@@ -445,7 +445,7 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                     near(rect(head).left - rect(sx).left, left0, 1.5, "pinned dialog th moved on horizontal scroll");
                     assert(freeX0 - rect(free).left > 100, "unpinned dialog column should move with the scroll");
                     // header stays on top of the dialog scroll area while scrolling down (the demo list is short: stretch the table)
-                    tbl(root).style.marginBottom = "1500px";
+                    tbl(root).style.height = "2000px";
                     tbl(root).style.height = "2500px";
                     await sleep(200);
                     const sy = scroller(tbl(root), "y");
@@ -458,7 +458,7 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                     sx.scrollLeft = 0;
                     sy.scrollTop = 0;
                     tbl(root).style.height = "";
-                    tbl(root).style.marginBottom = "";
+                    tbl(root).style.height = "";
                     clearKeys();
                 },
             },
@@ -570,7 +570,7 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                     const first = getComputedStyle(root.querySelector("thead th:first-child"));
                     assert(first.left === "auto" || first.zIndex !== "10", "th still pinned after unpin");
                     // the always-sticky header still works
-                    tbl(root).style.marginBottom = "1500px"; // only 6 demo customers in 12: force a vertical scroll
+                    tbl(root).style.height = "2000px"; // only 6 demo customers in 12: force a vertical scroll
                     const thead = root.querySelector("thead");
                     const sc = scroller(thead, "y");
                     assert(sc, "no vertical scroll area");
@@ -644,5 +644,102 @@ odoo.define("listview_sticky_header_and_column.tour", function (require) {
                     clearKeys();
                 },
             },
-    ], true));
+    ]));
+
+    // ---- Order Lines (sale): every data header has one pin button, none on the handle ----------------------
+    const OL = ".o_field_widget[name=order_line]";
+    const labelOf = (t) => t.innerText.trim();
+    // Odoo 12 keeps the column name in jQuery data (no data-name attribute on the th)
+    // 12 labels differ ("Ordered Qty"): the columns are addressed by field name
+    const nameOf = (t) => window.jQuery(t).data("name") || "";
+    // by text, or by data-name (the product field is product_id or product_template_id)
+    const olHead = (root, label) => [...root.querySelectorAll("thead tr th")].find((t) => labelOf(t) === label || nameOf(t) === label || (label === "product_id" && /^product_(template_)?id$/.test(nameOf(t))));
+
+    tour.register("lshc_order_lines", { test: true }, expandAsync([
+            { content: "edit mode (the form of Odoo 12 opens read-only and then the x2many has no [name])", trigger: ".o_form_button_edit", run: "click" },
+            { trigger: ".o_form_view.o_form_editable", run: () => {} },
+            { trigger: (OL) + " .o_data_row", run: () => {} },
+            {
+                content: "every data header of Order Lines has exactly one pin button (also those without data-name)",
+                trigger: (OL) + " .o_data_row",
+                run: async () => {
+                    clearKeys();
+                    const root = document.querySelector((OL) + " .table-responsive");
+                    await waitFor(() => olHead(root, "product_uom_qty")?.querySelector(".js_pin_this_column"), "pin button on Quantity");
+                    const ths = [...root.querySelectorAll("thead tr th")];
+                    let labelled = 0;
+                    for (const label of ["product_id", "product_uom_qty", "price_unit"]) {
+                        const t = olHead(root, label);
+                        assert(t, "no header " + (label));
+                        assert(t.querySelectorAll(".js_pin_this_column").length === 1, (label) + ": pin buttons = " + (t.querySelectorAll(".js_pin_this_column").length));
+                    }
+                    for (const t of ths) {
+                        const n = t.querySelectorAll(".js_pin_this_column").length;
+                        const excluded = t.matches(".o_handle_cell, .o_list_record_selector, .o_list_controller, .o_list_actions_header, .o_list_button, .o_list_open_form_view") || nameOf(t) === "sequence";
+                        if (excluded || !labelOf(t) && !nameOf(t)) {
+                            assert(n === 0, "pin button on a non-data header (class=\"" + t.className + "\")");
+                        } else {
+                            labelled++;
+                            assert(n === 1, "header \"" + labelOf(t) + "\": " + n + " pin buttons");
+                        }
+                    }
+                    assert(labelled >= 4, "only " + (labelled) + " pinnable headers");
+                    assert(getComputedStyle(olHead(root, "product_uom_qty").querySelector(".js_pin_this_column")).display === "none", "pin button should be hidden until hover");
+                    // the (absolute) button is positioned against its header, as for named columns
+                    assert(getComputedStyle(olHead(root, "price_unit")).position !== "static", "header is not a positioning context for the button");
+                },
+            },
+            {
+                content: "pin Description, Quantity, Unit Price in turn: that column and all on its left stay, scrolling horizontally",
+                trigger: (OL) + " .o_data_row",
+                run: async () => {
+                    const root = document.querySelector((OL) + " .table-responsive");
+                    await widen(root);
+                    for (const label of ["product_id", "product_uom_qty", "price_unit"]) {
+                        const heads = () => [...root.querySelectorAll("thead tr th")];
+                        const idx = heads().indexOf(olHead(root, label));
+                        assert(idx >= 1, (label) + " index " + (idx));
+                        olHead(root, label).querySelector(".js_pin_this_column").click();
+                        await sleep(700);
+                        const keys = lshcKeys();
+                        assert(keys.length === 1 && /__field_order_line$/.test(keys[0]), "localStorage keys: " + (keys));
+                        assert(Number(localStorage.getItem(keys[0])) === idx, (label) + ": saved index " + (localStorage.getItem(keys[0])) + " != " + (idx));
+                        heads().slice(0, idx + 1).forEach((h, i) => assert(getComputedStyle(h).position === "sticky" && getComputedStyle(h).zIndex === "10", (label) + ": th " + (i) + " not pinned"));
+                        const cell = root.querySelector(".o_data_row td:nth-child(" + (idx + 1) + ")");
+                        const first = root.querySelector(".o_data_row td:nth-child(1)");
+                        assert(getComputedStyle(cell).position === "sticky", (label) + ": pinned td not sticky");
+                        const free = root.querySelector(".o_data_row td:nth-child(" + (idx + 3) + ")");
+                        assert(getComputedStyle(free).position !== "sticky", (label) + ": column " + (idx + 3) + " must not be pinned");
+                        const sx = scroller(root.querySelector("table"), "x");
+                        assert(sx, "no horizontal scroll area");
+                        const l0 = rect(cell).left - rect(sx).left, f0 = rect(first).left, x0 = rect(free).left;
+                        sx.scrollLeft = 300;
+                        await sleep(300);
+                        assert(sx.scrollLeft > 100, "did not scroll (" + (sx.scrollLeft) + ")");
+                        near(rect(cell).left - rect(sx).left, l0, 1.5, (label) + ": pinned td moved");
+                        near(rect(first).left, f0, 1.5, (label) + ": columns on the left of the pinned one moved");
+                        near(rect(heads()[idx]).left - rect(sx).left, l0, 1.5, (label) + ": pinned th moved");
+                        assert(x0 - rect(free).left > 100, (label) + ": unpinned column should move");
+                        sx.scrollLeft = 0;
+                        await sleep(200);
+                        // pinning another column replaces the first pin (never two pins)
+                        assert(pinStyles().length === 2, (label) + ": style nodes " + (pinStyles().length));
+                    }
+                },
+            },
+            {
+                content: "second click on the pinned column unpins it",
+                trigger: (OL) + " .o_data_row",
+                run: async () => {
+                    const root = document.querySelector((OL) + " .table-responsive");
+                    olHead(root, "price_unit").querySelector(".js_pin_this_column").click();
+                    await sleep(700);
+                    assert(pinStyles().length === 0, "style nodes left after unpin");
+                    assert(lshcKeys().length === 0, "localStorage keys left: " + (lshcKeys()));
+                    const idx = [...root.querySelectorAll("thead tr th")].indexOf(olHead(root, "price_unit"));
+                    assert(getComputedStyle(root.querySelector(".o_data_row td:nth-child(" + (idx + 1) + ")")).position !== "sticky", "td still sticky");
+                    clearKeys();
+                },
+            },
+    ]));
 });
