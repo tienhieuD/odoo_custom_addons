@@ -136,10 +136,26 @@ class SlaDefinitionHook(models.Model):
                 tracked_fnames = [
                     name for name in vals
                     if name in self._fields and self._fields[name].store]
-                old_values = {
-                    record.id: {name: record[name] for name in tracked_fnames}
-                    for record in self.filtered('id')
-                }
+                # Field lưu tính được đang chờ tính lại (vd. đổi company_id rồi ghi tay validity_date): đọc
+                # giá trị cũ sẽ ép tính ngay và bắn hook compute giữa chừng (reset lần 1), rồi lần ghi này
+                # bắn lần 2. Lần ghi thay chính giá trị đó nên bỏ cờ chờ tính khi đọc giá trị cũ (đọc giá
+                # trị đang lưu), rồi đặt lại cờ để ORM tự xử lý khi ghi (task 021).
+                suspended = []
+                for name in tracked_fnames:
+                    field = self._fields[name]
+                    if field.compute:
+                        pending = self.env.records_to_compute(field) & self
+                        if pending:
+                            self.env.remove_to_compute(field, pending)
+                            suspended.append((field, pending))
+                try:
+                    old_values = {
+                        record.id: {name: record[name] for name in tracked_fnames}
+                        for record in self.filtered('id')
+                    }
+                finally:
+                    for field, pending in suspended:
+                        self.env.add_to_compute(field, pending)
                 result = write.origin(self, vals, **kw)  # pyright: ignore[reportFunctionMemberAccess]
                 changed_by_id = {}
                 for record in self.filtered('id'):
@@ -191,7 +207,15 @@ class SlaDefinitionHook(models.Model):
             if key in patched:
                 return
             patched.add(key)
-            method.origin = getattr(model_class, name)
+            origin = getattr(model_class, name)
+            # Idempotent (task 028): `_register_hook` có thể chạy khi lớp đã mang patch của ta,
+            # vd. định nghĩa SLA tạo trong lúc nạp module (data/demo) gọi `_register_sla_hook`,
+            # rồi bước cuối của `load_modules` gọi `_register_hook` lần nữa mà không gỡ trước. Nếu
+            # lấy patch cũ làm `origin` thì `write` chạy hai lớp hook -> reset bắn 2 lần. Bóc mọi
+            # lớp patch của ta để chỉ còn đúng một lớp.
+            while getattr(origin, 'sla_patch', False):
+                origin = origin.origin
+            method.origin = origin
             method.sla_patch = True  # dấu đánh dấu cho _ensure_hook_registered (D9/R-01)
             setattr(model_class, name, method)
 
