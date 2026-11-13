@@ -353,3 +353,4 @@ class TestReportingTour(HttpCase):
                 vals['end_time'] = now
             env['sla.task'].sudo().create(vals)
         self.start_tour('/odoo', 'dwo_sla_reporting_menu', login='admin')
+        self.start_tour('/odoo', 'dwo_sla_graph_colors', login='admin')

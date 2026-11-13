@@ -2,6 +2,24 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-13 - 19.0.1.2.2: màu biểu đồ theo ý nghĩa và trục phần trăm (task 023)
+
+Chỉ bản 19. Không đổi field, model, dữ liệu hay migration.
+
+### Thay đổi
+- Graph/pie chuẩn Odoo gán màu theo thứ tự nhóm (On Time có thể ra màu đỏ). Thêm patch JS `static/src/graph_colors/sla_graph_colors.js` (bundle `web.assets_backend_lazy`, nơi graph được nạp) vá `GraphRenderer` (`getBarChartData`, `getLineChartData`, `getPieChartData`, `getLegendOptions`). Khi chuỗi (series) của graph là một field trong bảng `SLA_GRAPH_COLORS`, màu đặt theo GIÁ TRỊ: `sla.task.outcome` (on_time xanh lục, late cam, breached_open đỏ, running xanh xám, paused xám nhạt, cancelled xám), `sla.task.stage`, `sla.task.usage_bucket` (xanh lục sang đỏ), `sla.event.event`. Model/field khác không bị ảnh hưởng.
+- Thứ tự xếp chồng/lát pie theo thứ tự selection (on_time, late, breached_open, ...), vì Odoo sắp nhóm theo khoá lưu (alphabet: late trước on_time). Nhãn nhận ra giá trị qua `selection` của field (theo ngôn ngữ hiện tại).
+- Trục phần trăm: `achieved_rate` trong graph Compliance Trend dùng `widget="percentage"` (graph Odoo 19 đọc widget của measure cho trục Y và tooltip): 0% đến 100% thay vì 0 đến 1.00. Pivot đã có từ trước. Dữ liệu và tên field giữ nguyên.
+
+### Test
+`tests/test_tg36_graph_colors.py` (4 test: bảng màu phủ đủ giá trị selection, thứ tự selection outcome, widget percentage, asset khai báo) và tour `dwo_sla_graph_colors` (static/tests/tours/reporting_tour.js, chạy trong `test_reporting_menu_tour`) đo màu thật trên đối tượng Chart.js: pie, bar chồng (màu và thứ tự), nhãn trục "50%". Tổng 475 test xanh.
+
+### Ảnh demo
+Ảnh 04-10 của `_demo/dwo_sla_demo` chụp lại (màu đúng nghĩa, trục %).
+
+### Đánh đổi
+Màu ở chế độ tối giữ nguyên (không đổi theo scheme). Graph một nhóm (không có chuỗi thứ hai) không tô từng cột theo giá trị.
+
 ## 2026-11-13 - 19.0.1.2.1: reset theo field lưu ghi được không bắn hai lần (task 021)
 
 Chỉ bản 19. Sửa lỗi, không đổi field/view/migration.

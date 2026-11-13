@@ -20,7 +20,7 @@ Requires only the standard base, resource, web and mail modules.
     'support': 'hello@duotek.io.vn',
 
     'category': 'Services',
-    'version': '19.0.1.2.1',
+    'version': '19.0.1.2.2',
     'installable': True,
     'application': False,
     'license': 'OPL-1',
@@ -70,6 +70,8 @@ Requires only the standard base, resource, web and mail modules.
             'dwo_sla_core/static/src/form_sla_status/form_sla_status.xml',
             'dwo_sla_core/static/src/form_sla_status/form_sla_status.scss',
         ],
+        # graph views live in the lazy bundle: the patch must load with them
+        'web.assets_backend_lazy': ['dwo_sla_core/static/src/graph_colors/sla_graph_colors.js'],
         'web.assets_tests': ['dwo_sla_core/static/tests/**/*'],
     },
 }
