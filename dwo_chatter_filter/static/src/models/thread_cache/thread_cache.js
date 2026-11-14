@@ -14,7 +14,7 @@ registerInstancePatchModel('mail.thread_cache', 'dwo_chatter_filter/static/src/m
      */
     _computeMessages() {
         const result = this._super();
-        if (!this.thread || !this.thread.dwoFilter) {
+        if (!this.thread || (!this.thread.dwoFilter && !this.thread.dwoSearch)) {
             return result;
         }
         return replace(this.fetchedMessages);

@@ -99,13 +99,25 @@ class MailMessage(models.Model):
         raise UserError(_("Unknown kind of message: %s") % category)
 
     @api.model
-    def _message_fetch(self, domain, *args, dwo_filter_id=None, **kwargs):
+    def _dwo_search_domain(self, text):
+        """The messages that contain the text (any case) in the body, the subject, the name or the email of
+        the author. No text: no condition."""
+        text = (text or "").strip() if isinstance(text, str) else ""
+        if not text:
+            return []
+        return expression.OR([
+            [("body", "ilike", text)], [("subject", "ilike", text)],
+            [("author_id.name", "ilike", text)], [("email_from", "ilike", text)],
+        ])
+
+    @api.model
+    def _message_fetch(self, domain, *args, dwo_filter_id=None, dwo_search=None, **kwargs):
         """The chatter asks for the messages of one chip: the filter is applied by the server, so the
         pagination (Load more) works on the filtered list and not on what was already loaded. A chip that
         is gone, archived or broken filters nothing.
 
         Odoo 15 has no way to pass an extra parameter from the browser to here: the controller
-        (see controllers/thread.py) puts the chip in the context."""
+        (see controllers/thread.py) puts the chip and the text searched in the context."""
         dwo_filter_id = dwo_filter_id or self.env.context.get("dwo_filter_id")
         if dwo_filter_id:
             chip = self.env["dwo.chatter.filter"].browse(int(dwo_filter_id)).exists()
@@ -117,10 +129,13 @@ class MailMessage(models.Model):
                     domain = expression.AND([domain or [], chip_domain])
                 except Exception:
                     _logger.warning("Chatter Quick Filter: the filter of %r is not valid", chip.name, exc_info=True)
+        dwo_search = dwo_search or self.env.context.get("dwo_search")
+        if dwo_search and isinstance(dwo_search, str) and dwo_search.strip():
+            domain = expression.AND([domain or [], self._dwo_search_domain(dwo_search)])
         return super()._message_fetch(domain, *args, **kwargs)
 
     @api.model
-    def dwo_filter_chips(self, res_model, res_id):
+    def dwo_filter_chips(self, res_model, res_id, search=None):
         """What the chatter shows above the messages of a record: the number of messages in all, and the
         chips (in their order) with the number of messages each one shows. A chip whose filter does not work
         (a field of a module that was removed) has no number; the others are not affected."""
@@ -130,6 +145,7 @@ class MailMessage(models.Model):
         record.check_access_rights("read")
         record.check_access_rule("read")
         base = [("model", "=", res_model), ("res_id", "=", res_id), ("message_type", "!=", "user_notification")]
+        base = expression.AND([base, self._dwo_search_domain(search)])
         chips = []
         for chip in self.env["dwo.chatter.filter"].search([], limit=MAX_CHIPS):
             try:

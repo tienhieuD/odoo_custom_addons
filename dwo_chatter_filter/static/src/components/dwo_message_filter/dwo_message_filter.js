@@ -36,7 +36,8 @@ export class DwoMessageFilter extends Component {
     setup() {
         super.setup();
         this.isAdmin = Boolean(session.is_admin);
-        this.state = useState({ data: null });
+        this.state = useState({ data: null, text: '' });
+        this.searchTimer = null;
         this.timer = null;
         this.watched = null;
     }
@@ -61,6 +62,7 @@ export class DwoMessageFilter extends Component {
         // the record was shown again (back from the list of chips, say): the chatter is a new one, the chips are read again
         if (this.props.chatterLocalId !== this.chatterLocalId) {
             this.chatterLocalId = this.props.chatterLocalId;
+            this.state.text = (this.thread && this.thread.dwoSearch) || '';
             this._loadChips();
         }
         const thread = this.thread;
@@ -83,6 +85,7 @@ export class DwoMessageFilter extends Component {
         this.unmounted = true;
         this.env.bus.off('ACTION_MANAGER:UI-UPDATED', this);
         clearTimeout(this.timer);
+        clearTimeout(this.searchTimer);
         // leaving this record: back to all the messages
         const thread = this.thread;
         if (thread && thread.exists()) {
@@ -130,7 +133,7 @@ export class DwoMessageFilter extends Component {
             const data = await this.env.services.rpc({
                 model: 'mail.message',
                 method: 'dwo_filter_chips',
-                args: [thread.model, thread.id],
+                args: [thread.model, thread.id, thread.dwoSearch || null],
             });
             if (this.unmounted) {
                 return;
@@ -154,7 +157,7 @@ export class DwoMessageFilter extends Component {
         await this._loadChips();
         // the server decides which messages a chip shows: ask it again when a new message came
         const thread = this.thread;
-        if (thread && thread.exists() && thread.dwoFilter && !this.unmounted) {
+        if (thread && thread.exists() && (thread.dwoFilter || thread.dwoSearch) && !this.unmounted) {
             thread.dwoReload();
         }
     }
@@ -168,6 +171,42 @@ export class DwoMessageFilter extends Component {
         if (thread) {
             thread.dwoSetFilter(chip === 'all' ? false : parseInt(chip, 10));
         }
+    }
+
+    /**
+     * Typing: search 300 ms after the last key.
+     *
+     * @param {InputEvent} ev
+     */
+    onSearchInput(ev) {
+        this.state.text = ev.target.value;
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this._applySearch(), 300);
+    }
+
+    /**
+     * @param {KeyboardEvent} ev
+     */
+    onSearchKeydown(ev) {
+        if (ev.key === 'Escape' && this.state.text) {
+            ev.stopPropagation();
+            this.onClickClearSearch();
+        }
+    }
+
+    onClickClearSearch() {
+        this.state.text = '';
+        clearTimeout(this.searchTimer);
+        return this._applySearch();
+    }
+
+    async _applySearch() {
+        const thread = this.thread;
+        if (this.unmounted || !thread || !thread.exists()) {
+            return;
+        }
+        thread.dwoSetSearch(this.state.text);
+        await this._loadChips();
     }
 
     onClickEdit() {
