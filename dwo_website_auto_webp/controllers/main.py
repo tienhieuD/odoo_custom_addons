@@ -18,7 +18,10 @@ class WebpBinary(Binary):
         """
         response = super(WebpBinary, self).content_image(*args, **kwargs)
         try:
-            return request.env['dwo.webp.helper']._webp_process_response(response, kwargs)
+            response = request.env['dwo.webp.helper']._webp_process_response(response, kwargs)
         except Exception:
             _logger.warning('dwo_website_auto_webp: unexpected error, fallback to original', exc_info=True)
-            return response
+        # The format depends on the Accept header: tell shared caches/CDN
+        if 'accept' not in response.headers.get('Vary', '').lower().replace(' ', '').split(','):
+            response.headers.add('Vary', 'Accept')
+        return response
