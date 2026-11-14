@@ -1,5 +1,9 @@
 import base64
+import getpass
 import io
+import json
+import os
+import re
 import zipfile
 from datetime import timedelta
 
@@ -363,6 +367,78 @@ class TestProtectJob(TransactionCase):
         # job history itself (name, state, result_info) must survive the cleanup
         self.assertEqual(job.state, "done")
         self.assertTrue(job.result_info)
+
+    # ------------------------------------------------------------------ #
+    # Result zip must not leak the server's paths / user name (issue #2)
+
+    def _result_files(self, job):
+        out_bytes = base64.b64decode(job.result_attachment_id.sudo().datas)
+        with zipfile.ZipFile(io.BytesIO(out_bytes)) as zf:
+            return {n: zf.read(n) for n in zf.namelist() if not n.endswith("/")}
+
+    def test_result_zip_does_not_leak_server_paths(self):
+        """No file in the result zip (manifest report, stubs, .so, anything) may contain an
+        absolute path of the server: the job work dir, the data dir, the home dir, the OS
+        user name in a path, or any /Users/<x>/ or /home/<x>/ style path."""
+        from odoo.tools import config
+
+        zip_bytes = _make_zip([{"root": "sale_ext", "manifest": True, "has_models": True}])
+        job = self._new_job(zip_bytes, filename="sale_ext.zip")
+        # the work dir is deleted when the job finishes: remember it from the extract step
+        job._process_one_step()
+        work_dir = job.work_dir
+        self._run_to_completion(job)
+        self.assertEqual(job.state, "done")
+        forbidden = [work_dir, os.path.dirname(work_dir), os.path.expanduser("~")]
+        data_dir = config.get("data_dir")
+        if data_dir:
+            forbidden.append(data_dir)
+        user = getpass.getuser()
+        forbidden += ["/Users/%s" % user, "/home/%s" % user]
+        forbidden = [f.encode() for f in forbidden if f and len(f) > 4]
+        pattern = re.compile(rb"/(?:Users|home)/[A-Za-z0-9._-]+|/var/folders/|/private/(?:var|tmp)/|dwo_protect_jobs")
+        files = self._result_files(job)
+        self.assertTrue(files)
+        for name, content in files.items():
+            for bad in forbidden:
+                self.assertNotIn(bad, content, "%s leaks server path %r" % (name, bad))
+            self.assertIsNone(pattern.search(content), "%s leaks a server-looking path" % name)
+
+    def test_result_manifest_uses_relative_paths(self):
+        """protection-manifest.json stays (useful to the customer) but lists paths relative
+        to the module folder."""
+        zip_bytes = _make_zip([{"root": "sale_ext", "manifest": True, "has_models": True}])
+        job = self._new_job(zip_bytes, filename="sale_ext.zip")
+        self._run_to_completion(job)
+        files = self._result_files(job)
+        report = json.loads(files["sale_ext/protection-manifest.json"].decode())
+        self.assertEqual(report["module_root"], "sale_ext")
+        self.assertEqual(report["output_root"], "sale_ext")
+        self.assertIn("models/test_model.py", report["selected_files"])
+        self.assertTrue(report["transformed_files"])
+        for key in ("selected_files", "skipped_files", "transformed_files", "compiled_artifacts"):
+            for path in report[key]:
+                self.assertFalse(os.path.isabs(path), "%s has absolute path %s" % (key, path))
+                self.assertNotIn("..", path.split("/"))
+        self.assertTrue(report["compiled_count"] == len(report["compiled_artifacts"]))
+        for path in report["compile_failures"]:
+            self.assertFalse(os.path.isabs(path["file"]))
+
+    def test_result_zip_strips_uploaded_bytecode(self):
+        """__pycache__/.pyc and .DS_Store in the uploaded zip embed the uploader's own build
+        paths (and stale bytecode of the unprotected source): they are dropped from the
+        result."""
+        zip_bytes = _make_zip([
+            {"root": "sale_ext", "manifest": True, "has_models": True},
+            {"path": "sale_ext/models/__pycache__/test_model.cpython-312.pyc",
+             "content": b"\x00/Users/uploader/proj/sale_ext/models/test_model.py"},
+            {"path": "sale_ext/.DS_Store", "content": b"x"},
+        ])
+        job = self._new_job(zip_bytes, filename="sale_ext.zip")
+        self._run_to_completion(job)
+        names = list(self._result_files(job))
+        self.assertFalse([n for n in names if "__pycache__" in n or n.endswith(".pyc")], names)
+        self.assertFalse([n for n in names if n.endswith(".DS_Store")], names)
 
     def test_find_module_roots_no_nested(self):
         """_find_module_roots returns top-level module dirs only."""
