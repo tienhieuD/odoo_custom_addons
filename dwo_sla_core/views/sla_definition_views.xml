@@ -34,7 +34,7 @@
                                 class="oe_stat_button" icon="fa-tasks"
                                 groups="dwo_sla_core.group_sla_user">
                             <field name="running_task_count" widget="statinfo"
-                                   string="Running Tasks"/>
+                                   string="Open Tasks"/>
                         </button>
                     </div>
                     <!-- Odoo 12 has no web_ribbon widget: a badge -->

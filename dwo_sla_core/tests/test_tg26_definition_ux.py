@@ -191,6 +191,16 @@ class TestSmartButton(Tg26Case):
         d.invalidate_cache(['running_task_count'], ids=d.ids)
         self.assertEqual(len(shown), d.running_task_count)
 
+    def test_button_label_is_open_tasks(self):
+        """Issue 5: the count covers in_progress and paused, so the label says
+        "Open Tasks" (not "Running Tasks"), on the button and on the field."""
+        root = self.arch('sla.definition', 'form')
+        field = root.xpath("//button[@name='action_view_tasks']//field[@name='running_task_count']")
+        self.assertEqual(len(field), 1)
+        self.assertEqual(field[0].get('string'), "Open Tasks")
+        label = self.env['sla.definition'].fields_get(['running_task_count'])['running_task_count']['string']
+        self.assertEqual(label, "Open Tasks")
+
     def test_form_arch_button_and_js_class(self):
         root = self.arch('sla.definition', 'form')
         self.assertEqual(root.get('js_class'), 'sla_definition_form')
