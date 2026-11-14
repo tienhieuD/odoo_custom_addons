@@ -1,4 +1,5 @@
 import base64
+import contextlib
 import io
 import json
 import logging
@@ -19,6 +20,62 @@ MAX_ZIP_SIZE_BYTES = 200 * 1024 * 1024  # 200 MB
 RESULT_RETENTION_DAYS = 1  # file ket qua (va file goc) chi giu 1 ngay, xem _cron_cleanup_expired
 BUS_CHANNEL_TYPE = "dwo_protect_job"
 MAX_STEP_ATTEMPTS = 3  # xem step_attempts / _step_protect_one_module
+# Khong dua vao zip ket qua: bytecode cua ban goc (ghi duong dan may nguoi tai len + ma nguon chua
+# bao ve) va file rac cua he dieu hanh.
+_SKIP_DIRS = ("__pycache__", "__MACOSX")
+_SKIP_SUFFIXES = (".pyc", ".pyo")
+_SKIP_NAMES = (".DS_Store",)
+
+
+@contextlib.contextmanager
+def _no_debug_info():
+    """Bien dich Cython KHONG kem thong tin debug (-g0 dat cuoi CFLAGS de thang -g cua Python).
+
+    Neu khong, file .so/.pyd mang theo duong dan tuyet doi cua may chu (thu muc job, thu muc build
+    tam) trong bang symbol/DWARF.
+    """
+    old = os.environ.get("CFLAGS")
+    os.environ["CFLAGS"] = ((old + " ") if old else "") + "-g0"
+    try:
+        yield
+    finally:
+        if old is None:
+            os.environ.pop("CFLAGS", None)
+        else:
+            os.environ["CFLAGS"] = old
+
+
+def _relativize_manifest(manifest_path, module_name, source_root, output_root, work_dir):
+    """Doi protection-manifest.json do jProtect ghi (duong dan TUYET DOI cua may chu) sang duong
+    dan tuong doi so voi thu muc module; giu nguyen so lieu/ danh sach file."""
+    manifest_path = Path(manifest_path)
+    if not manifest_path.is_file():
+        return
+    try:
+        report = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except ValueError:
+        manifest_path.unlink()
+        return
+    roots = sorted({str(source_root), str(output_root)}, key=len, reverse=True)
+
+    def clean(text):
+        for root in roots:
+            text = text.replace(root + os.sep, "").replace(root, ".")
+        return text.replace(str(work_dir), "<job>")
+
+    def walk(value):
+        if isinstance(value, dict):
+            return {k: walk(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [walk(v) for v in value]
+        if isinstance(value, str):
+            return clean(value)
+        return value
+
+    report = walk(report)
+    report["module_root"] = module_name
+    report["output_root"] = module_name
+    manifest_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
 
 class DwoProtectJob(models.Model):
@@ -427,7 +484,8 @@ class DwoProtectJob(models.Model):
         else:
             try:
                 cfg = ProtectConfig(input_path=Path(root), output_path=Path(out_path), compile=True)
-                report = run_pipeline(cfg)
+                with _no_debug_info():
+                    report = run_pipeline(cfg)
                 transformed = report.get("transformed_count", 0)
                 compiled = report.get("compiled_count", 0)
                 if transformed == 0:
@@ -438,6 +496,10 @@ class DwoProtectJob(models.Model):
                 else:
                     shutil.rmtree(root)
                     shutil.move(out_path, root)
+                    _relativize_manifest(
+                        os.path.join(root, "protection-manifest.json"),
+                        module_name, root, out_path, self.work_dir,
+                    )
                     rows.append({
                         "name": module_name, "status": "Protected",
                         "transformed": transformed, "compiled": compiled, "reason": "",
@@ -599,8 +661,11 @@ class DwoProtectJob(models.Model):
                 zf.setpassword(password)
                 zf.setencryption(pyzipper.WZ_AES, nbits=256)
             for file_path in sorted(source_path.rglob("*")):
-                if file_path.is_file():
-                    zf.write(file_path, file_path.relative_to(source_path))
+                rel = file_path.relative_to(source_path)
+                if (file_path.is_file() and file_path.name not in _SKIP_NAMES
+                        and file_path.suffix not in _SKIP_SUFFIXES
+                        and not any(part in _SKIP_DIRS for part in rel.parts)):
+                    zf.write(file_path, rel)
         return buf.getvalue()
 
     def _output_zip_name(self, upload_filename, record_id=None, timestamp=None, python_version=None):
