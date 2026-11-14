@@ -68,7 +68,7 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Safe when you switch</h4>
-                    <p class="mb-0" style="font-size: 14px;">Clicking another record while the current one has unsaved changes asks you to save or discard first, like Odoo does anywhere else.</p>
+                    <p class="mb-0" style="font-size: 14px;">Clicking another record saves your pending changes first. If they cannot be saved, for example a required field is empty, you stay on the record and Odoo tells you what is missing.</p>
                 </div>
             </div>
         </div>
@@ -115,28 +115,58 @@
         </div>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The list and the form, side by side</h2>
-    <p class="mb-4" style="font-size: 16px;">Sales orders in split mode. The list keeps its search bar and pager, the order opens on the right with its lines, and the expand button in the corner opens the full form.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">One click away on every list</h2>
+    <p class="mb-4" style="font-size: 16px;">The Split button sits in the view switcher, right after the list view. Click it to turn the list into a split view.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_1.png" alt="Sales orders in split mode with a search active: the list on the left, the selected order and an expand button on the right" class="img-fluid rounded shadow"/>
+        <img src="screenshot_1.png" alt="Sales orders list with the Split button, outlined, in the view switcher" class="img-fluid rounded shadow"/>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">One click away on every list</h2>
-    <p class="mb-4" style="font-size: 16px;">The Split button sits in the view switcher, right after the list view.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The list and the form, side by side</h2>
+    <p class="mb-4" style="font-size: 16px;">The selected order opens on the right with its lines and chatter, and its row is highlighted. The expand button in the top corner of the right pane (outlined here) opens the record in the full form.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_2.png" alt="Sales orders list with the new Split button in the view switcher" class="img-fluid rounded shadow"/>
+        <img src="screenshot_2.png" alt="Sales orders in split mode: the list on the left with the selected order highlighted, the order on the right and the expand button outlined in the top corner" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The list stays a list</h2>
+    <p class="mb-4" style="font-size: 16px;">The left pane keeps its own search bar, filters, group by and pager. Here the list is searched and grouped by salesperson, and the order picked in a group is open on the right.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_3.png" alt="Split view with a search and a group by active in the left pane while an order is open on the right" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Create records without leaving the list</h2>
-    <p class="mb-4" style="font-size: 16px;">Click New and the form of the new record opens on the right. Save it and the list shows it right away.</p>
+    <p class="mb-4" style="font-size: 16px;">Click New and the form of the new record opens on the right. Save it and the list shows it right away; Save, Discard and Delete work in the right pane.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_3.png" alt="A new record being created in the right pane while the list stays on the left" class="img-fluid rounded shadow"/>
+        <img src="screenshot_4.png" alt="A new quotation being created in the right pane while the list stays on the left" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Safe when you switch records</h2>
+    <p class="mb-4" style="font-size: 16px;">Clicking another row first saves your changes. If they cannot be saved, here because the required Customer is empty, you stay on the record and Odoo tells you what is missing.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_5.png" alt="A new quotation with the Customer field missing: a Missing required fields message appears when another row is clicked and the record stays open" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Give the room to what you need</h2>
+    <p class="mb-4" style="font-size: 16px;">Drag the divider between the panes to give more room to the list or to the form. The width is remembered for each action in your browser.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_6.png" alt="Split view with the divider dragged to the left: a narrow list and a wide form" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The full form, one click away</h2>
+    <p class="mb-4" style="font-size: 16px;">The expand button opens the record in the normal full form view. The breadcrumb takes you back.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_7.png" alt="The full form view of a sales order opened from the split view, with the breadcrumb above it" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Come back to the same place</h2>
-    <p class="mb-4" style="font-size: 16px;">Open the record in the full form, use the breadcrumb to go back, and the split view is exactly as you left it.</p>
+    <p class="mb-4" style="font-size: 16px;">Use the breadcrumb to go back and the split view is exactly as you left it: same search, same page, same record open and highlighted.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_4.png" alt="Split view after returning from the full form: the search, the open record and the highlighted row are unchanged" class="img-fluid rounded shadow"/>
+        <img src="screenshot_8.png" alt="Split view after returning from the full form: the search, the open record and the highlighted row are unchanged" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Switch it off when you do not want it</h2>
+    <p class="mb-4" style="font-size: 16px;">Settings > Split View turns the automatic Split mode on or off for the whole database. In developer mode a single window action can opt out.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_9.png" alt="Settings page of the Split View module with the option to add the Split mode to every list" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
