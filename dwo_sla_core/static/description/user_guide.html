@@ -76,10 +76,6 @@
     </ol>
     </div>
     <p class="mb-3" style="font-size: 15px;">Limit to keep in mind: a condition that reads a non-stored computed field, or one that reaches across a relation (for example <code>partner_id.country_id</code>), is not automatically re-evaluated when only the related record changes. Use the <strong>Re-check Conditions</strong> button on the task (or <strong>Re-evaluate</strong> on the error list for a batch) to refresh it on demand. The <strong>Note</strong> tab of the definition form collects these limits and the common mistakes in one place.</p>
-    <div class="text-center mb-5">
-    <img src="screenshot_2.png" alt="Start Condition tab showing Odoo&#x27;s domain builder with rules on Project and Priority fields" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
-    <p class="text-muted mt-2" style="font-size: 13px;">A Start Condition built entirely with Odoo's own domain editor &#8212; no code.</p>
-    </div>
     <h2 id="first-definition" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">5. Create Your First SLA Definition</h2>
     <ol style="font-size: 15px;" class="mb-4">
     <li class="mb-2">Go to <strong>SLA &#8594; SLA Definitions &#8594; New</strong>.</li>
@@ -127,8 +123,8 @@
     </ol>
     <p class="mb-3" style="font-size: 15px;">If the action fails (a broken Server Action, a field pointing nowhere), the engine logs one <strong>Escalate Failed</strong> event with the error and moves on &#8212; it does not retry. Transient failures aside, retrying an action that failed once rarely succeeds on its own, so the Error Events screen (&#167;14) is the place to catch and fix these, not a background retry loop. Server Actions always run with the permissions of the background job's own user, never with the permissions of whoever last edited the source record.</p>
     <div class="text-center mb-5">
-    <img src="screenshot_4.png" alt="Escalation tab with two threshold rules at 75% and 100%, one emailing every assignee and one emailing a fixed on-call address" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
-    <p class="text-muted mt-2" style="font-size: 13px;">A two-stage escalation: a 75% warning emailed to every assignee at once, then a 100% breach alert to a fixed on-call address.</p>
+    <img src="screenshot_11.png" alt="Escalation tab with two threshold rules at 75% and 100%, one emailing the salesperson of the record and one emailing a fixed on-call address" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+    <p class="text-muted mt-2" style="font-size: 13px;">A two-stage escalation: a 75% warning emailed to the salesperson of the record, then a 100% breach alert to a fixed on-call address.</p>
     </div>
     <h2 id="smart-button" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">9. Smart Button on the Source Record</h2>
     <p class="mb-3" style="font-size: 15px;">The SLA Progress widget (&#167;10) lives on the SLA Task screen. To see SLA status without leaving the ticket, task or any other record it is attached to, add a one-line smart button to that model's own form &#8212; no dependency on <code>dwo_sla_core</code>'s own views required, just two small additions in the model you already customise:</p>
@@ -167,7 +163,7 @@
     </table>
     <p class="mb-3" style="font-size: 15px;">The progress bar is always capped at 100% of the target so it stays readable; once a task runs far past its deadline, the overrun is shown as a multiplier next to the percentage (for example "100% (70.0x over target)") instead of a four- or five-digit number.</p>
     <div class="text-center mb-5">
-    <img src="screenshot_3.png" alt="SLA Task form with the SLA Progress widget showing a red breaching status, a capped progress bar and Start/Deadline/End milestones" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+    <img src="screenshot_9.png" alt="SLA Task form with the SLA Progress widget showing a red breaching status at 258 percent, a full progress bar and Start/Deadline/End milestones, and the History tab listing the events of the task" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
 
     </div>
     <p class="mb-3" style="font-size: 15px;">Below the card, the <strong>Overview</strong> tab groups every field the task carries:</p>
@@ -210,7 +206,7 @@
     <tr><td><strong>Currently Breaching</strong></td><td>1 while a task is running or paused and already past its deadline, otherwise 0. Summed over a group, it is how many SLAs are in breach right now.</td></tr>
     </table>
     <div class="text-center mb-5">
-    <img src="screenshot_8.png" alt="Pivot table of SLA Tasks broken down by definition, with Business Duration, Achieved Rate and Currently Breaching columns" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+    <img src="screenshot_4.png" alt="Open Backlog and Ageing pivot with one row per SLA definition, one column per week of the deadline, and Count and Currently Breaching measures" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
 
     </div>
     <h2 id="admin" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">14. Administration Settings</h2>
