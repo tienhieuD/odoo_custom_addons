@@ -432,15 +432,18 @@ class SlaDefinition(models.Model):
         }
 
     def action_view_tasks(self):
-        """Mở danh sách mọi task của định nghĩa này (smart button).
+        """Mở danh sách task của định nghĩa này (smart button), lọc mặc định "đang chạy".
 
+        Logic: domain chỉ giới hạn theo định nghĩa; giữ context của action
+        `action_sla_task` (facet mặc định In Progress + Paused, đúng tập
+        `running_task_count` đếm) để người dùng vẫn gỡ được bộ lọc xem cả
+        task đã xong (task 037; trước đó context bị xoá nên mở cả lịch sử).
         Refs: plan-improvement-sla-01-review §6.7
         """
         self.ensure_one()
         action = self.env.ref(
             'dwo_sla_core.action_sla_task').sudo().read()[0]  # Odoo 13: no `_for_xml_id`
         action['domain'] = [('sla_id', '=', self.id)]
-        action['context'] = {}
         return action
 
     def action_enable(self):
