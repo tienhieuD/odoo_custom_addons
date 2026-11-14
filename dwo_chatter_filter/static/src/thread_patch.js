@@ -11,13 +11,15 @@ patch(Thread.prototype, {
         super.setup(...arguments);
         /** The id of the chip chosen (the messages it shows are the only ones loaded), false for all. */
         this.dwoFilter = false;
+        /** The text searched in the messages (the server searches), empty for no search. */
+        this.dwoSearch = "";
     },
 });
 
 patch(ThreadService.prototype, {
     /** While a chip is chosen, the server only returns the messages of that chip (Load more included). */
     async fetchMessages(thread, { after, before } = {}) {
-        if (!thread.dwoFilter) {
+        if (!thread.dwoFilter && !thread.dwoSearch) {
             return super.fetchMessages(...arguments);
         }
         thread.status = "loading";
@@ -29,6 +31,7 @@ patch(ThreadService.prototype, {
                 after,
                 before,
                 dwo_filter_id: thread.dwoFilter,
+                dwo_search: thread.dwoSearch,
             });
             const messages = this.store.Message.insert(rawMessages.reverse(), { html: true });
             thread.isLoaded = true;
@@ -60,6 +63,17 @@ patch(ThreadService.prototype, {
         await this.fetchNewMessages(thread);
     },
 
+    /** Search a text in the messages, together with the chip chosen. */
+    async dwoSetSearch(thread, text) {
+        text = (text || "").trim();
+        if (thread.dwoSearch === text) {
+            return;
+        }
+        thread.dwoSearch = text;
+        this.dwoForgetMessages(thread);
+        await this.fetchNewMessages(thread);
+    },
+
     /** Load the messages of the chosen chip again (a message arrived: the server says if it belongs). */
     async dwoReload(thread) {
         this.dwoForgetMessages(thread);
@@ -68,8 +82,9 @@ patch(ThreadService.prototype, {
 
     /** Back to all the messages, for the next time the record is opened. */
     dwoReset(thread) {
-        if (thread.dwoFilter) {
+        if (thread.dwoFilter || thread.dwoSearch) {
             thread.dwoFilter = false;
+            thread.dwoSearch = "";
             this.dwoForgetMessages(thread);
         }
     },

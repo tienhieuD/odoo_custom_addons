@@ -8,7 +8,7 @@
     </div>
 
     <div class="my-5">
-        <p class="mb-4" style="font-size: 17px;">A long-lived record has hundreds of messages: talks, emails, notes, changed fields and automatic notices, all mixed. The search box only finds words. <strong>Chatter Quick Filter</strong> shows the messages you care about with one click, with the number of messages on every chip. And the chips are yours: want a <em>Quotes</em> chip, or <em>Messages from the customer</em>? The administrator makes it in a minute, and every chatter shows it.</p>
+        <p class="mb-4" style="font-size: 17px;">A long-lived record has hundreds of messages: talks, emails, notes, changed fields and automatic notices, all mixed. <strong>Chatter Quick Filter</strong> shows the messages you care about with one click, with the number of messages on every chip, and a search box right beside the chips finds the words you remember. And the chips are yours: want a <em>Quotes</em> chip, or <em>Messages from the customer</em>? The administrator makes it in a minute, and every chatter shows it.</p>
         <div class="text-center mb-4">
             <img src="flow.png" alt="Open a record, see your chips, click one, only those messages are shown" class="img-fluid rounded shadow-sm"/>
         </div>
@@ -59,8 +59,8 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Done by the server</h4>
-                    <p class="mb-0" style="font-size: 14px;">Load more works on the filtered list, not only on what is loaded.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Search box</h4>
+                    <p class="mb-0" style="font-size: 14px;">Type a word beside the chips: contents, subject, author or sender, together with the chip you chose.</p>
                 </div>
             </div>
         </div>
@@ -102,6 +102,12 @@
         <img src="screenshot_6.png" alt="The chatter with a new Quotes chip filtering the messages that mention a quotation" class="img-fluid rounded shadow"/>
     </div>
 
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Search beside the chips</h2>
+    <p class="mb-4" style="font-size: 16px;">Type a word and wait a moment: only the messages with it in their contents, subject, author or sender stay, and every chip count follows. <strong>X</strong> or <strong>Esc</strong> clears the box.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_7.png" alt="The chatter with the word quotation typed in the search box next to the chips, showing only the messages that contain it" class="img-fluid rounded shadow"/>
+    </div>
+
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
     <p class="mb-3" style="font-size: 16px;">Needs only the standard <code>mail</code> module. No external library.</p>
     <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">For internal users. Only administrators see the Edit link. The choice of chip is not kept: the next time you open a record, all messages are shown.</p>
@@ -127,6 +133,7 @@
         <div class="tab-pane fade" id="dcf_use" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Filter the messages</h4>
             <p class="mb-2" style="font-size: 14px;">Under <strong>Filter by:</strong>, click a chip to see its messages only. Click <strong>All</strong> to see everything again.</p>
+            <p class="mb-2" style="font-size: 14px;">Type in the box beside the chips to search the messages: contents, subject, author and sender, any case. It goes with the chip you chose, and the counts follow. <strong>X</strong> or <strong>Esc</strong> clears it.</p>
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Edit the chips (administrators)</h4>
             <p class="mb-2" style="font-size: 14px;">Click <strong>Edit</strong> after the last chip. The list shows the chips: drag a line by its handle to change the order, use the toggle to archive or bring back a chip. <strong>New</strong> makes a chip with its own colour.</p>
             <p class="mb-2" style="font-size: 14px;">Open a chip to change its name, its colour and its filter. The filter is the usual rule editor on the messages: contents, type, author, date, and more. Save, reload the page, and every chatter shows the change.</p>
@@ -137,12 +144,21 @@
         <div class="tab-pane fade" id="dcf_limits" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Good to know</h4>
             <p class="mb-2" style="font-size: 14px;">It works in the chatter of a record, not in Discuss or the inbox.</p>
-            <p class="mb-2" style="font-size: 14px;">One kind at a time. While you search messages with the magnifier, the badges are hidden.</p>
+            <p class="mb-2" style="font-size: 14px;">One kind of chip at a time. The search matches the stored text of the message, which is HTML, so a word that is part of a tag name can match. Odoo's own magnifier of the chatter is separate: while you use it, the badges are hidden.</p>
         </div>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Changelog</h2>
     <p class="mb-3" style="font-size: 16px;">Module releases, newest first.</p>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">2.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-14</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Search box beside the chips: contents, subject, author and sender, together with the chosen chip.</p></div>
+        </div>
+    </div></div>
     <div class="card mb-3"><div class="card-body">
         <div class="row">
             <div class="col-md-3 mb-2">
@@ -166,6 +182,10 @@
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Who can edit the chips?</h4>
         <p class="mb-0" style="font-size: 14px;">Administrators (Settings access). Everyone else sees the chips and uses them, without the Edit link.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What does the search box look into?</h4>
+        <p class="mb-0" style="font-size: 14px;">The contents, the subject, the name of the author and the sender email of the messages, in any case. It waits for a short pause in your typing, works together with the chip you chose, and the chip counts follow the text.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What can a chip filter on?</h4>

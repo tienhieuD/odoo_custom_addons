@@ -141,3 +141,33 @@ registry.category("web_tour.tours").add("dwo_chatter_filter_no_edit", {
         { trigger: ".o-mail-Chatter:not(:has(.o-dwo-filterEdit))", run: () => {} },
     ],
 });
+
+registry.category("web_tour.tours").add("dwo_chatter_filter_search", {
+    test: true,
+    steps: () => [
+        { trigger: ".o-mail-Chatter", run: () => {} },
+        { trigger: ".o-dwo-messageFilter .o-dwo-filterSearchInput", run: () => {} },
+        { trigger: `${badge("all")}.o-dwo-filterActive:contains('6')`, run: () => {} },
+        // typing: the server searches, the numbers follow the text
+        { trigger: ".o-dwo-filterSearchInput", run: "text reminder" },
+        { trigger: `${badge("all")}:contains('1')`, run: () => {} },
+        { trigger: showing("Private reminder"), run: () => {} },
+        { trigger: hidden("Talk about the order"), run: () => {} },
+        // AND with a chip
+        { trigger: badge("note"), run: "click" },
+        { trigger: showing("Private reminder"), run: () => {} },
+        // a disabled button is only found by a check step
+        { trigger: badge("discussion") + ".o-dwo-filterEmpty", isCheck: true, run: () => {} },
+        // Esc clears the text
+        {
+            trigger: ".o-dwo-filterSearchInput",
+            run: () => {
+                document.querySelector(".o-dwo-filterSearchInput").dispatchEvent(
+                    new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                );
+            },
+        },
+        { trigger: `${badge("all")}:contains('6')`, run: () => {} },
+        { trigger: ".o-dwo-filterSearchInput", run: () => { if (document.querySelector(".o-dwo-filterSearchInput").value) { throw new Error("The search text is not cleared"); } } },
+    ],
+});
