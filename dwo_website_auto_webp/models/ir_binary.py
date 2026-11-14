@@ -79,6 +79,11 @@ class IrBinary(models.AbstractModel):
         if not _WEBP_SUPPORTED:
             return super()._get_image_stream_from(record, field_name, **kwargs)
 
+        # The response format depends on the Accept header: tell shared caches/CDN
+        future_response = getattr(request, 'future_response', None) if request else None
+        if future_response is not None:
+            future_response.headers.add('Vary', 'Accept')
+
         # [2] Browser không support WebP → bypass
         if not self._webp_browser_supports():
             return super()._get_image_stream_from(record, field_name, **kwargs)
