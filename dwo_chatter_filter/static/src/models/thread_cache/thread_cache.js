@@ -5,7 +5,7 @@ const { registerInstancePatchModel } = require('mail/static/src/model/model_core
 
 /**
  * @param {mail.thread_cache} cache
- * @returns {boolean} whether the cache was made by a chip of the filter (its domain is the leaf dwo_filter_id)
+ * @returns {boolean} whether the cache was made by a chip of the filter (its domain has only the leaves dwo_filter_id and dwo_search)
  */
 function isChipCache(cache) {
     let domain;
@@ -14,7 +14,7 @@ function isChipCache(cache) {
     } catch (_e) {
         return false;
     }
-    return domain.length === 1 && domain[0][0] === 'dwo_filter_id';
+    return domain.length > 0 && domain.every((leaf) => leaf[0] === 'dwo_filter_id' || leaf[0] === 'dwo_search');
 }
 
 registerInstancePatchModel('mail.thread_cache', 'dwo_chatter_filter/static/src/models/thread_cache/thread_cache.js', {

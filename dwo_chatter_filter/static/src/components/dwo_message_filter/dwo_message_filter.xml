@@ -20,6 +20,12 @@
                     <span class="o-dwo-filterCount font-weight-bold ml-1" t-esc="item.count === null ? '?' : item.count"/>
                 </button>
             </t>
+            <div class="o-dwo-search position-relative d-inline-flex align-items-center ml-auto mb-1">
+                <input type="text" class="o-dwo-searchInput form-control form-control-sm" placeholder="Search messages..."
+                       t-att-value="state.search" t-on-input="onInputSearch" t-on-keydown="onKeydownSearch"/>
+                <button t-if="state.search" type="button" class="o-dwo-searchClear btn btn-link btn-sm p-0"
+                        title="Clear" t-on-click="onClickClearSearch">&#215;</button>
+            </div>
             <button t-if="isAdmin" type="button" class="o-dwo-filterEdit btn btn-link btn-sm p-0 ml-1"
                     t-on-click="onClickEdit">Edit</button>
         </div>

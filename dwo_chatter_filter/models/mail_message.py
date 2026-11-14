@@ -99,6 +99,18 @@ class MailMessage(models.Model):
         raise UserError(_("Unknown kind of message: %s") % category)
 
     @api.model
+    def _dwo_search_domain(self, text):
+        """The messages that contain the text (any case) in the body, the subject, the name or the email of
+        the author. No text: no condition."""
+        text = (text or "").strip()
+        if not text:
+            return []
+        return expression.OR([
+            [("body", "ilike", text)], [("subject", "ilike", text)],
+            [("author_id.name", "ilike", text)], [("email_from", "ilike", text)],
+        ])
+
+    @api.model
     def message_fetch(self, domain, limit=20, moderated_channel_ids=None):
         """The chatter asks for the messages of one chip: the filter is applied by the server, so the
         pagination (Load more) works on the filtered list and not on what was already loaded. A chip that
@@ -108,9 +120,12 @@ class MailMessage(models.Model):
         the domain, as a leaf ("dwo_filter_id", "=", id) that is turned into the chip's domain here."""
         kept = []
         chip_id = None
+        search_text = None
         for leaf in list(domain or []):
             if isinstance(leaf, (list, tuple)) and len(leaf) == 3 and leaf[0] == "dwo_filter_id":
                 chip_id = leaf[2]
+            elif isinstance(leaf, (list, tuple)) and len(leaf) == 3 and leaf[0] == "dwo_search":
+                search_text = leaf[2]
             else:
                 kept.append(leaf)
         if chip_id:
@@ -123,10 +138,12 @@ class MailMessage(models.Model):
                     kept = expression.AND([kept, chip_domain])
                 except Exception:
                     _logger.warning("Chatter Quick Filter: the filter of %r is not valid", chip.name, exc_info=True)
+        if search_text and isinstance(search_text, str):
+            kept = expression.AND([kept, self._dwo_search_domain(search_text)])
         return super().message_fetch(kept, limit=limit, moderated_channel_ids=moderated_channel_ids)
 
     @api.model
-    def dwo_filter_chips(self, res_model, res_id):
+    def dwo_filter_chips(self, res_model, res_id, search=None):
         """What the chatter shows above the messages of a record: the number of messages in all, and the
         chips (in their order) with the number of messages each one shows. A chip whose filter does not work
         (a field of a module that was removed) has no number; the others are not affected."""
@@ -137,6 +154,7 @@ class MailMessage(models.Model):
         record.check_access_rights("read")
         record.check_access_rule("read")
         base = [("model", "=", res_model), ("res_id", "=", res_id), ("message_type", "!=", "user_notification")]
+        base = expression.AND([base, self._dwo_search_domain(search if isinstance(search, str) else None)])
         chips = []
         for chip in self.env["dwo.chatter.filter"].search([], limit=MAX_CHIPS):
             try:

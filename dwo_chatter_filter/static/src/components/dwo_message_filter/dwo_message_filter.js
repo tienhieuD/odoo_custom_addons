@@ -26,6 +26,11 @@ function textColorOn(hex) {
     return 1.05 / (L + 0.05) >= (L + 0.05) / 0.05 ? '#ffffff' : '#000000';
 }
 
+/** @returns {string} the text searched in the chatter ('' for none) */
+function chatterSearch(chatter) {
+    return (chatter && chatter.dwoSearch) || '';
+}
+
 /**
  * The chips at the top of the chatter: All, then the chips the administrator made (see the model
  * dwo.chatter.filter), each with its number of messages. One at a time; a click shows only the messages of
@@ -49,8 +54,9 @@ class DwoMessageFilter extends Component {
             };
         });
         this.isAdmin = Boolean(session.is_admin);
-        this.state = useState({ data: null });
+        this.state = useState({ data: null, search: '' });
         this.timer = null;
+        this.searchTimer = null;
         this.watched = null;
     }
 
@@ -96,6 +102,7 @@ class DwoMessageFilter extends Component {
         this.unmounted = true;
         this.env.bus.off('ACTION_MANAGER:UI-UPDATED', this);
         clearTimeout(this.timer);
+        clearTimeout(this.searchTimer);
         // leaving this record: back to all the messages
         const chatter = this.chatter;
         if (chatter) {
@@ -143,7 +150,7 @@ class DwoMessageFilter extends Component {
             const data = await this.env.services.rpc({
                 model: 'mail.message',
                 method: 'dwo_filter_chips',
-                args: [thread.model, thread.id],
+                args: [thread.model, thread.id, (chatterSearch(this.chatter))],
             });
             if (this.unmounted) {
                 return;
@@ -182,6 +189,35 @@ class DwoMessageFilter extends Component {
         if (chatter) {
             chatter.dwoSetFilter(chip === 'all' ? false : parseInt(chip, 10));
         }
+    }
+
+    /** The text is sent to the server 300 ms after the last key. */
+    onInputSearch(ev) {
+        this.state.search = ev.target.value;
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this._applySearch(), 300);
+    }
+
+    onKeydownSearch(ev) {
+        if (ev.key === 'Escape') {
+            ev.stopPropagation();
+            this.onClickClearSearch();
+        }
+    }
+
+    onClickClearSearch() {
+        this.state.search = '';
+        clearTimeout(this.searchTimer);
+        this._applySearch();
+    }
+
+    async _applySearch() {
+        const chatter = this.chatter;
+        if (this.unmounted || !chatter) {
+            return;
+        }
+        chatter.dwoSetSearch(this.state.search);
+        await this._loadChips();
     }
 
     onClickEdit() {
