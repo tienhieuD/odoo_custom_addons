@@ -108,28 +108,49 @@ class MailMessage(models.Model):
         raise UserError(_("Unknown kind of message: %s") % category)
 
     @api.model
-    def dwo_filter_ids(self, res_model, res_id, chip_id):
-        """The ids of the messages of one chip of a record, newest first. Odoo 13 shows the messages of the
-        document by their ids (the field message_ids): the chatter keeps the ones of the chosen chip.
-        False when the chip is gone, archived or broken: the chatter then shows every message."""
+    def _dwo_search_domain(self, text):
+        """The messages that contain the text (any case) in the body, the subject, the name or the email of
+        the author. No text: no condition."""
+        text = (text or "").strip()
+        if not text:
+            return []
+        return expression.OR([
+            [("body", "ilike", text)], [("subject", "ilike", text)],
+            [("author_id.name", "ilike", text)], [("email_from", "ilike", text)],
+        ])
+
+    @api.model
+    def dwo_filter_ids(self, res_model, res_id, chip_id, search=None):
+        """The ids of the messages of one chip of a record and/or of a search text (both: AND), newest first.
+        Odoo 13 shows the messages of the document by their ids (the field message_ids): the chatter keeps
+        the ones found here. False when there is nothing to filter by (no text, and the chip is gone,
+        archived or broken): the chatter then shows every message."""
         record = self.env[res_model].browse(res_id)
         record.check_access_rights("read")
         record.check_access_rule("read")
-        chip = self.env["dwo.chatter.filter"].browse(int(chip_id)).exists()
-        if not chip or not chip.active:
+        domain = [("model", "=", res_model), ("res_id", "=", res_id), ("message_type", "!=", "user_notification")]
+        scoped = self.with_context(dwo_record=(res_model, res_id))
+        filtered = False
+        chip = self.env["dwo.chatter.filter"].browse(int(chip_id)).exists() if chip_id else None
+        if chip and chip.active:
+            try:
+                chip_domain = chip._dwo_domain()
+                with self.env.cr.savepoint():
+                    scoped.search(expression.AND([domain, chip_domain]), limit=1)   # does the filter work at all?
+                domain = expression.AND([domain, chip_domain])
+                filtered = True
+            except Exception:
+                _logger.warning("Chatter Quick Filter: the filter of %r is not valid", chip.name, exc_info=True)
+        search_domain = self._dwo_search_domain(search if isinstance(search, str) else None)
+        if search_domain:
+            domain = expression.AND([domain, search_domain])
+            filtered = True
+        if not filtered:
             return False
-        try:
-            chip_domain = chip._dwo_domain()
-            with self.env.cr.savepoint():
-                return self.with_context(dwo_record=(res_model, res_id)).search(expression.AND([
-                    [("model", "=", res_model), ("res_id", "=", res_id), ("message_type", "!=", "user_notification")],
-                    chip_domain])).ids
-        except Exception:
-            _logger.warning("Chatter Quick Filter: the filter of %r is not valid", chip.name, exc_info=True)
-            return False
+        return scoped.search(domain).ids
 
     @api.model
-    def dwo_filter_chips(self, res_model, res_id):
+    def dwo_filter_chips(self, res_model, res_id, search=None):
         """What the chatter shows above the messages of a record: the number of messages in all, and the
         chips (in their order) with the number of messages each one shows. A chip whose filter does not work
         (a field of a module that was removed) has no number; the others are not affected."""
@@ -140,6 +161,8 @@ class MailMessage(models.Model):
         record.check_access_rights("read")
         record.check_access_rule("read")
         base = [("model", "=", res_model), ("res_id", "=", res_id), ("message_type", "!=", "user_notification")]
+        base = expression.AND([base, self._dwo_search_domain(search if isinstance(search, str) else None)])
+        base = expression.AND([base, self._dwo_search_domain(search if isinstance(search, str) else None)])
         scoped = self.with_context(dwo_record=(res_model, res_id))
         chips = []
         for chip in self.env["dwo.chatter.filter"].search([], limit=MAX_CHIPS):

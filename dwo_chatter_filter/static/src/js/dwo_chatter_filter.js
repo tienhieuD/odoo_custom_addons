@@ -45,6 +45,30 @@ DocumentThread.include({
         }
     },
     /**
+     * Search a text in all the messages of the record (together with the chip chosen). The server finds
+     * the ids, so it works on the messages that are not loaded too.
+     *
+     * @param {string} text
+     */
+    dwoSetSearch: function (text) {
+        this._dwoSearch = (text || '').trim();
+        if (!this.dwoIsFiltered()) {
+            this._dwoIDs = null;
+        }
+    },
+    /**
+     * @returns {string}
+     */
+    dwoGetSearch: function () {
+        return this._dwoSearch || '';
+    },
+    /**
+     * @returns {boolean} whether a chip is chosen or a text is searched
+     */
+    dwoIsFiltered: function () {
+        return Boolean(this._dwoFilter || this._dwoSearch);
+    },
+    /**
      * @returns {number|false}
      */
     dwoGetFilter: function () {
@@ -54,14 +78,14 @@ DocumentThread.include({
      * @override
      */
     getMessageIDs: function () {
-        return this._dwoFilter && this._dwoIDs ? this._dwoIDs : this._super.apply(this, arguments);
+        return this.dwoIsFiltered() && this._dwoIDs ? this._dwoIDs : this._super.apply(this, arguments);
     },
     /**
      * @override
      */
     getMessages: function () {
         const messages = this._super.apply(this, arguments);
-        if (this._dwoFilter && this._dwoIDs) {
+        if (this.dwoIsFiltered() && this._dwoIDs) {
             return _.filter(messages, (message) => _.contains(this._dwoIDs, message.getID()));
         }
         // All: the filter may have loaded older messages of its chip. Only the messages without a hole (from the
@@ -87,16 +111,16 @@ DocumentThread.include({
     _fetchMessageIDs: function () {
         const self = this;
         return this._super.apply(this, arguments).then(function () {
-            if (!self._dwoFilter || !self.getDocumentID()) {
+            if (!self.dwoIsFiltered() || !self.getDocumentID()) {
                 self._dwoIDs = null;
                 return;
             }
             return self._rpc({
                 model: 'mail.message',
                 method: 'dwo_filter_ids',
-                args: [self.getDocumentModel(), self.getDocumentID(), self._dwoFilter],
+                args: [self.getDocumentModel(), self.getDocumentID(), self._dwoFilter, self._dwoSearch || null],
             }).then(function (ids) {
-                // false: the chip is gone, archived or broken: every message is shown
+                // false: nothing to filter by (the chip is gone, archived or broken, and no text): every message is shown
                 if (ids === false) {
                     self._dwoFilter = false;
                 }
@@ -110,12 +134,12 @@ DocumentThread.include({
      * @override
      */
     _fetchMessages: function (options) {
-        if (!this._dwoFilter) {
+        if (!this.dwoIsFiltered()) {
             return this._super.apply(this, arguments);
         }
         const self = this;
         return this._fetchMessageIDs().then(function () {
-            if (!self._dwoFilter) {
+            if (!self.dwoIsFiltered()) {
                 return self._super.apply(self, [options]);
             }
             const messageIDs = self._dwoIDs || [];
@@ -158,6 +182,16 @@ ThreadField.include({
             self.setElement($wrap);
             // setElement removes every '.widget_events' handler of the old element, the ones of the thread widget too
             self._threadWidget._delegateEvents();
+            self._$dwoChips = $('<div class="o-dwo-chips d-flex flex-wrap align-items-center"/>');
+            self._$dwoSearch = $('<div class="o-dwo-search position-relative d-inline-flex align-items-center ml-auto mb-1">' +
+                '<input type="text" class="o-dwo-searchInput form-control form-control-sm"/>' +
+                '<button type="button" class="o-dwo-searchClear btn btn-link btn-sm p-0 d-none" title="Clear">\u00d7</button>' +
+                '</div>');
+            self._$dwoSearch.find('input').attr('placeholder', _t('Search messages...'));
+            self._$dwoFilter.append(self._$dwoChips, self._$dwoSearch);
+            self._$dwoSearch.on('input', '.o-dwo-searchInput', self._dwoOnInputSearch.bind(self));
+            self._$dwoSearch.on('keydown', '.o-dwo-searchInput', self._dwoOnKeydownSearch.bind(self));
+            self._$dwoSearch.on('click', '.o-dwo-searchClear', self._dwoOnClickClearSearch.bind(self));
             self._$dwoFilter.on('click', '.o-dwo-filterBadge', self._dwoOnClickChip.bind(self));
             self._$dwoFilter.on('click', '.o-dwo-filterEdit', self._dwoOnClickEdit.bind(self));
         });
@@ -170,11 +204,13 @@ ThreadField.include({
     destroy: function () {
         if (this._documentThread) {
             this._documentThread.dwoSetFilter(false);
+            this._documentThread.dwoSetSearch('');
         }
         if (this._$dwoFilter) {
             this._$dwoFilter.remove();
         }
         clearTimeout(this._dwoTimer);
+        clearTimeout(this._dwoSearchTimer);
         this._super.apply(this, arguments);
     },
     /**
@@ -185,6 +221,12 @@ ThreadField.include({
     _reset: function () {
         if (this._documentThread) {
             this._documentThread.dwoSetFilter(false);
+            this._documentThread.dwoSetSearch('');
+        }
+        clearTimeout(this._dwoSearchTimer);
+        if (this._$dwoSearch) {
+            this._$dwoSearch.find('input').val('');
+            this._$dwoSearch.find('.o-dwo-searchClear').addClass('d-none');
         }
         this._dwoData = null;
         this._super.apply(this, arguments);
@@ -215,7 +257,7 @@ ThreadField.include({
             self._rpc({
                 model: 'mail.message',
                 method: 'dwo_filter_chips',
-                args: [self.model, self.res_id],
+                args: [self.model, self.res_id, self._documentThread.dwoGetSearch()],
             }).then(function (data) {
                 self._dwoData = data;
                 // the chip that is chosen was archived or deleted meanwhile: back to all the messages
@@ -239,7 +281,8 @@ ThreadField.include({
             return;
         }
         if (!this._dwoData || !this.res_id) {
-            this._$dwoFilter.addClass('d-none').empty();
+            this._$dwoFilter.addClass('d-none');
+            this._$dwoChips.empty();
             return;
         }
         const active = (this._documentThread && this._documentThread.dwoGetFilter()) || false;
@@ -254,10 +297,11 @@ ThreadField.include({
         });
         const items = [make(false, _t('All'), ALL_COLOR, data.all)].concat(
             _.map(data.chips, (chip) => make(chip.id, chip.name, chip.color, chip.count)));
-        this._$dwoFilter.html(QWeb.render('dwo_chatter_filter.MessageFilter', {
+        this._$dwoChips.html(QWeb.render('dwo_chatter_filter.MessageFilter', {
             items: items,
             isAdmin: Boolean(session.is_admin),
-        })).removeClass('d-none');
+        }));
+        this._$dwoFilter.removeClass('d-none');
     },
     /**
      * @private
@@ -271,6 +315,47 @@ ThreadField.include({
         }
         this._documentThread.dwoSetFilter(chip === 'all' ? false : parseInt(chip, 10));
         this._dwoRender();
+        this._fetchAndRenderThread();
+    },
+    /**
+     * The text is sent to the server 300 ms after the last key.
+     *
+     * @private
+     */
+    _dwoOnInputSearch: function () {
+        this._$dwoSearch.find('.o-dwo-searchClear').toggleClass('d-none', !this._$dwoSearch.find('input').val());
+        clearTimeout(this._dwoSearchTimer);
+        this._dwoSearchTimer = setTimeout(this._dwoApplySearch.bind(this), 300);
+    },
+    /**
+     * @private
+     * @param {Event} ev
+     */
+    _dwoOnKeydownSearch: function (ev) {
+        if (ev.which === $.ui.keyCode.ESCAPE) {
+            ev.stopPropagation();
+            this._dwoOnClickClearSearch(ev);
+        }
+    },
+    /**
+     * @private
+     * @param {Event} ev
+     */
+    _dwoOnClickClearSearch: function (ev) {
+        ev.preventDefault();
+        this._$dwoSearch.find('input').val('');
+        this._$dwoSearch.find('.o-dwo-searchClear').addClass('d-none');
+        clearTimeout(this._dwoSearchTimer);
+        this._dwoApplySearch();
+    },
+    /**
+     * @private
+     */
+    _dwoApplySearch: function () {
+        if (this.isDestroyed() || !this._documentThread) {
+            return;
+        }
+        this._documentThread.dwoSetSearch(this._$dwoSearch.find('input').val());
         this._fetchAndRenderThread();
     },
     /**
