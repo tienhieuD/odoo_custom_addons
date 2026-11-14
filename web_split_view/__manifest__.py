@@ -22,7 +22,7 @@ Features:
     'author': 'DUO-TEK Software Vietnam',
     'website': 'https://duotek.io.vn',
     'support': 'hello@duotek.io.vn',
-    'license': 'OPL-1',
+    'license': 'LGPL-3',
     'category': 'Extra Tools',
     'version': '19.0.1.1.0',
     'depends': ['web'],
