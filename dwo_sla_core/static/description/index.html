@@ -143,10 +143,37 @@
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #15133A;">See It in Action</h2>
-    <p class="mb-3" style="font-size: 16px;">Ten reporting screens and the SLA task, all from the demo data of a small company: leads, support tasks and sales orders under 18 definitions. Pick a tab to jump to the part that matters to you.</p>
+    <p class="mb-3" style="font-size: 16px;">From drafting a definition to the reports, all from the demo data of a small company: leads, support tasks and sales orders under 18 definitions. Pick a tab to jump to the part that matters to you: set-up first, then what you see on the records, then ten reporting screens.</p>
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_trend" role="tab" aria-controls="dwo_sla_shot_trend" aria-selected="true">Compliance Trend</a>
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_definition" role="tab" aria-controls="dwo_sla_shot_definition" aria-selected="true">Definition</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_pause" role="tab" aria-controls="dwo_sla_shot_pause" aria-selected="false">Pause & Resume</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_reset" role="tab" aria-controls="dwo_sla_shot_reset" aria-selected="false">Reset</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_escalation" role="tab" aria-controls="dwo_sla_shot_escalation" aria-selected="false">Escalation</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_apply" role="tab" aria-controls="dwo_sla_shot_apply" aria-selected="false">Existing Records</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_hours" role="tab" aria-controls="dwo_sla_shot_hours" aria-selected="false">Working Hours</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_holidays" role="tab" aria-controls="dwo_sla_shot_holidays" aria-selected="false">Holidays</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_chip" role="tab" aria-controls="dwo_sla_shot_chip" aria-selected="false">Status Chip</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_task" role="tab" aria-controls="dwo_sla_shot_task" aria-selected="false">SLA Task</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_trend" role="tab" aria-controls="dwo_sla_shot_trend" aria-selected="false">Compliance Trend</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_distribution" role="tab" aria-controls="dwo_sla_shot_distribution" aria-selected="false">Response Time</a>
@@ -166,18 +193,75 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_calendar" role="tab" aria-controls="dwo_sla_shot_calendar" aria-selected="false">Calendar Impact</a>
         </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_task" role="tab" aria-controls="dwo_sla_shot_task" aria-selected="false">SLA Task</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_chip" role="tab" aria-controls="dwo_sla_shot_chip" aria-selected="false">Status Chip</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_sla_shot_definition" role="tab" aria-controls="dwo_sla_shot_definition" aria-selected="false">Definition & Escalation</a>
-        </li>
     </ul>
     <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
-        <div class="tab-pane fade show active" id="dwo_sla_shot_trend" role="tabpanel">
+        <div class="tab-pane fade show active" id="dwo_sla_shot_definition" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">One Commitment, One Definition</h4>
+            <p class="mb-2" style="font-size: 14px;">Each commitment is an SLA Definition: the model it applies to, SLA or OLA, the target, the duration, the working calendar and when to warn that it is due soon. The Start Condition is built with Odoo's own domain editor and the form tells you how many records match right now. <strong>Enable</strong> or <strong>Disable</strong> at the top lets you draft first and switch on when ready, and a <strong>Running Tasks</strong> button opens the tasks of the definition.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_12.png" alt="SLA Definition form with Scope, Classification, Duration and Calendar groups, the Start Condition tab with 22 matching records, Disable and Apply to Existing Records buttons and a Running Tasks button" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_pause" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Stop the Clock While You Wait</h4>
+            <p class="mb-2" style="font-size: 14px;">The Pause/Resume Condition says when the clock stops and when it runs again. Here the clock stops while the task is in the Waiting state (waiting for the customer) and, with the resume mode <em>When pause no longer matches</em>, runs again as soon as that condition is no longer true. <strong>Retroactive Pause</strong> can also count the time the record spent waiting before the SLA attached, rebuilt from its change history.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_13.png" alt="Pause/Resume Condition tab of an SLA Definition: pause while the state is Waiting, resume mode When pause no longer matches, Retroactive Pause ticked" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_reset" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Start Over When the Record Starts Over</h4>
+            <p class="mb-2" style="font-size: 14px;">The Reset Condition restarts the clock when a record goes back to the beginning. Here a quotation in the Quotation Sent status whose Expiration changes has its previous task cancelled and a new one started. Each change of the trigger field resets once, no more.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_14.png" alt="Reset Condition tab of an SLA Definition: quotation in Quotation Sent status, reset action Cancel the previous task, trigger field Expiration" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_escalation" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Remind and Escalate in Stages</h4>
+            <p class="mb-2" style="font-size: 14px;">The Escalation tab stacks as many percentage thresholds as the process needs. This rule emails the salesperson of the record at 75% and 100%, a fixed address at 100% and a manager's address at 150%. Each step can send an email template or run a standard Odoo Server Action, and fires once per task.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_15.png" alt="Escalation tab of an SLA Definition with four steps: 75% and 100% email the salesperson of the lead, 100% a fixed address and 150% a manager address" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_apply" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Turn an SLA On After the Fact</h4>
+            <p class="mb-2" style="font-size: 14px;"><strong>Apply to Existing Records</strong> attaches the SLA to the records that already match its Start Condition, with an optional extra filter, and tells you in advance how many records will be checked. The first batch runs at once, larger sets continue in the background, and each run is logged on the definition.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_16.png" alt="Apply to Existing Records wizard with an explanation, an Extra Filter and Records to Check showing 22" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_hours" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Time Counts in Working Hours</h4>
+            <p class="mb-2" style="font-size: 14px;">Deadlines follow a working calendar, not the wall clock. The Standard Hours calendar here is 40 hours a week, Monday to Friday, 08:00 to 12:00 and 13:30 to 17:30. With no calendar the clock runs 24/7. Each definition has its own timezone, which takes priority over the timezone of the calendar.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_17.png" alt="Standard Hours working schedule, Monday to Friday, 08:00 to 12:00 and 13:30 to 17:30, 40 hours per week" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_holidays" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Holidays Are Skipped</h4>
+            <p class="mb-2" style="font-size: 14px;">Time off declared on the working calendar (Resource Time Off) does not count towards the deadline. This list shows four breaks of the Standard Hours calendar.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_18.png" alt="Resource Time Off list filtered on the Standard Hours calendar with four demo holidays" class="img-fluid rounded shadow"/>
+            </div>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Deadlines That Skip Holidays</h4>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Deadlines That Skip Holidays</h4>
+            <p class="mb-2" style="font-size: 14px;">A 2-hour response started on Friday at 16:30 has one working hour left that day. Monday is a holiday on the calendar, so the deadline lands on Tuesday at 09:00 and the task finishes at 83% of its target.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_chip" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Status on the Record, With No Code</h4>
+            <p class="mb-2" style="font-size: 14px;">Open any record that has an SLA: the form shows a status chip next to the pager with the time left or the overrun and a progress bar, and it turns red when a task is breached. Hover for each task. It shows to SLA users only, and can be switched off in the settings.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_8.png" alt="Lead form header with a red SLA chip reading Late 9d 23h next to the pager" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_task" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">One Task, Its Progress and Its History</h4>
+            <p class="mb-2" style="font-size: 14px;">The built-in <strong>SLA Progress</strong> widget gives every task a status badge, a progress bar and the three milestones that matter &mdash; Start, Deadline, End. Past the deadline the bar stays full and the overrun is shown next to the percentage (here +158%); far past it, as a multiplier such as 7.0&times; instead of a four-digit number. The History tab lists every attach, escalation and breach with its timestamp.</p>
+            <div class="text-center mb-3">
+                <img src="screenshot_9.png" alt="SLA Task form with the SLA Progress widget showing a red breaching status at 258 percent, and the History tab listing escalate, breach and attach events" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_sla_shot_trend" role="tabpanel">
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Is the Achieved Rate Going Up or Down?</h4>
             <p class="mb-2" style="font-size: 14px;">Finished tasks that started in the last 30 days, grouped by the week they ended and by definition, with the achieved rate on a 0&ndash;100% axis and one line per group. Here the lines are grouped by target, Response against Resolution, so a weak week for first replies stands out at once.</p>
             <div class="text-center mb-3">
@@ -224,32 +308,6 @@
             <p class="mb-2" style="font-size: 14px;">For finished tasks, the pivot puts the plain Duration next to the Business Duration and the paused hours (clock and business). A definition on a 24/7 clock shows the same figure twice; one on office hours shows how much of the clock time never counted.</p>
             <div class="text-center mb-3">
                 <img src="screenshot_7.png" alt="Calendar Impact pivot with Duration, Business Duration and Total Paused Hours per SLA definition" class="img-fluid rounded shadow"/>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="dwo_sla_shot_task" role="tabpanel">
-            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">One Task, Its Progress and Its History</h4>
-            <p class="mb-2" style="font-size: 14px;">The built-in <strong>SLA Progress</strong> widget gives every task a status badge, a progress bar and the three milestones that matter &mdash; Start, Deadline, End. Past the deadline the bar stays full and the overrun is shown next to the percentage (here +158%); far past it, as a multiplier such as 7.0&times; instead of a four-digit number. The History tab lists every attach, escalation and breach with its timestamp.</p>
-            <div class="text-center mb-3">
-                <img src="screenshot_9.png" alt="SLA Task form with the SLA Progress widget showing a red breaching status at 258 percent, and the History tab listing escalate, breach and attach events" class="img-fluid rounded shadow"/>
-            </div>
-            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Deadlines That Skip Holidays</h4>
-            <p class="mb-2" style="font-size: 14px;">A 2-hour response started on Friday at 16:30 has one working hour left that day. Monday is a holiday on the calendar, so the deadline lands on Tuesday at 09:00 and the task finishes at 83% of its target.</p>
-            <div class="text-center mb-3">
-                <img src="screenshot_10.png" alt="SLA Task form of an achieved task with a Friday start, a Tuesday deadline, the Standard Hours calendar and a Business Duration of 01:40 h" class="img-fluid rounded shadow"/>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="dwo_sla_shot_chip" role="tabpanel">
-            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Status on the Record, With No Code</h4>
-            <p class="mb-2" style="font-size: 14px;">Open any record that has an SLA: the form shows a status chip next to the pager with the time left or the overrun and a progress bar, and it turns red when a task is breached. Hover for each task. It shows to SLA users only, and can be switched off in the settings.</p>
-            <div class="text-center mb-3">
-                <img src="screenshot_8.png" alt="Lead form header with a red SLA chip reading Late 9d 23h next to the pager" class="img-fluid rounded shadow"/>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="dwo_sla_shot_definition" role="tabpanel">
-            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #2C2A6B;">Enable When Ready, Escalate in Stages</h4>
-            <p class="mb-2" style="font-size: 14px;">The definition form shows its state: <strong>Enable</strong> or <strong>Disable</strong> at the top, <strong>Apply to Existing Records</strong>, and a <strong>Running Tasks</strong> button with the number of tasks. The Escalation tab stacks as many thresholds as the process needs; this rule emails the salesperson of the record at 75%, then a fixed on-call address at 100%. Each percentage fires once.</p>
-            <div class="text-center mb-3">
-                <img src="screenshot_11.png" alt="SLA Definition form with Disable and Apply to Existing Records buttons, a Running Tasks button showing 6, and the Escalation tab with two rules" class="img-fluid rounded shadow"/>
             </div>
         </div>
     </div>
