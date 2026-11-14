@@ -51,6 +51,13 @@ class TestWebpHttp(WebpHttpBase):
         self.assertEqual(resp.content[:4], b'RIFF')
         self.assertEqual(resp.content[8:12], b'WEBP')
 
+    def test_vary_accept_header(self):
+        # the format depends on Accept: shared caches/CDN must key on it
+        for accept in (ACCEPT_WEBP, 'image/png,image/*;q=0.8', None):
+            resp = self.get(self.url_a, accept=accept)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('accept', resp.headers.get('Vary', '').lower().replace(' ', '').split(','), accept)
+
     def test_png_served_without_webp_accept(self):
         resp = self.get(self.url_a, accept='image/png,image/*;q=0.8')
         self.assertEqual(resp.status_code, 200)
