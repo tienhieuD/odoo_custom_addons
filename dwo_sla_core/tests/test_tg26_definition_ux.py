@@ -9,6 +9,7 @@ from lxml import etree
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import HttpCase, tagged
 from odoo.tools import file_open
+from odoo.tools.safe_eval import safe_eval
 
 from .common import SlaCase, SlaHttpCase, T0, hours
 
@@ -160,15 +161,35 @@ class TestSmartButton(Tg26Case):
     def test_count_zero_without_tasks(self):
         self.assertEqual(self.make_definition().running_task_count, 0)
 
-    def test_action_opens_all_tasks_of_definition(self):
+    def test_action_opens_definition_tasks_with_running_filter(self):
+        """Task 037: the button opens the tasks of the definition with the
+        default "running" filter, the same set the count shows; the filter can
+        be removed so the whole history stays reachable."""
         d = self.make_definition()
         self.raw_task(d)
+        self.raw_task(d, stage='paused')
         self.raw_task(d, stage='achieved')
         self.raw_task(self.make_definition(name="Other"))
         action = d.action_view_tasks()
         self.assertEqual(action['res_model'], 'sla.task')
-        self.assertEqual(len(self.Task.search(action['domain'])), 2)
-        self.assertEqual(action['context'], {})
+        # the domain is only the definition (the filter stays removable)
+        self.assertEqual(len(self.Task.search(action['domain'])), 3)
+        ctx = action['context']
+        if isinstance(ctx, str):  # the stored action keeps the context as text
+            ctx = safe_eval(ctx)
+        defaults = [k for k, v in ctx.items() if k.startswith('search_default_') and v]
+        self.assertTrue(defaults, "no default filter: the button would list every task")
+        # evaluate the default filters on the search view
+        search = self.arch('sla.task', 'search')
+        shown = self.Task.browse()
+        tasks = self.Task.search(action['domain'])
+        for key in defaults:
+            flt = search.xpath("//filter[@name='%s']" % key[len('search_default_'):])
+            self.assertEqual(len(flt), 1, key)
+            shown |= tasks.filtered_domain(safe_eval(flt[0].get('domain')))
+        self.assertEqual(len(shown), 2)
+        d.invalidate_cache(['running_task_count'], ids=d.ids)
+        self.assertEqual(len(shown), d.running_task_count)
 
     def test_form_arch_button_and_js_class(self):
         root = self.arch('sla.definition', 'form')
