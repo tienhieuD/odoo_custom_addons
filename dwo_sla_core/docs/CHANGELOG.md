@@ -2,6 +2,14 @@
 
 Ghi tóm tắt cải tiến để AI agent cập nhật lại docs 010-070 sau (docs chưa được sửa theo các mục dưới đây).
 
+## 2026-11-14 - 20.0.1.2.6: nhãn nút "Running Tasks" đổi thành "Open Tasks" (issue 5)
+
+Chỉ đổi nhãn: số đếm `running_task_count` gồm cả task `in_progress` và `paused` nên "Running" không đúng nghĩa. Giữ nguyên tên kỹ thuật `running_task_count` (tránh migration), cách đếm, action và dữ liệu.
+- Đổi `string` của field `running_task_count` ở `models/sla_definition.py` và của field trên smart button ở `views/sla_definition_views.xml` thành "Open Tasks".
+- Bản dịch `i18n/ja_JP.po` (bản dịch duy nhất của module): "Open Tasks" -> 未完了のタスク (trước: 実行中のタスク). Không có .pot / ngôn ngữ khác.
+- Listing (`static/description/index.html`, `_listings/dwo_sla_core.json`, duotek): sửa chữ "Running Tasks" thành "Open Tasks". Ảnh listing chưa chụp lại (vẫn ghi cũ), chụp ở lần cập nhật listing kế tiếp.
+- Test mới: `test_button_label_is_open_tasks` (tg26). Docs 010-070 còn nhắc "Running Tasks" (REQ-INT-025, TC-SBT-003, FT-21...), cập nhật sau.
+
 ## 2026-11-14 - 20.0.1.2.5: nút Running Tasks mở đúng tập task đang chạy (task 037)
 
 Chỉ đổi `action_view_tasks`; không đổi field, view, dữ liệu hay migration.
