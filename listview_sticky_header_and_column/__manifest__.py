@@ -11,7 +11,7 @@
     'website': 'https://duotek.io.vn',
     'support': 'hello@duotek.io.vn',
     'author': "DUO-TEK Software Vietnam",
-    'license': 'LGPL-3',
+    'license': 'OPL-1',
     'category': 'Extra Tools',
     'version': '19.0.0.7.0',
     'depends': ['base', 'web'],
