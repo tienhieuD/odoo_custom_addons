@@ -236,7 +236,7 @@ class SlaDefinition(models.Model):
               'the last day.'))
     # Refs: plan-improvement-sla-01-review §6.7
     running_task_count = fields.Integer(
-        string="Running Tasks", compute='_compute_running_task_count',
+        string="Open Tasks", compute='_compute_running_task_count',
         help=('Number of tasks of this SLA that are in progress or paused. '
               'Shown on the smart button and used to warn before saving '
               'changes that affect running tasks. Example: 12 means 12 '
