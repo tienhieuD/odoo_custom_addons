@@ -99,6 +99,42 @@
         </div>
     </div>
 
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">1. The Settings screen</h2>
+    <p class="mb-4" style="font-size: 16px;">Everything starts in <strong>Settings &rarr; Source Code Protector</strong>: the <strong>Protect a module zip</strong> button, <strong>View jobs</strong> with the number of jobs so far, the server limits that apply to background processing, and the module-structure notes your team should follow before uploading.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_1.png" alt="Settings, Source Code Protector: a short description, the Protect a module zip and View jobs buttons, the server limits and the recommended module structure" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">2. Upload the zip</h2>
+    <p class="mb-4" style="font-size: 16px;">Pick a <code>.zip</code> with one or more modules. If it is an AES-encrypted zip, type its password: the protected zip is encrypted with the same one. The dialog also reminds you that compiled binaries are platform-locked, so test on a staging database first. <strong>Start Protection</strong> closes it right away.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_2.png" alt="The upload dialog with a module zip chosen, its password filled in, and the platform notice" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">3. Jobs in the background</h2>
+    <p class="mb-4" style="font-size: 16px;">Each upload becomes a job. The list shows its state, progress, the current step, the number of modules, the Python version it is compiled for and, once it is done, the protected zip to download.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_3.png" alt="The job list with one job running at 62 percent and one job done with its download link" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">4. Progress of a running job</h2>
+    <p class="mb-4" style="font-size: 16px;">Open a job to follow it: the status bar, the progress bar, the module being processed and how many of the modules found are done. You can leave the screen; a notification tells you when it finishes.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_4.png" alt="A job form in the Running state with a progress bar, the step being processed and the number of modules found and done" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">5. Result and download</h2>
+    <p class="mb-4" style="font-size: 16px;">A finished job puts the <strong>download link</strong> first, with its expiry (the files are kept 1 day). Below, every module has its own result: <strong>Protected</strong> with the number of methods protected and compiled, or <strong>Skipped</strong> with the reason, here a module that has no business logic to protect.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_5.png" alt="A finished job with the download link of the protected zip, its expiry and a per-module result table with two Protected modules and one Skipped" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1A1C27;">6. Job history</h2>
+    <p class="mb-4" style="font-size: 16px;">Finished jobs stay in the list with their status and per-module result, and each shows its protected zip, named after the upload and the Python version it was compiled for, until the files expire.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_6.png" alt="The job list with two finished jobs, each with a download link to its protected zip" class="img-fluid rounded shadow"/>
+    </div>
+
     <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #1A1C27;">Key Features</h2>
     <div class="row">
         <div class="col-md-4 mb-4">
