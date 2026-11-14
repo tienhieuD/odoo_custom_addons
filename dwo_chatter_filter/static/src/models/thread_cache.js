@@ -15,7 +15,7 @@ registerPatch({
         messages: {
             compute() {
                 const messages = this._super();
-                if (!this.thread || !this.thread.dwoFilter || !messages) {
+                if (!this.thread || (!this.thread.dwoFilter && !this.thread.dwoSearch) || !messages) {
                     return messages;
                 }
                 return messages.filter(message => this.rawFetchedMessages.includes(message));

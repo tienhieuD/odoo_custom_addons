@@ -37,13 +37,20 @@ export class DwoMessageFilter extends Component {
         this.orm = useService('orm');
         this.action = useService('action');
         this.isAdmin = Boolean(session.is_admin);
-        this.state = useState({ data: null });
+        this.state = useState({ data: null, text: '' });
+        this.searchTimer = null;
         this.timer = null;
         this.watched = null;
         onMounted(() => this._loadChips());
         // a message arrived (bus) or was posted: the numbers follow, and the list if a chip is chosen
         onPatched(() => {
             const key = this.thread && this.thread.id + ':' + (this.thread.lastMessage ? this.thread.lastMessage.id : 0);
+            const threadId = this.thread && this.thread.id;
+            if (threadId !== this.watchedThreadId) {
+                // another record in the same chatter: its own text
+                this.watchedThreadId = threadId;
+                this.state.text = (this.thread && this.thread.dwoSearch) || '';
+            }
             if (key !== this.watched) {
                 const first = this.watched === null;
                 this.watched = key;
@@ -56,6 +63,7 @@ export class DwoMessageFilter extends Component {
         onWillUnmount(() => {
             this.unmounted = true;
             clearTimeout(this.timer);
+            clearTimeout(this.searchTimer);
             // leaving this record: back to all the messages
             if (this.thread && this.thread.exists()) {
                 this.thread.dwoReset();
@@ -93,7 +101,7 @@ export class DwoMessageFilter extends Component {
             return;
         }
         try {
-            const data = await this.orm.call('mail.message', 'dwo_filter_chips', [thread.model, thread.id]);
+            const data = await this.orm.call('mail.message', 'dwo_filter_chips', [thread.model, thread.id, thread.dwoSearch || null]);
             if (this.unmounted) {
                 return;
             }
@@ -113,7 +121,7 @@ export class DwoMessageFilter extends Component {
         }
         await this._loadChips();
         // the server decides which messages a chip shows: ask it again when a new message came
-        if (this.thread && this.thread.exists() && this.thread.dwoFilter && !this.unmounted) {
+        if (this.thread && this.thread.exists() && (this.thread.dwoFilter || this.thread.dwoSearch) && !this.unmounted) {
             this.thread.dwoReload();
         }
     }
@@ -122,6 +130,35 @@ export class DwoMessageFilter extends Component {
         if (this.thread) {
             this.thread.dwoSetFilter(item.id);
         }
+    }
+
+    /** Typing: search 300 ms after the last key. */
+    onSearchInput(ev) {
+        this.state.text = ev.target.value;
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this.applySearch(), 300);
+    }
+
+    onSearchKeydown(ev) {
+        if (ev.key === 'Escape' && this.state.text) {
+            ev.stopPropagation();
+            this.clearSearch();
+        }
+    }
+
+    clearSearch() {
+        this.state.text = '';
+        clearTimeout(this.searchTimer);
+        return this.applySearch();
+    }
+
+    async applySearch() {
+        const thread = this.thread;
+        if (this.unmounted || !thread || !thread.exists()) {
+            return;
+        }
+        thread.dwoSetSearch(this.state.text);
+        await this._loadChips();
     }
 
     edit() {
