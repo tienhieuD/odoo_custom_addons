@@ -18,4 +18,6 @@
         &.o-dwo-filterEmpty { opacity: .45; cursor: default; }
     }
     .o-dwo-filterEdit { font-size: .7rem; }
+    .o-dwo-filterSearchInput { font-size: .75rem; width: 12rem; padding-right: 1.5rem; }
+    .o-dwo-filterSearchClear { text-decoration: none; line-height: 1; }
 }

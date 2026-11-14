@@ -34,20 +34,24 @@ export class DwoMessageFilter extends Component {
         this.orm = useService("orm");
         this.action = useService("action");
         this.isAdmin = user.isAdmin;
-        this.state = proxy({ data: null });
+        this.state = proxy({ data: null, text: "" });
+        this.searchTimer = null;
         this.timer = null;
         this.lastNewestId = undefined;
         onWillDestroy(() => {
             this.unmounted = true;
             clearTimeout(this.timer);
+            clearTimeout(this.searchTimer);
         });
         // a new record, or leaving this one: back to all the messages
         useOnChange(
             () => [this.props.thread],
             (thread) => {
                 this.loadChips();
+                this.state.text = thread.dwoSearch || "";
                 return () => {
                     clearTimeout(this.timer);
+                    clearTimeout(this.searchTimer);
                     thread.dwoReset();
                 };
             }
@@ -95,6 +99,7 @@ export class DwoMessageFilter extends Component {
             const data = await this.orm.call("mail.message", "dwo_filter_chips", [
                 thread.model,
                 thread.id,
+                thread.dwoSearch || null,
             ]);
             if (this.unmounted) {
                 return;
@@ -119,7 +124,7 @@ export class DwoMessageFilter extends Component {
         this.lastNewestId = newestId;
         await this.loadChips();
         // the server decides which messages a chip shows: ask it again when a new message came
-        if (changed && thread.dwoFilter && !this.unmounted) {
+        if (changed && (thread.dwoFilter || thread.dwoSearch) && !this.unmounted) {
             await thread.dwoReload();
             this.lastNewestId = thread.newestPersistentMessage?.id;
         }
@@ -128,6 +133,36 @@ export class DwoMessageFilter extends Component {
     async select(item) {
         await this.props.thread.dwoSetFilter(item.id);
         this.lastNewestId = this.props.thread.newestPersistentMessage?.id;
+    }
+
+    /** Typing: search 300 ms after the last key. */
+    onSearchInput(ev) {
+        this.state.text = ev.target.value;
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this.applySearch(), 300);
+    }
+
+    onSearchKeydown(ev) {
+        if (ev.key === "Escape" && this.state.text) {
+            ev.stopPropagation();
+            this.clearSearch();
+        }
+    }
+
+    clearSearch() {
+        this.state.text = "";
+        clearTimeout(this.searchTimer);
+        return this.applySearch();
+    }
+
+    async applySearch() {
+        const thread = this.props.thread;
+        if (this.unmounted) {
+            return;
+        }
+        await thread.dwoSetSearch(this.state.text);
+        this.lastNewestId = thread.newestPersistentMessage?.id;
+        await this.loadChips();
     }
 
     edit() {

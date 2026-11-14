@@ -7,6 +7,8 @@ patch(ThreadModel.prototype, {
         super.setup(...arguments);
         /** The id of the chip chosen (the messages it shows are the only ones loaded), false for all. */
         this.dwoFilter = fields.Attr(false);
+        /** The text searched in the messages (the server searches), empty for no search. */
+        this.dwoSearch = fields.Attr("");
     },
 
     /** While a chip is chosen, the server only returns the messages of that chip (Load more included). */
@@ -14,7 +16,7 @@ patch(ThreadModel.prototype, {
         fetchParams: { after, around, before, limit } = {},
         routeParams = {},
     } = {}) {
-        if (!this.dwoFilter) {
+        if (!this.dwoFilter && !this.dwoSearch) {
             return super.fetchMessagesData(...arguments);
         }
         return await this.store.fetchStoreData(
@@ -28,6 +30,7 @@ patch(ThreadModel.prototype, {
                     around,
                     before,
                     dwo_filter_id: this.dwoFilter,
+                    dwo_search: this.dwoSearch,
                 },
             },
             { readonly: false, requestData: true }
@@ -53,6 +56,17 @@ patch(ThreadModel.prototype, {
         await this.fetchNewMessages();
     },
 
+    /** Search a text in the messages, together with the chip chosen. */
+    async dwoSetSearch(text) {
+        text = (text || "").trim();
+        if (this.dwoSearch === text) {
+            return;
+        }
+        this.dwoSearch = text;
+        this.dwoForgetMessages();
+        await this.fetchNewMessages();
+    },
+
     /** Load the messages of the chosen chip again (a message arrived: the server says if it belongs). */
     async dwoReload() {
         this.dwoForgetMessages();
@@ -61,8 +75,9 @@ patch(ThreadModel.prototype, {
 
     /** Back to all the messages, for the next time the record is opened. */
     dwoReset() {
-        if (this.dwoFilter) {
+        if (this.dwoFilter || this.dwoSearch) {
             this.dwoFilter = false;
+            this.dwoSearch = "";
             this.dwoForgetMessages();
         }
     },
