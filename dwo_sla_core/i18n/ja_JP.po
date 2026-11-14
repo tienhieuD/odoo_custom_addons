@@ -2735,8 +2735,8 @@ msgstr "実行中"
 #. module: dwo_sla_core
 #: model:ir.model.fields,field_description:dwo_sla_core.field_sla_definition__running_task_count
 #: model_terms:ir.ui.view,arch_db:dwo_sla_core.view_sla_definition_form
-msgid "Running Tasks"
-msgstr "実行中のタスク"
+msgid "Open Tasks"
+msgstr "未完了のタスク"
 
 #. module: dwo_sla_core
 #. odoo-javascript
