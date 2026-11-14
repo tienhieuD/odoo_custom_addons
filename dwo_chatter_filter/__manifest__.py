@@ -21,7 +21,7 @@
     "application": False,
     "installable": True,
     "auto_install": False,
-    "license": "LGPL-3",
+    "license": "OPL-1",
     "price": 9.00,
     "currency": "EUR",
 }  # type: ignore
