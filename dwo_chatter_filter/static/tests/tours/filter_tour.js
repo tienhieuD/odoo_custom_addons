@@ -132,3 +132,31 @@ registry.category("web_tour.tours").add("dwo_chatter_filter_no_edit", {
         { trigger: ".o-mail-Chatter:not(:has(.o-dwo-filterEdit))" },
     ],
 });
+
+registry.category("web_tour.tours").add("dwo_chatter_filter_search", {
+    steps: () => [
+        { trigger: ".o-mail-Chatter" },
+        { trigger: ".o-dwo-messageFilter .o-dwo-filterSearchInput" },
+        { trigger: `${badge("all")}.o-dwo-filterActive:contains('6')` },
+        // typing: the server searches, the numbers follow the text
+        { trigger: ".o-dwo-filterSearchInput", run: "edit reminder" },
+        { trigger: `${badge("all")}:contains('1')` },
+        { trigger: showing("Private reminder") },
+        { trigger: hidden("Talk about the order") },
+        // AND with a chip
+        { trigger: badge("note"), run: "click" },
+        { trigger: showing("Private reminder") },
+        { trigger: badge("discussion") + ".o-dwo-filterEmpty" },
+        // Esc clears the text
+        {
+            trigger: ".o-dwo-filterSearchInput",
+            run() {
+                this.anchor.dispatchEvent(
+                    new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+                );
+            },
+        },
+        { trigger: `${badge("all")}:contains('6')` },
+        { trigger: ".o-dwo-filterSearchInput", run() { if (this.anchor.value) { throw new Error("The search text is not cleared"); } } },
+    ],
+});

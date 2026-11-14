@@ -29,6 +29,9 @@ class TestMessageFilterTour(HttpCase):
     def test_filter_tour(self):
         self.start_tour(f"/odoo/action-base.action_partner_form/{self.record.id}", "dwo_chatter_filter", login="admin")
 
+    def test_filter_search_tour(self):
+        self.start_tour(f"/odoo/action-base.action_partner_form/{self.record.id}", "dwo_chatter_filter_search", login="admin")
+
     def test_filter_edit_tour(self):
         self.start_tour(f"/odoo/action-base.action_partner_form/{self.record.id}", "dwo_chatter_filter_edit", login="admin")
 

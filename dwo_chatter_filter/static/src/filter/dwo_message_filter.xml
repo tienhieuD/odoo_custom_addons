@@ -17,6 +17,13 @@
                 <span t-out="item.label"/>
                 <span class="o-dwo-filterCount fw-bold" t-out="item.count ?? '?'"/>
             </button>
+            <div class="o-dwo-filterSearch position-relative d-inline-flex align-items-center ms-1">
+                <input type="text" class="o-dwo-filterSearchInput form-control form-control-sm rounded-pill"
+                       placeholder="Search messages..." t-att-value="state.text"
+                       t-on-input="onSearchInput" t-on-keydown="onSearchKeydown"/>
+                <button t-if="state.text" type="button" class="o-dwo-filterSearchClear btn btn-link btn-sm p-0 position-absolute end-0 me-2"
+                        title="Clear" aria-label="Clear" t-on-click="() => this.clearSearch()">&#215;</button>
+            </div>
             <button t-if="isAdmin" type="button" class="o-dwo-filterEdit btn btn-link btn-sm p-0 ms-1"
                     t-on-click="edit">Edit</button>
         </div>

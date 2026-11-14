@@ -145,3 +145,34 @@ class TestMessageFilter(MailCommon):
             "groups_id": [(6, 0, [self.env.ref("base.group_portal").id])]})
         with self.assertRaises(AccessError):
             self.env["mail.message"].with_user(portal).dwo_filter_chips("res.partner", self.record.id)
+
+    def test_search_in_body_subject_author_and_email(self):
+        Message = self.env["mail.message"].with_user(self.user_employee)
+        author = self.env["res.partner"].create({"name": "Zorbaxia Quux"})
+        self.note.write({"body": "<p>The Needle is here</p>"})
+        self.discussion_1.write({"subject": "Haystack topic"})
+        self.discussion_2.write({"author_id": author.id})
+        self.email_in.write({"email_from": "someone@sphinx-mail.test"})
+
+        def found(text, chip=None):
+            return set(Message._message_fetch(
+                self._thread_domain, dwo_search=text, dwo_filter_id=chip)["messages"].ids)
+
+        self.assertEqual(found("needle"), {self.note.id})
+        self.assertEqual(found("HAYSTACK"), {self.discussion_1.id})
+        self.assertEqual(found("zorbaxia"), {self.discussion_2.id})
+        self.assertEqual(found("sphinx-mail"), {self.email_in.id})
+        # AND with the chip chosen
+        self.assertEqual(found("needle", self._chip("note").id), {self.note.id})
+        self.assertEqual(found("needle", self._chip("email").id), set())
+        # blank search: nothing is filtered
+        self.assertEqual(len(found("   ")), 9)
+
+    def test_counts_follow_the_search(self):
+        self.note.write({"body": "<p>The Needle is here</p>"})
+        result = self.env["mail.message"].with_user(self.user_employee).dwo_filter_chips(
+            "res.partner", self.record.id, "needle")
+        self.assertEqual(result["all"], 1)
+        counts = {chip["name"]: chip["count"] for chip in result["chips"]}
+        self.assertEqual(counts["Notes"], 1)
+        self.assertEqual(sum(counts.values()), 1)
