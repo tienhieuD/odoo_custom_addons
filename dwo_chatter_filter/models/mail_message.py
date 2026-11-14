@@ -82,7 +82,19 @@ class MailMessage(models.Model):
         raise UserError(self.env._("Unknown kind of message: %s", category))
 
     @api.model
-    def _message_fetch(self, domain, *, dwo_filter_id=None, **kwargs):
+    def _dwo_search_domain(self, text):
+        """The messages that contain the text (any case) in the body, the subject, the name or the email of
+        the author. No text: no condition."""
+        text = (text or "").strip()
+        if not text:
+            return Domain.TRUE
+        return Domain.OR([
+            Domain("body", "ilike", text), Domain("subject", "ilike", text),
+            Domain("author_id.name", "ilike", text), Domain("email_from", "ilike", text),
+        ])
+
+    @api.model
+    def _message_fetch(self, domain, *, dwo_filter_id=None, dwo_search=None, **kwargs):
         """The chatter asks for the messages of one chip: the filter is applied by the server, so the
         pagination (Load more) works on the filtered list and not on what was already loaded. A chip that
         is gone, archived or broken filters nothing."""
@@ -96,10 +108,12 @@ class MailMessage(models.Model):
                     domain = Domain(True if domain is None else domain) & chip_domain
                 except Exception:
                     _logger.warning("Chatter Quick Filter: the filter of %r is not valid", chip.name, exc_info=True)
+        if dwo_search and isinstance(dwo_search, str) and dwo_search.strip():
+            domain = Domain(True if domain is None else domain) & self._dwo_search_domain(dwo_search)
         return super()._message_fetch(domain, **kwargs)
 
     @api.model
-    def dwo_filter_chips(self, res_model, res_id):
+    def dwo_filter_chips(self, res_model, res_id, search=None):
         """What the chatter shows above the messages of a record: the number of messages in all, and the
         chips (in their order) with the number of messages each one shows. A chip whose filter does not work
         (a field of a module that was removed) has no number; the others are not affected."""
@@ -107,7 +121,8 @@ class MailMessage(models.Model):
             raise AccessError(self.env._("Only internal users can filter the messages."))
         self.env[res_model].browse(res_id).check_access("read")
         base = (Domain("model", "=", res_model) & Domain("res_id", "=", res_id)
-                & Domain("message_type", "!=", "user_notification"))
+                & Domain("message_type", "!=", "user_notification")
+                & self._dwo_search_domain(search if isinstance(search, str) else None))
         chips = []
         for chip in self.env["dwo.chatter.filter"].search([], limit=MAX_CHIPS):
             try:
