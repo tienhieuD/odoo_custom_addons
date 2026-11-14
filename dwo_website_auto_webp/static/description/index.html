@@ -139,10 +139,11 @@
     <!-- Proof screenshot -->
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">See It in Action</h2>
     <p class="mb-4" style="font-size: 16px;">
-        Open any image of your website in the browser and check the response in the developer tools: the <code>Content-Type</code> is <strong>image/webp</strong>.
+        The same <code>/web/image</code> address gives two responses: a browser that sends <code>Accept: image/webp</code> receives WebP, any other browser receives the original image, unchanged.
+        The sizes below are the real response sizes of three demo products at WebP quality 85; the savings on your own images depend on the images.
     </p>
     <div class="text-center mb-5">
-        <img src="screenshot_1.png" alt="Browser developer tools showing Content-Type image/webp for a /web/image request" class="img-fluid rounded shadow"/>
+        <img src="screenshot_1.png" alt="Three product images shown as the original JPEG and as the WebP response, with the file sizes before and after" class="img-fluid rounded shadow"/>
     </div>
 
     <!-- Configuration -->
@@ -152,7 +153,7 @@
         Conversion is <strong>on by default</strong>, so most shops never need to change anything.
     </p>
     <div class="text-center mb-4">
-        <img src="screenshot_3.png" alt="Auto WebP settings: toggle, quality and Clear WebP Cache button" class="img-fluid rounded shadow"/>
+        <img src="screenshot_2.png" alt="Auto WebP settings with the conversion toggle, WebP Quality, Clear WebP Cache and the two test buttons with their success messages" class="img-fluid rounded shadow"/>
     </div>
     <div class="row mb-5">
         <div class="col-md-4 mb-3">
@@ -173,6 +174,13 @@
                 <p class="mb-0" style="font-size: 14px;">Asks for confirmation, then flushes the cache of the current website. Images are re-converted on the next request.</p>
             </div></div>
         </div>
+    </div>
+
+    <p class="mb-4" style="font-size: 16px;">
+        Quality is a trade-off between file size and detail. The example below serves one product image at several WebP Quality values (real sizes of a demo image; yours will differ).
+    </p>
+    <div class="text-center mb-5">
+        <img src="screenshot_3.png" alt="One product image as the original JPEG and as WebP at quality 20, 50, 85 and 100 with the file size of each" class="img-fluid rounded shadow"/>
     </div>
 
     <!-- Built-in tests -->
@@ -201,6 +209,12 @@
         The module needs <strong>Pillow with the WebP encoder</strong> (built on <code>libwebp</code>) on the machine that runs Odoo.
         Most Linux and Windows installs already have it. If it is missing, the module does not crash &mdash; it simply serves the original images and logs a warning.
     </p>
+    <p class="mb-3" style="font-size: 16px;">
+        The same instructions are also inside Odoo, at the bottom of <strong>Settings &rarr; Auto WebP</strong>:
+    </p>
+    <div class="text-center mb-4">
+        <img src="screenshot_4.png" alt="Installation Guide in the Auto WebP settings with the Linux tab open and the test buttons above it" class="img-fluid rounded shadow"/>
+    </div>
     <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #ffc107;">
         Always install Pillow with the <strong>exact Python that runs Odoo</strong> (its virtualenv or the system Python), then restart Odoo.
         Installing into the wrong Python is the most common mistake.
