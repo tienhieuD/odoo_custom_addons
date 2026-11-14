@@ -123,8 +123,8 @@
     </ol>
     <p class="mb-3" style="font-size: 15px;">If the action fails (a broken Server Action, a field pointing nowhere), the engine logs one <strong>Escalate Failed</strong> event with the error and moves on &#8212; it does not retry. Transient failures aside, retrying an action that failed once rarely succeeds on its own, so the Error Events screen (&#167;14) is the place to catch and fix these, not a background retry loop. Server Actions always run with the permissions of the background job's own user, never with the permissions of whoever last edited the source record.</p>
     <div class="text-center mb-5">
-    <img src="screenshot_11.png" alt="Escalation tab with two threshold rules at 75% and 100%, one emailing the salesperson of the record and one emailing a fixed on-call address" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
-    <p class="text-muted mt-2" style="font-size: 13px;">A two-stage escalation: a 75% warning emailed to the salesperson of the record, then a 100% breach alert to a fixed on-call address.</p>
+    <img src="screenshot_15.png" alt="Escalation tab with four steps: 75% and 100% email the salesperson of the lead, 100% a fixed address, 150% a manager address" class="img-fluid rounded" style="border: 1px solid #ddd;"/>
+    <p class="text-muted mt-2" style="font-size: 13px;">A four-step escalation: 75% and 100% emails to the salesperson of the record, a fixed address at 100% and a manager address at 150%.</p>
     </div>
     <h2 id="smart-button" class="font-weight-bold mt-5 mb-3" style="font-size: 26px; color: #15133A;">9. Smart Button on the Source Record</h2>
     <p class="mb-3" style="font-size: 15px;">The SLA Progress widget (&#167;10) lives on the SLA Task screen. To see SLA status without leaving the ticket, task or any other record it is attached to, add a one-line smart button to that model's own form &#8212; no dependency on <code>dwo_sla_core</code>'s own views required, just two small additions in the model you already customise:</p>
