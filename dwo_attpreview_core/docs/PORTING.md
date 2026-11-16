@@ -180,3 +180,37 @@ etag=False, as_attachment=False)` (private cache; `nosniff` and `default-src 'no
 the controller subclass of `AttPreviewController`; Settings `<block title= name=>` and `<setting id= string= help=>`;
 `fields.Boolean(config_parameter=)`; the new tour step (`:not(:contains())` is jQuery on 17, `run()` gets
 `this.anchor` from `tour_compat.js`).
+
+## 18.0 -> 17.0 (#82)
+
+Source: 18.0 commits `f48d0cd` (new module `dwo_attpreview_archive` 18.0.1.0.0 + `.gitignore`) and `5d275c8` (core 18.0.1.2.0),
+themselves the 18.0 port of 19.0 `ad77f38` + `122f839`. Versions: archive `17.0.1.0.0`, core `17.0.1.2.0`.
+The module was copied from 18.0 (tracked files only, with `static/lib/tree_libs` and `thirdparty/rarfile` unchanged);
+the core change was applied with the 18.0 diff (without the manifest version and the docs).
+Tests: 171 (core + office + mail + archive, incl. the tour `dwo_attpreview_archive_tour` on a zip of 20 002 files), all
+green on Odoo 17.0 (`odoo-17.0.20240624`, Chrome headless shell, `browser_size = "1366,768"`).
+
+### dwo_attpreview_archive
+
+| File | 18.0 | 17.0 |
+|---|---|---|
+| `__manifest__.py` | `18.0.1.0.0` | `17.0.1.0.0` |
+| `models/engine.py` `_dwo_extract_hint` | `self.env._(...)` | `_(...)` from `odoo` |
+| `static/tests/tours/archive_tour.js` | `registry.category("web_tour.tours").add`, `run: "edit ..."` | `dwoAddTour` (core `tour_compat.js`), `run: "text ..."` (the 17 runner types with `text`: click, `keydown`, value, `input` event, which the filter listens to) |
+| `tests/test_archive.py` `TestArchiveTour` | `/odoo/res.partner/<id>` | `/web#id=..&model=res.partner&view_type=form`, `browser_size = "1366,768"` |
+
+Unchanged on 17: the parsers, `thirdparty/rarfile`, the vendored `tree_libs.min.js`, the OWL components
+`tree_view.js` / `archive_viewer.js` and their template (OWL 2 on 17: `onWillUpdateProps`, `onPatched`, `useRef`,
+`static props`), `download` from `@web/core/network/download`, `_t`, the `dwo_attpreview` service (no `rpc` call in the
+viewer), the SCSS (every Bootstrap variable has a fallback, as Bootstrap 5.1 of 17 lacks some), the jQuery selectors of
+the tour (`:contains`, `:last`, `:not(...)`) and the `KeyboardEvent` dispatch (`this.anchor` comes from `tour_compat.js`).
+The tree rules are kept: no `tree.rebuildTree()` during a render, state changes through
+`tree.applySubStateUpdate("expandedItems", ...)`, the big row data out of OWL reactivity.
+
+**Repository:** `!dwo_attpreview_archive/static/lib/` is added to `.gitignore` after the office line.
+
+### dwo_attpreview_core
+
+Applied as on 18.0: `module_dwo_attpreview_archive` tick (model + view), catalog entry + `static/catalog/dwo_attpreview_archive/`,
+`MAX_PART_INDEX = 1_000_000`, icons `dwo_attpreview_{folder,folder_open,lock,link}.svg`, `dwoAttPreviewSpecialIconUrl`
+and the new extensions in `file_kind.js`, tests (`test_core`, `test_part_preview`, `test_settings`). No Odoo 17 specific change.

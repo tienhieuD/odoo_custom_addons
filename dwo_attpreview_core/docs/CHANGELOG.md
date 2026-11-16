@@ -1,5 +1,15 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-16 - 17.0.1.2.0 - archive engine (#82), 17.0 port of 19.0.1.2.0 (via 18.0.1.2.0)
+
+- Settings and catalog: tick `module_dwo_attpreview_archive` "Secure Archive Preview: ZIP, RAR, 7Z, TAR"; catalog copy of
+  its description page.
+- `/dwo_attpreview/part_info`: position of an inner file up to 1 000 000 (was 10 000; an archive lists up to 100 000 files).
+- Icons: folder, open folder, lock (password protected) and link (`dwoAttPreviewSpecialIconUrl`); more extensions
+  mapped to the existing icons (pictures, video, audio, archives, code, text).
+- Same code as 18.0.1.2.0 (no Odoo 17 specific change in the core for this step; see `docs/PORTING.md`,
+  section "18.0 -> 17.0 (#82)").
+
 ## 2026-11-16 - 17.0.1.1.0 - 17.0 port of 19.0.1.1.0 (via 18.0) (#73)
 
 - Same features and behaviour as 19.0.1.1.0 (ported from the 18.0 port); the entries below are the history of the 18.0 and 19.0 series.
