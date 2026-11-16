@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<!-- Odoo 20: templates read the component through this., t-ref takes a signal ref -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_office.OfficeViewer">
+        <div class="o_dwo_office d-flex flex-column h-100" t-att-data-state="this.state.error ? 'error' : (this.state.loading ? 'loading' : 'ready')" t-att-data-layout="this.state.layout" t-att-data-page="this.state.page" t-att-data-total="this.state.total" t-att-data-find-total="this.state.findTotal" t-att-data-find-index="this.state.findIndex" t-att-data-find="this.state.findOk ? '1' : '0'" t-att-data-find-where="this.state.findWhere">
+            <div t-if="this.state.error" class="alert alert-warning m-3">
+                <!-- legacy (.doc/.xls/.ppt): a short message, the technical reason is only in the console -->
+                <span t-if="this.isLegacy" class="o_dwo_office_error">This legacy file cannot be previewed.</span>
+                <span t-elif="this.isText" class="o_dwo_office_error">This file cannot be previewed.</span>
+                <span t-else="" class="o_dwo_office_error">This file could not be displayed: <t t-out="this.state.error"/></span>
+                <a t-if="this.props.downloadUrl" t-att-href="this.props.downloadUrl" t-att-class="this.isShortError ? 'btn btn-primary btn-sm ms-2 o_dwo_office_download' : 'ms-2 o_dwo_office_download'">Download</a>
+            </div>
+            <div t-if="this.state.loading and !this.state.error" class="text-muted px-3 py-1">Loading...</div>
+            <iframe t-ref="this.frame" t-att-src="this.viewerUrl" sandbox="allow-scripts" class="w-100 border-0 flex-grow-1"
+                    t-att-class="{'d-none': this.state.error}" style="min-height:0"/>
+        </div>
+    </t>
+</templates>

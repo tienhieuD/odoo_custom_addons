@@ -1,0 +1,59 @@
+# Secure Office Preview: DOCX, DOC, XLSX, XLS, PPTX, PPT, CSV, TSV (`dwo_attpreview_office`)
+
+Engine for **Secure Attachment Preview** (`dwo_attpreview_core`, Odoo 19): preview `xlsx`, `docx` and `pptx` attachments from the chatter and from file fields of any record, fully offline, with their macro-enabled and template variants (`xlsm`, `xltx`, `xltm`, `docm`, `dotx`, `dotm`, `pptm`, `ppsx`, `ppsm`, `potx`, `potm`; macros are never run). `csv` and `tsv` are shown as a sheet. The older `doc`, `xls` and `ppt` formats are opened too, with limited support and a warning (see below).
+
+It replaces the old server-side engines `dwo_attpreview_word`, `dwo_attpreview_sheet`, `dwo_attpreview_slide` and the bundle `dwo_attpreview_office_suite`.
+
+## How it works
+
+- **Server (Python):** the engine registers with the Core registry for `xlsx`, `docx`, `pptx`, their 11 variants, `doc`, `xls`, `ppt`, `csv` and `tsv` (client-side output). It checks the Core size limit and, for the OOXML files, that the file is a sane Office zip (valid zip, main part of the base type present, not too large once unpacked; a variant is checked exactly as its base type and handed to the viewer as that type); for the old formats, that it is not empty and starts with the OLE (Compound File) signature. The old files are never parsed on the server. The original file is returned by `/dwo_attpreview_office/file/<attachment id>`, only to users who can read the attachment. For a binary field of a record (not an attachment), the Core checks the file the same way (`/dwo_attpreview/field_info`) and gives the viewer the `fileUrl` of the field (`/web/content` of the field, access checked again); no attachment is created (#72).
+- **Browser:** the file is drawn on canvas by the bundled viewer library (see below), inside an `<iframe sandbox="allow-scripts">` (opaque origin: no Odoo session, no access to the Odoo page). The parent window fetches the file and sends the bytes with `postMessage`.
+- **Offline:** no CDN, no Google Fonts (`useGoogleFonts: false`), no request to any other host. The viewer page is served with a Content-Security-Policy that only allows the server itself (`default-src 'none'`).
+- **Assets route:** `/dwo_attpreview_office/asset/...` serves `static/viewer` and `static/lib/silurus` with the right MIME (`application/wasm`, `text/javascript`) and a CORS header. The plain `/static` route of Odoo already gives the right MIME for `.wasm` but sends no CORS header, which a sandboxed iframe needs to load scripts.
+
+## Bundled library and license
+
+| | |
+|---|---|
+| Library | `@silurus/ooxml` (Office Open XML viewer, Rust/WebAssembly parser + Canvas renderer) |
+| Version (pinned) | **0.89.11 + local patches 0001** (XLSX connectors/arrows) **and 0003** (XLSX search highlight speed). See `docs/SILURUS_PATCHES.md` and `patches/silurus/` |
+| License | MIT (c) 2026 Yuki Yokotani, see `static/lib/silurus/LICENSE` |
+| Third-party notices | `static/lib/silurus/THIRD_PARTY_NOTICES.md` |
+| Legacy add-on | `@silurus/ooxml-legacy-office` 0.89.11 (MIT, same author) for `doc`, `xls`, `ppt`, with local patch 0002 (relative import). Licence `static/lib/silurus/LICENSE.ooxml-legacy-office`, notices `THIRD_PARTY_NOTICES.ooxml-legacy-office.md`. Must be upgraded together with the main library: see `docs/SILURUS_PATCHES.md` |
+| Home | https://ooxml.silurus.dev |
+
+Only the files the three viewers need are shipped (the `dist` folder without type definitions and without the unused entry points). The library carries local patches 0001 (XLSX connectors), 0002 (legacy add-on import) and 0003 (XLSX search highlight): see `docs/SILURUS_PATCHES.md`.
+To update: replace the content of `static/lib/silurus` with a newer `dist` (same selection), keep `LICENSE` and `THIRD_PARTY_NOTICES.md`, rerun the module tests. **If upstream has not fixed the XLSX connector bug yet, re-apply `patches/silurus/0001-*.patch` first** (how-to in `docs/SILURUS_PATCHES.md`).
+
+The module itself is OPL-1; the library keeps its MIT license.
+
+## Search in the preview (#71)
+
+- **Open:** the magnifier button on the viewer toolbar, Ctrl+F (Cmd+F) or `/` while the preview has the focus. Ctrl+F pressed elsewhere in the preview dialog is forwarded to the viewer; outside the dialog the key keeps its usual meaning (the browser search). The viewer is drawn on canvases, so the browser's own search cannot see its text.
+- **Use:** type (search starts after 250 ms), Enter = next match, Shift+Enter = previous, Esc or × = close and clear. The counter shows "n / total" ("…" while searching, "0 / 0" in red when nothing is found). Plain text, case-insensitive, no regular expression.
+- **Scope:** the whole document, also pages, slides and sheets not shown (library `findText` / `findNext` / `findPrev` / `clearFind`). Every match is highlighted, the active one in a stronger colour; the viewer scrolls to the page (docx), goes to the slide (pptx) or switches to the sheet and cell (xlsx, csv, tsv). Works for docx, xlsx, pptx, csv, tsv and the old doc, xls, ppt (same viewers). The button is hidden when the viewer cannot search.
+- **Long files:** a docx is searched once its whole layout is done (the counter shows "…" meanwhile); a newer query or Esc drops an older pending search. Measured: 15-page docx, 6,600 matches in about 0.4 s; xlsx with 100,000 rows, 100,000 matches in about 1 s (thanks to the local patch 0003; without it the page hung). Scrolling a sheet with 100,000 highlighted matches was not measured. Sheets now accept 200,000 rows / 1,500,000 cells, like csv. A very large match count is only counted, nothing is listed.
+- **Not done:** replace, regular expressions, search across several files. `enableTextSelection` (selectable text layer for copy) is not turned on: the search and its highlight do not need it (its effect on drawing speed was not measured properly). The labels of the search bar are English only (the viewer page is a static file outside the Odoo translation system).
+
+## Limits (accepted)
+
+- **XLSX connectors/arrows:** drawn thanks to the local patch (see `docs/SILURUS_PATCHES.md`). Still not handled: `absoluteAnchor` drawings, non-connector shapes rotated 90/270 degrees, double-line connectors with arrowheads. DOCX/PPTX are not affected by the patch.
+- **Formulas are not recalculated:** the value cached in the file is shown (files written by libraries without cache show 0).
+- **Very large files:** no extra processing by this module (no row cut). The server refuses files above the Core limit (Settings, default 20 MB, per-engine override in the engine list) and files that unpack to more than 128 MiB per part, 256 MiB in total, or 20000 parts (the same ceilings as the library `resourceLimits`). Beyond that the library itself may be slow or refuse; the user then sees a message and a Download button.
+- The viewer text is a canvas: text cannot be selected like normal page text (the library has its own selection and copy).
+- **Old formats `.doc`, `.xls`, `.ppt` (Word/Excel/PowerPoint 97-2003): limited support.** They open like the new ones, under a warning banner ("Legacy format ... may show incorrectly or fail to open. Download it to see it in full.", it can be closed). A file the viewer cannot read (a document with hyperlinks, merged table cells, footnotes or most pictures is refused as a whole, as are encrypted files and some shapes/backgrounds) shows a short message, "This legacy file cannot be previewed.", and a Download button; the technical reason is only in the browser console. In tests with Apache POI sample files about 70% of `.xls` and `.ppt` and about 40% of `.doc` opened. Display can differ from Office without any warning (fonts, a missing slide background, charts and vector pictures in `.doc`). The WebAssembly parsers (about 1.3 MB each) are downloaded only when such a file is opened. A web page or CSV saved with the `.xls` extension, a file that is not an OLE container, and an empty file are refused by the server with a message and a Download button (a toast).
+- **`.csv`, `.tsv`:** drawn as a sheet by `XlsxSheetViewer` (delimited-text mode): every cell stays text (no type, date or formula guessing, leading zeros kept). Delimiter: tab for `.tsv`; for `.csv` the most frequent of `,` `;` tab in the first line (outside quotes), a comma if none. Encoding UTF-8, with or without BOM (other encodings, including UTF-16, are not supported; a file with a NUL byte is refused by the server). No warning banner. Limits: the Core file size limit (default 20 MB), the library input limit of 64 MiB, and in the viewer 200,000 rows / 1,500,000 cells; above them the user sees "This file cannot be previewed." and a Download button. A 100,000-line, 5 MB file opened in about 3 seconds in the tour. Columns have the default width (long text is cut at the cell edge, as in a spreadsheet).
+- **Macro-enabled and template variants (#70):** `xlsm`, `xltx`, `xltm` (as xlsx), `docm`, `dotx`, `dotm` (as docx), `pptm`, `ppsx`, `ppsm`, `potx`, `potm` (as pptx). They have the same parts as the base type (only the content type of the main part differs, plus `vbaProject.bin` for the macro ones), and the viewer draws the content like the base type. **Macros are never run:** the library does not read `vbaProject.bin`, and the sandboxed viewer runs no script of the file. A slideshow (`ppsx`, `ppsm`) opens as normal slides, not full screen. All 11 were checked with files built from the module samples (content type changed, empty `vbaProject.bin` added for macro files), not with files saved by Microsoft Office; none had to be left out.
+- Not supported: `ods`, `odt`, `odp`, `xlsb` (binary Excel), `rtf`, password-protected files.
+- Hyperlinks inside documents are disabled (the sandbox cannot open pages).
+
+## Tests
+
+`tests/test_engine.py` (Odoo 19): registration, real xlsx/docx/pptx accepted, old formats (OLE accepted, not-OLE/empty/too large refused, notice in `/dwo_attpreview/info`, add-on files served with the right MIME), tours for a real .xls, .ppt and .doc (banner, viewer drawn), a .doc the viewer refuses (short message + Download, dialog intact) and a fake .xls (toast); sample files in `tests/files` (Apache POI, Apache-2.0, see `tests/files/NOTICE`); damaged/truncated/not-zip/empty/missing-part files refused with a friendly message, zip bombs (huge part, many parts, too many entries), Core size limit, XXE sample is only data, access rights of the file route, asset route (MIME, CORS, CSP, path whitelist, no external reference), and browser tours for xlsx, docx, pptx and a damaged file. Variants (#70): every one checked as its base type (unit test) and opened in a tour, plus a search in an xlsm. Search: tours `dwo_attpreview_office_tour_find_*` (exact counts, next/previous, sheet and slide switch, old formats, csv/tsv, a 100,000-row xlsx).
+
+## Layout of the viewers (#65)
+
+- **DOCX:** continuous vertical scroll like a PDF reader (`DocxScrollViewer`; only the visible pages are mounted, so long documents stay smooth); no previous/next page buttons, the "Page n / total" label and zoom stay. Toolbar: previous/next page, zoom, fit width.
+- **PPTX:** one slide at a time (`PptxViewer`) with previous/next buttons.
+- **XLSX:** grid with sheet tabs (unchanged).
+- A file the Core refuses (damaged, too large) is reported by a toast, without opening the dialog.
