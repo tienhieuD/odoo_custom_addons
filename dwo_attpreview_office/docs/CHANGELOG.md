@@ -1,5 +1,35 @@
 # CHANGELOG - dwo_attpreview_office
 
+## 2026-11-16 - 19.0.1.1.0 - silurus 0.90.0, OpenDocument (ODT, ODS, ODP) (#84)
+
+**Library:** `@silurus/ooxml`, `@silurus/ooxml-legacy-office` 0.89.11 -> **0.90.0**, new `@silurus/ooxml-opendocument`
+0.90.0 (MIT, same author). The main library is the stock npm build again: the xlsx connector/arrow fix (our local patch
+`0001`, upstream PR #2243) is merged upstream, so `0001` and its upstream-for-main copy are removed (checked: sheet
+"Hiring Flow" of the sample workbook draws its connectors and arrowheads). Patch `0002` (relative import of the
+companion runtime) now covers the legacy and the OpenDocument add-on; `0003` (xlsx search highlight, visible matches
+only) ported by hand to the new chunk (local names renamed `dwo*`: the old `F` would shadow a minified helper). Licences
+and notices of the three packages copied from 0.90.0. `useGoogleFonts` (deprecated in 0.90, warns even when false) is
+no longer passed; no font source = no web font. Details: `docs/SILURUS_PATCHES.md`.
+
+**Added:** OpenDocument `odt`, `ods`, `odp` and templates `ott`, `ots`, `otp`, drawn by the docx scroll, xlsx grid and
+pptx slide viewers (with search), **without** the "limited support" banner (user decision).
+- Server: a sane zip (same unpacked limits as Office files) whose `mimetype` part names the family of the extension
+  (document or template; compressed or not first is accepted, like the reader); otherwise a toast ("the mimetype part is
+  missing" / "another kind of OpenDocument file"). The viewer receives `odt`/`ods`/`odp`.
+- Viewer: loads `odt.mjs`/`ods.mjs`/`odp.mjs` only for such a file and passes `createOdt()`/`createOds()`/`createOdp()`
+  as the `odt`/`ods`/`odp` option. A file the reader refuses (encrypted, corrupt, over a limit) shows "This file cannot be
+  previewed." and Download, like csv; the code stays in the console; the 90 s load timeout applies.
+- Manifest: name `Secure Office Preview: DOCX, XLSX, PPTX, ODT, ODS, ODP, DOC, XLS, PPT, CSV`, summary/keywords and
+  description updated; listing page: banner, LibreOffice card, file types, limits, FAQ, two screenshots (ods, odt).
+
+**Tests:** `test_01` (extensions), `test_23` (six extensions accepted, templates both ways, re-zipped package, no
+notice), `test_24` (wrong family, missing/oversized `mimetype`, damaged, empty, not a zip), `test_25` (zip bomb, too
+many parts), `test_02e` (`/dwo_attpreview/info` without notice, file route), `test_03` (add-on files served, no bare
+import), `test_03c` (options, no `useGoogleFonts`), tours `test_70..75` (odt/ods/odp/ott/ots/otp drawn, right layout,
+no banner, fills the dialog), `test_76..78` (search in odt/ods/odp: counts, sheet and slide switch), `test_79`
+(encrypted odt: short message + Download, no banner). Samples `tests/files/sample.od?` (odfpy, English fictional data);
+not tried with files saved by LibreOffice itself.
+
 ## 2026-11-15 - Office files in binary fields of any record (#72)
 
 **Fixed:** an Office file in a binary field that is not an `ir.attachment` record (e.g. a custom binary field on a partner, or a field stored in its table) showed the toast "can be previewed from the attachments, not yet from this field" instead of the preview.

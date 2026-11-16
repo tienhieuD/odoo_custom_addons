@@ -38,21 +38,41 @@ LEGACY_KINDS = ("doc", "xls", "ppt")
 CFB_SIGNATURE = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
 CFB_MIN_BYTES = 512  # one sector: the header alone is 512 bytes
 
+# OpenDocument (LibreOffice, ODF 1.3), with the templates: opened in the browser by the optional silurus OpenDocument
+# add-on (static/lib/silurus/{odt,ods,odp}.mjs), which claims a package by its `mimetype` file only. The server checks
+# the zip like an Office file and that `mimetype` names the family of the extension (the document or its template);
+# the viewer receives odt/ods/odp. No warning banner (#84).
+OPENDOCUMENT = {
+    "odt": ("odt", ("application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.text-template")),
+    "ott": ("odt", ("application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.text-template")),
+    "ods": ("ods", ("application/vnd.oasis.opendocument.spreadsheet",
+                    "application/vnd.oasis.opendocument.spreadsheet-template")),
+    "ots": ("ods", ("application/vnd.oasis.opendocument.spreadsheet",
+                    "application/vnd.oasis.opendocument.spreadsheet-template")),
+    "odp": ("odp", ("application/vnd.oasis.opendocument.presentation",
+                    "application/vnd.oasis.opendocument.presentation-template")),
+    "otp": ("odp", ("application/vnd.oasis.opendocument.presentation",
+                    "application/vnd.oasis.opendocument.presentation-template")),
+}
+# the add-on reads at most 128 bytes of `mimetype`
+ODF_MIMETYPE_MAX_BYTES = 128
+
 
 class AttPreviewEngineOffice(models.AbstractModel):
-    """xlsx, docx and pptx (with their macro-enabled and template variants, and the old doc, xls, ppt, with a warning) are drawn in the browser by the bundled silurus viewer (static/lib/silurus), inside
+    """xlsx, docx and pptx (with their macro-enabled and template variants, the OpenDocument odt, ods, odp with their
+    templates, and the old doc, xls, ppt, with a warning) are drawn in the browser by the bundled silurus viewer (static/lib/silurus), inside
     a sandboxed iframe. The server only checks that the file is a sane Office zip (and not too large once
     unpacked), then hands the file type to the viewer; the bytes come from /dwo_attpreview_office/file/<id>."""
 
     _name = "dwo.attpreview.engine.office"
     _inherit = "dwo.attpreview.engine"
-    _description = "Attachment Preview Engine: xlsx, docx, pptx (and doc, xls, ppt)"
+    _description = "Attachment Preview Engine: xlsx, docx, pptx, odt, ods, odp (and doc, xls, ppt)"
 
     _dwo_engine_code = "office"
-    _dwo_engine_label = "XLSX, DOCX, PPTX, DOC, XLS, PPT, CSV, TSV"
+    _dwo_engine_label = "DOCX, XLSX, PPTX, ODT, ODS, ODP, DOC, XLS, PPT, CSV, TSV"
     _dwo_engine_extensions = (
         "xlsx", "docx", "pptx", "doc", "xls", "ppt", "csv", "tsv",
-    ) + tuple(VARIANTS)
+    ) + tuple(VARIANTS) + tuple(OPENDOCUMENT)
     _dwo_engine_output = "text"
     _dwo_engine_priority = 10
 
@@ -82,9 +102,8 @@ class AttPreviewEngineOffice(models.AbstractModel):
             raise UserError(self.env._(
                 "This is not a valid .%s file (it is binary, or not saved as UTF-8 text).", kind))
 
-    def _dwo_check_zip(self, content, kind, base=None):
-        """kind: the extension of the file (for the messages); base: xlsx/docx/pptx, the type it is checked as."""
-        base = base or kind
+    def _dwo_open_zip(self, content, kind):
+        """A sane zip (not empty, not damaged, within the part / unpacked size limits of the library)."""
         if not content:
             raise UserError(self.env._("The file is empty."))
         if not content.startswith(b"PK"):
@@ -104,6 +123,29 @@ class AttPreviewEngineOffice(models.AbstractModel):
             total += info.file_size
         if total > MAX_TOTAL_BYTES:
             raise UserError(self.env._("This file is too large once unpacked to be previewed."))
+        return zf, infos
+
+    def _dwo_check_opendocument(self, content, kind):
+        """odt/ods/odp and the templates ott/ots/otp: a sane zip whose `mimetype` part names the family of the
+        extension. As the add-on (and LibreOffice) does, `mimetype` may be compressed or not stored first. The XML
+        is never parsed here; encryption and the content are checked in the browser."""
+        zf, infos = self._dwo_open_zip(content, kind)
+        info = next((i for i in infos if i.filename == "mimetype"), None)
+        if info is None or info.file_size > ODF_MIMETYPE_MAX_BYTES:
+            raise UserError(self.env._(
+                "This is not a valid %s file (the mimetype part is missing).", kind.upper()))
+        try:
+            mimetype = zf.read(info).decode("ascii").strip()
+        except (zipfile.BadZipFile, UnicodeDecodeError, ValueError, OSError, RuntimeError, NotImplementedError):
+            raise UserError(self.env._("The file is damaged and cannot be opened."))
+        if mimetype not in OPENDOCUMENT[kind][1]:
+            raise UserError(self.env._(
+                "This is not a valid %s file (it is another kind of OpenDocument file).", kind.upper()))
+
+    def _dwo_check_zip(self, content, kind, base=None):
+        """kind: the extension of the file (for the messages); base: xlsx/docx/pptx, the type it is checked as."""
+        base = base or kind
+        _zf, infos = self._dwo_open_zip(content, kind)
         if MAIN_PART[base] not in {i.filename for i in infos}:
             raise UserError(self.env._("This is not a valid %s file (the main part is missing).", kind.upper()))
 
@@ -119,6 +161,9 @@ class AttPreviewEngineOffice(models.AbstractModel):
             self._dwo_check_zip(content, kind, VARIANTS[kind])
             # the viewer only needs the base type
             kind = VARIANTS[kind]
+        elif kind in OPENDOCUMENT:
+            self._dwo_check_opendocument(content, kind)
+            kind = OPENDOCUMENT[kind][0]
         else:
             raise UserError(self.env._("Unsupported file type."))
         return {"type": "text", "data": kind}

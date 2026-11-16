@@ -54,7 +54,7 @@ function p(e, t) {
 	});
 }
 function m(e) {
-	if (!b(e)) throw TypeError("model source config must be a plain object");
+	if (!C(e)) throw TypeError("model source config must be a plain object");
 	let t = Reflect.ownKeys(e);
 	if (t.length > c) throw RangeError(`model source config accepts at most ${c} entries`);
 	let n = {};
@@ -72,39 +72,68 @@ function m(e) {
 	}
 	return Object.freeze(n);
 }
-async function h(e, r, i, a, o = []) {
-	let s = p(e);
+async function h(e, r, i, a, o = [], s) {
+	let c = p(e);
 	t(a, n);
-	let c = await import(
+	let l = await import(
 		/* @vite-ignore */
-		s.moduleUrl
-), l = typeof c == "object" && c ? c.openModelSource : void 0;
-	if (typeof l != "function") throw TypeError("model source module must export openModelSource()");
+		c.moduleUrl
+), u = typeof l == "object" && l ? l.openModelSource : void 0;
+	if (typeof u != "function") throw TypeError("model source module must export openModelSource()");
 	t(a, n);
-	let u = await l(r, s.config, a, o);
-	if (typeof u != "object" || !u) throw TypeError("openModelSource() must return an object");
-	let d = u, f = d.close;
-	if (typeof f != "function") throw TypeError("an opened model source must provide close()");
-	let m = !1, h = () => {
-		m || (m = !0, f.call(u));
+	let d = await u(r, c.config, a, o, s === void 0 ? void 0 : v(s));
+	if (typeof d != "object" || !d) throw TypeError("openModelSource() must return an object");
+	let f = d, m = f.close;
+	if (typeof m != "function") throw TypeError("an opened model source must provide close()");
+	let h = !1, g = () => {
+		h || (h = !0, m.call(d));
 	};
 	try {
-		let e = i(d.archive), r = g(d.viewDefaults);
+		let e = i(f.archive), r = y(f.viewDefaults);
 		return t(a, n), Object.freeze({
 			archive: e,
 			viewDefaults: r,
-			close: h
+			close: g
 		});
 	} catch (e) {
 		try {
-			h();
+			g();
 		} catch {}
 		throw e;
 	}
 }
-function g(e) {
+function g(e, t) {
+	if (t && e === null) return null;
+	if (typeof e != "number" || !Number.isSafeInteger(e) || e < 0) throw TypeError("model source context limits must be non-negative safe integers");
+	return e;
+}
+function _(e) {
+	let t = typeof e == "object" && e ? e : {};
+	return Object.freeze({
+		maxRows: g(t.maxRows, !1),
+		maxCells: g(t.maxCells, !1),
+		maxOwnedUtf8Bytes: g(t.maxOwnedUtf8Bytes, !1),
+		maxJsonBytes: g(t.maxJsonBytes, !1)
+	});
+}
+function v(e) {
+	let t = e.resourcePolicy, n = Object.freeze({
+		maxArchiveEntryBytes: g(t?.maxArchiveEntryBytes, !0),
+		maxTotalInflatedBytes: g(t?.maxTotalInflatedBytes, !0),
+		maxArchiveEntries: g(t?.maxArchiveEntries, !0)
+	}), r = e.worksheetPolicy;
+	return Object.freeze(r === void 0 ? { resourcePolicy: n } : {
+		resourcePolicy: n,
+		worksheetPolicy: Object.freeze({
+			worksheet: _(r.worksheet),
+			cache: _(r.cache),
+			maxCoordinateIndexEntries: g(r.maxCoordinateIndexEntries, !1)
+		})
+	});
+}
+function y(e) {
 	if (e === void 0) return Object.freeze({});
-	if (!b(e)) throw TypeError("model source viewDefaults must be a plain object");
+	if (!C(e)) throw TypeError("model source viewDefaults must be a plain object");
 	let t = Reflect.ownKeys(e);
 	if (t.length > u) throw RangeError("model source viewDefaults has too many entries");
 	let n = {};
@@ -115,24 +144,24 @@ function g(e) {
 	}
 	return Object.freeze(n);
 }
-function _(e, t, n) {
+function b(e, t, n) {
 	if (typeof e != "object" && typeof e != "function" || e === null) throw TypeError(`${t} model source archive must be an object`);
 	for (let r of n) if (typeof e[r] != "function") throw TypeError(`${t} model source archive must implement ${r}()`);
 }
-function v(e, t) {
+function x(e, t) {
 	return (typeof e == "object" || typeof e == "function") && e !== null && typeof e[t] == "function";
 }
-function y(e) {
+function S(e) {
 	return /* @__PURE__ */ Error(`${e} is unsupported for this source`);
 }
-function b(e) {
+function C(e) {
 	if (typeof e != "object" || !e || Array.isArray(e)) return !1;
 	let t = Object.getPrototypeOf(e);
 	return t === Object.prototype || t === null;
 }
 //#endregion
 //#region packages/core/src/errors/ooxml-error.ts
-var x = class e extends Error {
+var w = class e extends Error {
 	code = "ooxml-resource-limit";
 	details;
 	constructor(t, n) {
@@ -159,31 +188,31 @@ var x = class e extends Error {
 			violation: i
 		}), Object.setPrototypeOf(this, e.prototype);
 	}
-}, S = "OOXML_RESOURCE_LIMIT:", C = 128, ee = 256, w = 4096;
-function T(e) {
+}, ee = "OOXML_RESOURCE_LIMIT:", te = 128, T = 256, E = 4096;
+function D(e) {
 	return typeof e == "number" && Number.isSafeInteger(e) && e >= 0;
 }
-function E(e) {
+function O(e) {
 	if (!e || typeof e != "object" || Array.isArray(e)) return !1;
 	let t = e;
-	return T(t.archiveEntryCount) && T(t.declaredInflatedBytes) && (t.largestInflatedEntryBytes === void 0 || T(t.largestInflatedEntryBytes)) && T(t.distinctInflatedBytes) && T(t.operationInflatedBytes);
+	return D(t.archiveEntryCount) && D(t.declaredInflatedBytes) && (t.largestInflatedEntryBytes === void 0 || D(t.largestInflatedEntryBytes)) && D(t.distinctInflatedBytes) && D(t.operationInflatedBytes);
 }
-function D(e) {
+function k(e) {
 	return e === "docx" || e === "xlsx" || e === "pptx";
 }
-function O(e) {
+function A(e) {
 	return e === "container" || e === "decompression" || e === "parsing" || e === "serialization" || e === "layout" || e === "rendering" || e === "worker";
 }
-function k(e, t) {
+function j(e, t) {
 	return typeof e == "string" && e.length > 0 && e.length <= t && !/[\u0000-\u001f\u007f]/u.test(e);
 }
-function A(e) {
-	return k(e, C) && /^[a-z0-9][a-z0-9-]*$/u.test(e);
+function M(e) {
+	return j(e, te) && /^[a-z0-9][a-z0-9-]*$/u.test(e);
 }
-function j(e) {
-	return !k(e, w) || e.startsWith("/") || e.startsWith("\\") || e.includes("\\") || e.includes("?") || e.includes("#") || e.includes("://") || /^[a-z]:/iu.test(e) ? !1 : e.split("/").every((e) => e !== "" && e !== "." && e !== "..");
+function N(e) {
+	return !j(e, E) || e.startsWith("/") || e.startsWith("\\") || e.includes("\\") || e.includes("?") || e.includes("#") || e.includes("://") || /^[a-z]:/iu.test(e) ? !1 : e.split("/").every((e) => e !== "" && e !== "." && e !== "..");
 }
-var M = new Map([
+var P = new Map([
 	["archive-entry:declared-inflated-bytes", {
 		stage: "container",
 		part: "required"
@@ -285,26 +314,26 @@ var M = new Map([
 		part: "forbidden",
 		configurable: !1
 	}]
-]), N = new Set([...M.keys()].map((e) => e.slice(0, e.indexOf(":")))), P = new Set([...M.keys()].map((e) => e.slice(e.indexOf(":") + 1)));
-function F(e) {
-	if (!e || typeof e != "object" || Array.isArray(e)) return !1;
-	let t = e;
-	return !D(t.format) || !k(t.operation, ee) || !A(t.resource) || !A(t.metric) || !T(t.limit) || !T(t.observed) || typeof t.configurable != "boolean" || !E(t.usage) ? !1 : !("part" in t) || j(t.part);
-}
-function I(e) {
-	if (!e || typeof e != "object" || Array.isArray(e)) return !1;
-	let t = e;
-	if (!O(t.stage) || !F(t.violation)) return !1;
-	let n = t.violation, r = M.get(`${n.resource}:${n.metric}`);
-	return r ? t.stage !== r.stage || r.configurable === !1 && n.configurable !== !1 ? !1 : r.part === "required" ? n.part !== void 0 : r.part === "forbidden" ? n.part === void 0 : !0 : !(N.has(n.resource) && P.has(n.metric));
-}
+]), F = new Set([...P.keys()].map((e) => e.slice(0, e.indexOf(":")))), I = new Set([...P.keys()].map((e) => e.slice(e.indexOf(":") + 1)));
 function L(e) {
+	if (!e || typeof e != "object" || Array.isArray(e)) return !1;
+	let t = e;
+	return !k(t.format) || !j(t.operation, T) || !M(t.resource) || !M(t.metric) || !D(t.limit) || !D(t.observed) || typeof t.configurable != "boolean" || !O(t.usage) ? !1 : !("part" in t) || N(t.part);
+}
+function R(e) {
+	if (!e || typeof e != "object" || Array.isArray(e)) return !1;
+	let t = e;
+	if (!A(t.stage) || !L(t.violation)) return !1;
+	let n = t.violation, r = P.get(`${n.resource}:${n.metric}`);
+	return r ? t.stage !== r.stage || r.configurable === !1 && n.configurable !== !1 ? !1 : r.part === "required" ? n.part !== void 0 : r.part === "forbidden" ? n.part === void 0 : !0 : !(F.has(n.resource) && I.has(n.metric));
+}
+function z(e) {
 	let t = e.violation;
 	return `OOXML resource limit exceeded${t.part ? ` for ${t.part}` : ""} (${t.resource}, ${e.stage}): ${t.metric} ${t.observed} > ${t.limit}`;
 }
-function R(e) {
+function B(e) {
 	let t = e instanceof Error ? e.message : String(e);
-	if (!t.startsWith(S)) return;
+	if (!t.startsWith(ee)) return;
 	let n;
 	try {
 		n = JSON.parse(t.slice(21));
@@ -313,35 +342,35 @@ function R(e) {
 	}
 	if (!n || typeof n != "object") return;
 	let r = n;
-	if (!(r.code !== "ooxml-resource-limit" || !I(r.details))) return new x(L(r.details), r.details);
+	if (!(r.code !== "ooxml-resource-limit" || !R(r.details))) return new w(z(r.details), r.details);
 }
-function z(e) {
+function ne(e) {
 	try {
 		return e();
 	} catch (e) {
-		throw e instanceof x || typeof e != "string" && !(e instanceof Error) ? e : R(e) ?? e;
+		throw e instanceof w || typeof e != "string" && !(e instanceof Error) ? e : B(e) ?? e;
 	}
 }
 //#endregion
 //#region packages/core/src/worker/wasm-guard.ts
-function te(e) {
+function V(e) {
 	let t = globalThis.WebAssembly?.RuntimeError;
 	return t && e instanceof t || e instanceof RangeError ? !0 : e instanceof Error ? e.name === "RuntimeError" || e.name === "CompileError" || e.name === "LinkError" || e.name === "InternalError" || e.name === "OOMError" : !1;
 }
 //#endregion
 //#region packages/core/src/source/worker-model-source.ts
-function B(e, t) {
+function H(e, t) {
 	return new Proxy(e, { get(e, n) {
 		if (n === t) return (...n) => new Uint8Array(f(Reflect.apply(e[t], e, n)));
 		let r = Reflect.get(e, n);
 		return typeof r == "function" ? r.bind(e) : r;
 	} });
 }
-function V(e, t) {
+function U(e, t) {
 	try {
-		return z(e);
+		return ne(e);
 	} catch (e) {
-		if (te(e)) try {
+		if (V(e)) try {
 			t();
 		} catch {}
 		throw e;
@@ -349,18 +378,18 @@ function V(e, t) {
 }
 //#endregion
 //#region packages/xlsx/src/internal/host-layout.ts
-var H = "xlsx-host-layout-request", U = 4096, W = 255, G = 65535 / 20, K = 4096;
-function q(e) {
-	if (!(e instanceof Uint8Array) || e.byteLength > U) throw RangeError("XLSX host layout request byte budget exceeded");
+var W = "xlsx-host-layout-request", G = 4096, K = 255, q = 65535 / 20, J = 4096;
+function Y(e) {
+	if (!(e instanceof Uint8Array) || e.byteLength > G) throw RangeError("XLSX host layout request byte budget exceeded");
 	let t;
 	try {
 		t = JSON.parse(new TextDecoder("utf-8", { fatal: !0 }).decode(e));
 	} catch {
 		throw TypeError("invalid XLSX host layout request");
 	}
-	return t === null ? null : J(t);
+	return t === null ? null : X(t);
 }
-function J(e) {
+function X(e) {
 	if (typeof e != "object" || !e || Array.isArray(e)) throw TypeError("invalid XLSX host layout font");
 	let t = Object.keys(e), n = [
 		"family",
@@ -370,7 +399,7 @@ function J(e) {
 	];
 	if (t.length !== n.length || !n.every((t) => Object.hasOwn(e, t))) throw TypeError("invalid XLSX host layout font");
 	let { family: r, sizePt: i, bold: a, italic: o } = e;
-	if (typeof r != "string" || r.length === 0 || r.length > W || typeof i != "number" || !Number.isFinite(i) || i <= 0 || i > G || typeof a != "boolean" || typeof o != "boolean") throw TypeError("invalid XLSX host layout font");
+	if (typeof r != "string" || r.length === 0 || r.length > K || typeof i != "number" || !Number.isFinite(i) || i <= 0 || i > q || typeof a != "boolean" || typeof o != "boolean") throw TypeError("invalid XLSX host layout font");
 	return Object.freeze({
 		family: r,
 		sizePt: i,
@@ -378,27 +407,27 @@ function J(e) {
 		italic: o
 	});
 }
-function Y(e) {
-	return typeof e == "number" && Number.isInteger(e) && e >= 1 && e <= K ? e : void 0;
+function Z(e) {
+	return typeof e == "number" && Number.isInteger(e) && e >= 1 && e <= J ? e : void 0;
 }
-async function X(e, t) {
+async function re(e, t) {
 	if (typeof e.host_layout_request != "function") return;
 	if (typeof e.configure_host_layout != "function") throw TypeError("XLSX model source archive must implement configure_host_layout()");
-	let n = q(e.host_layout_request()), r = n ? Y(await t(n)) : void 0;
+	let n = Y(e.host_layout_request()), r = n ? Z(await t(n)) : void 0;
 	return e.configure_host_layout(r), r;
 }
-var Z = 1;
-function Q(e, t) {
-	let n = Z++;
+var ie = 1;
+function ae(e, t) {
+	let n = ie++;
 	return new Promise((r) => {
 		let i = (t) => {
 			let a = t.data;
-			!$(a) || a.requestId !== n || (e.removeEventListener("message", i), r(Y(a.maximumDigitWidth)));
+			!Q(a) || a.requestId !== n || (e.removeEventListener("message", i), r(Z(a.maximumDigitWidth)));
 		};
 		e.addEventListener("message", i);
 		try {
 			e.postMessage({
-				type: H,
+				type: W,
 				requestId: n,
 				font: t
 			});
@@ -407,12 +436,12 @@ function Q(e, t) {
 		}
 	});
 }
-function $(e) {
+function Q(e) {
 	return typeof e == "object" && !!e && e.type === "xlsx-host-layout-result" && typeof e.requestId == "number";
 }
 //#endregion
 //#region packages/xlsx/src/internal/worker-worksheet-source.ts
-var ne = [
+var oe = [
 	"open_sheet_cursor",
 	"pull_sheet_cursor",
 	"sheet_cursor_pull_finished",
@@ -423,14 +452,14 @@ var ne = [
 	"parse",
 	"extract_image"
 ];
-function re(e) {
-	return _(e, "XLSX", ne), e;
+function $(e) {
+	return b(e, "XLSX", oe), e;
 }
-function ie(e) {
+function se(e) {
 	let [t] = Object.keys(e);
 	if (t !== void 0) throw TypeError(`unsupported XLSX model source view default: ${t}`);
 }
-var ae = (e, t, n) => h(e, t, re, void 0, n), oe = class {
+var ce = (e, t, n, r) => h(e, t, $, void 0, n, r), le = class {
 	ooxmlHost;
 	openSource;
 	modelSource;
@@ -439,41 +468,41 @@ var ae = (e, t, n) => h(e, t, re, void 0, n), oe = class {
 		return f(e);
 	}
 	isHostLayoutResult(e) {
-		return $(e);
+		return Q(e);
 	}
 	requestHostLayoutFromPage(e, t) {
-		return Q(e, t);
+		return ae(e, t);
 	}
 	extractImage(e) {
 		return this.execute((t) => this.copyBytes(t.extract_image(e)));
 	}
-	constructor(e, t = ae) {
+	constructor(e, t = ce) {
 		this.ooxmlHost = e, this.openSource = t;
 	}
 	get kind() {
 		return this.modelSource ? "model-source" : "ooxml";
 	}
-	async openModelSource(e, t, n, r = []) {
+	async openModelSource(e, t, n, r = [], i) {
 		if (this.modelSource || this.ooxmlHost.archive) throw Error("Workbook source already loaded");
-		let i = await this.openSource(t, e, r);
+		let a = await this.openSource(t, e, r, i);
 		try {
-			if (ie(i.viewDefaults), this.modelSource || this.ooxmlHost.archive) throw Error("Workbook source open was superseded");
+			if (se(a.viewDefaults), this.modelSource || this.ooxmlHost.archive) throw Error("Workbook source open was superseded");
 		} catch (e) {
 			try {
-				i.close();
+				a.close();
 			} catch {}
 			throw e;
 		}
-		let a = B(i.archive, "pull_sheet_cursor"), o = {
-			archive: i.archive,
-			transferArchive: a,
-			close: i.close
+		let o = H(a.archive, "pull_sheet_cursor"), s = {
+			archive: a.archive,
+			transferArchive: o,
+			close: a.close
 		};
-		this.modelSource = o;
+		this.modelSource = s;
 		try {
-			if (this.measuredMaximumDigitWidth = await X(i.archive, n), this.modelSource !== o) throw Error("Workbook source open was superseded");
+			if (this.measuredMaximumDigitWidth = await re(a.archive, n), this.modelSource !== s) throw Error("Workbook source open was superseded");
 		} catch (e) {
-			if (this.modelSource === o) try {
+			if (this.modelSource === s) try {
 				this.closeModelSource();
 			} catch {}
 			throw e;
@@ -492,20 +521,20 @@ var ae = (e, t, n) => h(e, t, re, void 0, n), oe = class {
 			if (!t) throw Error("Workbook not loaded");
 			return this.ooxmlHost.run(() => e(t));
 		}
-		return V(() => e(t.transferArchive), () => {
+		return U(() => e(t.transferArchive), () => {
 			this.modelSource === t && this.closeModelSource();
 		});
 	}
 	resourceUsage() {
 		let e = this.modelSource;
-		if (e) return v(e.archive, "resource_usage") ? this.execute(() => e.archive.resource_usage()) : void 0;
+		if (e) return x(e.archive, "resource_usage") ? this.execute(() => e.archive.resource_usage()) : void 0;
 		let t = this.ooxml();
 		return this.ooxmlHost.run(() => t.resource_usage());
 	}
 	toMarkdown() {
 		let e = this.modelSource;
 		if (e) {
-			if (!v(e.archive, "to_markdown")) throw y("Markdown conversion");
+			if (!x(e.archive, "to_markdown")) throw S("Markdown conversion");
 			return this.execute(() => e.archive.to_markdown());
 		}
 		let t = this.ooxml();
@@ -522,4 +551,4 @@ var ae = (e, t, n) => h(e, t, re, void 0, n), oe = class {
 	}
 };
 //#endregion
-export { oe as WorkerWorksheetSourceOwner };
+export { le as WorkerWorksheetSourceOwner };
