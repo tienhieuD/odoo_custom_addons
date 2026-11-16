@@ -2,7 +2,7 @@
 {
     "name": "Advanced Email Composer",
     "version": "19.0.1.0.0",
-    "summary": "A Send email button in the chatter: official emails with To, Cc, Bcc, reply-all defaults, quoted history, address book and autosaved drafts.",
+    "summary": "Send emails from the chatter with To, Cc, Bcc, reply all, quoted history and drafts. Keywords: email composer, compose email, send email, mail composer, reply all, email reply, email draft, outlook style email, cc bcc.",
     "description": "Adds a Send email button next to Send message. It opens an inline form with From, To, Cc, Bcc, subject, body, attachments and templates. Recipients are address badges with suggestions from users, partners and previously typed addresses. Replies default to reply-all, the previous email is quoted in the body, and the draft is saved automatically. Official emails are told apart from internal discussion in the thread. Requires dwo_mail_bcc.",
     "author": "DuoTEK",
     "website": "https://duotek.io.vn",

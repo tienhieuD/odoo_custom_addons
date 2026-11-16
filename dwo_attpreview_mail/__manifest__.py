@@ -3,8 +3,7 @@
 {
     "name": "Secure Email Preview: EML, MSG, ICS, VCF",
     "version": "19.0.2.1.0",
-    "summary": "Open Outlook MSG and EML emails, calendar invitations and contact cards inside Odoo. "
-               "Remote pictures load through your server, attachments previewed in place.",
+    "summary": "Open Outlook MSG and EML emails in Odoo with their attachments, level after level. Keywords: email preview, preview email, eml preview, preview eml, eml viewer, msg preview, preview msg, msg viewer, outlook msg, outlook email, open msg file, email attachment preview, ics preview, calendar invitation, vcf preview, vcard.",
     "description": "Engine for Secure Attachment Preview (dwo_attpreview_core). Preview .eml, .emlx, .msg and .oft "
                    "emails with headers, body and attachments (each attachment opens in its own preview), .ics "
                    "invitations and .vcf contact cards. Read on your server and shown in an isolated frame; pictures linked "
