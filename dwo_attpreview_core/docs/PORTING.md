@@ -100,6 +100,33 @@ never ran the 19.0 code. Behaviour is the same as on 19.0. Full test suite: 148 
 - `parsers/remote.py`, `models/engine.py`, `models/res_config_settings.py`, the data and view files, the tour and
   `dwo_attpreview_core/tests/test_settings.py`: same as 19.0.
 
+### 19.0 -> 20.0 (#82) - archive engine (archive 19.0.1.0.0 -> 20.0.1.0.0, core 19.0.1.2.0 -> 20.0.1.2.0)
+
+**dwo_attpreview_core 20.0.1.2.0:** same changes as 19.0.1.2.0, no Odoo 20 specific code: `module_dwo_attpreview_archive`
+tick (model + view), catalog entry and `static/catalog/dwo_attpreview_archive/`, `MAX_PART_INDEX = 1_000_000`, icons
+`dwo_attpreview_{folder,folder_open,lock,link}.svg` and `dwoAttPreviewSpecialIconUrl` + more extensions in
+`file_kind.js`, tests (`test_core.py` test_13, `test_part_preview.py` bad path `"9999999"`, `test_settings.py`).
+
+**dwo_attpreview_archive 20.0.1.0.0:**
+- `__manifest__.py`: version `20.0.1.0.0`. `.gitignore`: `!dwo_attpreview_archive/static/lib/` (the generic `lib/`
+  rule would drop the vendored tree libraries).
+- Unchanged: `parsers/__init__.py`, `thirdparty/rarfile`, `models/engine.py` (the Core already passes `bytes`; the size
+  limit is read through `cache._param`, which uses `get_int`), `static/lib/tree_libs/tree_libs.min.js`
+  (framework-agnostic bundle, copied as is), the tour.
+- `static/src/js/archive_viewer.js`: `static dwoAttPreviewProps = ["content", "attachmentId", "downloadUrl", "fileUrl",
+  "source"]` + `props = useProps()` instead of `static props`; `this.ui = proxy(...)` instead of `useState`;
+  `this.root = signal.ref()` (was `useRef("tree")`). The listing (up to 100 000 rows) stays in plain fields.
+- `static/src/js/tree_view.js` (`DwoTreeView`): `props = useProps()`; `this.ticks = proxy({n: 0})` (the single
+  counter that re-renders); `this.scroll` / `this.list` are `signal.ref()` read as `this.scroll()` / `this.list()`.
+  Kept from 19: `tree.rebuildTree()` only in `onMounted` / `onWillUpdateProps` (when `version` changes) and in
+  `expandItems`, never while rendering (a rebuild notifies a change: endless render loop); state changes through
+  `tree.applySubStateUpdate("expandedItems", ...)` (`setState` only notifies).
+- `static/src/xml/archive_viewer.xml`: `this.` for every member, `t-ref="this.scroll"` / `this.list` / `this.root`,
+  `t-out`, handlers as arrow functions, `.bind="this.method"` props; icons `oi` `arrow_drop_down` / `arrow_right`
+  (folder chevron, was `fa-caret-down/right`), `search`, `download`.
+- `static/src/scss/archive_viewer.scss`: `.o_dwo_arc_search > .oi` (was `.fa`).
+- `tests/test_archive.py`: `set_int` (was `set_param`); attachments created with `raw` (bytes) as on 19.
+
 ### Syncing a change from 19.0
 
 - Python: binary values are `BinaryValue` (use `bytes(v)`, `v.size`), never base64; write base64 as `str`.

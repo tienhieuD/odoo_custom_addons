@@ -20,6 +20,7 @@
                         <div class="o_dwo_ap_engine_list">
                             <field name="module_dwo_attpreview_office" widget="dwo_attpreview_engine_boolean"/>
                             <field name="module_dwo_attpreview_mail" widget="dwo_attpreview_engine_boolean"/>
+                            <field name="module_dwo_attpreview_archive" widget="dwo_attpreview_engine_boolean"/>
                         </div>
                     </block>
                 </app>

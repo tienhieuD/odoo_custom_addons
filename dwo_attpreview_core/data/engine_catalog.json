@@ -37,5 +37,20 @@
       "vcf"
     ],
     "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_mail"
+  },
+  {
+    "module": "dwo_attpreview_archive",
+    "name": "Secure Archive Preview: ZIP, RAR, 7Z, TAR",
+    "extensions": [
+      "zip",
+      "rar",
+      "7z",
+      "tar",
+      "tgz",
+      "gz",
+      "bz2",
+      "xz"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_archive"
   }
 ]

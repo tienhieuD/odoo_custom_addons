@@ -141,6 +141,7 @@ class TestAttPreviewCore(TransactionCase):
         import re
         from odoo.tools import file_path
         kinds = ("pdf word sheet slide image video audio archive text code markdown mail cad default").split()
+        specials = ("folder", "folder_open", "lock", "link")  # dwoAttPreviewSpecialIconUrl (archive tree)
         with open(file_path("dwo_attpreview_core/static/src/js/file_kind.js")) as f:
             js = f.read()
         for kind in kinds:
@@ -151,4 +152,9 @@ class TestAttPreviewCore(TransactionCase):
             self.assertNotRegex(text, r"https?://(?!www\.w3\.org/2000/svg)", kind)
             self.assertTrue(kind in js, "kind %s is not mapped in file_kind.js" % kind)
         files = os.listdir(os.path.dirname(file_path("dwo_attpreview_core/static/img/dwo_attpreview_pdf.svg")))
-        self.assertEqual(sorted(files), sorted("dwo_attpreview_%s.svg" % k for k in kinds))
+        self.assertEqual(sorted(files), sorted("dwo_attpreview_%s.svg" % k for k in kinds + list(specials)))
+        for kind in specials:
+            with open(file_path("dwo_attpreview_core/static/img/dwo_attpreview_%s.svg" % kind)) as f:
+                text = f.read()
+            self.assertTrue(text.startswith("<svg"), kind)
+            self.assertNotRegex(text, r"https?://(?!www\.w3\.org/2000/svg)", kind)

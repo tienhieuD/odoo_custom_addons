@@ -6,13 +6,13 @@ const BY_EXT = {
     word: ["doc", "docx", "docm", "dot", "dotx", "odt", "rtf"],
     sheet: ["xls", "xlsx", "xlsm", "xlsb", "xltx", "ods", "csv", "tsv"],
     slide: ["ppt", "pptx", "pptm", "pps", "ppsx", "odp"],
-    image: ["png", "jpg", "jpeg", "gif", "webp", "avif", "bmp", "svg", "tif", "tiff", "ico", "heic"],
-    video: ["mp4", "webm", "mov", "mkv", "avi", "m4v", "ogv"],
-    audio: ["mp3", "wav", "ogg", "oga", "m4a", "flac", "aac", "opus"],
-    archive: ["zip", "rar", "7z", "tar", "gz", "tgz", "bz2", "xz", "jar"],
+    image: ["png", "jpg", "jpeg", "gif", "webp", "avif", "bmp", "svg", "tif", "tiff", "ico", "heic", "heif", "psd", "ai", "eps", "raw", "cr2", "nef", "dng"],
+    video: ["mp4", "webm", "mov", "mkv", "avi", "m4v", "ogv", "wmv", "flv", "3gp", "mpg", "mpeg"],
+    audio: ["mp3", "wav", "ogg", "oga", "m4a", "flac", "aac", "opus", "wma", "aiff", "mid", "midi"],
+    archive: ["zip", "rar", "7z", "tar", "gz", "tgz", "bz2", "tbz2", "tbz", "xz", "txz", "jar", "war", "apk", "cab", "iso", "dmg", "lz", "lzma", "zst"],
     markdown: ["md", "markdown"],
-    code: ["json", "xml", "html", "htm", "js", "mjs", "ts", "py", "css", "scss", "yml", "yaml", "sql", "sh", "java", "c", "cpp", "h", "php", "rb", "go", "rs"],
-    text: ["txt", "log", "ini", "cfg", "conf", "rst"],
+    code: ["json", "jsonc", "json5", "geojson", "ndjson", "xml", "xsd", "xsl", "html", "htm", "xhtml", "js", "mjs", "cjs", "jsx", "ts", "tsx", "vue", "py", "ipynb", "css", "scss", "sass", "less", "yml", "yaml", "toml", "sql", "sh", "bash", "zsh", "ps1", "bat", "java", "kt", "swift", "c", "cpp", "cc", "h", "hpp", "cs", "php", "rb", "go", "rs", "dart", "lua", "r", "pl", "scala", "groovy", "gradle", "dockerfile", "makefile"],
+    text: ["txt", "log", "ini", "cfg", "conf", "rst", "env", "properties", "tex", "srt", "vtt", "po", "pot", "diff", "patch", "nfo", "out"],
     mail: ["eml", "msg", "oft", "mbox", "emlx", "ics", "vcf"],
     cad: ["dxf", "dwg", "dwf", "stl"],
 };
@@ -40,6 +40,11 @@ export function dwoAttPreviewKind(name, mimetype) {
     if (mime.startsWith("text/")) return "text";
     if (mime === "message/rfc822") return "mail";
     return "default";
+}
+
+/** Icons that are not a file type: folder (closed / open), password protected file, symbolic link. */
+export function dwoAttPreviewSpecialIconUrl(kind) {
+    return `/dwo_attpreview_core/static/img/dwo_attpreview_${kind}.svg`;
 }
 
 export function dwoAttPreviewIconUrl(name, mimetype) {
