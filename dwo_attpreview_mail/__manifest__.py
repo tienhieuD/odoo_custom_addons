@@ -2,18 +2,22 @@
 # Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 {
     "name": "Secure Email Preview: EML, MSG, ICS, VCF",
-    "version": "18.0.2.0.0",
+    "version": "18.0.2.1.0",
     "summary": "Open Outlook MSG and EML emails, calendar invitations and contact cards inside Odoo. "
-               "Remote content blocked, attachments previewed in place.",
+               "Remote pictures load through your server, attachments previewed in place.",
     "description": "Engine for Secure Attachment Preview (dwo_attpreview_core). Preview .eml, .emlx, .msg and .oft "
                    "emails with headers, body and attachments (each attachment opens in its own preview), .ics "
-                   "invitations and .vcf contact cards. Read on your server, shown in an isolated frame with no "
-                   "network access; nothing is sent outside.",
-    "author": "Duotek",
+                   "invitations and .vcf contact cards. Read on your server and shown in an isolated frame; pictures linked "
+                   "from the internet are downloaded by your server, never by the browser of the user.",
+    "author": "DuoTEK",
     "website": "https://duotek.io.vn",
     "support": "hello@duotek.io.vn",
     "category": "Productivity/Documents",
     "depends": ["dwo_attpreview_core"],
+    "data": [
+        "data/ir_config_parameter.xml",
+        "views/res_config_settings_views.xml",
+    ],
     "assets": {
         "web.assets_backend": [
             "dwo_attpreview_mail/static/src/js/*.js",

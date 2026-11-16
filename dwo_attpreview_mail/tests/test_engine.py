@@ -128,7 +128,9 @@ class TestMailEngine(TransactionCase):
         self.assertIn("background-color:#eeeeee", body)
         self.assertIn("background-color:#ff0000", body)
         self.assertNotIn("x.example", body)
-        self.assertNotIn("<img", body, "blocked or missing pictures are dropped, not shown broken")
+        self.assertEqual(body.count("<img"), 1, "the missing cid: picture is dropped, not shown broken")
+        self.assertIn('<img data-dwo-remote="0" hidden', body, "the remote picture waits for the proxy (#79)")
+        self.assertEqual((d["remote_images"], d["remote_insecure"]), (1, 0))
         self.assertTrue(d["remote_blocked"])
 
     def test_03_plain_text_email_and_bogus_charset(self):
@@ -306,4 +308,14 @@ class TestMailTour(HttpCase):
         att = self.env["ir.attachment"].create({"name": "Quarterly review.eml", "raw": EML,
                                                 "res_model": "res.partner", "res_id": partner.id})
         partner.message_post(body="email", attachment_ids=[att.id])
-        self.start_tour("/odoo/res.partner/%d" % partner.id, "dwo_attpreview_mail_tour", login="admin")
+        from odoo.addons.dwo_attpreview_mail.parsers import remote
+        remote.CACHE.clear()
+        fetched = []
+
+        def fake(url, https_only=True):  # no network in tests: the remote picture of EML is answered here
+            fetched.append(url)
+            return base64.b64decode(PNG), "image/png"
+
+        with patch("odoo.addons.dwo_attpreview_mail.parsers.remote.fetch_picture", fake):
+            self.start_tour("/odoo/res.partner/%d" % partner.id, "dwo_attpreview_mail_tour", login="admin")
+        self.assertEqual(fetched, ["https://evil.example/track.png"], "loaded by the server, once")

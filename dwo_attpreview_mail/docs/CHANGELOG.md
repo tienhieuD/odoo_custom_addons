@@ -1,9 +1,46 @@
 # CHANGELOG - dwo_attpreview_mail
 
+## 2026-11-16 - 18.0.2.1.0 - 18.0 port of 19.0.2.1.0 (#79)
+
+- Same features and behaviour as 19.0.2.1.0 (remote pictures through the server, image proxy). Needs dwo_attpreview_core 18.0.1.1.0.
+- Only change: the route `/dwo_attpreview_mail/remote_settings` is `type="json"` (19: `jsonrpc`). Details in
+  `dwo_attpreview_core/docs/PORTING.md`.
+
 ## 2026-11-16 - 18.0.2.0.0 - 18.0 port of 19.0.2.0.0 (#73)
 
 - Same features and behaviour as 19.0.2.0.0; the entries below are the history of the 19.0 series. Needs dwo_attpreview_core 18.0.1.1.0.
 - No code change; tour only: chatter file cards are `.o-mail-AttachmentCard`. Details in `dwo_attpreview_core/docs/PORTING.md`.
+
+## 2026-11-16 - 19.0.2.1.0 - Remote pictures through the server (#79)
+
+**Added:** pictures that an email links from the internet are downloaded by the Odoo server and shown from there
+(image proxy). The browser of the user never contacts the sender's servers: the IP address, location, browser and
+cookies of the user stay private. The sender can still see that the email was opened, from the server's address.
+- Settings > Attachment Preview > Email preview: "Load remote pictures through the server" and "Only secure (HTTPS)
+  pictures", both on by default (`ir.config_parameter` `dwo_attpreview_mail.remote_images` /
+  `.remote_https_only`, data file `noupdate`). Off: pictures stay blocked, with a "Load them through the server"
+  button per email.
+- Engine (version 3): each `<img src="http(s)://...">` of the sanitized body becomes `<img data-dwo-remote="N" hidden>`
+  (no address in the page); `remote_images` / `remote_insecure` counts in the result. Source sets, backgrounds and
+  CSS `url()` stay removed.
+- Route `/dwo_attpreview_mail/remote_image?<source_ref>&path=&index=N` (auth user): checks the access to the email
+  like `/part_info`, takes the address from the email itself (the browser only sends a position, so it is no open
+  proxy) and downloads it with `parsers/remote.py`: http(s) only (https only by default), default ports, no user
+  info; every resolved address must be public (no loopback, private, link-local / cloud metadata, multicast,
+  reserved, IPv4-mapped); connection to the checked address (no DNS rebinding), redirects followed by hand (3) and
+  checked again; no cookie or referer; 3 s / 5 s timeouts, 5 MB; decoded and encoded again with Pillow (PNG, JPEG,
+  GIF, WebP in; PNG or JPEG out; SVG refused; first frame only); in-memory cache per process (1 h, failures 5 min).
+  Answer with `nosniff`, `Content-Security-Policy: default-src 'none'`, `Referrer-Policy: no-referrer`, private cache.
+- Viewer: loads the pictures with the session (4 at a time), turns them into `data:` URIs and draws the frame once;
+  the frame policy is unchanged (`img-src data:`). Banner: "loaded through your Odoo server" / blocked + button.
+- Listing and duotek pages: the sentences "remote pictures blocked / opening tells the sender nothing" replaced by
+  "remote pictures load through your server, your IP address stays private"; screenshot 01 taken again.
+
+**Tests:** `tests/test_remote.py` (URL rules, private address ranges incl. one private answer among public ones,
+connection to the checked address, redirects to internal or plain http refused, redirect loop, clean pictures only,
+cache; engine order of URLs; defaults on; route: position only and extra parameters ignored, headers, https-only
+setting, access of the email (portal, public, not an email)); the tour checks the picture is replaced by the proxied one.
+Core `test_settings`: an engine module may add its own fields to the Attachment Preview app.
 
 ## 2026-11-16 - 19.0.2.0.0 - Secure Email Preview: EML, MSG, ICS, VCF (#78)
 
