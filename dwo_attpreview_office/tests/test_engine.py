@@ -701,3 +701,14 @@ class TestOfficeFieldPreview(HttpCase):
 
     def test_65_tour_xlsx_in_binary_field(self):
         self._field_tour("xlsx", "budget.xlsx", _fixture("sample.xlsx"))
+
+
+@tagged("post_install", "-at_install")
+class TestViewerCss(TransactionCase):
+
+    def test_01_xlsx_canvas_has_no_margin(self):
+        """#76: the stage gives every canvas an 8px margin (docx / pdf pages); the xlsx canvas must not have it, or the
+        find boxes (placed in the same box as the canvas) sit 8px above the matching cells."""
+        with open(file_path("%s/static/viewer/viewer.css" % MODULE)) as f:
+            css = f.read()
+        self.assertRegex(css, r"#stage\.xlsx canvas\s*\{[^}]*margin:\s*0")
