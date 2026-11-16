@@ -149,7 +149,8 @@ class TestArchiveEngine(TransactionCase):
             self.render(b"7z\xbc\xaf\x27\x1c" + b"\0" * 64, "a.7z")
 
     def test_09_large_archive_index_above_10000(self):
-        big = make_zip([("folder%02d/file%05d.txt" % (i // 1000, i), b"%d" % i) for i in range(12000)])
+        # an extension no engine reads (".txt" is read by the text engine when it is installed)
+        big = make_zip([("folder%02d/file%05d.xyz" % (i // 1000, i), b"%d" % i) for i in range(12000)])
         att = self.env["ir.attachment"].create({"name": "big.zip", "raw": big})
         ctrl = AttPreviewController()
         with patch(REQUEST, new=SimpleNamespace(env=self.env)):
@@ -157,7 +158,7 @@ class TestArchiveEngine(TransactionCase):
             self.assertEqual((info["mode"], info["engine"], info["width"]), ("rendered", "archive", "medium"))
             self.assertEqual(len(json.loads(info["content"])["files"]), 12000)
             out = ctrl.part_info(info["source_ref"], "11999")
-        self.assertEqual((out["name"], out["mode"]), ("file11999.txt", "unsupported"))
+        self.assertEqual((out["name"], out["mode"]), ("file11999.xyz", "unsupported"))
 
     def test_10_zip_in_an_email_level_after_level(self):
         if "dwo.attpreview.engine.mail" not in self.env:
