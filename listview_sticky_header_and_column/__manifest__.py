@@ -10,7 +10,7 @@
     """,
     'website': 'https://duotek.io.vn',
     'support': 'hello@duotek.io.vn',
-    'author': "DUO-TEK Software Vietnam",
+    'author': "DuoTEK",
     'license': 'OPL-1',
     'category': 'Extra Tools',
     'version': '17.0.0.7.0',
