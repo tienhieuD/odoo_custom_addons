@@ -3,9 +3,9 @@
 // File type -> icon kind. The icons are the original SVG set of this module (static/img/dwo_attpreview_<kind>.svg).
 const BY_EXT = {
     pdf: ["pdf"],
-    word: ["doc", "docx", "docm", "dot", "dotx", "odt", "rtf"],
-    sheet: ["xls", "xlsx", "xlsm", "xlsb", "xltx", "ods", "csv", "tsv"],
-    slide: ["ppt", "pptx", "pptm", "pps", "ppsx", "odp"],
+    word: ["doc", "docx", "docm", "dot", "dotx", "odt", "ott", "rtf"],
+    sheet: ["xls", "xlsx", "xlsm", "xlsb", "xltx", "ods", "ots", "csv", "tsv"],
+    slide: ["ppt", "pptx", "pptm", "pps", "ppsx", "odp", "otp"],
     image: ["png", "jpg", "jpeg", "gif", "webp", "avif", "bmp", "svg", "tif", "tiff", "ico", "heic", "heif", "psd", "ai", "eps", "raw", "cr2", "nef", "dng"],
     video: ["mp4", "webm", "mov", "mkv", "avi", "m4v", "ogv", "wmv", "flv", "3gp", "mpg", "mpeg"],
     audio: ["mp3", "wav", "ogg", "oga", "m4a", "flac", "aac", "opus", "wma", "aiff", "mid", "midi"],

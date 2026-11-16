@@ -133,3 +133,21 @@ tick (model + view), catalog entry and `static/catalog/dwo_attpreview_archive/`,
 - Settings: typed getters/setters of `ir.config_parameter`.
 - Templates: prefix every member of the component with `this.`, use `t-out`, `oi` icons; no `static props` (use `useProps()`), `proxy` / `signal.ref()`.
 - A new viewer prop the Core must detect goes into `static dwoAttPreviewProps`.
+
+## #84 - silurus 0.90.0 + ODT/ODS/ODP (office 20.0.1.1.0; core version unchanged)
+
+Copied as is from 19.0 (`421592b`, `adb7794`): `static/lib/silurus` (silurus 0.90.0 dist + legacy and OpenDocument
+add-ons, patches 0002/0003 applied), `static/viewer/*`, `patches/silurus/`, `docs/SILURUS_PATCHES.md`, the test samples
+`tests/files/sample.od?`, the listing (`static/description/*`, banner, screenshots 20-21) and, in the Core, the catalog
+entry, the Settings label, `file_kind.js` (ott/ots/otp icons) and the catalog copy of the office page. The office
+controller needed no change (the asset route serves the new `.mjs` / `.wasm` files by extension).
+
+Differences from 19.0:
+
+- `static/src/xml/office_viewer.xml`: the hunk adapted to the Owl 3 template (`t-elif="this.isText or
+  this.isOpenDocument"`).
+- `tests/test_engine.py` test_23: `bytes(rec.data).decode()` (binary fields read as raw bytes) instead of
+  `base64.b64decode(rec.data)`.
+- Tour `find_ods`: one extra step waits for `data-find-where*='Notes'` after the second search. Both searches of that
+  tour have one match, so without it the check could read the result of the first search (it failed once on 20.0;
+  19.0 has the same race, it passed there by timing).
