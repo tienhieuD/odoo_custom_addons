@@ -1,4 +1,4 @@
-import { n as e, r as t, t as n } from "./legacy-source-Dds5PgNt.js";
+import { n as e, r as t, t as n } from "./legacy-source-CFRuXN53.js";
 //#region src/wasm-direct-xls/legacy_xls_direct_bg.wasm?url
 var r = new URL("legacy_xls_direct_bg.wasm", import.meta.url).href, i = new URL("legacy-xls-source-module.mjs", import.meta.url).href;
 //#endregion

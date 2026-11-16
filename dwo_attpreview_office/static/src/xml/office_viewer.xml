@@ -7,7 +7,7 @@
             <div t-if="this.state.error" class="alert alert-warning m-3">
                 <!-- legacy (.doc/.xls/.ppt): a short message, the technical reason is only in the console -->
                 <span t-if="this.isLegacy" class="o_dwo_office_error">This legacy file cannot be previewed.</span>
-                <span t-elif="this.isText" class="o_dwo_office_error">This file cannot be previewed.</span>
+                <span t-elif="this.isText or this.isOpenDocument" class="o_dwo_office_error">This file cannot be previewed.</span>
                 <span t-else="" class="o_dwo_office_error">This file could not be displayed: <t t-out="this.state.error"/></span>
                 <a t-if="this.props.downloadUrl" t-att-href="this.props.downloadUrl" t-att-class="this.isShortError ? 'btn btn-primary btn-sm ms-2 o_dwo_office_download' : 'ms-2 o_dwo_office_download'">Download</a>
             </div>
