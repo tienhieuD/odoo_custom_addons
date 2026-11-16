@@ -73,7 +73,7 @@ class TestPartInfo(TransactionCase):
 
     def test_05_bad_paths(self):
         src = {"attachment_id": self.att.id}
-        for path in ("", "x", "-1", "/".join(["1"] * 21), None, [], "99999"):
+        for path in ("", "x", "-1", "/".join(["1"] * 21), None, [], "9999999"):
             self.assertEqual(self._call("part_info", src, path)["mode"], "denied", path)
         out = self._call("part_info", src, "9")
         self.assertEqual(out["mode"], "error")

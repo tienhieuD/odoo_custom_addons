@@ -1,5 +1,13 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-16 - 19.0.1.2.0 - archive engine (#82)
+
+- Settings and catalog: tick `module_dwo_attpreview_archive` "Secure Archive Preview: ZIP, RAR, 7Z, TAR"; catalog copy of
+  its description page.
+- `/dwo_attpreview/part_info`: position of an inner file up to 1 000 000 (was 10 000; an archive lists up to 100 000 files).
+- Icons: folder, open folder, lock (password protected) and link (`dwoAttPreviewSpecialIconUrl`); more extensions
+  mapped to the existing icons (pictures, video, audio, archives, code, text).
+
 ## 2026-11-16 - 19.0.1.1.0 - Files inside a file, JSON results (#78)
 
 **Added (engine API, used by the email engine):**
