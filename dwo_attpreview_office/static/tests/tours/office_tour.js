@@ -52,9 +52,11 @@ for (const kind of ["xlsx", "docx", "pptx", "docx_long"]) {
     });
 }
 
-// csv/tsv (a sheet of text cells): drawn, and no warning banner (they are not legacy formats).
+// csv/tsv (a sheet of text cells) and OpenDocument (odt/ods/odp and the templates ott/ots/otp, #84): drawn, and no
+// warning banner (they are not legacy formats).
 const OTHER_LAYOUT = {
     csv: "grid", tsv: "grid", csv_semicolon: "grid", csv_big: "grid",
+    odt: "scroll", ods: "grid", odp: "slides", ott: "scroll", ots: "grid", otp: "slides",
 };
 for (const kind of Object.keys(OTHER_LAYOUT)) {
     registry.category("web_tour.tours").add(`dwo_attpreview_office_tour_${kind}`, {
@@ -72,10 +74,43 @@ for (const kind of Object.keys(OTHER_LAYOUT)) {
                     }
                 },
             },
+            {
+                content: "The viewer fills the large dialog",
+                trigger: ".modal .o_dwo_office iframe",
+                run() {
+                    const r = this.anchor.getBoundingClientRect();
+                    if (r.width < window.innerWidth * 0.85 || r.height < window.innerHeight * 0.6) {
+                        throw new Error(`viewer too small: ${r.width}x${r.height}`);
+                    }
+                },
+            },
             { trigger: ".modal .o_dwo_ap_close", run: "click" },
         ],
     });
 }
+
+// An OpenDocument file the add-on refuses (here: encrypted with a password): no banner, the short message and Download
+// (the reason, e.g. "unsupported-encryption", only goes to the console).
+registry.category("web_tour.tours").add("dwo_attpreview_office_tour_odf_refused", {
+    steps: () => [
+        { trigger: ".o-mail-AttachmentList .o-mail-AttachmentCard", run: "click" },
+        {
+            content: "Short message, no technical code",
+            trigger: ".modal .o_dwo_office[data-state=error] .alert .o_dwo_office_error:contains('This file cannot be previewed.')",
+            timeout: 60000,
+            run() {
+                const text = this.anchor.closest(".alert").textContent;
+                if (/unsupported|encrypt|code|ooxml|wasm|decrypt/i.test(text.replace("This file cannot be previewed.", ""))) {
+                    throw new Error("technical detail shown to the user: " + text);
+                }
+            },
+        },
+        { content: "Download button", trigger: ".modal .o_dwo_office .alert a.o_dwo_office_download[href*='download=true']" },
+        { content: "No warning banner", trigger: ".modal:not(:has(.o_dwo_ap_notice)) .o_dwo_ap_title:contains('locked.odt')" },
+        { trigger: ".modal .o_dwo_ap_close", run: "click" },
+        { trigger: "body:not(:has(.modal))" },
+    ],
+});
 
 // A file the Core already refuses (damaged zip, over the size limit) opens no dialog: a toast with Download.
 registry.category("web_tour.tours").add("dwo_attpreview_office_tour_error", {
@@ -256,6 +291,27 @@ const FIND = {
         ...step(1, 2), ...step(1, 3), ...step(1, 1),
     ],
     csv: () => [...search("PATE", 1)],
+    // OpenDocument (#84): same viewers, same search
+    odt: () => [
+        ...search("milestone", 5), ...step(1, 2), ...step(-1, 1), ...step(-1, 5),
+        check("Match on the first page", (w) => expect(w.page === 0, "odt: " + JSON.stringify(w))),
+    ],
+    ods: () => [
+        ...search("online store", 1),
+        check("Cell A6 of the first sheet", (w) => expect(w.sheet === 0 && w.ref === "A6", "ods: " + JSON.stringify(w))),
+        // "Finance" is only on the second sheet ("Notes"): the viewer switches to it
+        ...search("finance", 1),
+        // same count as the search before: wait for the new result (else the check may read the old one)
+        { content: "The result of the new search", trigger: `${OFFICE}[data-find-where*='Notes']`, timeout: 60000 },
+        check("The viewer switched to the sheet of the match", (w) => expect(w.sheet === 1 && w.shownSheet === 1 && w.sheetName === "Notes", "ods sheet: " + JSON.stringify(w))),
+    ],
+    // "Milestone" is on slide 2 only (title and last line): the viewer goes to slide 2
+    odp: () => [
+        ...search("milestone", 2),
+        check("The viewer moved to slide 2", (w) => expect(w.slide === 1 && w.shownSlide === 1, "odp: " + JSON.stringify(w))),
+        { content: "Slide label follows", trigger: `${OFFICE}[data-page='2']` },
+        ...step(1, 2), ...step(1, 1),
+    ],
     tsv: () => [...search("đá", 1)],
     legacy_xls: () => [...search("2000", null)],
     legacy_ppt: () => [...search("design pattern", 2), ...step(1, 2), ...search("title", null)],
