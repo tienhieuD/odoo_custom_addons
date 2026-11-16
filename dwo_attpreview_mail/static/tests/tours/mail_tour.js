@@ -27,7 +27,16 @@ registry.category("web_tour.tours").add("dwo_attpreview_mail_tour", {
             },
         },
         { content: "From", trigger: ".modal .o_dwo_mail_fields td:contains('anna@example.com')" },
-        { content: "Remote content blocked", trigger: ".modal .o_dwo_mail_blocked" },
+        {
+            content: "The remote picture is loaded through the server (#79), not by the browser",
+            trigger: ".modal .o_dwo_mail_proxied:not(:contains('Loading'))",
+            run() {
+                const doc = document.querySelector(".modal iframe.o_dwo_mail_body").getAttribute("srcdoc") || "";
+                if (doc.includes("data-dwo-remote") || doc.split("data:image/png").length < 3) {
+                    throw new Error("remote picture not replaced by the proxied one");
+                }
+            },
+        },
         {
             content: "Body frame: no script, no same origin, CSP without network",
             trigger: ".modal iframe.o_dwo_mail_body",

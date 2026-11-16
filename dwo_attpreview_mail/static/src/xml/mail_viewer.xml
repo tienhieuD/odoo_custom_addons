@@ -14,8 +14,17 @@
                         </tr>
                     </table>
                 </div>
-                <div t-if="this.data.remote_blocked" class="o_dwo_mail_blocked">
-                    <i class="oi me-1" data-icon="security" aria-hidden="true"/>Remote pictures and content of this email are blocked to protect your privacy.
+                <div t-if="this.remote.status === 'loading' or this.remote.status === 'loaded'" class="o_dwo_mail_blocked o_dwo_mail_proxied">
+                    <i class="oi me-1" data-icon="security" aria-hidden="true"/>Remote pictures are loaded through your Odoo server: your IP address and browser are not shown to the sender.
+                    <t t-if="this.remote.status === 'loading'"> Loading...</t>
+                    <t t-elif="this.remote.failed"> <t t-out="this.remote.failed"/> could not be loaded.</t>
+                </div>
+                <div t-elif="this.remote.status === 'blocked'" class="o_dwo_mail_blocked">
+                    <i class="oi me-1" data-icon="security" aria-hidden="true"/>Remote pictures of this email are blocked to protect your privacy.
+                    <button type="button" class="btn btn-link btn-sm p-0 ms-2 align-baseline o_dwo_mail_load_remote" t-on-click="() => this.loadRemote()">Load them through the server</button>
+                </div>
+                <div t-elif="this.data.remote_blocked" class="o_dwo_mail_blocked">
+                    <i class="oi me-1" data-icon="security" aria-hidden="true"/>Remote content of this email is blocked to protect your privacy.
                 </div>
                 <div t-if="this.attachments.length" class="o_dwo_mail_atts">
                     <div t-foreach="this.attachments" t-as="att" t-key="att.index" class="o_dwo_mail_att">
