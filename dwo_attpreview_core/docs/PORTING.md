@@ -87,6 +87,19 @@ never ran the 19.0 code. Behaviour is the same as on 19.0. Full test suite: 148 
 - `static/src/scss/mail_viewer.scss`: `.o_dwo_mail_card_top > .oi` (was `.fa`).
 - `tests/test_engine.py`: `bytes(rec.data)`.
 
+### #79 - remote pictures through the server (mail 19.0.2.1.0 -> 20.0.2.1.0)
+
+- `dwo_attpreview_mail/__manifest__.py`: version `20.0.2.1.0`.
+- `controllers/main.py`: `from odoo.http.stream import Stream` (was `http.Stream`); `_dwo_mail_settings` reads the two
+  parameters with `get_bool` (was `bool(get_param(...))`). The `noupdate` data file still stores `True`, which
+  `get_bool` reads as on; Boolean `config_parameter` fields of `res.config.settings` use `get_bool` / `set_bool` in
+  Odoo 20 (unticking stores `False` instead of deleting the parameter).
+- `static/src/js/mail_viewer.js`: `this.remote = proxy(...)` (was `useState`).
+- `static/src/xml/mail_viewer.xml`: banners read `this.remote...`, `t-out` for the failed count, icon `oi` `security`.
+- `tests/test_remote.py`: `get_bool` / `set_bool` (was `get_param` / `set_param`).
+- `parsers/remote.py`, `models/engine.py`, `models/res_config_settings.py`, the data and view files, the tour and
+  `dwo_attpreview_core/tests/test_settings.py`: same as 19.0.
+
 ### Syncing a change from 19.0
 
 - Python: binary values are `BinaryValue` (use `bytes(v)`, `v.size`), never base64; write base64 as `str`.
