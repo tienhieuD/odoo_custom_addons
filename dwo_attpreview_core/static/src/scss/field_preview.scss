@@ -1,0 +1,44 @@
+// Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3).
+// Preview buttons on file fields: the action colour of the theme and a thin outline, so they stand out from the
+// grey Download / Edit / Clear icons without changing the height of the field.
+.o_dwo_ap_field_preview,
+.o_dwo_ap_m2mb_preview,
+.o_dwo_ap_list_preview,
+.o_dwo_ap_kanban_preview {
+    color: $o-action;
+    &:hover,
+    &:focus {
+        color: $o-action;
+        filter: brightness(0.85);
+    }
+}
+
+.o_dwo_ap_field_preview {
+    border: 1px solid rgba($o-action, 0.55);
+    border-radius: $border-radius;
+    &:hover,
+    &:focus {
+        background-color: rgba($o-action, 0.08);
+    }
+}
+
+// the binary field of a form (edit mode) is an inline flex row: keep the eye square like its neighbours
+.o_field_binary .o_dwo_ap_field_preview.fa {
+    padding: 0.2rem 0.3rem;
+}
+
+.o_dwo_ap_field_preview_text {
+    padding: 0.15rem 0.45rem;
+    white-space: nowrap;
+}
+
+.o_dwo_ap_m2o_readonly {
+    min-width: 0;
+}
+
+// above the text of the card, on the card background so a long name does not show through
+.o_dwo_ap_kanban_preview {
+    z-index: 1;
+    background-color: var(--o-view-background-color, $white);
+    padding: 0.15rem 0.4rem;
+}

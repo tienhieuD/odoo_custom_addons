@@ -1,0 +1,199 @@
+// Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3).
+// Attachment Preview dialog: almost the whole screen (95vw x 92vh), full screen on small screens or on demand.
+.modal:not(.o_modal_full) .modal-dialog:has(.o_dwo_ap_dialog) {
+    width: 95vw;
+    max-width: none;
+    height: 92vh;
+    min-height: 0;
+    margin: 4vh auto;
+    padding: 0;
+}
+
+.modal.o_modal_full .modal-dialog:has(.o_dwo_ap_dialog) {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.o_modal_full .o_dwo_ap_dialog.modal-content {
+    border-radius: 0;
+    border: 0;
+}
+
+.o_dwo_ap_dialog.modal-content {
+    align-self: stretch;
+    height: 100% !important;
+    max-height: none !important;
+    overflow: hidden;
+
+    > .modal-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+}
+
+.o_modal_full .o_dwo_ap_dialog.modal-content {
+    height: 100vh !important;
+}
+
+.o_dwo_ap {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    background: var(--bs-secondary-bg, #f3f4f6);
+}
+
+.o_dwo_ap_bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    padding: 0.35rem 0.75rem;
+    background: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #212529);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+
+    .o_dwo_ap_icon {
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+    }
+    .o_dwo_ap_title {
+        flex: 1 1 auto;
+        min-width: 0;
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .o_dwo_ap_actions {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 0.15rem;
+
+        .btn {
+            width: 2rem;
+            height: 2rem;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-body-color, #212529);
+            opacity: 0.75;
+            &:hover, &:focus-visible {
+                opacity: 1;
+                background: var(--bs-tertiary-bg, #e9ecef);
+            }
+            &[disabled] {
+                opacity: 0.25;
+            }
+        }
+    }
+}
+
+// warning banner of an engine (for example "legacy format, limited support"), under the title bar
+.o_dwo_ap_notice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0.35rem 0.75rem;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    font-size: 0.875rem;
+
+    .o_dwo_ap_notice_icon {
+        flex: 0 0 auto;
+    }
+    .o_dwo_ap_notice_text {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    .o_dwo_ap_notice_close {
+        position: static;
+        flex: 0 0 auto;
+        padding: 0.25rem;
+    }
+}
+
+.o_dwo_ap_content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+
+    // viewers rendered by an engine fill the area
+    > .o_dwo_office, > .o_dwo_ap_fill {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+    > iframe {
+        flex: 1 1 auto;
+        width: 100%;
+        border: 0;
+        background: #fff;
+    }
+    > img {
+        margin: auto;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    > video {
+        margin: auto;
+        max-width: 100%;
+        max-height: 100%;
+    }
+    > audio {
+        margin: auto;
+        width: 90%;
+        max-width: 640px;
+    }
+    > pre {
+        margin: 0;
+        padding: 1rem;
+        flex: 1 1 auto;
+        overflow: auto;
+        background: var(--bs-body-bg, #fff);
+        color: var(--bs-body-color, #212529);
+    }
+    > .alert {
+        margin: 1rem;
+    }
+}
+
+// Settings: engine ticks and their popup
+.o_dwo_ap_engine_list {
+    grid-column: 1 / -1;
+    width: 100%;
+    .o_field_widget { display: block; width: 100%; }
+}
+.o_dwo_ap_engine {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+    .o-checkbox { min-width: 22rem; margin: 0; }
+    .o_dwo_ap_engine_name { font-size: 1.05em; }
+    .o_dwo_ap_engine_ext { min-width: 12rem; }
+    .o_dwo_ap_engine_state { font-weight: 500; }
+}
+.o_dwo_ap_store_desc {
+    width: 100%;
+    height: 52vh;
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    background: #fff;
+}

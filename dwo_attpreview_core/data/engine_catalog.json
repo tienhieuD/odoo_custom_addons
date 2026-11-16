@@ -1,0 +1,38 @@
+[
+  {
+    "module": "dwo_attpreview_office",
+    "name": "Secure Office Preview: DOCX, DOC, XLSX, XLS, PPTX, PPT, CSV, TSV",
+    "extensions": [
+      "xlsx",
+      "docx",
+      "pptx",
+      "doc",
+      "xls",
+      "ppt",
+      "csv",
+      "tsv",
+      "xlsm",
+      "xltx",
+      "xltm",
+      "docm",
+      "dotx",
+      "dotm",
+      "pptm",
+      "ppsx",
+      "ppsm",
+      "potx",
+      "potm"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_office"
+  },
+  {
+    "module": "dwo_attpreview_mail",
+    "name": "Email, calendar, contact card",
+    "extensions": [
+      "eml",
+      "ics",
+      "vcf"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_mail"
+  }
+]

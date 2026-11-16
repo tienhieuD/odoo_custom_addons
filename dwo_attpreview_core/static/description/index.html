@@ -1,0 +1,236 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #14304F;">Secure Attachment Preview</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #14304F;">Your documents never leave your Odoo server.</p>
+        <p class="mb-4" style="font-size: 15px;">Preview attachments and file fields in a large dialog, with Odoo access rights, without any external service.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Click an attachment in the chatter, or the Preview button of a file field, and the file opens in a large dialog instead of being downloaded. PDF, images, video and audio are shown by the browser itself from your Odoo server. Other file types are handled by <strong>preview engines</strong>, separate modules that you tick in the Settings (for example <strong>Secure Office Preview</strong> for Word, Excel and PowerPoint files). Every preview follows the Odoo access rights, and no file is sent to an outside service.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: click a file, Odoo checks the access rights and size, the file opens in a large preview dialog, or a short notice explains why it cannot be previewed" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #14304F;">Built for Private Documents</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">No outside service</h4>
+                    <p class="mb-0" style="font-size: 14px;">No online viewer, no CDN, no conversion service. Files go from your Odoo server to the browser of the user who opens them, and nowhere else.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Odoo access rights</h4>
+                    <p class="mb-0" style="font-size: 14px;">A file can be previewed only by a user who can read the attachment, or the record and field that holds it. Anyone else gets &ldquo;You are not allowed to see this file.&rdquo;</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Limits and cache</h4>
+                    <p class="mb-0" style="font-size: 14px;">A maximum file size (default 20 MB) is set in Settings. Rendered results are cached, readable only by administrators, and cleaned automatically every day.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #14304F;">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Large preview dialog</h4>
+                    <p class="mb-0" style="font-size: 14px;">Almost the whole window, with a full screen button, Download, and Open in a new tab for PDF and media. Esc closes it.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">PDF, images, video, audio</h4>
+                    <p class="mb-0" style="font-size: 14px;">PDF in the browser's own viewer; PNG, JPEG, GIF, WebP, AVIF, BMP and SVG images; video and audio with player controls.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Preview buttons on file fields</h4>
+                    <p class="mb-0" style="font-size: 14px;">Binary fields of any model, <code>many2many_binary</code> fields, lists and kanban of attachments, and many2one fields to an attachment get a Preview (eye) button. Odoo's own buttons stay unchanged.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Clear notice when not possible</h4>
+                    <p class="mb-0" style="font-size: 14px;">A file that cannot be previewed opens no empty dialog: a short notice gives the file name, the reason and a Download button.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Engines in Settings</h4>
+                    <p class="mb-0" style="font-size: 14px;">Each preview engine is a tick box in <strong>Settings &rarr; Attachment Preview</strong>. Tick and save to install an engine that is in your addons; for one that is not, a window shows what it previews.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Free and open</h4>
+                    <p class="mb-0" style="font-size: 14px;">LGPL-3, no activation key, no account, no data collection. Works with Odoo Community and Enterprise.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Attachments in the Chatter</h2>
+    <p class="mb-4" style="font-size: 16px;">Click any attachment of the chatter to preview it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-chatter-attachments.png" alt="A company record with its chatter showing attachments of several types: spreadsheet, document, presentation, PDF, picture and an unknown file" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Preview from a File Field</h2>
+    <p class="mb-4" style="font-size: 16px;">The dialog takes almost the whole window. Here a Word report opened from a file field (with the Secure Office Preview engine).</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/10-binary-field-dialog.png" alt="The large preview dialog showing a Word report opened from a file field" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Preview Buttons on File Fields</h2>
+    <p class="mb-3" style="font-size: 16px;">Each button only opens the preview; download, edit, clear and delete work as before.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_core_fields_binary" role="tab" aria-controls="dwo_ap_core_fields_binary" aria-selected="true">Binary and many2one</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_core_fields_m2mb" role="tab" aria-controls="dwo_ap_core_fields_m2mb" aria-selected="false">many2many_binary</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_core_fields_list" role="tab" aria-controls="dwo_ap_core_fields_list" aria-selected="false">Attachment list</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_core_fields_kanban" role="tab" aria-controls="dwo_ap_core_fields_kanban" aria-selected="false">Attachment kanban</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_core_fields_binary" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/11-binary-and-many2one-preview.png" alt="A binary field and a many2one field to an attachment, each with an eye button" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">A binary field of a partner and a many2one to an attachment.</p>
+            <div class="text-center mb-3">
+                <img src="screenshots/09-binary-field-preview.png" alt="The File Content field of an attachment with the eye button before Edit, Download and Clear" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">The eye stands before Edit, Download and Clear.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_core_fields_m2mb" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/12-many2many-binary-preview.png" alt="A many2many_binary field with an eye next to each file" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">An eye next to the extension of each file.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_core_fields_list" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/13-attachment-list-preview.png" alt="A list of attachments with a preview column" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">Lists of attachments get a Preview column.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_core_fields_kanban" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/14-attachment-kanban-preview.png" alt="A kanban card of an attachment with an eye button" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">Cards of the Attachments menu.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Files That Cannot Be Previewed</h2>
+    <p class="mb-4" style="font-size: 16px;">No empty dialog: a short notice explains why and offers the download.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/06-toast-unsupported-file.png" alt="A notice in the corner of the screen: the file name, No preview is available for this file type, and a Download button" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Settings</h2>
+    <p class="mb-4" style="font-size: 16px;">Set the maximum file size and tick the preview engines you want. Each engine shows its file types and whether it is installed.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/07-preview-engines.png" alt="Settings page Attachment Preview with the maximum file size and the list of preview engines with their file types and state" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Engine Not Yet in Your Addons</h2>
+    <p class="mb-4" style="font-size: 16px;">Ticking an engine that is not in your addons opens a window with its file types and description, and explains how to add it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/08-engine-popup.png" alt="A window describing a preview engine that is not in the addons, with its file types and a short description" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Details</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_core_security" role="tab" aria-controls="dwo_ap_core_security" aria-selected="true">Security</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_core_limits" role="tab" aria-controls="dwo_ap_core_limits" aria-selected="false">Limitations</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_core_install" role="tab" aria-controls="dwo_ap_core_install" aria-selected="false">Requirements</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_core_security" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">How files are protected</h4>
+            <p class="mb-2" style="font-size: 14px;">Every preview request checks the Odoo read access of the attachment, or of the record and the field that holds the file. Files are served only by your Odoo server; nothing is uploaded elsewhere and no CDN or web font is loaded.</p>
+            <p class="mb-2" style="font-size: 14px;">HTML produced by an engine is shown in a sandboxed frame without scripts. Engines that draw files in the browser, such as Secure Office Preview, use their own isolated frame.</p>
+            <p class="mb-2" style="font-size: 14px;">A file in a binary field stored outside attachments is checked in memory: no attachment and no cache entry are created.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_core_limits" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">Good to know</h4>
+            <p class="mb-2" style="font-size: 14px;">On its own this module previews PDF, images, video and audio. Office, email and other file types need the matching engine module.</p>
+            <p class="mb-2" style="font-size: 14px;">PDF uses the PDF viewer of the browser. A file just uploaded to a field can be previewed after the record is saved.</p>
+            <p class="mb-2" style="font-size: 14px;">Very large files are refused by the size limit and get the notice with a Download button.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_core_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">Requirements</h4>
+            <p class="mb-2" style="font-size: 14px;">Odoo Community or Enterprise, on premise or on Odoo.sh. Depends only on the standard <code>base</code>, <code>web</code> and <code>mail</code> modules. No Python library to add.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Odoo Online is not supported</strong> (it cannot install third-party modules).</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Are my files sent to an outside service?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Files are served by your Odoo server to the browser of the user who opens them.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Who can preview a file?</h4>
+        <p class="mb-0" style="font-size: 14px;">Only users who can read it in Odoo: the attachment, or the record and the field that holds it.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Which files can be previewed without an engine?</h4>
+        <p class="mb-0" style="font-size: 14px;">PDF, common image formats, video and audio that the browser can play.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">How do I preview Word, Excel or PowerPoint files?</h4>
+        <p class="mb-0" style="font-size: 14px;">Add the Secure Office Preview engine to your addons, then tick it in Settings &rarr; Attachment Preview and save.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Does it change Odoo's download or upload buttons?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It only adds a Preview button; the existing buttons keep working as before.</p>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #1F5A96;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #1F5A96;">Preview files in Odoo. Keep them on your server.</p>
+        <p class="mb-2" style="font-size: 15px;">A large preview dialog for the chatter and for file fields, with Odoo access rights. Free, LGPL-3, for Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by Duotek</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>

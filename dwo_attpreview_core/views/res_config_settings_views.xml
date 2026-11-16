@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.dwo.attpreview</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Attachment Preview" name="dwo_attpreview_core" groups="base.group_system">
+                    <block title="Attachment Preview">
+                        <setting string="Max file size (MB)" help="Larger files are not previewed.">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_attpreview_max_file_size_mb"/></div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Preview engines" help="Tick an engine and save to install its module. Engines that are not in your addons open a short description first.">
+                        <field name="dwo_attpreview_engines" invisible="1"/>
+                        <div class="o_dwo_ap_engine_list">
+                            <field name="module_dwo_attpreview_office" widget="dwo_attpreview_engine_boolean"/>
+                            <field name="module_dwo_attpreview_mail" widget="dwo_attpreview_engine_boolean"/>
+                        </div>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>
