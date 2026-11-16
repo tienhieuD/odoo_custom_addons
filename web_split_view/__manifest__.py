@@ -2,7 +2,7 @@
 {
     'name': "Web Split View",
     'summary': """Dual-view layout, seamlessly dividing the screen into list and detail sections for CRUD operations.""",
-    'author': "DUO-TEK Software Vietnam",
+    'author': "DuoTEK",
     'website': 'https://duotek.io.vn',
     'support': 'hello@duotek.io.vn',
     'license': 'LGPL-3',
