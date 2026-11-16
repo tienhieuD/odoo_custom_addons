@@ -1,0 +1,290 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #14304F;">Secure Office Preview: DOCX, DOC, XLSX, XLS, PPTX, PPT, CSV, TSV</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #14304F;">Your documents never leave your Odoo server.</p>
+        <p class="mb-4" style="font-size: 15px;">Open Word, Excel and PowerPoint files right inside Odoo, without downloading them and without any online viewer or conversion service.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Click a <code>.docx</code>, <code>.xlsx</code> or <code>.pptx</code> attachment in the chatter, or the Preview button of a file field, and the document opens in a large dialog. The file goes only from your Odoo server to the browser of the user who is allowed to read it. The viewer is bundled in the module and draws the document in that browser, inside an isolated frame that has no network access. Nothing is uploaded to a third-party service, and no CDN or web font is loaded. This engine works with the free <strong>Secure Attachment Preview</strong> module (<code>dwo_attpreview_core</code>), installed automatically as a dependency.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: click a file, Odoo checks the access rights and the file, a sandboxed viewer draws it in the browser, the user reads and searches it in a large dialog" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #14304F;">Why It Is Safe for Sensitive Documents</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Never leaves your server</h4>
+                    <p class="mb-0" style="font-size: 14px;">No online document viewer, no conversion service, no CDN, no Google Fonts. The viewer libraries are shipped inside the module, so the preview also works on a server without internet access.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Isolated viewer frame</h4>
+                    <p class="mb-0" style="font-size: 14px;">The document is drawn in a sandboxed frame (scripts only, no same-origin access) with a Content Security Policy of <code>default-src 'none'</code>: it cannot read your Odoo session or page, and it can load files only from your own server.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Same rights as Odoo</h4>
+                    <p class="mb-0" style="font-size: 14px;">A user can preview a file only if Odoo lets them read that attachment or record. The access is checked again when the file is sent to the viewer.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Macros never run</h4>
+                    <p class="mb-0" style="font-size: 14px;">Macro-enabled files (<code>xlsm</code>, <code>docm</code>, <code>pptm</code>...) open as plain documents. The macro part is not read, no code of the document is executed, and links inside documents are disabled.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Checked before opening</h4>
+                    <p class="mb-0" style="font-size: 14px;">Size limit (default 20 MB, set in Settings). Office files are checked as sane archives with limits on unpacked size and number of parts (zip bombs are refused). XML is read as data only. Old <code>.doc/.xls/.ppt</code> files are parsed in the browser, never in the Odoo server process.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">No tracking, no key</h4>
+                    <p class="mb-0" style="font-size: 14px;">The module collects no data, sends no statistics and needs no activation key or account.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #14304F;">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Word (docx)</h4>
+                    <p class="mb-0" style="font-size: 14px;">Pages with tables, images, headers and footers, shown as one continuous scroll like a PDF reader, with page counter and zoom.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Excel (xlsx)</h4>
+                    <p class="mb-0" style="font-size: 14px;">Sheet tabs, merged cells, formats, conditional colours, images, native charts, shapes and connector arrows.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">PowerPoint (pptx)</h4>
+                    <p class="mb-0" style="font-size: 14px;">One slide at a time with previous/next buttons: layouts, charts, tables, images and flow diagrams.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Search in the preview</h4>
+                    <p class="mb-0" style="font-size: 14px;">Magnifier button or Ctrl+F: every match is highlighted, Enter goes to the next one, across pages, slides and sheets. Works for docx, xlsx, pptx, csv, tsv and the old formats.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Chatter and file fields</h4>
+                    <p class="mb-0" style="font-size: 14px;">Opens from chatter attachments and from the Preview buttons of file fields: binary fields of any record, <code>many2many_binary</code>, attachment lists and kanban.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">11 template and macro variants</h4>
+                    <p class="mb-0" style="font-size: 14px;"><code>xlsm</code>, <code>xltx</code>, <code>xltm</code>, <code>docm</code>, <code>dotx</code>, <code>dotm</code>, <code>pptm</code>, <code>ppsx</code>, <code>ppsm</code>, <code>potx</code>, <code>potm</code> open like their base format.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">CSV and TSV</h4>
+                    <p class="mb-0" style="font-size: 14px;">Shown as a sheet where every cell stays text: leading zeros kept, no date or formula guessing. Delimiter detected (comma, semicolon, tab), UTF-8 with or without BOM.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Old formats, with a warning</h4>
+                    <p class="mb-0" style="font-size: 14px;"><code>.doc</code>, <code>.xls</code> and <code>.ppt</code> (Office 97-2003) open with limited support and a visible warning. A file that cannot be shown gets a short message and a Download button.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Clear messages</h4>
+                    <p class="mb-0" style="font-size: 14px;">A damaged, empty or too large file opens no dialog: a short notice names the file, gives the reason and offers a Download button.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Excel Sheets with Charts</h2>
+    <p class="mb-4" style="font-size: 16px;">Workbooks keep their formats, merged cells, charts and sheet tabs. Formulas show the value stored in the file.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/02-xlsx-sheet-with-charts.png" alt="An xlsx workbook previewed in a large dialog: a formatted table and a doughnut chart, with sheet tabs at the bottom" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Word Documents as a Continuous Scroll</h2>
+    <p class="mb-4" style="font-size: 16px;">Long documents scroll smoothly page after page; the toolbar shows the page number and the zoom.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/04-docx-continuous-scroll.png" alt="A docx report previewed as continuous pages with a table of headline figures" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Search Inside the Document</h2>
+    <p class="mb-4" style="font-size: 16px;">Find a word in the whole document, not only on the visible page. The counter shows the active match and the total.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/15-docx-search.png" alt="The search bar of the preview with the query minimum wage and the counter 1 of 12, the match highlighted in the document" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">PowerPoint Slides</h2>
+    <div class="text-center mb-4">
+        <img src="screenshots/05-pptx-slide-with-chart.png" alt="A pptx slide with a line chart and a bar chart, previous and next buttons and the slide counter" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">More Screens</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_shots_flow" role="tab" aria-controls="dwo_ap_office_shots_flow" aria-selected="true">Shapes and arrows</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_shots_legacy" role="tab" aria-controls="dwo_ap_office_shots_legacy" aria-selected="false">Old .xls</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_shots_doc" role="tab" aria-controls="dwo_ap_office_shots_doc" aria-selected="false">Old .doc</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_shots_csv" role="tab" aria-controls="dwo_ap_office_shots_csv" aria-selected="false">CSV</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_office_shots_flow" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/03-xlsx-hiring-flow-arrows.png" alt="An xlsx sheet with a flow diagram made of shapes and connector arrows" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">Shapes and connector arrows drawn on a sheet.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_office_shots_legacy" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/17-legacy-xls-warning.png" alt="An old xls file previewed under a yellow warning about limited support" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">Old formats open under a warning that support is limited.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_office_shots_doc" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/18-legacy-doc-warning.png" alt="An old doc file previewed under the same warning" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">A Word 97-2003 document with lists.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_office_shots_csv" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/19-csv-as-sheet.png" alt="A csv file shown as a sheet of text cells" class="img-fluid rounded shadow"/>
+            </div>
+            <p class="text-muted mb-3" style="font-size: 14px;">CSV and TSV files are shown as a sheet; every cell stays text.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Details</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_formats" role="tab" aria-controls="dwo_ap_office_formats" aria-selected="true">File types</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_security" role="tab" aria-controls="dwo_ap_office_security" aria-selected="false">Security</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_limits" role="tab" aria-controls="dwo_ap_office_limits" aria-selected="false">Limitations</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_office_install" role="tab" aria-controls="dwo_ap_office_install" aria-selected="false">Requirements</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_office_formats" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">Supported file types</h4>
+            <p class="mb-2" style="font-size: 14px;"><strong>Full support:</strong> <code>docx</code>, <code>xlsx</code>, <code>pptx</code>, <code>csv</code>, <code>tsv</code>.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Variants (shown as their base format, macros never run):</strong> <code>xlsm</code>, <code>xltx</code>, <code>xltm</code>, <code>docm</code>, <code>dotx</code>, <code>dotm</code>, <code>pptm</code>, <code>ppsx</code>, <code>ppsm</code>, <code>potx</code>, <code>potm</code>. A slideshow file opens as normal slides.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Limited support, with a warning:</strong> <code>doc</code>, <code>xls</code>, <code>ppt</code>.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Not supported: <code>odt</code>, <code>ods</code>, <code>odp</code>, <code>xlsb</code>, <code>rtf</code> and password-protected files. They get the short notice with a Download button.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_office_security" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">What happens to a file</h4>
+            <p class="mb-2" style="font-size: 14px;">1. The user clicks a file. Odoo checks that this user can read the attachment or the record, applies the size limit and checks the file structure.</p>
+            <p class="mb-2" style="font-size: 14px;">2. The browser of that user receives the original file from your Odoo server only, through a route that checks the access again.</p>
+            <p class="mb-2" style="font-size: 14px;">3. The bundled viewer draws it inside a sandboxed frame. Its Content Security Policy blocks every address except your own server, so the document cannot call out to the internet, and the frame cannot read the Odoo session.</p>
+            <p class="mb-2 p-3 border rounded" style="font-size: 14px; border-left: 4px solid #ffc107;">Rendered results kept by the preview cache are readable only by administrators and are cleaned automatically. A file stored in a binary field outside attachments is checked in memory and no copy is created.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_office_limits" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">Good to know</h4>
+            <p class="mb-2" style="font-size: 14px;"><strong>Old formats (.doc, .xls, .ppt):</strong> support is limited. Some files show incorrectly or cannot be opened (for example .doc files with hyperlinks, merged table cells, footnotes or most pictures, and encrypted files); the user then gets a short message and a Download button. In our tests with public sample files, about 70% of .xls and .ppt files and about 40% of .doc files opened.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Formulas</strong> are not recalculated: the value stored in the file is shown.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>Display</strong> can differ slightly from Microsoft Office (fonts, some drawing types). Text is drawn on a canvas, so it is selected with the viewer, not like normal page text.</p>
+            <p class="mb-2" style="font-size: 14px;"><strong>CSV/TSV:</strong> UTF-8 only, default column width, up to 200,000 rows.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">The labels of the viewer toolbar and search bar are in English.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_office_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">Requirements</h4>
+            <p class="mb-2" style="font-size: 14px;">Odoo Community or Enterprise, on premise or on Odoo.sh. <strong>Odoo Online is not supported</strong> (it cannot install third-party modules).</p>
+            <p class="mb-2" style="font-size: 14px;">Depends on <strong>Secure Attachment Preview</strong> (<code>dwo_attpreview_core</code>, free), installed automatically. No Python library to add, no system package, no internet access needed.</p>
+            <p class="mb-2" style="font-size: 14px;">A recent desktop browser (Chrome, Edge, Firefox, Safari) with WebAssembly. After installation the engine is ready: there is nothing to configure. The size limit is in <strong>Settings &rarr; Attachment Preview</strong>.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Is my document sent to Microsoft, Google or any other service?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. The file goes from your Odoo server to the browser of the user who opened it, and is drawn there by a library shipped inside the module. No online viewer, CDN or font service is called.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Can someone see a file they are not allowed to open?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. The preview follows the Odoo access rights of the attachment or the record, and the access is checked again when the file is sent to the viewer.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Do macros run?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Macro-enabled files are shown as plain documents; the macro part is not read and no code of the document is executed.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Why do old .doc, .xls and .ppt files show a warning?</h4>
+        <p class="mb-0" style="font-size: 14px;">Their binary format is only partly supported. Many files open well, but some show differences or cannot be opened. The warning says so, and a Download button is always there.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Does it change or convert my files?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. The original file is never modified and no converted copy is stored.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Can I preview files stored in custom binary fields?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. File fields get a Preview button; an Office file in a binary field of any record opens in the same viewer, with the same access checks.</p>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #1F5A96;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #1F5A96;">Read Office files in Odoo. Keep them on your server.</p>
+        <p class="mb-2" style="font-size: 15px;">Word, Excel and PowerPoint previews in a large, searchable dialog, with access rights and an isolated viewer. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by Duotek</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
