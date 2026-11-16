@@ -147,3 +147,20 @@ and the new extensions in `file_kind.js`, tests (`test_core` test_13, `test_part
   card selector of 17.
 - OWL on 17 is OWL 2 as well: the viewer should run unchanged; check the `Dialog` props and `useService("rpc")` in core.
 - `browser_size = "1366,768"` on the tour class.
+
+## #84 - silurus 0.90.0 + ODT/ODS/ODP (office 18.0.1.1.0; core version unchanged)
+
+Copied as is from 19.0 (`421592b`, `adb7794`): `static/lib/silurus` (silurus 0.90.0 dist + legacy and OpenDocument
+add-ons, patches 0002/0003 applied), `static/viewer/*`, `patches/silurus/`, `docs/SILURUS_PATCHES.md`, the test samples
+`tests/files/sample.od?`, the listing (`static/description/*`, banner, screenshots 20-21) and, in the Core, the catalog
+entry, the Settings label, `file_kind.js` (ott/ots/otp icons) and the catalog copy of the office page. The office
+controller needed no change (the asset route serves the new `.mjs` / `.wasm` files by extension).
+
+Differences from 19.0:
+
+- `static/tests/tours/office_tour.js`: the new tour `odf_refused` clicks `.o-mail-AttachmentCard`.
+- The new tours run in `TestOfficeRoutes`, which already has the test-cookie mixin for the sandboxed iframe.
+- `README.md`: written from 19.0 with "Odoo 18".
+- Tour `find_ods`: one extra step waits for `data-find-where*='Notes'` after the second search. Both searches of that
+  tour have one match, so without it the check could read the result of the first search (it failed once on 20.0;
+  19.0 has the same race, it passed there by timing).
