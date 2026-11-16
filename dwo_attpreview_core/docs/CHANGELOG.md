@@ -1,5 +1,11 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-17 - 18.0.1.3.0 - shared tree view, text engine tick and catalog (#83), 18.0 port of 19.0.1.3.0
+
+- Same as 19.0.1.3.0: `DwoTreeView` (`static/src/js/tree_view.js`, template, styles) and `static/lib/tree_libs` live in
+  the core (moved from `dwo_attpreview_archive`); tick and catalog entry of `dwo_attpreview_text`; more icons.
+- No Odoo 18 specific change in the core code (see PORTING.md, section "#83").
+
 ## 2026-11-16 - office engine with OpenDocument (#84)
 
 - Catalog (`data/engine_catalog.json`) and Settings label of `module_dwo_attpreview_office`: `Secure Office Preview: DOCX,

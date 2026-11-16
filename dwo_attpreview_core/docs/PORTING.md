@@ -164,3 +164,23 @@ Differences from 19.0:
 - Tour `find_ods`: one extra step waits for `data-find-where*='Notes'` after the second search. Both searches of that
   tour have one match, so without it the check could read the result of the first search (it failed once on 20.0;
   19.0 has the same race, it passed there by timing).
+
+## #83 - text engine and shared tree view (text 18.0.1.0.0, core 18.0.1.3.0, archive: no version change)
+
+Source: 19.0 commits `7275ec8` (core), `cef91fb` (archive), `8a66fd3` (text). Taken as is, except:
+
+| File | 19.0 | 18.0 |
+|---|---|---|
+| `dwo_attpreview_core/__manifest__.py` | `19.0.1.3.0` | `18.0.1.3.0` (the manifest keeps its own text) |
+| `dwo_attpreview_text/__manifest__.py` | `19.0.1.0.0` | `18.0.1.0.0` |
+| `dwo_attpreview_text/static/src/js/attachment_list_patch.js` | patches `onClickAttachment(attachment)` | wraps `this.fileViewer.open` in `setup()` (on top of the wrapper of the core): text files go to the `dwo_attpreview` service |
+| `dwo_attpreview_text/static/tests/tours/text_tour.js` | `.o-mail-AttachmentContainer` | `.o-mail-AttachmentCard` |
+
+The text module has no controller: no `type="json"` change. `self.env._` exists in 18. The vendored `static/lib/*` bundles are
+copied unchanged (`.gitignore` has `!dwo_attpreview_text/static/lib/` and `!dwo_attpreview_core/static/lib/`).
+
+### For the 17.0 port
+
+- `dwo_attpreview_text/models/engine.py`: `self.env._(...)` -> `_()` (import `from odoo import _`).
+- Tour: `run: "text ..."`, `dwoAddTour`, `/web#` URLs, `browser_size = "1366,768"`, chatter card selector of 17.
+- `attachment_list_patch.js`: check how the core 17 patch reaches the file viewer.
