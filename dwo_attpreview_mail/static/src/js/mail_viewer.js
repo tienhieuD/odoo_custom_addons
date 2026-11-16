@@ -1,6 +1,7 @@
 /** @odoo-module **/
 // Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { Component } from "@odoo/owl";
+import { Component, onMounted, useState } from "@odoo/owl";
+import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { download } from "@web/core/network/download";
@@ -16,6 +17,9 @@ const FRAME_STYLE =
     "body{margin:16px 20px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;" +
     "line-height:1.45;color:#1f2937;background:#fff;overflow-wrap:anywhere}img{max-width:100%;height:auto}" +
     "pre{white-space:pre-wrap;font-family:inherit;margin:0}table{max-width:100%}";
+
+const REMOTE_IMG = /<img data-dwo-remote="(\d+)" hidden/g;
+const MAX_PARALLEL = 4;
 
 function escapeHtml(text) {
     return String(text || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -49,6 +53,73 @@ export class MailViewer extends Component {
         } catch {
             this.data = {};
         }
+        // remote pictures of the body (#79): loaded through the Odoo server, never by the browser from outside
+        this.remote = useState({ status: "idle", pictures: {}, failed: 0 });
+        onMounted(() => this.startRemote());
+    }
+
+    get remoteCount() {
+        return this.data.remote_images || 0;
+    }
+
+    async startRemote() {
+        if (!this.remoteCount || !this.props.source) {
+            return;
+        }
+        let settings = { auto: false };
+        try {
+            settings = await rpc("/dwo_attpreview_mail/remote_settings", {});
+        } catch {
+            // keep them blocked
+        }
+        if (settings.auto) {
+            this.loadRemote();
+        } else {
+            this.remote.status = "blocked";
+        }
+    }
+
+    remoteUrl(index) {
+        const params = new URLSearchParams();
+        for (const [key, value] of Object.entries(this.props.source || {})) {
+            if (value) {
+                params.set(key, value);
+            }
+        }
+        params.set("index", String(index));
+        return `/dwo_attpreview_mail/remote_image?${params.toString()}`;
+    }
+
+    async loadRemote() {
+        this.remote.status = "loading";
+        const pictures = {};
+        let failed = 0;
+        const queue = [...Array(this.remoteCount).keys()];
+        const worker = async () => {
+            while (queue.length) {
+                const index = queue.shift();
+                try {
+                    const response = await fetch(this.remoteUrl(index), { credentials: "same-origin" });
+                    if (!response.ok) {
+                        throw new Error(String(response.status));
+                    }
+                    const blob = await response.blob();
+                    pictures[index] = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                } catch {
+                    failed++;
+                }
+            }
+        };
+        await Promise.all(Array.from({ length: Math.min(MAX_PARALLEL, queue.length) }, worker));
+        // one update of the frame, when every picture is there
+        this.remote.pictures = pictures;
+        this.remote.failed = failed;
+        this.remote.status = "loaded";
     }
 
     get isEmail() {
@@ -80,7 +151,11 @@ export class MailViewer extends Component {
     }
 
     get srcdoc() {
-        const body = this.data.body_html || `<pre>${escapeHtml(this.data.body_text)}</pre>`;
+        const pictures = this.remote.pictures;
+        const body = (this.data.body_html || `<pre>${escapeHtml(this.data.body_text)}</pre>`).replace(
+            REMOTE_IMG,
+            (match, index) => (pictures[index] ? `<img src="${pictures[index]}"` : match)
+        );
         return (
             `<!DOCTYPE html><html><head><meta charset="utf-8">` +
             `<meta http-equiv="Content-Security-Policy" content="${FRAME_CSP}">` +
