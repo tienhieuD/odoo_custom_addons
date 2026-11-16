@@ -18,7 +18,7 @@ distribution, status mix, open backlog, performance by definition and by source,
 pauses, escalations, source heatmap and calendar impact.
 Requires only the standard base, resource, web, mail and mail_tracking modules.
 """,
-    'author': "DUO-TEK Software Vietnam",
+    'author': "DuoTEK",
     'website': 'https://duotek.io.vn',
     'support': 'hello@duotek.io.vn',
 
