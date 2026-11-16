@@ -10,9 +10,10 @@ const BY_EXT = {
     video: ["mp4", "webm", "mov", "mkv", "avi", "m4v", "ogv", "wmv", "flv", "3gp", "mpg", "mpeg"],
     audio: ["mp3", "wav", "ogg", "oga", "m4a", "flac", "aac", "opus", "wma", "aiff", "mid", "midi"],
     archive: ["zip", "rar", "7z", "tar", "gz", "tgz", "bz2", "tbz2", "tbz", "xz", "txz", "jar", "war", "apk", "cab", "iso", "dmg", "lz", "lzma", "zst"],
-    markdown: ["md", "markdown"],
-    code: ["json", "jsonc", "json5", "geojson", "ndjson", "xml", "xsd", "xsl", "html", "htm", "xhtml", "js", "mjs", "cjs", "jsx", "ts", "tsx", "vue", "py", "ipynb", "css", "scss", "sass", "less", "yml", "yaml", "toml", "sql", "sh", "bash", "zsh", "ps1", "bat", "java", "kt", "swift", "c", "cpp", "cc", "h", "hpp", "cs", "php", "rb", "go", "rs", "dart", "lua", "r", "pl", "scala", "groovy", "gradle", "dockerfile", "makefile"],
-    text: ["txt", "log", "ini", "cfg", "conf", "rst", "env", "properties", "tex", "srt", "vtt", "po", "pot", "diff", "patch", "nfo", "out"],
+    markdown: ["md", "markdown", "mdx"],
+    code: ["json", "jsonc", "json5", "geojson", "ndjson", "xml", "xsd", "xsl", "html", "htm", "xhtml", "js", "mjs", "cjs", "jsx", "ts", "tsx", "vue", "py", "ipynb", "css", "scss", "sass", "less", "yml", "yaml", "toml", "sql", "sh", "bash", "zsh", "ps1", "bat", "java", "kt", "swift", "c", "cpp", "cc", "h", "hpp", "cs", "php", "rb", "go", "rs", "dart", "lua", "r", "pl", "scala", "groovy", "gradle", "dockerfile", "makefile",
+        "xslt", "rss", "atom", "plist", "kml", "gpx", "wsdl", "xlf", "xliff", "resx", "jsonl", "webmanifest", "pyi", "cxx", "hh", "kts", "pm", "cmd", "mk"],
+    text: ["txt", "log", "ini", "cfg", "conf", "rst", "env", "properties", "tex", "srt", "vtt", "po", "pot", "diff", "patch", "nfo", "out", "err", "text", "adoc", "asciidoc"],
     mail: ["eml", "msg", "oft", "mbox", "emlx", "ics", "vcf"],
     cad: ["dxf", "dwg", "dwf", "stl"],
 };

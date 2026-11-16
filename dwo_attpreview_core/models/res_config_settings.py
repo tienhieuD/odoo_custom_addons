@@ -16,6 +16,7 @@ class ResConfigSettings(models.TransientModel):
     module_dwo_attpreview_office = fields.Boolean(string="Secure Office Preview: DOCX, XLSX, PPTX, ODT, ODS, ODP, DOC, XLS, PPT, CSV")
     module_dwo_attpreview_mail = fields.Boolean(string="Secure Email Preview: EML, MSG, ICS, VCF")
     module_dwo_attpreview_archive = fields.Boolean(string="Secure Archive Preview: ZIP, RAR, 7Z, TAR")
+    module_dwo_attpreview_text = fields.Boolean(string="Secure Text & Code Preview: MD, HTML, XML, JSON, YAML, LOG")
     # what the widget `dwo_attpreview_engine_boolean` shows (name, file types, state), by engine module
     dwo_attpreview_engines = fields.Json(compute="_compute_dwo_attpreview_engines")
 

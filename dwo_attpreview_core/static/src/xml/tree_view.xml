@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). -->
+<templates xml:space="preserve">
+    <!-- Virtualized tree shared by the engines (js/tree_view.js). -->
+    <t t-name="dwo_attpreview_core.TreeView">
+        <div class="o_dwo_tree">
+            <div class="o_dwo_tree_head" aria-hidden="true" t-att-style="gridStyle">
+                <span class="o_dwo_tree_col_name" t-esc="props.nameLabel or 'Name'"/>
+                <span t-foreach="props.columns or []" t-as="col" t-key="col.key"
+                      t-att-class="'o_dwo_tree_cell o_dwo_tree_col_' + col.key + (col.align === 'right' ? ' text-end' : '')" t-esc="col.label"/>
+                <span t-if="props.onDownload" class="o_dwo_tree_col_act"/>
+            </div>
+            <div class="o_dwo_tree_scroll" t-ref="scroll">
+                <div class="o_dwo_tree_list" t-ref="list" role="tree" t-att-aria-label="props.label or 'Files'"
+                     t-attf-style="height: {{ totalHeight }}px;">
+                    <div t-foreach="rows" t-as="row" t-key="row.key" class="o_dwo_tree_row"
+                         t-att-class="{ 'o_dwo_tree_focused': row.focused, 'o_dwo_tree_folder': row.folder, 'o_dwo_tree_muted': row.info.muted }"
+                         t-att-data-tree-id="row.id" role="treeitem" t-att-aria-level="row.level + 1"
+                         t-att-aria-expanded="row.ariaExpanded"
+                         t-att-aria-setsize="row.setsize" t-att-aria-posinset="row.posinset" aria-selected="false"
+                         t-att-tabindex="row.focused ? 0 : -1" t-att-title="row.info.title or row.info.name"
+                         t-attf-style="transform: translateY({{ row.top }}px); {{ gridStyle }}"
+                         t-on-click="(ev) => this.onRowClick(ev, row.id)">
+                        <span class="o_dwo_tree_col_name" t-attf-style="padding-left: {{ 6 + row.level * 18 }}px;">
+                            <i t-if="row.folder" class="o_dwo_tree_chevron fa" t-att-class="row.expanded ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"/>
+                            <span t-else="" class="o_dwo_tree_chevron"/>
+                            <img t-if="row.icon" class="o_dwo_tree_icon" alt="" t-att-src="row.icon"/>
+                            <span t-elif="row.info.badge" class="o_dwo_tree_badge" t-att-class="row.info.badgeClass" t-esc="row.info.badge"/>
+                            <span class="o_dwo_tree_name" t-att-class="row.info.nameClass" t-esc="row.info.name"/>
+                            <span t-if="row.info.count !== undefined and row.info.count !== null" class="o_dwo_tree_count" t-esc="row.info.count"/>
+                        </span>
+                        <span t-foreach="props.columns or []" t-as="col" t-key="col.key" t-att-class="cellClass(row, col)"
+                              t-esc="row.info[col.key]"/>
+                        <span t-if="props.onDownload" class="o_dwo_tree_col_act">
+                            <button t-if="!row.folder and !row.info.muted" type="button"
+                                    class="btn btn-link btn-sm o_dwo_tree_download" t-att-title="'Download ' + row.info.name"
+                                    aria-label="Download" t-on-click.stop="() => props.onDownload(row.id)">
+                                <i class="fa fa-download" aria-hidden="true"/>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
