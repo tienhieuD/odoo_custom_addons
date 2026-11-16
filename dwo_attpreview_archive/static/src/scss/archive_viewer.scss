@@ -1,0 +1,157 @@
+// Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+.o_dwo_arc {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    background: var(--bs-body-bg, #fff);
+
+    .o_dwo_arc_bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.75rem;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--bs-border-color, #e5e7eb);
+        font-size: 0.875rem;
+    }
+    .o_dwo_arc_tools {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-left: auto;
+    }
+    .o_dwo_arc_search {
+        position: relative;
+        > .oi { // Odoo 20: .oi icons (Font Awesome is gone)
+            position: absolute;
+            left: 0.55rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--bs-secondary-color, #6b7280);
+            font-size: 0.8rem;
+        }
+        input {
+            width: 14rem;
+            padding-left: 1.7rem;
+        }
+    }
+    .o_dwo_arc_note {
+        border-radius: 0;
+        padding: 0.35rem 1rem;
+        font-size: 0.8125rem;
+    }
+    .o_dwo_arc_empty {
+        padding: 1rem;
+        text-align: center;
+    }
+}
+
+.o_dwo_tree {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    font-size: 0.875rem;
+
+    .o_dwo_tree_head,
+    .o_dwo_tree_row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 6.5rem 10rem 2.25rem;
+        align-items: center;
+    }
+    .o_dwo_tree_head {
+        flex: 0 0 auto;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid var(--bs-border-color, #e5e7eb);
+        color: var(--bs-secondary-color, #6b7280);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        > .o_dwo_tree_col_name {
+            padding-left: 1rem;
+        }
+    }
+    .o_dwo_tree_scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
+    }
+    .o_dwo_tree_list {
+        position: relative;
+        outline: none;
+    }
+    .o_dwo_tree_row {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        cursor: pointer;
+        user-select: none;
+        outline: none;
+        &:hover {
+            background: var(--bs-tertiary-bg, #f3f4f6);
+            .o_dwo_tree_download {
+                visibility: visible;
+            }
+        }
+        &.o_dwo_tree_focused {
+            background: var(--bs-primary-bg-subtle, #e0ecf8);
+            box-shadow: inset 2px 0 0 var(--bs-primary, #1f5a96);
+        }
+        &.o_dwo_tree_muted .o_dwo_tree_name {
+            color: var(--bs-secondary-color, #6b7280);
+        }
+    }
+    .o_dwo_tree_col_name {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        min-width: 0;
+    }
+    .o_dwo_tree_chevron {
+        flex: 0 0 0.75rem;
+        width: 0.75rem;
+        text-align: center;
+        color: var(--bs-secondary-color, #6b7280);
+    }
+    .o_dwo_tree_icon {
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
+    }
+    .o_dwo_tree_name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .o_dwo_tree_folder .o_dwo_tree_name {
+        font-weight: 500;
+    }
+    .o_dwo_tree_count {
+        flex: 0 0 auto;
+        padding: 0 0.4rem;
+        border-radius: 0.6rem;
+        background: var(--bs-secondary-bg, #e5e7eb);
+        color: var(--bs-secondary-color, #6b7280);
+        font-size: 0.6875rem;
+    }
+    .o_dwo_tree_col_size,
+    .o_dwo_tree_col_date {
+        padding-right: 0.75rem;
+        color: var(--bs-secondary-color, #6b7280);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .o_dwo_tree_col_size {
+        text-align: right;
+    }
+    .o_dwo_tree_download {
+        visibility: hidden;
+        padding: 0 0.4rem;
+    }
+}

@@ -1,0 +1,126 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #14304F;">Secure Archive Preview: ZIP, RAR, 7Z, TAR</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #14304F;">Browse archives in Odoo without extracting them.</p>
+        <p class="mb-4" style="font-size: 15px;">See what is inside a zip, rar, 7z or tar file as a folder tree, then open any file inside in place.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Click an archive in the chatter or in a file field: its folders and files appear as a tree, with sizes and dates. Click a file and it opens on top with the preview engines you have, or download just that file. A zip inside the archive opens the same way, level after level. The archive is read on your Odoo server and never extracted to disk. Works with the free <strong>Secure Attachment Preview</strong> module, installed automatically.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: click an archive, Odoo checks the access rights and limits, the content is shown as a folder tree, any file inside opens in its own preview" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #14304F;">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Folder tree</h4>
+                    <p class="mb-0" style="font-size: 14px;">Folders first, natural order (file2 before file10), sizes, dates and a file count per folder. Expand, collapse and move with the keyboard.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Fast with huge archives</h4>
+                    <p class="mb-0" style="font-size: 14px;">Only the visible rows are drawn, so an archive of tens of thousands of files scrolls smoothly. Filter by name to find a file deep in a folder.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Open files inside</h4>
+                    <p class="mb-0" style="font-size: 14px;">PDF and pictures open with the free core; Word, Excel and PowerPoint with Secure Office Preview; emails with Secure Email Preview. Any file can be downloaded alone.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Safe by design</h4>
+                    <p class="mb-0" style="font-size: 14px;">Nothing is written to disk. Zip bombs and oversized files are refused, password protected files are marked, and Odoo access rights apply at every level.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Formats</h4>
+                    <p class="mb-0" style="font-size: 14px;"><code>zip</code>, <code>tar</code>, <code>tar.gz</code>, <code>tar.bz2</code>, <code>tar.xz</code>, <code>gz</code> with no extra installation; <code>rar</code> (files inside open when unrar is on the server); <code>7z</code> when the py7zr Python package is installed.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">No extra dependency required</h4>
+                    <p class="mb-0" style="font-size: 14px;">The module installs on any Odoo server. Optional tools add rar extraction and 7z; without them a clear message says what to install.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">An Archive as a Folder Tree</h2>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-archive-tree.png" alt="A zip archive shown as a folder tree with sizes and dates" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Any File Inside, Opened in Place</h2>
+    <div class="text-center mb-4">
+        <img src="screenshots/02-file-in-archive.png" alt="A spreadsheet from the archive opened in a second preview window" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">More Screens</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_arc_shots_nested" role="tab" aria-controls="dwo_ap_arc_shots_nested" aria-selected="true">Zip in a zip</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_arc_shots_filter" role="tab" aria-controls="dwo_ap_arc_shots_filter" aria-selected="false">Filter by name</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_arc_shots_nested" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/03-zip-in-zip.png" alt="A zip file inside the archive opened in its own window as a folder tree" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_arc_shots_filter" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/04-filter.png" alt="The tree filtered by name, showing only the matching files and their folders" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Is the archive extracted on the server?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Only the list of files is read; a file is decompressed in memory when you open or download it, and nothing is written to disk.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Can it open very large archives?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. The tree draws only the visible rows, so tens of thousands of files scroll smoothly. Up to 100 000 entries are listed.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Do I need to install anything for rar and 7z?</h4>
+        <p class="mb-0" style="font-size: 14px;">Not to install the module. RAR archives are always listed; opening a compressed file inside needs unrar on the server. 7z archives need the py7zr Python package. Without them, a message says what to install.</p>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> zip preview, preview zip, zip viewer, open zip, rar preview, preview rar, rar viewer, open rar, 7z preview, 7z viewer, tar preview, tar.gz viewer, archive preview, archive viewer, compressed file preview, zip file browser, file tree, folder tree</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #1F5A96;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #1F5A96;">See inside archives without downloading them.</p>
+        <p class="mb-2" style="font-size: 15px;">Zip, rar, 7z and tar files as a folder tree, with every file one click away. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
