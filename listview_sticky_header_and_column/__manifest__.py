@@ -1,9 +1,6 @@
 {
     'name': "List View Sticky Header & Freeze Column",
-    'summary': """
-        Fixed Header when scrolling vertically,
-        Fixed Column when scrolling horizontally.
-    """,
+    'summary': "Keep the list view header and first column visible while scrolling. Keywords: sticky header, fixed header, freeze header, freeze column, frozen column, sticky column, list view header, tree view header, fixed column, table header.",
     'description': """
         Fixed Header when scrolling vertically,
         Fixed Column when scrolling horizontally.
