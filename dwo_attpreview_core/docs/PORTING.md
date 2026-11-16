@@ -160,3 +160,23 @@ the tour exists in 18).
 
 - Check `fields.Json` (17+), `Dialog` / `CheckBox` props, the chatter `AttachmentList` (16 has the old messaging models),
   Settings `<app>/<block>/<setting>` (17+), inline `invisible="1"` (16 uses `attrs`), and `browser_size` again.
+
+## #79 - remote pictures through the server (mail 17.0.2.1.0)
+
+Ported from 19.0 `6f63ca6` + `23226fd` (mail 19.0.2.1.0, core `test_settings` and mail catalog).
+
+| File | 19.0 | 17.0 |
+|---|---|---|
+| `dwo_attpreview_mail/__manifest__.py` | `19.0.2.1.0` | `17.0.2.1.0` |
+| `dwo_attpreview_mail/controllers/main.py` | `/dwo_attpreview_mail/remote_settings` `type="jsonrpc"` | `type="json"` |
+| `dwo_attpreview_mail/static/src/js/mail_viewer.js` | `rpc` from `@web/core/network/rpc` | `this.rpc = useService("rpc")` |
+| `dwo_attpreview_mail/tests/test_engine.py` (tour) | `/odoo/res.partner/<id>` | `/web#id=..&model=res.partner&view_type=form` (same `fetch_picture` patch: no network) |
+
+Checked on 17 and unchanged: `parsers/remote.py` with urllib3 2.0.7 (17 venv, Python 3.12) and 1.26.5
+(`requirements.txt` for Python < 3.12): `HTTPSConnectionPool(server_hostname=, assert_hostname=, cert_reqs=)`,
+`response.read(n, decode_content=True)`, `release_conn()` (a real download, a redirect and a refused self-signed
+certificate were tried by hand outside the tests); Pillow 10.2 with WebP; `http.Stream(type="data", max_age=,
+etag=False, as_attachment=False)` (private cache; `nosniff` and `default-src 'none'` come from `set_csp` for pictures);
+the controller subclass of `AttPreviewController`; Settings `<block title= name=>` and `<setting id= string= help=>`;
+`fields.Boolean(config_parameter=)`; the new tour step (`:not(:contains())` is jQuery on 17, `run()` gets
+`this.anchor` from `tour_compat.js`).
