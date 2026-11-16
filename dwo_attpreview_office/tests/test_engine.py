@@ -68,6 +68,46 @@ def _variant(ext, sample=None):
     return buf.getvalue()
 
 
+# OpenDocument (#84): the templates are the samples with the template media type (in `mimetype` and in the manifest)
+ODF_TEMPLATES = {"ott": "odt", "ots": "ods", "otp": "odp"}
+ODF_MIMETYPES = {
+    "odt": "application/vnd.oasis.opendocument.text",
+    "ods": "application/vnd.oasis.opendocument.spreadsheet",
+    "odp": "application/vnd.oasis.opendocument.presentation",
+}
+ENCRYPTION_DATA = (
+    '<manifest:encryption-data manifest:checksum-type="SHA1/1K" manifest:checksum="AAAA">'
+    '<manifest:algorithm manifest:algorithm-name="Blowfish CFB" manifest:initialisation-vector="AAAA"/>'
+    '<manifest:key-derivation manifest:key-derivation-name="PBKDF2" manifest:iteration-count="1024" '
+    'manifest:salt="AAAA"/></manifest:encryption-data>')
+
+
+def _odf(base, template=False, encrypted=False, mimetype=None, stored_first=True):
+    """sample.<base> rewritten: as a template, with content.xml marked as encrypted in the manifest (what a document
+    saved with a password declares), another `mimetype`, or `mimetype` compressed and not first (re-zipped)."""
+    src = zipfile.ZipFile(io.BytesIO(_fixture("sample.%s" % base)))
+    media = ODF_MIMETYPES[base] + ("-template" if template else "")
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as out:
+        if not stored_first:
+            out.writestr("aaa.txt", b"first")
+        for info in src.infolist():
+            data = src.read(info.filename)
+            if info.filename == "mimetype":
+                data = (mimetype or media).encode()
+                out.writestr("mimetype", data, compress_type=zipfile.ZIP_STORED if stored_first else zipfile.ZIP_DEFLATED)
+                continue
+            if info.filename == "META-INF/manifest.xml":
+                text = data.decode().replace('"%s"' % ODF_MIMETYPES[base], '"%s"' % media)
+                if encrypted:
+                    needle = 'manifest:full-path="content.xml" manifest:media-type="text/xml"/>'
+                    assert needle in text
+                    text = text.replace(needle, needle[:-2] + ">" + ENCRYPTION_DATA + "</manifest:file-entry>")
+                data = text.encode()
+            out.writestr(info.filename, data)
+    return buf.getvalue()
+
+
 def _zip(entries, level=1):
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED, compresslevel=level) as z:
@@ -94,13 +134,15 @@ class TestOfficeEngine(TransactionCase):
 
     def test_01_registered_client_side(self):
         self.assertEqual(set(self.engine._dwo_engine_extensions), {
-            "xlsx", "docx", "pptx", "doc", "xls", "ppt", "csv", "tsv"} | set(VARIANT_TYPES))
+            "xlsx", "docx", "pptx", "doc", "xls", "ppt", "csv", "tsv",
+            "odt", "ods", "odp", "ott", "ots", "otp"} | set(VARIANT_TYPES))
         self.assertEqual(self.engine._dwo_engine_output, "text")
-        for name in ("a.xlsx", "A.DOCX", "b.pptx", "a.xls", "a.DOC", "a.ppt", "a.csv", "a.TSV"):
+        for name in ("a.xlsx", "A.DOCX", "b.pptx", "a.xls", "a.DOC", "a.ppt", "a.csv", "a.TSV", "a.odt", "A.ODS",
+                     "a.odp", "a.ott", "a.ots", "a.otp"):
             found = self.Engines._dwo_find_engine(name)
             self.assertIsNotNone(found, name)
             self.assertEqual(found._dwo_engine_code, "office", name)
-        for name in ("a.ods", "a.xlsb", "a.rtf", "a.txt", "a.odt", "a.odp", "a.pages"):  # out of scope
+        for name in ("a.xlsb", "a.rtf", "a.txt", "a.odg", "a.odf", "a.fodt", "a.pages"):  # out of scope
             found = self.Engines._dwo_find_engine(name)
             self.assertTrue(found is None or found._dwo_engine_code != "office", name)
 
@@ -276,6 +318,56 @@ class TestOfficeEngine(TransactionCase):
         for ext in VARIANT_TYPES:
             self.assertFalse(self.engine._dwo_engine_notice(ext), ext)
 
+    def test_23_opendocument_accepted_with_its_family(self):
+        # odt/ods/odp and the templates: a zip whose `mimetype` names the family; the viewer gets odt/ods/odp
+        for base in ("odt", "ods", "odp"):
+            rec = self._render("sample.%s" % base, _fixture("sample.%s" % base))
+            self.assertFalse(rec.error, base)
+            self.assertEqual(base64.b64decode(rec.data).decode(), base)
+        for ext, base in ODF_TEMPLATES.items():
+            rec = self._render("template.%s" % ext.upper(), _odf(base, template=True))
+            self.assertFalse(rec.error, ext)
+            self.assertEqual(base64.b64decode(rec.data).decode(), base, ext)
+            # a document saved with the template extension (and the other way round) is still the same family
+            self.assertEqual(self.engine._dwo_render(_fixture("sample.%s" % base), "x." + ext)["data"], base)
+            self.assertEqual(self.engine._dwo_render(_odf(base, template=True), "x." + base)["data"], base)
+        # re-zipped by a general archiver: `mimetype` compressed and not the first part (the add-on reads it too)
+        self.assertEqual(self.engine._dwo_render(_odf("ods", stored_first=False), "a.ods")["data"], "ods")
+        # the server does not decrypt: an encrypted package passes here and the browser refuses it
+        self.assertEqual(self.engine._dwo_render(_odf("odt", encrypted=True), "a.odt")["data"], "odt")
+        # no warning banner (not a legacy format)
+        for ext in ("odt", "ods", "odp", "ott", "ots", "otp"):
+            self.assertFalse(self.engine._dwo_engine_notice(ext), ext)
+
+    def test_24_opendocument_refused_with_the_extension(self):
+        cases = (
+            ("odt", _fixture("sample.ods"), "another kind of OpenDocument"),  # a spreadsheet named .odt
+            ("otp", _fixture("sample.odt"), "another kind of OpenDocument"),
+            ("ods", _odf("ods", mimetype="application/vnd.oasis.opendocument.graphics"), "another kind"),
+            ("odp", _odf("odp", mimetype="text/plain"), "ODP"),
+            ("odt", _fixture("sample.docx"), "mimetype part is missing"),  # a Word file named .odt
+            ("ods", _zip([("mimetype", b"x" * 200)]), "mimetype part is missing"),  # too long to be a media type
+            ("ods", _odf("ods")[:300], "damaged"),
+            ("ott", b"", "empty"),
+            ("odt", b"<html>not a document</html>", "ODT"),
+            ("ods", _fixture("legacy_sample.xls"), "ODS"),
+        )
+        for ext, raw, needle in cases:
+            with self.assertRaises(UserError, msg=ext) as cm:
+                self.engine._dwo_render(raw, "x." + ext)
+            self.assertIn(needle, str(cm.exception), ext)
+        # through the Core: an error, no data, no traceback
+        rec = self._render("fake.odt", _fixture("sample.xlsx"))
+        self.assertTrue(rec.error)
+        self.assertFalse(rec.data)
+        self.assertNotIn("Traceback", rec.error)
+
+    def test_25_opendocument_zip_limits(self):
+        raw = _zip([("mimetype", ODF_MIMETYPES["ods"].encode()), ("content.xml", b"\0" * (129 * 1024 * 1024))], level=9)
+        self.assertIn("too large once unpacked", self._render("bomb.ods", raw).error)
+        raw = _zip([("mimetype", ODF_MIMETYPES["odt"].encode())] + [("f%d" % i, b"") for i in range(20001)])
+        self.assertIn("too many parts", self._render("many.odt", raw).error)
+
     def test_10_direct_render_errors_are_user_errors(self):
         with self.assertRaises(UserError):
             self.Model._dwo_render(b"nope", "a.docx")
@@ -366,6 +458,19 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
             self.assertEqual((res["mode"], res["engine"], res["content"]), ("rendered", "office", content), name)
             self.assertFalse(res["notice"], name)
 
+    def test_02e_info_without_notice_for_opendocument(self):
+        self.authenticate("admin", "admin")
+        for name, raw, content in (("a.odt", _fixture("sample.odt"), "odt"), ("a.ods", _fixture("sample.ods"), "ods"),
+                                   ("a.odp", _fixture("sample.odp"), "odp"), ("a.ott", _odf("odt", True), "odt"),
+                                   ("a.ots", _odf("ods", True), "ods"), ("a.otp", _odf("odp", True), "odp")):
+            _p, att = self._att(name, raw)
+            res = self.make_jsonrpc_request("/dwo_attpreview/info", {"attachment_id": att.id})
+            self.assertEqual((res["mode"], res["engine"], res["content"]), ("rendered", "office", content), name)
+            self.assertFalse(res["notice"], name)
+            self.assertEqual(res.get("width"), "wide", name)
+            res = self.url_open("/dwo_attpreview_office/file/%d" % att.id)
+            self.assertEqual((res.status_code, res.content), (200, raw), name)
+
     def test_02c_info_carries_the_notice(self):
         self.authenticate("admin", "admin")
 
@@ -398,17 +503,22 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
         self.assertEqual(mjs.status_code, 200)
         self.assertIn("javascript", mjs.headers["Content-Type"])
         # the legacy add-on: modules, wasm, shared chunk and the companion runtime next to them
-        for name in ("doc.mjs", "xls.mjs", "ppt.mjs", "internal-companion.mjs", "legacy-source-Dds5PgNt.js",
-                     "legacy-doc-source-module.mjs", "legacy-xls-source-module.mjs", "legacy-ppt-source-module.mjs"):
+        # and the OpenDocument add-on (#84): same companion runtime
+        for name in ("doc.mjs", "xls.mjs", "ppt.mjs", "internal-companion.mjs", "legacy-source-CFRuXN53.js",
+                     "legacy-doc-source-module.mjs", "legacy-xls-source-module.mjs", "legacy-ppt-source-module.mjs",
+                     "odt.mjs", "ods.mjs", "odp.mjs", "odf-source-CcsC38G5.js", "odt-source-module.mjs",
+                     "ods-source-module.mjs", "odp-source-module.mjs"):
             res = self.url_open(base + "lib/silurus/" + name)
             self.assertEqual(res.status_code, 200, name)
             self.assertNotIn("@silurus/", res.text.replace("@silurus/ooxml ", ""), name)  # no bare import
-        for name in ("legacy_doc_direct_bg.wasm", "legacy_xls_direct_bg.wasm", "legacy_ppt_direct_bg.wasm"):
+        for name in ("legacy_doc_direct_bg.wasm", "legacy_xls_direct_bg.wasm", "legacy_ppt_direct_bg.wasm",
+                     "opendocument_odt_bg.wasm", "opendocument_ods_bg.wasm", "opendocument_odp_bg.wasm"):
             res = self.url_open(base + "lib/silurus/" + name)
             self.assertEqual(res.headers["Content-Type"], "application/wasm", name)
             self.assertEqual(res.content[:4], b"\0asm")
         # not served: licence and notices of the add-on
         self.assertEqual(self.url_open(base + "lib/silurus/LICENSE.ooxml-legacy-office").status_code, 404)
+        self.assertEqual(self.url_open(base + "lib/silurus/LICENSE.ooxml-opendocument").status_code, 404)
         html = self.url_open(base + "viewer/viewer.html")
         self.assertEqual(html.status_code, 200)
         csp = html.headers["Content-Security-Policy"]
@@ -432,8 +542,12 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
     def test_03c_viewer_passes_the_legacy_options(self):
         with open(file_path("%s/static/viewer/viewer.js" % MODULE)) as f:
             js = f.read()
-        for needle in ("legacyDoc", "legacyXls", "legacyPpt", "maxInputBytes", "doc.mjs", "xls.mjs", "ppt.mjs"):
+        for needle in ("legacyDoc", "legacyXls", "legacyPpt", "maxInputBytes", "doc.mjs", "xls.mjs", "ppt.mjs",
+                       "createOdt", "createOds", "createOdp", "odt.mjs", "ods.mjs", "odp.mjs"):
             self.assertIn(needle, js)
+        # silurus 0.90: any value of the deprecated useGoogleFonts logs a warning; no `fonts` source = no web font
+        self.assertNotIn("useGoogleFonts", js)
+        self.assertNotIn("googleFonts", js)
 
     def test_03d_find_bar_in_the_viewer(self):
         # search bar and magnifier button; the library search API, not the browser's find (the page is canvas)
@@ -533,6 +647,37 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
     def test_51_tour_find_in_xlsm(self):
         # search works the same in a variant (the xlsm viewer is the xlsx one)
         self._tour("find_xlsx", "macros.xlsm", _variant("xlsm"))
+
+    # OpenDocument (#84): drawn by the viewer of its family, no banner, fills the dialog; search works the same
+    def test_70_tour_odt(self):
+        self._tour("odt", "notes.odt", _fixture("sample.odt"))
+
+    def test_71_tour_ods(self):
+        self._tour("ods", "sales.ods", _fixture("sample.ods"))
+
+    def test_72_tour_odp(self):
+        self._tour("odp", "deck.odp", _fixture("sample.odp"))
+
+    def test_73_tour_ott(self):
+        self._tour("ott", "notes.ott", _odf("odt", template=True))
+
+    def test_74_tour_ots(self):
+        self._tour("ots", "sales.ots", _odf("ods", template=True))
+
+    def test_75_tour_otp(self):
+        self._tour("otp", "deck.otp", _odf("odp", template=True))
+
+    def test_76_tour_find_odt(self):
+        self._tour("find_odt", "notes.odt", _fixture("sample.odt"))
+
+    def test_77_tour_find_ods(self):
+        self._tour("find_ods", "sales.ods", _fixture("sample.ods"))
+
+    def test_78_tour_find_odp(self):
+        self._tour("find_odp", "deck.odp", _fixture("sample.odp"))
+
+    def test_79_tour_odf_refused_by_the_viewer_shows_download(self):
+        self._tour("odf_refused", "locked.odt", _odf("odt", encrypted=True))
 
     def test_36_tour_find_legacy_xls(self):
         self._tour("find_legacy_xls", "old.xls", _fixture("legacy_sample.xls"))

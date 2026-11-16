@@ -45,6 +45,22 @@ async function legacyOption(kind) {
     return { [spec.option]: addon[spec.factory]({ maxInputBytes: LEGACY_MAX_INPUT_BYTES }) };
 }
 
+// OpenDocument (LibreOffice, ODF 1.3) is read by the optional silurus OpenDocument add-on into the DOCX / XLSX / PPTX
+// models, so the usual viewers draw it. Loaded only when such a file is opened (WebAssembly reader of about 1.2-1.5 MB,
+// started in the parser Worker). The factories take only { moduleUrl, wasmUrl }: the defaults point next to the
+// module, i.e. the asset route of this module. The server sends odt/ods/odp also for the templates ott/ots/otp.
+const OPENDOCUMENT = {
+    odt: { target: "docx", module: "../lib/silurus/odt.mjs", factory: "createOdt", option: "odt" },
+    ods: { target: "xlsx", module: "../lib/silurus/ods.mjs", factory: "createOds", option: "ods" },
+    odp: { target: "pptx", module: "../lib/silurus/odp.mjs", factory: "createOdp", option: "odp" },
+};
+
+async function openDocumentOption(kind) {
+    const spec = OPENDOCUMENT[kind];
+    const addon = await import(spec.module);
+    return { [spec.option]: addon[spec.factory]() };
+}
+
 // csv / tsv: delimited text drawn by XlsxSheetViewer (every cell stays text: no type or formula guessing).
 // A larger limit than the library default (100000 rows, 250000 cells) so that a 100k-line export still opens;
 // above it the library refuses and the user gets the short message and Download. UTF-8 only (BOM removed here).
@@ -385,11 +401,15 @@ window.addEventListener("message", (e) => {
 
 async function open(data) {
     kind = data.kind;
-    // No call to the outside, no Google Fonts, no hyperlink navigation.
-    const opts = { useGoogleFonts: false, enableHyperlinks: false };
-    const target = LEGACY[kind] ? LEGACY[kind].target : kind;
+    // No call to the outside, no hyperlink navigation. No `fonts` source is given, so no web font is requested
+    // (silurus 0.90 deprecated its old Google Fonts switch: any value of it, even false, logs a warning).
+    const opts = { enableHyperlinks: false };
+    const addon = LEGACY[kind] || OPENDOCUMENT[kind];
+    const target = addon ? addon.target : kind;
     if (LEGACY[kind]) {
         Object.assign(opts, await legacyOption(kind));
+    } else if (OPENDOCUMENT[kind]) {
+        Object.assign(opts, await openDocumentOption(kind));
     }
     let layout;
     if (kind === "csv" || kind === "tsv") {

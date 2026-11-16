@@ -5,7 +5,10 @@ import { registry } from "@web/core/registry";
 
 // Old binary formats: opened with limited support; a failure shows a short message and a Download button
 const LEGACY_KINDS = ["doc", "xls", "ppt"];
+// Delimited text and OpenDocument (the server sends odt/ods/odp also for ott/ots/otp): no warning banner, but a file
+// the viewer cannot read also gets the short message and Download (the reason stays in the console)
 const TEXT_KINDS = ["csv", "tsv"];
+const OPENDOCUMENT_KINDS = ["odt", "ods", "odp"];
 const LEGACY_LOAD_TIMEOUT_MS = 90000;
 const VIEWER_URL = "/dwo_attpreview_office/asset/viewer/viewer.html";
 
@@ -61,9 +64,13 @@ export class OfficeViewer extends Component {
         return TEXT_KINDS.includes(this.props.content);
     }
 
-    /** Legacy and delimited-text files: a short message, the reason stays in the console. */
+    get isOpenDocument() {
+        return OPENDOCUMENT_KINDS.includes(this.props.content);
+    }
+
+    /** Legacy, delimited-text and OpenDocument files: a short message, the reason stays in the console. */
     get isShortError() {
-        return this.isLegacy || this.isText;
+        return this.isLegacy || this.isText || this.isOpenDocument;
     }
 
     /** The technical detail only goes to the console; a legacy file just gets a short message and Download. */
