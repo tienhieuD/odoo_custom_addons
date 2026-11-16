@@ -16,7 +16,6 @@
     "depends": ["dwo_attpreview_core"],
     "assets": {
         "web.assets_backend": [
-            "dwo_attpreview_archive/static/lib/tree_libs/tree_libs.min.js",
             "dwo_attpreview_archive/static/src/js/*.js",
             "dwo_attpreview_archive/static/src/xml/*.xml",
             "dwo_attpreview_archive/static/src/scss/*.scss",

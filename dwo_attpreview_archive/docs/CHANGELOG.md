@@ -1,5 +1,10 @@
 # CHANGELOG - dwo_attpreview_archive
 
+## 2026-11-17 - the tree view comes from the core (#83)
+
+- Same as 19.0: `DwoTreeView`, its template, styles and `tree_libs` moved to `dwo_attpreview_core` 18.0.1.3.0; the viewer
+  imports `@dwo_attpreview_core/js/tree_view`. No version change of the module (needs core 18.0.1.3.0).
+
 ## 2026-11-16 - 18.0.1.0.0 - 18.0 port of 19.0.1.0.0 (#82)
 
 - Same features and behaviour as 19.0.1.0.0 (entry below), engine of Secure Attachment Preview core 18.0.1.2.0.
