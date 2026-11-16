@@ -10,7 +10,7 @@
     """,
     'website': 'https://duotek.io.vn',
     'support': 'hello@duotek.io.vn',
-    'author': "DUO-TEK Software Vietnam",
+    'author': "DuoTEK",
     'license': 'OPL-1',
     # 'website': "https://www.nissho-vn.com/en/",
     # Categories can be used to filter modules in modules listing

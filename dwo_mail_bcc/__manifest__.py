@@ -4,7 +4,7 @@
     "version": "12.0.1.1.0",
     "summary": "Cc, Bcc and Reply-To in the Odoo composer, on templates and on outgoing emails. Bcc stays hidden.",
     "description": "Adds Cc, Bcc and Reply-To to the full composer (Send message), and shows them on outgoing emails and in the message log. Bcc recipients receive the email, but their addresses never appear in any header seen by other recipients. Cc is written in the headers and gets one copy. Reply-To sends the answers to the address you choose, with a check that it is one valid address. Templates have a Bcc field. Requires only the standard mail module.",
-    "author": "DUO-TEK Software Vietnam",
+    "author": "DuoTEK",
     "website": "https://duotek.io.vn",
     "support": "hello@duotek.io.vn",
     "category": "Productivity/Discuss",
