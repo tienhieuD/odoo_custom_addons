@@ -1,0 +1,36 @@
+From: Duotek
+Subject: [PATCH 0003] xlsx find: highlight only the visible matches, append the boxes at once
+
+@silurus/ooxml 0.89.11 (dist/xlsx-BGxOngVB.js, class of the XLSX find overlay, updateOverlay()). After a search,
+every match of the current sheet got an absolutely positioned <div>, appended one by one, and cellRect() reads the
+layout (canvasArea.clientWidth) for each match: the browser recomputes the layout after every append, so the time
+grows with the square of the match count (11,112 matches in a 100,000-row sheet: 70 s for findText, 37 s more for
+findNext; 100,000 matches: the page hangs). The overlay is rebuilt on every scroll as well.
+The patch skips the matches outside the visible area (no box; their cell is not drawn anyway) and appends the boxes
+through one DocumentFragment. Measured after the patch: 11,112 matches 1.1 s, 100,000 matches 1.0 s.
+Apply from static/lib/silurus/ with: patch -p1 < 0003-...patch   (paths below are a/ b/ relative)
+
+---
+--- a/xlsx-BGxOngVB.js
++++ b/xlsx-BGxOngVB.js
+@@ -2918,14 +2918,18 @@
+ 		let t = this.host.worksheet();
+ 		if (!t) return;
+ 		let n = this.host.scale(), r = (e) => Math.round(e * n), i = r(50), a = r(22), o = t.freezeRows ?? 0, s = t.freezeCols ?? 0, c = z(t).roundedFrozenExtent(n), l = i + c.width, u = a + c.height, d = this.host.highlightColors(), f = fi(!1, d), p = fi(!0, d);
++		// [dwo patch 0003] only the cells inside the visible area get a highlight box, and the boxes are appended at once
++		// (appending one by one while cellRect() reads the layout made thousands of matches quadratic: minutes).
++		let W = e.find.clientWidth || Infinity, H = e.find.clientHeight || Infinity, F = this.host.ownerDocument.createDocumentFragment();
+ 		for (let t of this.controller.sheetHighlights(this.host.currentSheet())) {
+ 			let n = this.host.cellRect(t.row, t.col);
+ 			if (!n) continue;
+ 			let { x: r, y: c, w: d, h: m } = n;
+-			if (r < i && (d -= i - r, r = i), c < a && (m -= a - c, c = a), t.col > s && r < l && (d -= l - r, r = l), t.row > o && c < u && (m -= u - c, c = u), d <= 0 || m <= 0) continue;
++			if (r < i && (d -= i - r, r = i), c < a && (m -= a - c, c = a), t.col > s && r < l && (d -= l - r, r = l), t.row > o && c < u && (m -= u - c, c = u), d <= 0 || m <= 0 || r >= W || c >= H) continue;
+ 			let h = this.host.screenX(r, d), { border: g, background: _ } = t.active ? p : f, v = this.host.ownerDocument.createElement("div");
+-			v.style.cssText = `position:absolute;left:${h}px;top:${c}px;width:${d}px;height:${m}px;box-sizing:border-box;border:${g};background:${_};pointer-events:none;`, e.appendFind(v);
++			v.style.cssText = `position:absolute;left:${h}px;top:${c}px;width:${d}px;height:${m}px;box-sizing:border-box;border:${g};background:${_};pointer-events:none;`, F.appendChild(v);
+ 		}
++		e.appendFind(F);
+ 	}
+ 	async find(e, t = {}) {
+ 		if (!this.host.workbook()) return [];
