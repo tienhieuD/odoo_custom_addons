@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import base64
+import html as html_lib
 import re
 
 from lxml import etree
@@ -16,6 +17,10 @@ from ..parsers import MailParseError, parse_email, parse_ics, parse_vcf
 CID_SRC = re.compile(r"""(src\s*=\s*)(["']?)cid:([^"'\s>]+)\2""", re.I)
 # what a sanitized body may still load from outside: pictures, sources sets, backgrounds, CSS url()
 REMOTE_ATTR = re.compile(r"""\s(?:src|srcset|background|poster|lowsrc|dynsrc)\s*=\s*(["'])(?!data:)[^"']+\1""", re.I)
+# a remote picture of the body (after html_sanitize, attributes are double quoted): loaded through the server (#79)
+REMOTE_IMG = re.compile(r"""<img\b([^>]*?)\ssrc="(https?://[^"]+)"([^>]*)>""", re.I)
+SRCSET = re.compile(r'\ssrcset="[^"]*"', re.I)
+MAX_REMOTE_IMAGES = 100
 IMG_WITHOUT_SRC = re.compile(r"""<img\b(?![^>]*\ssrc\s*=\s*["']data:)[^>]*>""", re.I)
 CSS_URL = re.compile(r"""url\(\s*(['"]?)(?!data:)[^)]*\1\s*\)""", re.I)
 # email HTML colours cells with bgcolor="" and "background: #fff" shorthands; html_sanitize keeps only
@@ -79,7 +84,7 @@ class AttPreviewEngineMail(models.AbstractModel):
     _dwo_engine_extensions = ("eml", "emlx", "msg", "oft", "ics", "vcf")
     _dwo_engine_output = "json"
     _dwo_engine_priority = 10
-    _dwo_engine_version = "2"
+    _dwo_engine_version = "3"
     _dwo_engine_dialog_width = "medium"  # an email or a card reads better in a narrower window
 
     # --- engine API ---------------------------------------------------------
@@ -113,7 +118,7 @@ class AttPreviewEngineMail(models.AbstractModel):
             raise UserError(_("This file is not a readable email, or it is damaged."))
 
     def _dwo_mail_result(self, mail):
-        body, used_cids, remote = self._dwo_mail_body(mail)
+        body, used_cids, remote, remote_images = self._dwo_mail_body(mail)
         attachments = [
             {"index": i, "name": a["name"], "mimetype": a["mimetype"], "size": len(a["data"] or b"")}
             for i, a in enumerate(mail["attachments"])
@@ -127,17 +132,29 @@ class AttPreviewEngineMail(models.AbstractModel):
             "body_html": body,
             "body_text": "" if body else (mail.get("text") or ""),
             "remote_blocked": remote,
+            # pictures of the body hosted on the internet: <img data-dwo-remote="N" hidden ...> in body_html,
+            # loaded by the viewer through /dwo_attpreview_mail/remote_image (never by the browser itself)
+            "remote_images": len(remote_images),
+            "remote_insecure": sum(1 for url in remote_images if not url.lower().startswith("https:")),
             "attachments": attachments,
         }
+
+    def _dwo_remote_images(self, content, filename):
+        """URLs of the remote pictures of the body, in the order of their ``data-dwo-remote`` index."""
+        if self._dwo_ext(filename) in ("ics", "vcf"):
+            return []
+        return self._dwo_mail_body(self._dwo_mail_parse(content, filename))[3]
 
     def _dwo_mail_body(self, mail):
         """The HTML body, safe to show in the sandboxed frame of the viewer: pictures of the email (``cid:``)
         become ``data:`` URIs, Odoo's ``html_sanitize`` removes scripts, event handlers, forms and unsafe
-        styles, then every remaining reference to an outside resource is removed (tracking pixels, remote
-        pictures and CSS). Returns ``(html, content ids used, whether something remote was removed)``."""
+        styles. Each remaining ``<img>`` hosted on the internet loses its address and becomes
+        ``<img data-dwo-remote="N" hidden ...>`` (the viewer loads it through the server); every other reference
+        to an outside resource (source sets, backgrounds, CSS ``url()``) is removed.
+        Returns ``(html, content ids used, whether something remote was found, remote picture URLs)``."""
         html = mail.get("html")
         if not html:
-            return "", set(), False
+            return "", set(), False, []
         images, total = {}, 0
         for att in mail["attachments"]:
             cid, data = att.get("content_id"), att.get("data") or b""
@@ -158,8 +175,19 @@ class AttPreviewEngineMail(models.AbstractModel):
         html = _keep_backgrounds(html)
         html = str(html_sanitize(html, sanitize_attributes=True, sanitize_style=True, sanitize_form=True,
                                  strip_classes=False))
-        cleaned = REMOTE_ATTR.sub("", html)
+        remote_urls = []
+
+        def mark(match):
+            if len(remote_urls) >= MAX_REMOTE_IMAGES:
+                return ""
+            remote_urls.append(html_lib.unescape(match.group(2)))
+            rest = SRCSET.sub("", match.group(1) + match.group(3))
+            return '<img data-dwo-remote="%d" hidden%s>' % (len(remote_urls) - 1, rest)
+
+        marked = REMOTE_IMG.sub(mark, html)
+        cleaned = REMOTE_ATTR.sub("", marked)
         cleaned = CSS_URL.sub("none", cleaned)
-        remote = cleaned != html
-        cleaned = IMG_WITHOUT_SRC.sub("", cleaned)  # a blocked picture would show as a broken image
-        return cleaned, used, remote
+        remote = bool(remote_urls) or cleaned != marked
+        cleaned = IMG_WITHOUT_SRC.sub(
+            lambda m: m.group(0) if "data-dwo-remote=" in m.group(0) else "", cleaned)  # no broken pictures
+        return cleaned, used, remote, remote_urls
