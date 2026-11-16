@@ -2,72 +2,163 @@
 # Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import base64
 import re
-from email import policy
-from email.parser import BytesParser
+
+from lxml import etree
+from lxml import html as lxml_html
 
 from odoo import models
-from odoo.addons.dwo_attpreview_core.tools import esc, table_html
+from odoo.exceptions import UserError
+from odoo.tools.mail import html_sanitize
 
-REMOTE_SRC = re.compile(r"""\s(src|background|srcset)\s*=\s*(["'])\s*(?:https?:)?//[^"']*\2""", re.I)
-CID_SRC = re.compile(r"""src\s*=\s*(["'])cid:([^"']+)\1""", re.I)
-CSS_URL = re.compile(r"""url\(\s*['"]?\s*(?:https?:)?//[^)]*\)""", re.I)
+from ..parsers import MailParseError, parse_email, parse_ics, parse_vcf
+
+CID_SRC = re.compile(r"""(src\s*=\s*)(["']?)cid:([^"'\s>]+)\2""", re.I)
+# what a sanitized body may still load from outside: pictures, sources sets, backgrounds, CSS url()
+REMOTE_ATTR = re.compile(r"""\s(?:src|srcset|background|poster|lowsrc|dynsrc)\s*=\s*(["'])(?!data:)[^"']+\1""", re.I)
+IMG_WITHOUT_SRC = re.compile(r"""<img\b(?![^>]*\ssrc\s*=\s*["']data:)[^>]*>""", re.I)
+CSS_URL = re.compile(r"""url\(\s*(['"]?)(?!data:)[^)]*\1\s*\)""", re.I)
+# email HTML colours cells with bgcolor="" and "background: #fff" shorthands; html_sanitize keeps only
+# background-color: turn them into it first (white text on a coloured header would become invisible otherwise)
+BACKGROUND = re.compile(r"(?<![-\w])background\s*:\s*([^;]+)", re.I)
+COLOR = re.compile(r"#[0-9a-f]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)|\b[a-z]{3,20}\b", re.I)
+NOT_COLORS = {"url", "none", "repeat", "no", "center", "top", "left", "right", "bottom", "fixed", "scroll",
+              "inherit", "initial", "unset", "cover", "contain", "auto", "padding", "border", "content", "local",
+              "space", "round", "box", "x", "y"}
+MAX_INLINE_IMAGE = 3 * 1024 * 1024
+MAX_INLINE_TOTAL = 15 * 1024 * 1024
+
+
+def _clean(value):
+    """JSON-safe text: lone surrogates (damaged UTF-16) and NUL characters replaced."""
+    if isinstance(value, str):
+        return value.encode("utf-8", "replace").decode("utf-8").replace("\x00", "")
+    if isinstance(value, dict):
+        return {k: _clean(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_clean(v) for v in value]
+    return value
+
+
+def _background_color(match):
+    for token in COLOR.findall(re.sub(r"url\([^)]*\)", " ", match.group(1))):
+        if token.split("(")[0].lower() not in NOT_COLORS and not token.lower().startswith(("repeat", "no-")):
+            return "background-color:%s" % token
+    return ""
+
+
+def _keep_backgrounds(html):
+    """``bgcolor`` attributes and ``background`` shorthands -> ``background-color`` (see BACKGROUND)."""
+    try:
+        doc = lxml_html.document_fromstring(html)
+    except (etree.ParserError, ValueError):
+        return html
+    changed = False
+    for el in doc.iter():
+        if not isinstance(el.tag, str):
+            continue
+        style = el.get("style") or ""
+        bgcolor = (el.attrib.pop("bgcolor", None) or "").strip()
+        if bgcolor and COLOR.fullmatch(bgcolor):
+            style = "background-color:%s;%s" % (bgcolor, style)
+        if "background" in style.lower():
+            style = BACKGROUND.sub(_background_color, style)
+        if style != (el.get("style") or ""):
+            el.set("style", style)
+            changed = True
+    return lxml_html.tostring(doc, encoding="unicode") if changed else html
 
 
 class AttPreviewEngineMail(models.AbstractModel):
     _name = "dwo.attpreview.engine.mail"
     _inherit = "dwo.attpreview.engine"
-    _description = "Attachment Preview Engine: mail"
+    _description = "Attachment Preview Engine: email"
 
     _dwo_engine_code = "mail"
-    _dwo_engine_label = "Email, calendar, vCard"
-    _dwo_engine_extensions = ("eml", "ics", "vcf")
-    _dwo_engine_output = "html"
+    _dwo_engine_label = "Email (EML, MSG), calendar (ICS), contact (VCF)"
+    _dwo_engine_extensions = ("eml", "emlx", "msg", "oft", "ics", "vcf")
+    _dwo_engine_output = "json"
     _dwo_engine_priority = 10
+    _dwo_engine_version = "2"
+    _dwo_engine_dialog_width = "medium"  # an email or a card reads better in a narrower window
 
+    # --- engine API ---------------------------------------------------------
     def _dwo_render(self, content, filename):
-        ext = filename.rsplit(".", 1)[-1].lower()
-        if ext == "eml":
-            return {"type": "html", "data": self._eml(content)}
-        text = content.decode("utf-8", "replace")
-        unfolded = re.sub(r"\r?\n[ \t]", "", text)
-        rows = []
-        for line in unfolded.splitlines():
-            if ":" in line and not line.startswith(("BEGIN", "END")):
-                key, _, val = line.partition(":")
-                rows.append([key.split(";")[0], val.replace("\\n", "\n").replace("\\,", ",")])
-        return {"type": "html", "data": table_html(rows)}
+        ext = self._dwo_ext(filename)
+        if ext == "ics":
+            data = parse_ics(content)
+        elif ext == "vcf":
+            data = parse_vcf(content)
+        else:
+            data = self._dwo_mail_result(self._dwo_mail_parse(content, filename))
+        return {"type": "json", "data": _clean(data)}
 
-    def _eml(self, content):
-        msg = BytesParser(policy=policy.default).parsebytes(content)
-        head = "".join(
-            "<tr><th align='left'>%s</th><td>%s</td></tr>" % (esc(h), esc(str(msg.get(h, ""))))
-            for h in ("From", "To", "Cc", "Date", "Subject") if msg.get(h))
-        cids = {}
-        atts = []
-        for part in msg.walk():
-            if part.is_multipart():
-                continue
-            cid = (part.get("Content-ID") or "").strip("<>")
-            ctype = part.get_content_type()
-            if cid and ctype.startswith("image/"):
-                data = part.get_payload(decode=True) or b""
-                if len(data) < 5 * 1024 * 1024:
-                    cids[cid] = "data:%s;base64,%s" % (ctype, base64.b64encode(data).decode())
-            fn = part.get_filename()
-            if fn:
-                atts.append((fn, len(part.get_payload(decode=True) or b"")))
-        body_part = msg.get_body(preferencelist=("html", "plain"))
-        body = ""
-        if body_part is not None:
-            raw = body_part.get_content()
-            if body_part.get_content_type() == "text/html":
-                body = CID_SRC.sub(lambda m: 'src="%s"' % cids.get(m.group(2), ""), raw)
-                body = REMOTE_SRC.sub("", body)
-                body = CSS_URL.sub("none", body)
-            else:
-                body = "<pre style='white-space:pre-wrap'>%s</pre>" % esc(raw)
-        att_html = ""
-        if atts:
-            att_html = "<hr/><b>Attachments</b><ul>%s</ul>" % "".join(
-                "<li>%s (%d KB)</li>" % (esc(n), s // 1024) for n, s in atts)
-        return "<table style='font-family:sans-serif;font-size:13px'>%s</table><hr/>%s%s" % (head, body, att_html)
+    def _dwo_extract_part(self, content, filename, index):
+        if self._dwo_ext(filename) in ("ics", "vcf"):
+            return None
+        attachments = self._dwo_mail_parse(content, filename)["attachments"]
+        if not 0 <= index < len(attachments):
+            return None
+        return attachments[index]["name"], attachments[index]["data"]
+
+    # --- helpers --------------------------------------------------------------
+    @staticmethod
+    def _dwo_ext(filename):
+        return filename.rsplit(".", 1)[-1].lower() if "." in (filename or "") else ""
+
+    def _dwo_mail_parse(self, content, filename):
+        try:
+            return parse_email(content, filename)
+        except MailParseError:
+            raise UserError(self.env._("This file is not a readable email, or it is damaged."))
+
+    def _dwo_mail_result(self, mail):
+        body, used_cids, remote = self._dwo_mail_body(mail)
+        attachments = [
+            {"index": i, "name": a["name"], "mimetype": a["mimetype"], "size": len(a["data"] or b"")}
+            for i, a in enumerate(mail["attachments"])
+            if not (a.get("content_id") and a["content_id"] in used_cids)  # pictures shown in the body
+        ]
+        return {
+            "kind": "email",
+            "format": mail["format"],
+            "subject": mail["subject"], "from": mail["from"], "to": mail["to"], "cc": mail["cc"],
+            "bcc": mail["bcc"], "reply_to": mail["reply_to"], "date": mail["date"],
+            "body_html": body,
+            "body_text": "" if body else (mail.get("text") or ""),
+            "remote_blocked": remote,
+            "attachments": attachments,
+        }
+
+    def _dwo_mail_body(self, mail):
+        """The HTML body, safe to show in the sandboxed frame of the viewer: pictures of the email (``cid:``)
+        become ``data:`` URIs, Odoo's ``html_sanitize`` removes scripts, event handlers, forms and unsafe
+        styles, then every remaining reference to an outside resource is removed (tracking pixels, remote
+        pictures and CSS). Returns ``(html, content ids used, whether something remote was removed)``."""
+        html = mail.get("html")
+        if not html:
+            return "", set(), False
+        images, total = {}, 0
+        for att in mail["attachments"]:
+            cid, data = att.get("content_id"), att.get("data") or b""
+            if cid and att["mimetype"].startswith("image/") and att["mimetype"] != "image/svg+xml" \
+                    and len(data) <= MAX_INLINE_IMAGE and total + len(data) <= MAX_INLINE_TOTAL:
+                images[cid] = "data:%s;base64,%s" % (att["mimetype"], base64.b64encode(data).decode())
+                total += len(data)
+        used = set()
+
+        def inline(match):
+            cid = match.group(3)
+            if cid in images:
+                used.add(cid)
+                return '%s"%s"' % (match.group(1), images[cid])
+            return '%s""' % match.group(1)
+
+        html = CID_SRC.sub(inline, html)
+        html = _keep_backgrounds(html)
+        html = str(html_sanitize(html, sanitize_attributes=True, sanitize_style=True, sanitize_form=True,
+                                 strip_classes=False))
+        cleaned = REMOTE_ATTR.sub("", html)
+        cleaned = CSS_URL.sub("none", cleaned)
+        remote = cleaned != html
+        cleaned = IMG_WITHOUT_SRC.sub("", cleaned)  # a blocked picture would show as a broken image
+        return cleaned, used, remote
