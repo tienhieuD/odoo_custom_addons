@@ -1,7 +1,7 @@
 [
   {
     "module": "dwo_attpreview_office",
-    "name": "Secure Office Preview: DOCX, DOC, XLSX, XLS, PPTX, PPT, CSV, TSV",
+    "name": "Secure Office Preview: DOCX, XLSX, PPTX, ODT, ODS, ODP, DOC, XLS, PPT, CSV",
     "extensions": [
       "xlsx",
       "docx",
@@ -21,7 +21,13 @@
       "ppsx",
       "ppsm",
       "potx",
-      "potm"
+      "potm",
+      "odt",
+      "ods",
+      "odp",
+      "ott",
+      "ots",
+      "otp"
     ],
     "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_office"
   },
