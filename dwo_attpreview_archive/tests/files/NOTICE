@@ -1,0 +1,6 @@
+Test files of dwo_attpreview_archive
+
+rar5-subdirs.rar, rar3-comment-psw.rar and unicode.rar are unmodified copies of the test data of rarfile
+(https://github.com/markokr/rarfile, directory test/files), Copyright (c) 2005-2026 Marko Kreen, ISC license (see
+LICENSE-rarfile in this folder). RAR files cannot be written with free tools; these are used only by the automated
+tests. The zip, tar, gz and 7z samples of the tests are generated in tests/test_archive.py by this project.
