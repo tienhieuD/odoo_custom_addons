@@ -6,7 +6,7 @@
                     'compiled to native binaries. Requires the jprotect and pyzipper Python '
                     'packages, and a C compiler with Python headers on the server for Cython.',
     'category': 'Extra Tools',
-    'author': 'DUO-TEK Software Vietnam',
+    'author': 'DuoTEK',
     'website': 'https://duotek.io.vn',
     'license': 'OPL-1',
     'depends': ['base', 'base_setup', 'bus'],

@@ -4,7 +4,7 @@
     "version": "16.0.1.0.0",
     "summary": "A Send email button in the chatter: official emails with To, Cc, Bcc, reply-all defaults, quoted history, address book and autosaved drafts.",
     "description": "Adds a Send email button next to Send message. It opens an inline form with From, To, Cc, Bcc, subject, body, attachments and templates. Recipients are address badges with suggestions from users, partners and previously typed addresses. Replies default to reply-all, the previous email is quoted in the body, and the draft is saved automatically. Official emails are told apart from internal discussion in the thread. Requires dwo_mail_bcc.",
-    "author": "DUO-TEK Software Vietnam",
+    "author": "DuoTEK",
     "website": "https://duotek.io.vn",
     "support": "hello@duotek.io.vn",
     "category": "Productivity/Discuss",
