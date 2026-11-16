@@ -5,7 +5,7 @@
     "version": "18.0.1.1.0",
     "summary": "Preview attachments and file fields in a large dialog inside Odoo. Your documents never leave your Odoo server.",
     "description": "Core of the Attachment Preview family. Opens PDF, images, video and audio in a large preview dialog from the chatter and from file fields (binary, many2many_binary, attachment lists, kanban and many2one). Files that cannot be previewed show a short notice with a Download button. Provides the engine registry, render cache (lazy, auto-cleaned), access-checked controller and a Settings page where engine modules are ticked to be installed. No CDN, no external service: nothing is sent outside your server.",
-    "author": "DUO-TEK Software Vietnam",
+    "author": "DuoTEK",
     "website": "https://duotek.io.vn",
     "support": "hello@duotek.io.vn",
     "category": "Productivity/Documents",
