@@ -19,7 +19,7 @@ Features:
 - Settings > Split View switches the automatic mode on/off; a window action can opt out (No split view)
 - Explicit <split> views and debug menu entries to add / remove a custom split view on an action
     """,
-    'author': 'DUO-TEK Software Vietnam',
+    'author': 'DuoTEK',
     'website': 'https://duotek.io.vn',
     'support': 'hello@duotek.io.vn',
     'license': 'LGPL-3',
