@@ -17,6 +17,8 @@ eggs/
 lib/
 # the office viewer library is shipped with the module (vendored, patched): never ignore it
 !dwo_attpreview_office/static/lib/
+!dwo_attpreview_text/static/lib/
+!dwo_attpreview_core/static/lib/
 !dwo_attpreview_archive/static/lib/
 lib64/
 parts/
