@@ -19,7 +19,7 @@ NATIVE_MIMES = (
 NATIVE_PREFIXES = ("video/", "audio/")
 # files inside a file (/dwo_attpreview/part_info): how deep, how many, and the keys of a source_ref
 MAX_PART_DEPTH = 20  # an email in an email in an email...: far deeper than real mail, still bounded
-MAX_PART_INDEX = 10000
+MAX_PART_INDEX = 1_000_000  # an archive may list 100 000 files (dwo_attpreview_archive)
 SOURCE_KEYS = ("attachment_id", "model", "res_id", "field", "filename_field")
 
 

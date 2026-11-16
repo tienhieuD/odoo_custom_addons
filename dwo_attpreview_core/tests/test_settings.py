@@ -10,7 +10,7 @@ from odoo.tests import TransactionCase, tagged
 from .sample_engine import patch_sample_engine
 
 SETTINGS_FIELDS = {"dwo_attpreview_max_file_size_mb", "dwo_attpreview_engines",
-                   "module_dwo_attpreview_office", "module_dwo_attpreview_mail"}
+                   "module_dwo_attpreview_office", "module_dwo_attpreview_mail", "module_dwo_attpreview_archive"}
 REMOVED_FIELDS = ("dwo_attpreview_render_timeout", "dwo_attpreview_cache_ttl_days", "dwo_attpreview_cache_max_mb",
                   "dwo_attpreview_cache_count", "dwo_attpreview_cache_size_mb")
 
@@ -33,7 +33,7 @@ class TestAttPreviewSettings(TransactionCase):
         self.assertFalse([n for n in extra if not n.startswith(("dwo_attpreview_mail_", "dwo_attpreview_office_"))], extra)
         self.assertEqual(app.xpath(".//button"), [], "no button (Clear cache, Manage engines) any more")
         widgets = {f.get("name"): f.get("widget") for f in app.iter("field")}
-        for name in ("module_dwo_attpreview_office", "module_dwo_attpreview_mail"):
+        for name in ("module_dwo_attpreview_office", "module_dwo_attpreview_mail", "module_dwo_attpreview_archive"):
             self.assertEqual(widgets[name], "dwo_attpreview_engine_boolean")
         for name in REMOVED_FIELDS:
             self.assertNotIn(name, self.Settings._fields)
@@ -51,7 +51,7 @@ class TestAttPreviewSettings(TransactionCase):
 
     def test_04_every_catalog_entry_has_a_tick_and_facts(self):
         entries = catalog.load_catalog()
-        self.assertEqual({e["module"] for e in entries}, {"dwo_attpreview_office", "dwo_attpreview_mail"})
+        self.assertEqual({e["module"] for e in entries}, {"dwo_attpreview_office", "dwo_attpreview_mail", "dwo_attpreview_archive"})
         for entry in entries:
             self.assertIn("module_" + entry["module"], self.Settings._fields)
             self.assertEqual(entry["store_url"], "https://apps.odoo.com/apps/modules/" + entry["module"])

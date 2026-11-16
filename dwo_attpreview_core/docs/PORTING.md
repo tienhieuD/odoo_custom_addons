@@ -104,3 +104,46 @@ and the core `test_settings` change. The same-origin `fetch` of the viewer carri
   check `AttachmentList`, `Many2OneField`, `KanbanRecord` templates and the `Dialog` props on 17.
 - Odoo 17 ignores `ODOO_BROWSER_BIN` (the test script patches the browser) and needs `browser_size = "1366,768"`.
 - Copy `dwo_attpreview_office/static/lib/silurus/` by hand (not in git, see above).
+
+## 19.0 -> 18.0 (#82)
+
+Source: 19.0 commits `ad77f38` (new module `dwo_attpreview_archive` 19.0.1.0.0 + `.gitignore`) and `122f839` (core 19.0.1.2.0).
+Versions: archive `18.0.1.0.0`, core `18.0.1.2.0`. The module was copied with `git archive ad77f38` (tracked files only),
+the core change applied with `git diff --binary 122f839^ 122f839` (without the manifest version and the CHANGELOG).
+Tests: 171 (core + office + mail + archive, incl. the tour `dwo_attpreview_archive_tour` on a zip of 20 002 files), all
+green on Odoo 18.0 (`odoo-18.0.20260412`, Chrome headless shell).
+
+### dwo_attpreview_archive
+
+| File | 19.0 | 18.0 |
+|---|---|---|
+| `__manifest__.py` | `19.0.1.0.0` | `18.0.1.0.0` |
+| `static/tests/tours/archive_tour.js` | chatter card `.o-mail-AttachmentContainer` | `.o-mail-AttachmentCard` |
+
+Unchanged on 18: `parsers/__init__.py` (pure Python: `zipfile`, `tarfile`, `gzip`, `bz2`, `lzma`, optional `py7zr`),
+`thirdparty/rarfile` (rarfile 4.5), `models/engine.py` (`self.env._` exists on 18), the vendored bundle
+`static/lib/tree_libs/tree_libs.min.js` (Headless Tree 1.8.0 + TanStack Virtual 3.19.11, framework-agnostic),
+the OWL 2 components `tree_view.js` / `archive_viewer.js` and their template, the SCSS, the tests (`HttpCase` without the
+test-cookie mixin: the viewer only makes same-origin requests, which carry the cookie), and the tour steps
+(`run: "edit ..."`, the hoot `:last` / `:contains` selectors and `KeyboardEvent` dispatch work in the 18 tour runner).
+The tree rules of 19 are kept as is: `tree.rebuildTree()` never runs during a render, `tree.setState()` only notifies
+(state changes go through `tree.applySubStateUpdate("expandedItems", ...)`), the 100 000 rows stay out of OWL reactivity.
+
+**Repository:** `.gitignore` has `lib/`; `!dwo_attpreview_archive/static/lib/` is added after the office line so the
+tree bundle is committed (check `git status --ignored --short dwo_attpreview_*`).
+
+### dwo_attpreview_core
+
+Applied as is: `module_dwo_attpreview_archive` tick (model + view), catalog entry + `static/catalog/dwo_attpreview_archive/`,
+`MAX_PART_INDEX = 1_000_000`, icons `dwo_attpreview_{folder,folder_open,lock,link}.svg`, `dwoAttPreviewSpecialIconUrl`
+and the new extensions in `file_kind.js`, tests (`test_core` test_13, `test_part_preview` bad path `"9999999"`,
+`test_settings`). No Odoo 18 specific change.
+
+### For the 17.0 port
+
+- `models/engine.py` `_dwo_extract_hint`: `self.env._(...)` -> `_()`.
+- Tour: check `run: "edit ..."` (17 uses `run: "text ..."`), `:last` / `:contains` (jQuery on 17), checking steps need
+  `run: () => {}`, URL `/web#id=..&model=res.partner&view_type=form` instead of `/odoo/res.partner/<id>`, and the chatter
+  card selector of 17.
+- OWL on 17 is OWL 2 as well: the viewer should run unchanged; check the `Dialog` props and `useService("rpc")` in core.
+- `browser_size = "1366,768"` on the tour class.
