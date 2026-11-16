@@ -1,7 +1,7 @@
 {
     'name': 'Source Code Protector',
     'version': '20.0.2.1.2',
-    'summary': 'Protect your Odoo module source code: compile business logic to native binaries',
+    'summary': "Protect your Odoo module source code by compiling Python to native binaries. Keywords: code protection, source code protection, protect source code, protect module, code obfuscation, obfuscate python, compile python, cython, license protection, anti piracy.",
     'description': 'Upload a module .zip and get back the same module with its business logic '
                     'compiled to native binaries. Requires the jprotect and pyzipper Python '
                     'packages, and a C compiler with Python headers on the server for Cython.',

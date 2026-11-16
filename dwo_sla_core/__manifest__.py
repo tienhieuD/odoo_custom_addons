@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "SLA & Escalation",
-    'summary': "Enterprise SLA & escalation engine for any Odoo model: working-calendar durations, multi-stage alerts, enable and apply to existing records, ten built-in reports",
+    'summary': "SLA and escalation for any Odoo model: deadlines on working hours, alerts and reports. Keywords: sla, sla management, service level agreement, escalation, helpdesk sla, ticket sla, response time, resolution time, deadline alert, sla report.",
     'description': """
 Enterprise-grade Service Level Agreement (SLA) and Operational Level
 Agreement (OLA) engine for Odoo, not tied to any specific model.
