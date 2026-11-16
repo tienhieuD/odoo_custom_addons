@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). -->
+<templates xml:space="preserve">
+
+    <!-- binary: right after the file name (edit mode), after the file name link (read-only) -->
+    <!-- Odoo 20: no Edit button any more (the file name input opens the file chooser); templates read members with this. -->
+    <t t-name="dwo_attpreview_core.BinaryField" t-inherit="web.BinaryField" t-inherit-mode="extension">
+        <xpath expr="//t[@t-set-slot='toggler']" position="inside">
+            <button t-if="this.dwoCanPreview"
+                    type="button"
+                    class="btn btn-link lh-1 oi o_dwo_ap_field_preview"
+                    data-icon="visibility"
+                    data-tooltip="Preview"
+                    aria-label="Preview"
+                    t-on-click.stop.prevent="this.onDwoPreview"/>
+        </xpath>
+        <xpath expr="//a[hasclass('o_form_uri')]" position="after">
+            <button t-if="this.dwoCanPreview"
+                    type="button"
+                    class="btn btn-link btn-sm lh-1 ms-2 o_dwo_ap_field_preview o_dwo_ap_field_preview_text"
+                    aria-label="Preview"
+                    t-on-click.stop.prevent="this.onDwoPreview">
+                <i class="oi me-1" data-icon="visibility"/>Preview
+            </button>
+        </xpath>
+    </t>
+
+    <!-- many2many_binary: an eye next to the extension of each saved file -->
+    <!-- Odoo 20: the files are drawn by web.Many2XBinary.attachment_preview -->
+    <t t-name="dwo_attpreview_core.Many2XBinary.attachment_preview"
+       t-inherit="web.Many2XBinary.attachment_preview" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('caption') and hasclass('small')]/a" position="after">
+            <a t-if="this.dwoCanPreviewFile(file)"
+               href="#"
+               class="ms-2 o_dwo_ap_m2mb_preview"
+               role="button"
+               t-att-data-tooltip="'Preview ' + file.name"
+               aria-label="Preview"
+               t-on-click.stop.prevent="() => this.onDwoPreviewFile(file)"><i class="oi" data-icon="visibility"/></a>
+        </xpath>
+    </t>
+
+    <!-- many2one to ir.attachment: next to the internal link (edit) or the name (read-only) -->
+    <t t-name="dwo_attpreview_core.Many2One" t-inherit="web.Many2One" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='this.hasLinkButton']" position="before">
+            <button t-if="this.dwoCanPreview"
+                    class="btn btn-link px-1 o_dwo_ap_field_preview o_dwo_ap_m2o_preview"
+                    type="button"
+                    tabindex="-1"
+                    data-tooltip="Preview"
+                    aria-label="Preview"
+                    t-on-click.stop.prevent="this.onDwoPreview"><i class="oi" data-icon="visibility"/></button>
+        </xpath>
+        <xpath expr="//t[@t-if='this.props.readonly']/t[@t-if='this.props.value']" position="attributes">
+            <attribute name="t-if">this.props.value and !this.dwoCanPreview</attribute>
+        </xpath>
+        <xpath expr="//t[@t-if='this.props.readonly']" position="inside">
+            <div t-if="this.props.value and this.dwoCanPreview" class="d-flex align-items-center o_dwo_ap_m2o_readonly">
+                <a t-if="this.props.canOpen" class="o_form_uri text-truncate" t-att-class="this.props.linkCssClass" t-att-href="this.linkHref" t-on-click.prevent.stop="() => this.openRecord('action')" t-out="this.displayName" t-att-title="this.displayName"/>
+                <span t-else="" t-out="this.displayName" t-att-title="this.displayName" class="text-truncate"/>
+                <button class="btn btn-link btn-sm lh-1 ms-2 o_dwo_ap_field_preview o_dwo_ap_m2o_preview"
+                        type="button"
+                        data-tooltip="Preview"
+                        aria-label="Preview"
+                        t-on-click.stop.prevent="this.onDwoPreview"><i class="oi" data-icon="visibility"/></button>
+            </div>
+        </xpath>
+    </t>
+
+    <!-- a card of a kanban of attachments: eye in the top right corner, left of the card menu -->
+    <t t-name="dwo_attpreview_core.KanbanRecord" t-inherit="web.KanbanRecord" t-inherit-mode="extension">
+        <xpath expr="//article/t[@t-call='{{ this.constructor.menuTemplate }}']" position="before">
+            <button t-if="this.dwoCanPreview"
+                    type="button"
+                    class="btn btn-link btn-sm position-absolute top-0 end-0 o_dwo_ap_kanban_preview"
+                    t-att-class="{'me-4': this.showMenu}"
+                    data-tooltip="Preview"
+                    aria-label="Preview"
+                    t-on-click.stop.prevent="this.onDwoPreview"><i class="oi" data-icon="visibility"/></button>
+        </xpath>
+    </t>
+
+    <!-- the column added to every list of attachments -->
+    <t t-name="dwo_attpreview_core.ListButton">
+        <button t-if="this.canPreview"
+                type="button"
+                class="btn btn-link btn-sm p-0 o_dwo_ap_list_preview"
+                data-tooltip="Preview"
+                aria-label="Preview"
+                t-on-click.stop.prevent="this.onClick"><i class="oi" data-icon="visibility"/></button>
+    </t>
+
+</templates>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). -->
+<!-- Odoo 20: templates read the component through this., icons are .oi (Font Awesome is gone), t-out for t-esc -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_core.Dialog">
+        <Dialog size="'xl'" header="false" footer="false" withBodyPadding="false" fullscreen="this.state.fullscreen"
+                contentClass="this.contentClass">
+            <div class="o_dwo_ap" t-att-data-kind="this.state.info ? this.state.info.mode : ''">
+                <div class="o_dwo_ap_bar">
+                    <img class="o_dwo_ap_icon" t-att-src="this.iconUrl" alt=""/>
+                    <h4 class="modal-title o_dwo_ap_title" t-att-title="this.fileName" t-out="this.fileName"/>
+                    <div class="o_dwo_ap_actions">
+                        <button type="button" class="btn btn-link o_dwo_ap_download" title="Download" aria-label="Download" t-on-click="this.onDownload"><i class="oi" data-icon="download"/></button>
+                        <button t-if="this.canOpenInTab" type="button" class="btn btn-link o_dwo_ap_newtab" title="Open in a new tab" aria-label="Open in a new tab" t-on-click="this.onOpenInTab"><i class="oi" data-icon="open_in_new"/></button>
+                        <button type="button" class="btn btn-link o_dwo_ap_fullscreen" t-att-title="this.state.fullscreen ? 'Exit full screen' : 'Full screen'" t-att-aria-label="this.state.fullscreen ? 'Exit full screen' : 'Full screen'" t-on-click="this.toggleFullscreen"><i class="oi" t-att-data-icon="this.state.fullscreen ? 'fullscreen_exit' : 'fullscreen'"/></button>
+                        <button type="button" class="btn btn-link o_dwo_ap_close" title="Close" aria-label="Close" t-on-click="this.props.close"><i class="oi" data-icon="close"/></button>
+                    </div>
+                </div>
+                <div t-if="this.notice and !this.state.noticeClosed" class="alert alert-warning o_dwo_ap_notice" role="alert">
+                    <i class="oi o_dwo_ap_notice_icon" data-icon="warning" aria-hidden="true"/>
+                    <span class="o_dwo_ap_notice_text" t-out="this.notice"/>
+                    <button type="button" class="btn-close o_dwo_ap_notice_close" aria-label="Close" t-on-click="this.closeNotice"/>
+                </div>
+                <div class="o_dwo_ap_content" t-key="this.state.attachmentId">
+                    <t t-if="this.state.info">
+                        <t t-if="this.state.info.mode === 'native'">
+                            <iframe t-if="this.nativeKind === 'pdf'" t-att-src="this.state.info.url"/>
+                            <video t-elif="this.nativeKind === 'video'" t-att-src="this.state.info.url" controls="controls"/>
+                            <audio t-elif="this.nativeKind === 'audio'" t-att-src="this.state.info.url" controls="controls"/>
+                            <img t-else="" t-att-src="this.state.info.url" t-att-alt="this.fileName"/>
+                        </t>
+                        <t t-elif="this.state.info.mode === 'rendered'">
+                            <t t-if="this.viewerComponent" t-component="this.viewerComponent" t-props="this.viewerProps"/>
+                            <iframe t-elif="this.state.info.type === 'html'" t-att-srcdoc="this.state.info.content" sandbox=""/>
+                            <pre t-elif="this.state.info.type === 'text'" t-out="this.state.info.content"/>
+                            <img t-else="" t-att-src="this.state.info.data_url" t-att-alt="this.fileName"/>
+                        </t>
+                        <div t-else="" class="alert alert-info o_dwo_ap_unavailable">
+                            <t t-out="this.reason"/>
+                            <a t-att-href="this.downloadUrl" class="ms-2">Download</a>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </Dialog>
+    </t>
+</templates>

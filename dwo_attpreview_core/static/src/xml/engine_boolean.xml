@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). -->
+<!-- Odoo 20: templates read the component through this., t-out for t-esc -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_core.EngineBooleanField">
+        <div class="o_dwo_ap_engine d-flex align-items-center flex-wrap gap-2" t-att-data-module="this.module" t-att-data-state="this.info and this.info.state">
+            <CheckBox id="this.props.id" value="this.state.value" className="'d-inline-block'" disabled="this.props.readonly" onChange.bind="this.onChange">
+                <span class="o_dwo_ap_engine_name fw-bold" t-out="this.info ? this.info.name : this.module"/>
+            </CheckBox>
+            <span class="o_dwo_ap_engine_ext text-muted" t-out="this.extensions"/>
+            <span class="o_dwo_ap_engine_state badge rounded-pill" t-att-class="this.stateClass" t-out="this.stateLabel"/>
+        </div>
+    </t>
+
+    <t t-name="dwo_attpreview_core.EngineStoreDialog">
+        <Dialog size="'lg'" title="this.props.info.name">
+            <div class="o_dwo_ap_store">
+                <p class="o_dwo_ap_store_facts mb-2">
+                    <strong>File types:</strong> <span t-out="this.extensions"/>
+                </p>
+                <iframe t-if="this.state.srcdoc" class="o_dwo_ap_store_desc" t-att-srcdoc="this.state.srcdoc" sandbox="" title="Description"/>
+                <p class="o_dwo_ap_store_note text-muted mt-3 mb-0">
+                    This engine is not in the addons of this database, so Odoo cannot install it yet.
+                    After you get the module, copy it to your addons folder, update the apps list,
+                    then tick it again here. Odoo Online cannot install third-party apps.
+                </p>
+            </div>
+            <t t-set-slot="footer">
+                <a class="btn btn-primary o_dwo_ap_store_link" t-att-href="this.props.info.store_url" target="_blank" rel="noopener noreferrer">Open on Odoo Apps</a>
+                <button class="btn btn-secondary o_dwo_ap_store_close" t-on-click="this.props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>
