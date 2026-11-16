@@ -1,0 +1,33 @@
+<!-- Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The CSP (no network, no remote font or image) is sent as a header by the asset route of the controller. -->
+<title>Office preview</title>
+<link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<div id="bar" hidden>
+    <button type="button" id="prev" title="Previous">&#8249;</button>
+    <span id="pos"></span>
+    <button type="button" id="next" title="Next">&#8250;</button>
+    <span class="sep"></span>
+    <button type="button" id="zout" title="Zoom out">&minus;</button>
+    <button type="button" id="zin" title="Zoom in">+</button>
+    <button type="button" id="fit" title="Fit width">&#8596;</button>
+    <button type="button" id="find-open" title="Find (Ctrl+F)" aria-label="Find in document" hidden><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 10l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+</div>
+<div id="find" hidden>
+    <input type="text" id="find-input" placeholder="Find" autocomplete="off" spellcheck="false" aria-label="Find in document">
+    <span id="find-count"></span>
+    <button type="button" id="find-prev" title="Previous (Shift+Enter)">&#8593;</button>
+    <button type="button" id="find-next" title="Next (Enter)">&#8595;</button>
+    <button type="button" id="find-close" title="Close (Esc)">&times;</button>
+</div>
+<div id="stage"></div>
+<div id="msg" hidden></div>
+<script type="module" src="viewer.js"></script>
+</body>
+</html>

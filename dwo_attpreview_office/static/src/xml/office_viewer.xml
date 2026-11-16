@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_office.OfficeViewer">
+        <div class="o_dwo_office d-flex flex-column h-100" t-att-data-state="state.error ? 'error' : (state.loading ? 'loading' : 'ready')" t-att-data-layout="state.layout" t-att-data-page="state.page" t-att-data-total="state.total" t-att-data-find-total="state.findTotal" t-att-data-find-index="state.findIndex" t-att-data-find="state.findOk ? '1' : '0'" t-att-data-find-where="state.findWhere">
+            <div t-if="state.error" class="alert alert-warning m-3">
+                <!-- legacy (.doc/.xls/.ppt): a short message, the technical reason is only in the console -->
+                <span t-if="isLegacy" class="o_dwo_office_error">This legacy file cannot be previewed.</span>
+                <span t-elif="isText" class="o_dwo_office_error">This file cannot be previewed.</span>
+                <span t-else="" class="o_dwo_office_error">This file could not be displayed: <t t-esc="state.error"/></span>
+                <a t-if="props.downloadUrl" t-att-href="props.downloadUrl" t-att-class="isShortError ? 'btn btn-primary btn-sm ms-2 o_dwo_office_download' : 'ms-2 o_dwo_office_download'">Download</a>
+            </div>
+            <div t-if="state.loading and !state.error" class="text-muted px-3 py-1">Loading...</div>
+            <iframe t-ref="frame" t-att-src="viewerUrl" sandbox="allow-scripts" class="w-100 border-0 flex-grow-1"
+                    t-att-class="{'d-none': state.error}" style="min-height:0"/>
+        </div>
+    </t>
+</templates>
