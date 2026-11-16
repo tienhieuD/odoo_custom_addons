@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Web Split View",
-    'summary': """Dual-view layout, seamlessly dividing the screen into list and detail sections for CRUD operations.""",
+    'summary': "See the list and the form side by side and edit records without leaving the list. Keywords: split view, split screen, dual pane, side by side, list and form, list form view, master detail, two panel view, quick edit.",
     'author': "DuoTEK",
     'support': 'hello@duotek.io.vn',
     'website': 'https://duotek.io.vn',
