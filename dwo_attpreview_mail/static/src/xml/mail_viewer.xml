@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<!-- Odoo 20: templates read the component through this., icons are .oi (Font Awesome is gone), t-out for t-esc -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_mail.MailViewer">
+        <div class="o_dwo_mail" t-att-data-kind="this.data.kind">
+            <t t-if="this.isEmail">
+                <div class="o_dwo_mail_head">
+                    <h5 class="o_dwo_mail_subject" t-out="this.data.subject or '(no subject)'"/>
+                    <table class="o_dwo_mail_fields">
+                        <tr t-foreach="this.fields" t-as="field" t-key="field[0]">
+                            <th t-out="field[0]"/>
+                            <td t-out="field[1]"/>
+                        </tr>
+                    </table>
+                </div>
+                <div t-if="this.data.remote_blocked" class="o_dwo_mail_blocked">
+                    <i class="oi me-1" data-icon="security" aria-hidden="true"/>Remote pictures and content of this email are blocked to protect your privacy.
+                </div>
+                <div t-if="this.attachments.length" class="o_dwo_mail_atts">
+                    <div t-foreach="this.attachments" t-as="att" t-key="att.index" class="o_dwo_mail_att">
+                        <img class="o_dwo_mail_att_icon" t-att-src="this.iconOf(att)" alt=""/>
+                        <button type="button" class="btn btn-link o_dwo_mail_att_name" t-att-title="'Preview ' + att.name"
+                                t-att-disabled="!this.canOpenParts" t-on-click="() => this.onPreview(att)" t-out="att.name"/>
+                        <span class="o_dwo_mail_att_size" t-out="this.sizeOf(att)"/>
+                        <button type="button" class="btn btn-link o_dwo_mail_att_download" t-att-title="'Download ' + att.name"
+                                aria-label="Download" t-att-disabled="!this.canOpenParts" t-on-click="() => this.onDownload(att)">
+                            <i class="oi" data-icon="download"/>
+                        </button>
+                    </div>
+                </div>
+                <iframe class="o_dwo_mail_body" title="Email body" sandbox="allow-popups allow-popups-to-escape-sandbox"
+                        referrerpolicy="no-referrer" t-att-srcdoc="this.srcdoc"/>
+            </t>
+            <div t-elif="this.data.kind === 'calendar'" class="o_dwo_mail_cards">
+                <div t-if="!this.data.events.length" class="alert alert-info">This file holds no event.</div>
+                <div t-foreach="this.data.events" t-as="event" t-key="event_index" class="o_dwo_mail_card">
+                    <div class="o_dwo_mail_card_top">
+                        <i class="oi me-2" data-icon="calendar_today" aria-hidden="true"/>
+                        <h5 class="o_dwo_mail_card_title" t-out="event.summary or '(no title)'"/>
+                        <span t-if="this.methodLabel(this.data.method)" class="badge text-bg-secondary ms-2" t-out="this.methodLabel(this.data.method)"/>
+                        <span t-if="event.status === 'CANCELLED'" class="badge text-bg-danger ms-2">Cancelled</span>
+                    </div>
+                    <table class="o_dwo_mail_fields">
+                        <tr t-if="event.start"><th>When</th><td><t t-out="event.start"/><t t-if="event.end"> - <t t-out="event.end"/></t></td></tr>
+                        <tr t-if="event.recurrence"><th>Repeats</th><td t-out="event.recurrence"/></tr>
+                        <tr t-if="event.location"><th>Where</th><td t-out="event.location"/></tr>
+                        <tr t-if="event.organizer"><th>Organizer</th><td t-out="event.organizer"/></tr>
+                        <tr t-if="event.url and this.isWebLink(event.url)"><th>Link</th><td><a t-att-href="event.url" target="_blank" rel="noopener noreferrer" t-out="event.url"/></td></tr>
+                    </table>
+                    <div t-if="event.attendees.length" class="o_dwo_mail_people">
+                        <div class="o_dwo_mail_label">Attendees</div>
+                        <div t-foreach="event.attendees" t-as="person" t-key="person_index" class="o_dwo_mail_person">
+                            <span t-out="person.name"/>
+                            <span t-if="this.statusLabel(person.status)" class="o_dwo_mail_status" t-att-data-status="person.status" t-out="this.statusLabel(person.status)"/>
+                        </div>
+                    </div>
+                    <pre t-if="event.description" class="o_dwo_mail_note" t-out="event.description"/>
+                </div>
+            </div>
+            <div t-elif="this.data.kind === 'contacts'" class="o_dwo_mail_cards">
+                <div t-if="!this.data.contacts.length" class="alert alert-info">This file holds no contact.</div>
+                <div t-foreach="this.data.contacts" t-as="card" t-key="card_index" class="o_dwo_mail_card">
+                    <div class="o_dwo_mail_card_top">
+                        <i class="oi me-2" data-icon="account_circle" aria-hidden="true"/>
+                        <div>
+                            <h5 class="o_dwo_mail_card_title" t-out="card.name or '(no name)'"/>
+                            <div t-if="card.title or card.organization" class="text-muted">
+                                <t t-out="card.title"/><t t-if="card.title and card.organization">, </t><t t-out="card.organization"/>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="o_dwo_mail_fields">
+                        <tr t-foreach="card.emails" t-as="item" t-key="'e' + item_index"><th>Email<t t-if="item.type"> (<t t-out="item.type"/>)</t></th><td><a t-att-href="'mailto:' + item.value" t-out="item.value"/></td></tr>
+                        <tr t-foreach="card.phones" t-as="item" t-key="'p' + item_index"><th>Phone<t t-if="item.type"> (<t t-out="item.type"/>)</t></th><td t-out="item.value"/></tr>
+                        <tr t-foreach="card.addresses" t-as="item" t-key="'a' + item_index"><th>Address<t t-if="item.type"> (<t t-out="item.type"/>)</t></th><td t-out="item.value"/></tr>
+                        <tr t-if="card.birthday"><th>Birthday</th><td t-out="card.birthday"/></tr>
+                        <tr t-if="card.url and this.isWebLink(card.url)"><th>Website</th><td><a t-att-href="card.url" target="_blank" rel="noopener noreferrer" t-out="card.url"/></td></tr>
+                    </table>
+                    <pre t-if="card.note" class="o_dwo_mail_note" t-out="card.note"/>
+                </div>
+            </div>
+            <div t-else="" class="alert alert-info m-3">This file could not be displayed.</div>
+        </div>
+    </t>
+</templates>
