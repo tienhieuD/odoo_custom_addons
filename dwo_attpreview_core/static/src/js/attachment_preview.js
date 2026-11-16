@@ -97,6 +97,11 @@ export class AttPreviewDialog extends Component {
         if (this.fileUrl) {
             props.fileUrl = this.fileUrl;
         }
+        // where the file comes from, for a viewer that previews the files inside it (see service.openPart)
+        const viewer = this.viewerComponent;
+        if (viewer && "source" in (viewer.props || {}) && this.state.info.source_ref) {
+            props.source = this.state.info.source_ref;
+        }
         return props;
     }
 
@@ -131,6 +136,12 @@ export class AttPreviewDialog extends Component {
 
     onOpenInTab() {
         browser.open(this.state.info.url, "_blank");
+    }
+
+    /** Width of the dialog by kind of file (``info.width``: wide, medium or narrow, given by the server). */
+    get contentClass() {
+        const width = (this.state.info && this.state.info.width) || "wide";
+        return `o_dwo_ap_dialog o_dwo_ap_w_${["wide", "medium", "narrow"].includes(width) ? width : "wide"}`;
     }
 
     toggleFullscreen() {
@@ -225,6 +236,41 @@ registry.category("services").add("dwo_attpreview", {
                 }
                 dialog.add(AttPreviewDialog, { attachmentId, info });
                 return true;
+            },
+            /**
+             * Preview a file inside another file (an attachment of an email) in a dialog above the current
+             * one (its width follows its own kind of file), with the engines installed. ``source``: the ``source_ref`` of the outer file (given
+             * to a viewer that declares a ``source`` prop); ``path``: position(s) of the inner file, "2" or "2/0".
+             * @returns {Promise<boolean>} true when the dialog opened
+             */
+            async openPart(source, path) {
+                let info;
+                try {
+                    info = await rpc("/dwo_attpreview/part_info", { source, path: String(path) });
+                } catch {
+                    info = { mode: "error", error: _t("The preview could not be loaded.") };
+                }
+                if (PREVIEWABLE_MODES.includes(info.mode) && !viewerTakesFileUrl(info)) {
+                    info = { ...info, mode: "unsupported", reason: "viewer" };
+                }
+                if (!PREVIEWABLE_MODES.includes(info.mode)) {
+                    toast(0, info);
+                    return false;
+                }
+                dialog.add(AttPreviewDialog, { attachmentId: 0, info });
+                return true;
+            },
+            /** URL of the bytes of a file inside another file (see openPart). */
+            partUrl(source, path, { download = true } = {}) {
+                const params = new URLSearchParams();
+                for (const key of ["attachment_id", "model", "res_id", "field", "filename_field"]) {
+                    if (source && source[key]) {
+                        params.set(key, source[key]);
+                    }
+                }
+                params.set("path", String(path));
+                params.set("download", download ? "true" : "false");
+                return `/dwo_attpreview/part?${params.toString()}`;
             },
         };
     },

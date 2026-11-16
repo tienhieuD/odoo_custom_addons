@@ -197,3 +197,17 @@
     border-radius: var(--bs-border-radius);
     background: #fff;
 }
+
+// Width by kind of file (info.width): "wide" keeps 95vw (sheets, documents, slides, PDF, pictures, video);
+// an email or a card reads better in a narrower window; a sound needs only a small one.
+// (no CSS min(): Odoo compiles this file with libsass, which rejects it)
+.modal:not(.o_modal_full) .modal-dialog:has(.o_dwo_ap_w_medium) {
+    width: 1080px;
+    max-width: 95vw;
+}
+.modal:not(.o_modal_full) .modal-dialog:has(.o_dwo_ap_w_narrow) {
+    width: 640px;
+    max-width: 95vw;
+    height: 320px;
+    max-height: 92vh;
+}

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3).
 import base64
+import json
 import logging
 import time
 
@@ -100,11 +101,15 @@ class AttPreviewCache(models.Model):
             data = (data or "").encode()
         elif rtype == "image":
             data = data or b""
+        elif rtype == "json":
+            # for an engine with its own viewer; the engine sanitizes the HTML it puts inside (see _dwo_render)
+            data = json.dumps(data if data is not None else {}, ensure_ascii=False).encode()
         else:
             raise UserError(self.env._("Engine returned an unsupported output type."))
         return {
             "result_type": rtype,
-            "mimetype": res.get("mimetype") or {"html": "text/html", "text": "text/plain"}.get(rtype),
+            "mimetype": res.get("mimetype") or {
+                "html": "text/html", "text": "text/plain", "json": "application/json"}.get(rtype),
             "data": base64.b64encode(data),
             "data_size": len(data),
         }

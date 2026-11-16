@@ -6,3 +6,4 @@ from . import test_tour
 from . import test_engine_tour
 from . import test_field_preview
 from . import test_field_tour
+from . import test_part_preview

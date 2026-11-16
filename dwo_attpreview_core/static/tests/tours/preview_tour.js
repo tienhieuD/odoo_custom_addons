@@ -152,7 +152,7 @@ registry.category("web_tour.tours").add("dwo_attpreview_core_tour_engine_popup",
         },
         {
             content: "Mail engine is not in the addons: not ticked, state Not installed",
-            trigger: ".o_dwo_ap_engine[data-module='dwo_attpreview_mail'][data-state='missing']:has(input:not(:checked)):contains('.eml .ics .vcf'):contains('Not installed')",
+            trigger: ".o_dwo_ap_engine[data-module='dwo_attpreview_mail'][data-state='missing']:has(input:not(:checked)):contains('.eml .msg .oft'):contains('Not installed')",
         },
         {
             content: "Tick the engine that is not in the addons",
@@ -161,7 +161,7 @@ registry.category("web_tour.tours").add("dwo_attpreview_core_tour_engine_popup",
         },
         {
             content: "A popup names the engine, and its file types",
-            trigger: ".modal:contains('Email, calendar, contact card'):contains('.eml, .ics, .vcf')",
+            trigger: ".modal:contains('Secure Email Preview: EML, MSG, ICS, VCF'):contains('.eml, .msg, .oft')",
         },
         {
             content: "The neutral note says what to do after getting the module",
@@ -191,7 +191,7 @@ registry.category("web_tour.tours").add("dwo_attpreview_core_tour_engine_popup",
                 if (/<script/i.test(doc) || /https?:\/\//i.test(doc.replaceAll(location.origin, ""))) {
                     throw new Error("script or remote address in the description");
                 }
-                if (!doc.includes("Email, calendar and contact card previews")) {
+                if (!doc.includes("Read saved emails without leaving Odoo")) {
                     throw new Error("the description of the catalog is not shown");
                 }
             },

@@ -13,7 +13,7 @@ const BY_EXT = {
     markdown: ["md", "markdown"],
     code: ["json", "xml", "html", "htm", "js", "mjs", "ts", "py", "css", "scss", "yml", "yaml", "sql", "sh", "java", "c", "cpp", "h", "php", "rb", "go", "rs"],
     text: ["txt", "log", "ini", "cfg", "conf", "rst"],
-    mail: ["eml", "msg", "mbox", "emlx"],
+    mail: ["eml", "msg", "oft", "mbox", "emlx", "ics", "vcf"],
     cad: ["dxf", "dwg", "dwf", "stl"],
 };
 const EXT_TO_KIND = {};

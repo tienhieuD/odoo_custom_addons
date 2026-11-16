@@ -22,15 +22,29 @@ class AttPreviewEngine(models.AbstractModel):
     _dwo_engine_priority = 10  # lower wins when several engines match
     _dwo_engine_version = "1"  # bump to invalidate cached results
     _dwo_engine_max_size_mb = 0  # 0 = use the global limit
+    # width of the preview dialog for this engine's files: "wide" (95% of the window: sheets, documents, slides),
+    # "medium" (about 1080px: emails, cards, text) or "narrow" (about 640px)
+    _dwo_engine_dialog_width = "wide"
 
     def _dwo_render(self, content, filename):
-        """Return ``{"type": "html"|"text"|"image", "data": <str|bytes>}``.
+        """Return ``{"type": "html"|"text"|"image"|"json", "data": <str|bytes|dict|list>}``.
 
         ``html`` is sanitized by the core; ``image`` data are raw bytes
-        (the mimetype goes in ``"mimetype"``). Raise ``UserError`` for a clean
-        user-facing failure.
+        (the mimetype goes in ``"mimetype"``). ``json`` is for an engine that has its own
+        viewer component (registry ``dwo_attpreview.viewers``): the data are stored as JSON and given to
+        the viewer as a string; the Core does NOT sanitize it, so the engine must sanitize any HTML it puts
+        inside (``odoo.tools.mail.html_sanitize``) and the viewer must show it in a sandboxed frame.
+        Raise ``UserError`` for a clean user-facing failure.
         """
         raise NotImplementedError
+
+    def _dwo_extract_part(self, content, filename, index):
+        """For a container format (an email with attachments, ...): the inner file number ``index`` (an int, the
+        position in the list of files the engine gave in its result) as ``(file_name, raw_bytes)``, or ``None``
+        when there is no such file. The Core checks the access to the outer file first and previews the inner
+        file in memory (no attachment, no cache), with the engines installed. Raise ``UserError`` for a clean
+        user-facing failure."""
+        return None
 
     def _dwo_engine_notice(self, extension):
         """A short, translated warning shown in a banner of the preview dialog for files of this extension

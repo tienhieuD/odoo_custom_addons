@@ -3,7 +3,7 @@
 <templates xml:space="preserve">
     <t t-name="dwo_attpreview_core.Dialog">
         <Dialog size="'xl'" header="false" footer="false" withBodyPadding="false" fullscreen="state.fullscreen"
-                contentClass="'o_dwo_ap_dialog'">
+                contentClass="contentClass">
             <div class="o_dwo_ap" t-att-data-kind="state.info ? state.info.mode : ''">
                 <div class="o_dwo_ap_bar">
                     <img class="o_dwo_ap_icon" t-att-src="iconUrl" alt=""/>

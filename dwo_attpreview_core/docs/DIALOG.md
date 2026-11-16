@@ -60,3 +60,33 @@ Same answer as `/info` plus `source: "field"`, `download_url` and `file_url` (bo
 - **Field stored in its table** (`attachment=False`): the base64 value is read after the access checks; the size is computed from its length before decoding and checked against the limit (`max_file_size_mb`, or the engine's own). The mimetype is guessed from the content (or from the file name). Native files are shown through `/web/content` of the field; other files are rendered **in memory** (`dwo.attpreview.cache._dwo_render_values`, same sanitizing as the cache) and **no attachment and no cache entry are created**: the result is computed again at each opening.
 - **Viewers that load the file in the browser** (registry `dwo_attpreview.viewers`, e.g. office): the dialog gives them `fileUrl` for a field. A viewer that does not declare a `fileUrl` prop only knows how to fetch an attachment by id, so for a field the service shows the toast ("This file type can be previewed from the attachments, not yet from this field.") instead of a broken dialog. The office viewer declares it (office CHANGELOG, #72): docx/xlsx/pptx/csv... in a field open in the dialog.
 - The toast and the dialog use `info.download_url` when given (the field's own download), else `/web/content/<attachment id>`.
+
+## Files inside a file: email attachments (#78)
+
+An engine can open files that live inside the file it previews (today: the attachments of an email, with the
+`dwo_attpreview_mail` engine). Nothing is extracted to the database.
+
+- **Engine side:** return `{"type": "json", ...}` and register a viewer in `dwo_attpreview.viewers` that declares
+  the props `source` (and `fileUrl`, so that it also works for a file that is itself inside another file);
+  implement `_dwo_extract_part(content, filename, index)` (index = position in the list your result gives).
+- **Viewer side:** `this.env.services.dwo_attpreview.openPart(baseSource, path)` where `baseSource` is the
+  `source` prop without its `path` and `path` = `source.path ? source.path + "/" + index : index`;
+  `partUrl(baseSource, path)` for a download link.
+- **Server:** `/dwo_attpreview/part_info {source, path}` answers like `/info` (`mode`, `type`, `content`,
+  `download_url`, `file_url`, `source_ref` with the path); `/dwo_attpreview/part?attachment_id=..|model=..&res_id=..&field=..[&filename_field=..]&path=..&download=true|false`
+  sends the bytes. Both check the access to the outer file again on every call; at most 20 levels, index < 10000.
+- **Dialog:** the inner file opens in a second dialog above the first, with the width of its own kind of file
+  (see below); Esc closes the top one only. An inner Office file gets `fileUrl` (the `/part` URL), so the office viewer loads it.
+
+## Dialog width by kind of file (#78)
+
+The server tells the dialog how wide to be (`info.width`), the dialog adds `o_dwo_ap_w_<width>`:
+
+| width | size | for |
+| --- | --- | --- |
+| `wide` (default) | 95% of the window | sheets, documents, slides, PDF, pictures, video |
+| `medium` | min(1080px, 95vw) | emails, invitations, contact cards (engine `mail`) |
+| `narrow` | min(640px, 95vw), 320px high | sound files |
+
+An engine sets `_dwo_engine_dialog_width`; native files get `narrow` for audio and `wide` otherwise. Full screen
+mode ignores the width.

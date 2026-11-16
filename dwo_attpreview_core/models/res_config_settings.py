@@ -14,7 +14,7 @@ class ResConfigSettings(models.TransientModel):
     # One tick per engine module: Odoo installs it on Save and asks to uninstall it when unticked.
     # A module that is not in the addons path cannot be installed: the widget shows its page instead.
     module_dwo_attpreview_office = fields.Boolean(string="Secure Office Preview: DOCX, DOC, XLSX, XLS, PPTX, PPT, CSV, TSV")
-    module_dwo_attpreview_mail = fields.Boolean(string="Email, calendar, contact card")
+    module_dwo_attpreview_mail = fields.Boolean(string="Secure Email Preview: EML, MSG, ICS, VCF")
     # what the widget `dwo_attpreview_engine_boolean` shows (name, file types, state), by engine module
     dwo_attpreview_engines = fields.Json(compute="_compute_dwo_attpreview_engines")
 

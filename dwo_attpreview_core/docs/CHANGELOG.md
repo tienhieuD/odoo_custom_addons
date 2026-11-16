@@ -1,5 +1,19 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-16 - 19.0.1.1.0 - Files inside a file, JSON results (#78)
+
+**Added (engine API, used by the email engine):**
+- Result type `json` for an engine with its own viewer: `_dwo_render` returns `{"type": "json", "data": dict|list}`; the cache stores it as JSON (mimetype `application/json`) and the viewer gets it as the `content` string. The Core does not sanitize it: the engine sanitizes any HTML inside, the viewer shows it in a sandboxed frame.
+- Hook `_dwo_extract_part(content, filename, index)` on `dwo.attpreview.engine`: the inner file number `index` of a container (an attachment of an email) as `(name, bytes)`, or `None`.
+- Route `/dwo_attpreview/part_info` (jsonrpc) `{source, path}` and `/dwo_attpreview/part` (GET): preview / bytes of the file at `path` (`"2"`, `"2/0"`, at most 20 levels) inside the outer file `source`. Access is checked on the outer file exactly as `/info` (attachment) or `/field_info` (binary field); size limit of the outer file; the inner file is rendered in memory (no attachment, no cache entry). `/part` is sent like `/web/content` (`X-Content-Type-Options: nosniff`, `Content-Security-Policy: default-src 'none'`) and only PDF, pictures, video and audio may be inline: anything else (HTML...) is always a download.
+- `source_ref` in the answers of `/info`, `/field_info` and `/part_info` (where the file comes from); a viewer that declares a `source` prop receives it.
+- Service: `openPart(source, path)` opens the inner file in a second dialog above the first one; `partUrl(source, path, {download})`.
+- Dialog width by kind of file: `_dwo_engine_dialog_width` on the engine (`wide` default, `medium`, `narrow`), sent as `info.width`; native audio is `narrow`, other native files `wide`. Classes `o_dwo_ap_w_wide` (95vw), `o_dwo_ap_w_medium` (min(1080px, 95vw)), `o_dwo_ap_w_narrow` (min(640px, 95vw), 320px high). A dialog opened from another one follows its own kind (no "smaller than the previous" rule, user feedback on #78).
+- `_dwo_field_access` / `_dwo_source_file` helpers in the controller (shared by `/field_info` and the part routes).
+- File icons: `oft`, `ics`, `vcf` use the mail icon. Catalog and Settings label of the email engine: `Secure Email Preview: EML, MSG, ICS, VCF` (eml, msg, oft, emlx, ics, vcf).
+
+**Tests:** `tests/test_part_preview.py` (container sample engine `BOX` in `tests/sample_engine.py`): JSON result untouched, part rendered in memory (no cache, no attachment), nested path, native/unsupported parts, bad paths, access checked on the outer file (portal user), binary field source, outer size limit, headers of `/part` (nosniff, CSP, HTML never inline, 404).
+
 ## 2026-11-15 - Name and Odoo Apps listing (#72)
 
 - Manifest: name `Secure Attachment Preview` (was "Attachment Preview Core"), new summary/description (large dialog, file fields, nothing sent outside), `images` = `static/description/banner.png`. Technical name unchanged.

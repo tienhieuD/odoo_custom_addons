@@ -27,9 +27,12 @@
   },
   {
     "module": "dwo_attpreview_mail",
-    "name": "Email, calendar, contact card",
+    "name": "Secure Email Preview: EML, MSG, ICS, VCF",
     "extensions": [
       "eml",
+      "msg",
+      "oft",
+      "emlx",
       "ics",
       "vcf"
     ],
