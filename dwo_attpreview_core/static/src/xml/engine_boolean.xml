@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_core.EngineBooleanField">
+        <div class="o_dwo_ap_engine d-flex align-items-center flex-wrap gap-2" t-att-data-module="module" t-att-data-state="info and info.state">
+            <CheckBox id="props.id" value="state.value" className="'d-inline-block'" disabled="props.readonly" onChange.bind="onChange">
+                <span class="o_dwo_ap_engine_name fw-bold" t-esc="info ? info.name : module"/>
+            </CheckBox>
+            <span class="o_dwo_ap_engine_ext text-muted" t-esc="extensions"/>
+            <span class="o_dwo_ap_engine_state badge rounded-pill" t-att-class="stateClass" t-esc="stateLabel"/>
+        </div>
+    </t>
+
+    <t t-name="dwo_attpreview_core.EngineStoreDialog">
+        <Dialog size="'lg'" title="props.info.name">
+            <div class="o_dwo_ap_store">
+                <p class="o_dwo_ap_store_facts mb-2">
+                    <strong>File types:</strong> <span t-esc="extensions"/>
+                </p>
+                <iframe t-if="state.srcdoc" class="o_dwo_ap_store_desc" t-att-srcdoc="state.srcdoc" sandbox="" title="Description"/>
+                <p class="o_dwo_ap_store_note text-muted mt-3 mb-0">
+                    This engine is not in the addons of this database, so Odoo cannot install it yet.
+                    After you get the module, copy it to your addons folder, update the apps list,
+                    then tick it again here. Odoo Online cannot install third-party apps.
+                </p>
+            </div>
+            <t t-set-slot="footer">
+                <a class="btn btn-primary o_dwo_ap_store_link" t-att-href="props.info.store_url" target="_blank" rel="noopener noreferrer">Open on Odoo Apps</a>
+                <button class="btn btn-secondary o_dwo_ap_store_close" t-on-click="props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>
