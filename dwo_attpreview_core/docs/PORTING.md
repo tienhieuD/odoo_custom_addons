@@ -69,6 +69,20 @@ database, `dbfilter` or `-d`).
 No other change: the parsers, `models/engine.py` and the OWL viewer run as is (luxon is global in 18, the hoot `:last` selector of
 the tour exists in 18).
 
+#### #79 - remote pictures through the server (mail 19.0.2.1.0 -> 18.0.2.1.0)
+
+Source: 19.0 commits `6f63ca6` + `23226fd` (`git diff 98f75ed 23226fd`). Every file is taken as is from 19.0, except:
+
+| File | 19.0 | 18.0 |
+|---|---|---|
+| `__manifest__.py` | `19.0.2.1.0` | `18.0.2.1.0` |
+| `controllers/main.py` | route `/dwo_attpreview_mail/remote_settings` with `type="jsonrpc"` | `type="json"` |
+
+Unchanged on 18: the subclass of the core controller (`SOURCE_KEYS`, `_dwo_source_file`, `_dwo_resolve_part`), `http.Stream(...).get_response()`
+headers (`nosniff`, `default-src 'none'`, private cache), the settings view (`<block>` / `<setting>` inside `<app name="dwo_attpreview_core">`),
+`parsers/remote.py` (urllib3, Pillow), the viewer (`rpc`, `fetch`, `useState`), the tour step (the tour already used the 18 selectors)
+and the core `test_settings` change. The same-origin `fetch` of the viewer carries the test cookie, so the tour needs no `check_test_cursor` change.
+
 ### Checked on 18 and unchanged
 
 - `self.env._(...)` (exists since 18), `record.check_access("read")`, `http.Stream(type="data", ..., as_attachment=..., etag=False)`,
