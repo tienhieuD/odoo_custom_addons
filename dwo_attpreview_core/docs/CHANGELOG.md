@@ -1,5 +1,13 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-16 - office engine with OpenDocument (#84)
+
+- Catalog (`data/engine_catalog.json`) and Settings label of `module_dwo_attpreview_office`: `Secure Office Preview: DOCX,
+  XLSX, PPTX, ODT, ODS, ODP, DOC, XLS, PPT, CSV`; the office entry lists `odt`, `ods`, `odp`, `ott`, `ots`, `otp`.
+  Catalog copy of the office description page synced (two new screenshots).
+- Icons: `ott`, `ots`, `otp` mapped to the word / sheet / slide icons (`odt`, `ods`, `odp` already were).
+- No code change of the Core; version unchanged.
+
 ## 2026-11-16 - 17.0.1.2.0 - archive engine (#82), 17.0 port of 19.0.1.2.0 (via 18.0.1.2.0)
 
 - Settings and catalog: tick `module_dwo_attpreview_archive` "Secure Archive Preview: ZIP, RAR, 7Z, TAR"; catalog copy of
