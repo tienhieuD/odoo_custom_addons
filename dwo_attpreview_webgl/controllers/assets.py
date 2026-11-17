@@ -5,7 +5,7 @@ import os
 
 from odoo.http import Stream, request
 
-ASSET_EXT = (".html", ".css", ".js", ".mjs", ".wasm", ".json")
+ASSET_EXT = (".html", ".css", ".js", ".mjs", ".wasm", ".json", ".woff", ".ttf")
 
 
 def viewer_csp(origin, extra_script=""):
