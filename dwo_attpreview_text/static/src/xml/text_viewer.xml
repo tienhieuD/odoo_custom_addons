@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_text.LineView">
+        <div class="o_dwo_lines" t-att-class="{ o_dwo_lines_wrap: props.wrap, o_dwo_lines_table: props.headers }">
+            <div t-if="props.headers" class="o_dwo_lines_head" t-att-style="gridStyle" aria-hidden="true">
+                <span t-foreach="props.headers" t-as="h" t-key="h_index" t-esc="h"/>
+            </div>
+            <div class="o_dwo_lines_scroll" t-ref="scroll" tabindex="0" t-att-aria-label="props.label or 'Lines'">
+                <div class="o_dwo_lines_list" t-ref="list" t-attf-style="height: {{ totalHeight }}px;">
+                    <div t-foreach="rows" t-as="r" t-key="r.index" class="o_dwo_line" t-att-class="r.cls"
+                         t-att-data-index="r.index" t-attf-style="transform: translateY({{ r.top }}px); {{ gridStyle }}">
+                        <t t-foreach="r.cells" t-as="c" t-key="c_index">
+                            <span t-if="c.num !== undefined" class="o_dwo_line_num" t-esc="c.num"/>
+                            <span class="o_dwo_line_text" t-att-class="c.cls" t-out="c.html"/>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="dwo_attpreview_text.TextViewer">
+        <div class="o_dwo_txt" t-ref="root" t-att-data-mode="ui.mode" t-att-data-format="group">
+            <div class="o_dwo_txt_bar">
+                <div t-if="viewButtons.length > 1" class="btn-group btn-group-sm o_dwo_txt_views" role="tablist" aria-label="View">
+                    <button t-foreach="viewButtons" t-as="v" t-key="v.id" type="button" role="tab"
+                            class="btn o_dwo_txt_view" t-att-class="ui.mode === v.id ? 'btn-primary active' : 'btn-outline-secondary'"
+                            t-att-aria-selected="ui.mode === v.id ? 'true' : 'false'" t-att-data-view="v.id"
+                            t-on-click="() => this.setMode(v.id)" t-esc="v.label"/>
+                </div>
+                <span class="o_dwo_txt_info text-muted">
+                    <t t-foreach="infoParts" t-as="part" t-key="part_index">
+                        <span t-if="part_index" class="o_dwo_txt_sep">·</span><span t-esc="part"/>
+                    </t>
+                </span>
+                <div class="o_dwo_txt_tools">
+                    <t t-if="lineMode">
+                        <button type="button" class="btn btn-sm btn-light o_dwo_txt_find_btn" title="Find (Ctrl+F)"
+                                aria-label="Find" t-on-click="openFind"><i class="fa fa-search" aria-hidden="true"/></button>
+                    </t>
+                    <input t-if="views.includes('raw')" type="number" min="1" class="form-control form-control-sm o_dwo_txt_goto"
+                           placeholder="Go to line" aria-label="Go to line" title="Go to line (Ctrl+G)" t-on-keydown="onGotoKeydown"/>
+                    <button t-if="lineMode" type="button" class="btn btn-sm o_dwo_txt_wrap"
+                            t-att-class="ui.wrap ? 'btn-secondary' : 'btn-light'" t-att-aria-pressed="ui.wrap ? 'true' : 'false'"
+                            title="Wrap long lines" t-on-click="toggleWrap"><i class="fa fa-paragraph me-1" aria-hidden="true"/>Wrap</button>
+                    <button type="button" class="btn btn-sm btn-light o_dwo_txt_copy" title="Copy the whole text"
+                            t-on-click="copyAll"><i class="fa fa-clipboard me-1" aria-hidden="true"/>Copy</button>
+                </div>
+            </div>
+
+            <div t-if="ui.findOpen and lineMode" class="o_dwo_txt_findbar">
+                <i class="fa fa-search text-muted" aria-hidden="true"/>
+                <input type="search" class="form-control form-control-sm o_dwo_txt_find_input" placeholder="Find in the text"
+                       aria-label="Find in the text" t-att-value="ui.query" t-on-input="onFindInput" t-on-keydown="onFindKeydown"/>
+                <span class="o_dwo_txt_matches text-muted" t-esc="matchLabel"/>
+                <button type="button" class="btn btn-sm btn-light" title="Previous (Shift+Enter)" aria-label="Previous"
+                        t-on-click="() => this.nextMatch(-1)"><i class="fa fa-chevron-up" aria-hidden="true"/></button>
+                <button type="button" class="btn btn-sm btn-light" title="Next (Enter)" aria-label="Next"
+                        t-on-click="() => this.nextMatch(1)"><i class="fa fa-chevron-down" aria-hidden="true"/></button>
+                <button type="button" class="btn btn-sm btn-light" title="Close (Esc)" aria-label="Close find"
+                        t-on-click="closeFind"><i class="fa fa-times" aria-hidden="true"/></button>
+            </div>
+
+            <div t-if="data.truncated" class="o_dwo_txt_note alert alert-warning mb-0">
+                Large file: only the first 10 MB are shown, without tree. Download the file to see all of it.
+            </div>
+            <div t-if="ui.mode === 'raw' and bigNoColours" class="o_dwo_txt_note alert alert-light mb-0 text-muted">
+                Large file: shown without syntax colours, so that it stays fast.
+            </div>
+
+            <!-- Raw -->
+            <t t-if="ui.mode === 'raw'">
+                <DwoLineView t-key="'raw' + ui.wrap" count="lines.length" row.bind="rawRow" columns="rawColumns"
+                             wrap="ui.wrap" version="ui.version" onReady.bind="onLineReady" startIndex="startIndex or 0"
+                             activeIndex="ui.activeIndex" label="'Lines of the file'"/>
+            </t>
+
+            <!-- Structure -->
+            <t t-elif="ui.mode === 'structure'">
+                <div t-if="ui.structureError" class="o_dwo_txt_error">
+                    <div class="alert alert-warning mb-2"><i class="fa fa-exclamation-triangle me-2" aria-hidden="true"/><t t-esc="ui.structureError"/></div>
+                    <button type="button" class="btn btn-sm btn-secondary" t-on-click="() => this.setMode('raw')">Show the raw text</button>
+                </div>
+                <t t-else="">
+                    <div class="o_dwo_txt_treebar">
+                        <div class="o_dwo_txt_search">
+                            <i class="fa fa-search" aria-hidden="true"/>
+                            <input type="search" class="form-control form-control-sm o_dwo_txt_tree_filter" t-att-placeholder="treeFilterLabel"
+                                   t-att-aria-label="treeFilterLabel" t-on-input="onTreeFilterInput"/>
+                        </div>
+                        <span t-if="ui.treeFilter" class="o_dwo_txt_tree_matches text-muted"><t t-esc="ui.treeMatches"/> found</span>
+                        <span class="text-muted o_dwo_txt_tree_size"><t t-esc="treeSize.toLocaleString()"/> nodes</span>
+                        <button type="button" class="btn btn-link btn-sm" t-att-disabled="!canExpandAll"
+                                t-att-title="canExpandAll ? 'Expand all' : 'Too many nodes to expand all'" t-on-click="expandAll">Expand all</button>
+                        <button type="button" class="btn btn-link btn-sm" t-on-click="collapseAll">Collapse all</button>
+                    </div>
+                    <div t-if="treeTruncated" class="o_dwo_txt_note alert alert-warning mb-0">Very large XML: only the first 200 000 elements are in the tree.</div>
+                    <DwoTreeView rootId="treeRoot" label="'Structure of the file'" nameLabel="treeNameLabel" columns="treeColumns"
+                                 version="ui.treeVersion" expanded="treeExpanded" getChildren.bind="treeChildren"
+                                 isFolder.bind="treeIsFolder" row.bind="treeRow" onOpen.bind="onTreeOpen"
+                                 onReady.bind="onTreeReady" onFocus.bind="onTreeFocus"/>
+                    <div class="o_dwo_txt_path">
+                        <code class="o_dwo_txt_path_text" t-esc="ui.focusPath or ' '"/>
+                        <button t-if="ui.focusPath" type="button" class="btn btn-link btn-sm" t-on-click="copyPath">Copy path</button>
+                        <button t-if="ui.focusLine" type="button" class="btn btn-link btn-sm o_dwo_txt_showline" t-on-click="showFocusLine">
+                            Show line <t t-esc="ui.focusLine"/> in Raw
+                        </button>
+                    </div>
+                </t>
+            </t>
+
+            <!-- Preview -->
+            <t t-elif="ui.mode === 'preview'">
+                <t t-if="group === 'markdown' or group === 'html' or group === 'notebook'">
+                    <div t-if="frame.blocked" class="o_dwo_txt_note alert alert-info mb-0 o_dwo_txt_blocked">
+                        <i class="fa fa-shield me-2" aria-hidden="true"/><t t-esc="frame.blocked"/> picture(s) from the internet or other files are not loaded (privacy and safety). Download the file to see them.
+                    </div>
+                    <iframe class="o_dwo_txt_frame" title="Preview" sandbox="allow-popups allow-popups-to-escape-sandbox"
+                            referrerpolicy="no-referrer" t-att-srcdoc="frame.html"/>
+                </t>
+                <div t-elif="group === 'svg'" class="o_dwo_txt_svg">
+                    <img t-att-src="svgUrl" alt="Picture"/>
+                </div>
+                <t t-elif="group === 'log'">
+                    <div class="o_dwo_txt_levels" role="group" aria-label="Log levels">
+                        <button t-foreach="levelButtons" t-as="l" t-key="l.id" type="button"
+                                class="btn btn-sm o_dwo_txt_level" t-att-class="'o_dwo_lvb_' + l.id + (l.on ? ' active' : '')"
+                                t-att-aria-pressed="l.on ? 'true' : 'false'" t-att-data-level="l.id"
+                                t-on-click="() => this.toggleLevel(l.id)">
+                            <t t-esc="l.label"/> <span class="badge rounded-pill" t-esc="l.count"/>
+                        </button>
+                        <span class="text-muted ms-2 o_dwo_txt_log_shown"><t t-esc="logCount.toLocaleString()"/> lines shown</span>
+                    </div>
+                    <DwoLineView t-key="'log' + ui.wrap" count="logCount" row.bind="logRow" columns="rawColumns"
+                                 wrap="ui.wrap" version="ui.version" onReady.bind="onLineReady" label="'Log lines'"/>
+                </t>
+                <t t-elif="group === 'diff'">
+                    <div class="o_dwo_txt_sub text-muted">
+                        <t t-esc="diffStats.files"/> file(s) changed,
+                        <span class="o_dwo_diff_plus">+<t t-esc="diffStats.adds"/></span>
+                        <span class="o_dwo_diff_minus">−<t t-esc="diffStats.dels"/></span>
+                    </div>
+                    <DwoLineView t-key="'diff' + ui.version" count="diff.rows.length" row.bind="diffRow" columns="diffColumns"
+                                 wrap="true" onReady.bind="onLineReady" startIndex="startIndex or 0" label="'Changes'"/>
+                </t>
+                <t t-elif="group === 'subtitles'">
+                    <div class="o_dwo_txt_sub text-muted"><t t-esc="cues.length"/> cues<t t-if="cues.length">, until <t t-esc="cues[cues.length - 1].end"/></t></div>
+                    <DwoLineView count="cues.length" row.bind="cueRow" columns="'4rem 8rem 8rem minmax(0, 1fr)'"
+                                 headers="['#', 'Start', 'End', 'Text']" wrap="true" label="'Subtitles'"/>
+                </t>
+                <t t-elif="group === 'po'">
+                    <div class="o_dwo_txt_sub">
+                        <span class="text-muted me-2" t-if="poLanguage" t-esc="poLanguage"/>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Show">
+                            <button type="button" class="btn o_dwo_po_filter" t-att-class="ui.poFilter === 'all' ? 'btn-secondary' : 'btn-light'" data-filter="all" t-on-click="() => this.setPoFilter('all')">All <t t-esc="poStats.total"/></button>
+                            <button type="button" class="btn o_dwo_po_filter" t-att-class="ui.poFilter === 'missing' ? 'btn-secondary' : 'btn-light'" data-filter="missing" t-on-click="() => this.setPoFilter('missing')">Untranslated <t t-esc="poStats.missing"/></button>
+                            <button type="button" class="btn o_dwo_po_filter" t-att-class="ui.poFilter === 'fuzzy' ? 'btn-secondary' : 'btn-light'" data-filter="fuzzy" t-on-click="() => this.setPoFilter('fuzzy')">Fuzzy <t t-esc="poStats.fuzzy"/></button>
+                            <button type="button" class="btn o_dwo_po_filter" t-att-class="ui.poFilter === 'done' ? 'btn-secondary' : 'btn-light'" data-filter="done" t-on-click="() => this.setPoFilter('done')">Translated <t t-esc="poStats.translated"/></button>
+                        </div>
+                    </div>
+                    <DwoLineView t-key="'po' + ui.poFilter" count="poRows.length" row.bind="poRow" columns="'minmax(0, 1fr) minmax(0, 1fr) 14rem'"
+                                 headers="['Source text', 'Translation', 'Used in']" wrap="true" label="'Translations'"/>
+                </t>
+            </t>
+        </div>
+    </t>
+</templates>
