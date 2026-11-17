@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.dwo.attpreview.office</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="dwo_attpreview_core.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='dwo_attpreview_core']" position="inside">
+                <block title="Office size limits" name="dwo_attpreview_office_size_block">
+                    <setting id="dwo_attpreview_max_mb_office_sheet" string="Spreadsheets: XLSX, XLS, ODS and variants" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_office_sheet"/> MB</div>
+                    </setting>
+                    <setting id="dwo_attpreview_max_mb_office_doc" string="Documents: DOCX, DOC, ODT and variants" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_office_doc"/> MB</div>
+                    </setting>
+                    <setting id="dwo_attpreview_max_mb_office_slide" string="Presentations: PPTX, PPT, ODP and variants" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_office_slide"/> MB</div>
+                    </setting>
+                    <setting id="dwo_attpreview_max_mb_office_csv" string="CSV and TSV" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_office_csv"/> MB</div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

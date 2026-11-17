@@ -77,6 +77,12 @@ class AttPreviewEngineOffice(models.AbstractModel):
     _dwo_engine_output = "text"
     _dwo_engine_priority = 10
 
+    _dwo_engine_size_groups = (
+        ("office_sheet", ("xlsx", "xlsm", "xltx", "xltm", "xls", "ods", "ots"), 50),
+        ("office_doc", ("docx", "docm", "dotx", "dotm", "doc", "odt", "ott"), 30),
+        ("office_slide", ("pptx", "pptm", "ppsx", "ppsm", "potx", "potm", "ppt", "odp", "otp"), 30),
+        ("office_csv", ("csv", "tsv"), 20),
+    )
     def _dwo_engine_notice(self, extension):
         if extension in LEGACY_KINDS:
             return _(

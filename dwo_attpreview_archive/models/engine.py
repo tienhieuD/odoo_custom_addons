@@ -19,6 +19,8 @@ class AttPreviewEngineArchive(models.AbstractModel):
     _dwo_engine_output = "json"
     _dwo_engine_priority = 10
     _dwo_engine_version = "1"
+
+    _dwo_engine_size_groups = (("archive", ("zip", "rar", "7z", "tar", "tgz", "gz", "bz2", "xz"), 500),)
     _dwo_engine_dialog_width = "medium"
 
     def _dwo_render(self, content, filename):

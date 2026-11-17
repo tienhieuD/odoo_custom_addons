@@ -85,6 +85,11 @@ class AttPreviewEngineMail(models.AbstractModel):
     _dwo_engine_output = "json"
     _dwo_engine_priority = 10
     _dwo_engine_version = "3"
+
+    _dwo_engine_size_groups = (
+        ("mail_message", ("eml", "emlx", "msg", "oft"), 30),
+        ("mail_card", ("ics", "vcf"), 5),
+    )
     _dwo_engine_dialog_width = "medium"  # an email or a card reads better in a narrower window
 
     # --- engine API ---------------------------------------------------------

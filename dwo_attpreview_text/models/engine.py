@@ -26,7 +26,9 @@ class AttPreviewEngineText(models.AbstractModel):
     # a generic reader: an engine made for one of these extensions (office for csv...) wins
     _dwo_engine_priority = 200
     _dwo_engine_version = "1"
-    _dwo_engine_max_size_mb = 0  # the global limit of the core (Settings); the text shown is cut at 10 MB
+    _dwo_engine_max_size_mb = 0  # see _dwo_engine_size_groups; the text shown is cut at 10 MB
+
+    _dwo_engine_size_groups = (("text", text_tools.EXTENSIONS, 10),)
     _dwo_engine_dialog_width = "wide"
 
     def _dwo_render(self, content, filename):
