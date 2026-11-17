@@ -3,11 +3,12 @@
 {
     "name": "Form Focus Mode",
     "version": "19.0.1.0.0",
-    "summary": "One click gives the form view the whole screen: hide the chatter, widen the sheet, hide the top bar, and bring the chatter back as a side drawer. Remembered per model. Keywords: full screen form view, fullscreen form, wide form view, hide chatter, chatter toggle, form view width, focus mode, form view layout, maximize form, chatter drawer, form view full width.",
-    "description": "A small button in the control panel of every form view cycles three layouts: normal, wide (the chatter is "
-                   "hidden and the sheet uses the full width) and focus (the same, and the top navigation bar is hidden "
-                   "too). While the chatter is hidden a floating button opens it as a side drawer, so the history is one "
-                   "click away. The choice is remembered for each model in your browser. Keyboard shortcut Alt+Shift+F (Ctrl+Shift+F on a Mac).",
+    "summary": "Three buttons next to the pager choose the form layout for all your forms: normal, chatter always hidden, or auto chatter (a bar on the right opens the chatter as a drawer you can resize). Remembered. Keywords: full screen form view, fullscreen form, wide form view, hide chatter, chatter toggle, form view width, auto chatter, chatter drawer, form view layout, maximize form.",
+    "description": "Three buttons next to the pager of every form view choose the layout, for all your forms: normal "
+                   "(the chatter beside the form, as Odoo does), always hidden (the form uses the full width) and auto "
+                   "drawer (the chatter is hidden; a bar on the right with the words Auto chatter opens it as a drawer "
+                   "over a dimmed background, as wide as the usual chatter, with a handle to change its width). The "
+                   "choice and the width are remembered. Keyboard shortcut Alt+Shift+F (Ctrl+Shift+F on a Mac).",
     "author": "DuoTEK",
     "website": "https://duotek.io.vn",
     "support": "hello@duotek.io.vn",
