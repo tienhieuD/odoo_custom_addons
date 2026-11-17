@@ -11,11 +11,13 @@ MAX_3MF_UNPACKED = 512 * 1024 * 1024
 MAX_3MF_ENTRIES = 20000
 MESH_KINDS = ("stl", "obj", "ply")
 SCENE_KINDS = ("glb", "gltf", "3mf", "fbx", "dae")
+STEP_KINDS = ("step", "stp", "iges", "igs")
 
 
 class AttPreview3DEngine(models.AbstractModel):
-    """3D models (STL, OBJ, GLB/GLTF, 3MF, PLY, FBX, DAE), drawn in the browser by three.js in a sandboxed frame. The
-    server only checks that the file is what its extension says (and sane); it parses nothing but the JSON of a
+    """3D models (STL, OBJ, GLB/GLTF, 3MF, PLY, FBX, DAE) and CAD solids (STEP, IGES, Rhino 3DM), drawn in the browser by
+    three.js in a sandboxed frame (STEP and IGES are meshed by Open CASCADE, 3DM read by rhino3dm, both WebAssembly).
+    The server only checks that the file is what its extension says (and sane); it parses nothing but the JSON of a
     .gltf."""
 
     _name = "dwo.attpreview.engine.model3d"
@@ -23,13 +25,15 @@ class AttPreview3DEngine(models.AbstractModel):
     _description = "Attachment Preview: 3D models"
 
     _dwo_engine_code = "model3d"
-    _dwo_engine_label = "3D models (STL, OBJ, GLB, GLTF, 3MF, PLY, FBX, DAE)"
-    _dwo_engine_extensions = MESH_KINDS + SCENE_KINDS
+    _dwo_engine_label = "3D models (STL, OBJ, GLB, GLTF, 3MF, PLY, FBX, DAE, STEP, IGES, 3DM)"
+    _dwo_engine_extensions = MESH_KINDS + SCENE_KINDS + STEP_KINDS + ("3dm",)
     _dwo_engine_output = "text"
     _dwo_engine_priority = 10
     _dwo_engine_size_groups = (
         ("model3d_mesh", MESH_KINDS, 50),
         ("model3d_scene", SCENE_KINDS, 50),
+        ("model3d_step", STEP_KINDS, 25),
+        ("model3d_rhino", ("3dm",), 50),
     )
 
     def _dwo_render(self, content, filename):
@@ -84,6 +88,25 @@ class AttPreview3DEngine(models.AbstractModel):
                 raise UserError(self.env._(
                     "This glTF file refers to separate files (%s). Use a .glb file, or a .gltf with the data inside.",
                     str(uri)[:80]))
+
+    def _dwo_check_step(self, content):
+        head = self._dwo_head(content, 4096)
+        if not head.startswith(b"ISO-10303-21") or b"FILE_SCHEMA" not in content[:65536]:
+            raise self._dwo_bad("step")
+
+    _dwo_check_stp = _dwo_check_step
+
+    def _dwo_check_iges(self, content):
+        # fixed 80-column records; the first one is the Start section, with S in column 73
+        first = content[:81].split(b"\n")[0].rstrip(b"\r")
+        if len(first) < 73 or first[72:73] != b"S" or b"\0" in content[:2048]:
+            raise self._dwo_bad("iges")
+
+    _dwo_check_igs = _dwo_check_iges
+
+    def _dwo_check_3dm(self, content):
+        if not content.startswith(b"3D Geometry File Format"):
+            raise self._dwo_bad("3dm")
 
     def _dwo_check_fbx(self, content):
         if not (content.startswith(b"Kaydara FBX Binary") or self._dwo_head(content)[:1] == b";"
