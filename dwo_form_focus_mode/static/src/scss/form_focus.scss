@@ -1,16 +1,9 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 // Layouts of a form view: the class is set by form_focus.js on the form (o_dwo_ffm_wide / o_dwo_ffm_focus).
 
-// the toggle button of the control panel (before the pager)
-.o_dwo_ffm_toggle {
-    white-space: nowrap;
-
-    // outline only, also while a layout is on: the colour of the theme tells it
-    &.active, &.active:hover, &.active:focus {
-        color: var(--primary, #714b67);
-        background-color: transparent;
-        border-color: var(--primary, #714b67);
-    }
+// the three layout buttons of the control panel (before the pager), like the view switcher
+.o_dwo_ffm_switch .o_dwo_ffm_icon {
+    vertical-align: -3px;
 }
 
 // wide and focus: no chatter in the page, the sheet takes the width
@@ -46,26 +39,36 @@
     box-shadow: -6px 0 24px rgba(0, 0, 0, .18);
 }
 
+// the dimmed background behind the open drawer: a click on it closes the drawer
+.o_dwo_ffm_backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1035;
+    background: rgba(0, 0, 0, .35);
+}
+
+// the button that opens the drawer, with its label
 .o_dwo_ffm_drawer_btn {
     position: fixed;
     right: 1rem;
     bottom: 1rem;
     z-index: 1050;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 50%;
-    padding: 0;
+    border-radius: 2rem;
+    padding: .45rem .9rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
-}
 
-.o_dwo_ffm_drawer .o_dwo_ffm_drawer_btn {
-    top: .75rem;
-    bottom: auto;
-    width: 2rem;
-    height: 2rem;
+    &.o_dwo_ffm_open {
+        top: .75rem;
+        bottom: auto;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        border-radius: 50%;
+    }
 }
 
 // focus: without the top navigation bar
 body.o_dwo_ffm_focus_body .o_main_navbar {
     display: none;
 }
+

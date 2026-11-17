@@ -42,6 +42,12 @@ patch(FormController.prototype, {
         super.setup(...arguments);
         this.dwoFfm = useState({ mode: readMode(this.props.resModel), drawer: false });
         useHotkey("alt+shift+f", () => this.dwoFfmCycle(), { allowRepeat: false });
+        // Esc closes the chatter drawer
+        useHotkey("escape", () => {
+            if (this.dwoFfm.drawer) {
+                this.dwoFfm.drawer = false;
+            }
+        }, { bypassEditableProtection: true });
         // the button is in the control panel (before the pager): it reads the layout from here
         useSubEnv({ dwoFfm: this });
         useEffect(
@@ -62,21 +68,22 @@ patch(FormController.prototype, {
         return this.dwoFfmEnabled ? this.dwoFfm.mode : "normal";
     },
 
-    /** What a click does, as the label of the button. */
-    get dwoFfmLabel() {
-        return { normal: _t("Wide form"), wide: _t("Focus mode"), focus: _t("Normal form") }[this.dwoFfmMode];
-    },
-
-    get dwoFfmTitle() {
+    /** Name of a layout, for the tooltip of its button. */
+    dwoFfmTitleOf(mode) {
         return {
-            normal: _t("Wide form: hide the chatter and use the full width (Alt+Shift+F)"),
-            wide: _t("Focus mode: also hide the top bar (Alt+Shift+F)"),
-            focus: _t("Back to the normal form (Alt+Shift+F)"),
-        }[this.dwoFfmMode];
+            normal: _t("Normal form (Alt+Shift+F cycles the layouts)"),
+            wide: _t("Wide form: hide the chatter and use the full width"),
+            focus: _t("Focus mode: also hide the top bar"),
+        }[mode];
     },
 
-    get dwoFfmIcon() {
-        return this.dwoFfmMode === "normal" ? "fa-expand" : this.dwoFfmMode === "wide" ? "fa-arrows-alt" : "fa-compress";
+    dwoFfmSet(mode) {
+        if (!this.dwoFfmEnabled || !MODES.includes(mode) || mode === this.dwoFfm.mode) {
+            return;
+        }
+        this.dwoFfm.mode = mode;
+        this.dwoFfm.drawer = false;
+        saveMode(this.props.resModel, mode);
     },
 
     dwoFfmCycle() {
