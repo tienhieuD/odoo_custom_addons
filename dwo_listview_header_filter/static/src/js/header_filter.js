@@ -24,7 +24,16 @@ export class DwoHeaderFilter extends Component {
 
     setup() {
         this.searchModel = this.env.searchModel;
-        this.popover = usePopover(DwoHeaderFilterPopover, { position: "bottom-end", popoverClass: "o_dwo_hf_popover" });
+        this.popover = usePopover(DwoHeaderFilterPopover, {
+            position: "bottom-end",
+            popoverClass: "o_dwo_hf_popover",
+            // the icon stays shown while its popover is open
+            onClose: () => {
+                if (this.openedBy) {
+                    delete this.openedBy.dataset.dwoHfOpen;
+                }
+            },
+        });
         useBus(this.searchModel, "update", () => this.render());
     }
 
@@ -59,6 +68,8 @@ export class DwoHeaderFilter extends Component {
             return;
         }
         const item = this.activeItems[0];
+        this.openedBy = ev.currentTarget;
+        this.openedBy.dataset.dwoHfOpen = "1";
         this.popover.open(ev.currentTarget, {
             field: { ...this.field, name: this.props.column.name, string: this.props.column.label || this.field.string },
             kind: this.kind,
