@@ -10,7 +10,7 @@
     </t>
 
     <t t-name="dwo_form_focus_mode.Button">
-        <button t-if="ffm.dwoFfmEnabled" type="button" class="btn btn-outline-secondary o_dwo_ffm_toggle" t-att-class="{ active: ffm.dwoFfmMode !== 'normal' }"
+        <button t-if="ffm.dwoFfmEnabled" type="button" class="btn btn-sm btn-outline-secondary o_dwo_ffm_toggle" t-att-class="{ active: ffm.dwoFfmMode !== 'normal' }"
                 t-att-data-mode="ffm.dwoFfmMode" t-att-data-tooltip="ffm.dwoFfmTitle" t-on-click.stop="() => ffm.dwoFfmCycle()">
             <i class="fa me-1" t-att-class="ffm.dwoFfmIcon" role="img"/><span class="o_dwo_ffm_label d-none d-xl-inline" t-esc="ffm.dwoFfmLabel"/>
         </button>
