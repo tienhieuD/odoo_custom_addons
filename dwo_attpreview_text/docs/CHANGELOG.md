@@ -1,5 +1,19 @@
 # CHANGELOG - dwo_attpreview_text
 
+## 2026-11-17 - 18.0.1.1.0 - Web pictures through the server, link confirmation (#87)
+
+**Added:** Markdown, HTML and notebook previews show the pictures they link from the internet: the Odoo server downloads
+them (https only by default, real pictures only, re-encoded; an address ending like a program or script is refused) and
+the viewer shows them; one that cannot be shown gets a red error with the reason. Settings > Attachment Preview >
+"Text and code pictures": "Load web pictures through the server" and "Only secure (HTTPS) pictures", both on by default
+(`dwo_attpreview_text.remote_images` / `.remote_https_only`). Off: pictures stay blocked, with a button per file.
+Route `/dwo_attpreview_text/remote_image` (auth user): the file is access-checked like the preview and `url` must be an
+address written in that file, so it cannot fetch any other address. A click on a link opens a confirmation dialog with
+the full address, then a new tab (`noopener,noreferrer`).
+
+- Same frame as the Mail preview: one script by nonce, no `allow-popups`. Engine version 2 (HTML result has
+  `remote_urls`, pictures are markers).
+
 ## 2026-11-17 - 18.0.1.0.0 - 18.0 port of 19.0.1.0.0 (#83)
 
 - Same features and behaviour as 19.0.1.0.0 (entry below); engine of Secure Attachment Preview core 18.0.1.3.0.

@@ -1,5 +1,20 @@
 # CHANGELOG - dwo_attpreview_mail
 
+## 2026-11-17 - 18.0.2.2.0 - Errors for refused pictures, link confirmation (#87)
+
+**Added:** a picture that cannot be shown is replaced by a red message that says why (not a picture, plain http, private
+address, host not found, too large, website error) instead of an empty hole. An `<img>` whose address is not http(s)
+(`javascript:`, `file:`, a path, a script name) is kept as an error marker `data-dwo-bad` (it was dropped silently).
+A click on a link (body, calendar event, contact card) opens a dialog with the full address; "Open in a new tab"
+opens it with `noopener,noreferrer`, "Stay here" opens nothing.
+
+- The image proxy moved to the core (`dwo_attpreview_core/remote_image.py`, shared with the Text preview);
+  `parsers/remote.py` is an alias of it. A refused picture answers `422` with the reason as plain text; addresses ending
+  like a program or script (`.exe .sh .bat .js .svg .zip` ...) are refused before any download.
+- The body frame now holds exactly one script (allowed by a nonce in its CSP) that reports link clicks to the viewer;
+  `allow-popups` is gone from the sandbox (no `allow-same-origin`, no network).
+- Engine version 4 (the body markup changed: cached results are rebuilt).
+
 ## 2026-11-16 - 18.0.2.1.0 - 18.0 port of 19.0.2.1.0 (#79)
 
 - Same features and behaviour as 19.0.2.1.0 (remote pictures through the server, image proxy). Needs dwo_attpreview_core 18.0.1.1.0.
