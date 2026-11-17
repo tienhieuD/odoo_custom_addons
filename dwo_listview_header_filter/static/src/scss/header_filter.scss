@@ -1,31 +1,50 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-// The filter icon lives in its own box in the header cell and takes no absolute position, so it does not touch what
-// other modules add to the cell (the pin button of the sticky header and column module is placed apart, see below).
-.o_list_renderer th .o_dwo_hf_btn {
-    flex: 0 0 auto;
-    line-height: 1;
-    padding: 2px 3px !important;
-    border-radius: 4px;
-    color: inherit;
-    opacity: .4;
-    font-size: .8em;
+// The filter icon looks like the pin button of listview_sticky_header_and_column: a small framed box over the header
+// cell, shown while the pointer is on the header (or the popover is open). A filtered column keeps it visible, in the
+// colour of the theme. It is placed out of the flow (absolute), so it never changes the width of a column.
+.o_list_renderer thead th .o_dwo_hf_btn {
+    display: none;
+    position: absolute;
+    bottom: 50%;
+    margin: 0 1px -10px 0 !important;
+    right: 24px;
+    width: 20px;
+    height: 20px;
+    padding: 0 !important;
+    z-index: 10;
+    line-height: 18px;
+    font-size: .8rem;
+    text-align: center;
     text-decoration: none;
+    color: #495057;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
 
-    &:hover, &:focus {
-        opacity: .9;
+    &:hover, &:focus-visible, &[data-dwo-hf-open] {
+        display: block;
+    }
+
+    &:active {
+        transform: scale(.8);
     }
 
     &.o_dwo_hf_active {
-        opacity: 1;
+        display: block;
         color: #fff;
         background: var(--primary, #714b67);
+        border-color: var(--primary, #714b67);
     }
 }
 
-// next to the pin button of listview_sticky_header_and_column (shown on hover, 24px from the right edge, 20px wide: it covers 24-44px):
-// keep the filter icon clear of it
-.o_list_renderer th:has(> .js_pin_this_column) .o_dwo_hf_btn {
-    margin-right: 46px;
+.o_list_renderer thead th:hover .o_dwo_hf_btn {
+    display: block;
+}
+
+// next to the pin button of listview_sticky_header_and_column (24px from the right edge, 20px wide): one step further
+.o_list_renderer thead th:has(> .js_pin_this_column) .o_dwo_hf_btn {
+    right: 48px;
 }
 
 .o_dwo_hf_popover .popover-body, .o_dwo_hf_popover .o_popover {
