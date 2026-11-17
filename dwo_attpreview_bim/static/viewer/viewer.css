@@ -1,0 +1,17 @@
+/* Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). */
+#main { flex: 1; min-height: 0; display: flex; }
+#center { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+#tree, #props { flex: none; overflow: auto; background: #fff; font-size: 13px; padding: 8px; box-sizing: border-box; }
+#tree { width: 230px; border-right: 1px solid #d8dadd; }
+#props { width: 300px; border-left: 1px solid #d8dadd; }
+#tree[hidden], #props[hidden] { display: none; }
+#tree ul { list-style: none; margin: 0; padding-left: 14px; }
+#tree > ul { padding-left: 0; }
+#tree li > label { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
+#tree .kind { color: #777; font-size: 11px; }
+#props h3 { margin: 0 0 6px; font-size: 14px; }
+#props h4 { margin: 12px 0 4px; font-size: 12px; text-transform: uppercase; color: #555; }
+#props table { width: 100%; border-collapse: collapse; }
+#props td { padding: 2px 4px; border-bottom: 1px solid #eceef0; vertical-align: top; word-break: break-word; }
+#props td:first-child { color: #555; width: 45%; }
+#props .hint { color: #777; }
