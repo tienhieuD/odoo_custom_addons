@@ -1,29 +1,31 @@
 /** @odoo-module **/
 // Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { Component, onMounted, proxy, useProps } from "@odoo/owl";
+import { Component, onMounted, proxy, signal, useProps } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { download } from "@web/core/network/download";
 import { _t } from "@web/core/l10n/translation";
 import { dwoAttPreviewIconUrl } from "@dwo_attpreview_core/js/file_kind";
+import {
+    FRAME_SANDBOX, escapeHtml, fetchPictures, frameParts, onLinkClick, pictureError, useFrameLinks,
+} from "@dwo_attpreview_core/js/safe_frame";
 
 const { DateTime } = luxon;
 
-// The body is shown in a frame with no script and no network: only pictures already inside the email (data: URIs)
-// and inline styles. Links open in a new tab, without referrer, when the user clicks them.
-const FRAME_CSP = "default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:";
+// The body is shown in a frame with no network: only pictures already inside the email (data: URIs), pictures the
+// server fetched for the user, and inline styles. A click on a link asks the user first (safe_frame.js).
 const FRAME_STYLE =
     "body{margin:16px 20px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;" +
     "line-height:1.45;color:#1f2937;background:#fff;overflow-wrap:anywhere}img{max-width:100%;height:auto}" +
     "pre{white-space:pre-wrap;font-family:inherit;margin:0}table{max-width:100%}";
 
-const REMOTE_IMG = /<img data-dwo-remote="(\d+)" hidden/g;
-const MAX_PARALLEL = 4;
-
-function escapeHtml(text) {
-    return String(text || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-}
+const REMOTE_IMG = /<img data-dwo-remote="(\d+)" hidden([^>]*)>/g;
+const BAD_IMG = /<img data-dwo-bad="([^"]*)" hidden([^>]*)>/g;
+const altOf = (rest) => {
+    const m = /\salt="([^"]*)"/.exec(rest || "");
+    return m ? m[1] : "";
+};
 
 export function dwoMailSize(bytes) {
     if (bytes < 1024) return `${bytes} B`;
@@ -50,8 +52,10 @@ export class MailViewer extends Component {
             this.data = {};
         }
         // remote pictures of the body (#79): loaded through the Odoo server, never by the browser from outside
-        // Odoo 20 (Owl 3): proxy instead of useState
-        this.remote = proxy({ status: "idle", pictures: {}, failed: 0 });
+        // Odoo 20 (Owl 3): proxy instead of useState, signal ref read as this.frame()
+        this.remote = proxy({ status: "idle", pictures: {}, errors: {}, failed: 0 });
+        this.frame = signal.ref();
+        this.links = useFrameLinks(() => this.frame());
         onMounted(() => this.startRemote());
     }
 
@@ -89,33 +93,11 @@ export class MailViewer extends Component {
 
     async loadRemote() {
         this.remote.status = "loading";
-        const pictures = {};
-        let failed = 0;
-        const queue = [...Array(this.remoteCount).keys()];
-        const worker = async () => {
-            while (queue.length) {
-                const index = queue.shift();
-                try {
-                    const response = await fetch(this.remoteUrl(index), { credentials: "same-origin" });
-                    if (!response.ok) {
-                        throw new Error(String(response.status));
-                    }
-                    const blob = await response.blob();
-                    pictures[index] = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(blob);
-                    });
-                } catch {
-                    failed++;
-                }
-            }
-        };
-        await Promise.all(Array.from({ length: Math.min(MAX_PARALLEL, queue.length) }, worker));
+        const { pictures, errors } = await fetchPictures((i) => this.remoteUrl(i), this.remoteCount);
         // one update of the frame, when every picture is there
         this.remote.pictures = pictures;
-        this.remote.failed = failed;
+        this.remote.errors = errors;
+        this.remote.failed = Object.keys(errors).length;
         this.remote.status = "loaded";
     }
 
@@ -148,17 +130,34 @@ export class MailViewer extends Component {
     }
 
     get srcdoc() {
-        const pictures = this.remote.pictures;
-        const body = (this.data.body_html || `<pre>${escapeHtml(this.data.body_text)}</pre>`).replace(
-            REMOTE_IMG,
-            (match, index) => (pictures[index] ? `<img src="${pictures[index]}"` : match)
-        );
-        return (
-            `<!DOCTYPE html><html><head><meta charset="utf-8">` +
-            `<meta http-equiv="Content-Security-Policy" content="${FRAME_CSP}">` +
-            `<meta name="referrer" content="no-referrer"><base target="_blank">` +
-            `<style>${FRAME_STYLE}</style></head><body>${body}</body></html>`
-        );
+        // made again only when the pictures change: a new document (new nonce) would reload the frame
+        if (!this._srcdoc || this._srcdocKey !== this.remote.status) {
+            this._srcdocKey = this.remote.status;
+            this._srcdoc = this.buildSrcdoc();
+        }
+        return this._srcdoc;
+    }
+
+    buildSrcdoc() {
+        const { pictures, errors } = this.remote;
+        const body = (this.data.body_html || `<pre>${escapeHtml(this.data.body_text)}</pre>`)
+            .replace(REMOTE_IMG, (match, index, rest) => {
+                if (pictures[index]) {
+                    return `<img src="${pictures[index]}"${rest}>`;
+                }
+                return errors[index] ? pictureError(errors[index], altOf(rest)) : match;
+            })
+            .replace(BAD_IMG, (match, code, rest) => pictureError(code, altOf(rest)));
+        const { head, tail } = frameParts();
+        return `<!DOCTYPE html><html><head>${head}<style>${FRAME_STYLE}</style></head><body>${body}${tail}</body></html>`;
+    }
+
+    get frameSandbox() {
+        return FRAME_SANDBOX;
+    }
+
+    openLink(ev, url) {
+        onLinkClick(this.links, ev, url);
     }
 
     // --- attachments ------------------------------------------------------

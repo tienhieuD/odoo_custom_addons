@@ -38,7 +38,7 @@
                         </button>
                     </div>
                 </div>
-                <iframe class="o_dwo_mail_body" title="Email body" sandbox="allow-popups allow-popups-to-escape-sandbox"
+                <iframe class="o_dwo_mail_body" title="Email body" t-ref="this.frame" t-att-sandbox="this.frameSandbox"
                         referrerpolicy="no-referrer" t-att-srcdoc="this.srcdoc"/>
             </t>
             <div t-elif="this.data.kind === 'calendar'" class="o_dwo_mail_cards">
@@ -55,7 +55,7 @@
                         <tr t-if="event.recurrence"><th>Repeats</th><td t-out="event.recurrence"/></tr>
                         <tr t-if="event.location"><th>Where</th><td t-out="event.location"/></tr>
                         <tr t-if="event.organizer"><th>Organizer</th><td t-out="event.organizer"/></tr>
-                        <tr t-if="event.url and this.isWebLink(event.url)"><th>Link</th><td><a t-att-href="event.url" target="_blank" rel="noopener noreferrer" t-out="event.url"/></td></tr>
+                        <tr t-if="event.url and this.isWebLink(event.url)"><th>Link</th><td><a t-att-href="event.url" target="_blank" rel="noopener noreferrer" t-on-click="(ev) => this.openLink(ev, event.url)" t-out="event.url"/></td></tr>
                     </table>
                     <div t-if="event.attendees.length" class="o_dwo_mail_people">
                         <div class="o_dwo_mail_label">Attendees</div>
@@ -84,7 +84,7 @@
                         <tr t-foreach="card.phones" t-as="item" t-key="'p' + item_index"><th>Phone<t t-if="item.type"> (<t t-out="item.type"/>)</t></th><td t-out="item.value"/></tr>
                         <tr t-foreach="card.addresses" t-as="item" t-key="'a' + item_index"><th>Address<t t-if="item.type"> (<t t-out="item.type"/>)</t></th><td t-out="item.value"/></tr>
                         <tr t-if="card.birthday"><th>Birthday</th><td t-out="card.birthday"/></tr>
-                        <tr t-if="card.url and this.isWebLink(card.url)"><th>Website</th><td><a t-att-href="card.url" target="_blank" rel="noopener noreferrer" t-out="card.url"/></td></tr>
+                        <tr t-if="card.url and this.isWebLink(card.url)"><th>Website</th><td><a t-att-href="card.url" target="_blank" rel="noopener noreferrer" t-on-click="(ev) => this.openLink(ev, card.url)" t-out="card.url"/></td></tr>
                     </table>
                     <pre t-if="card.note" class="o_dwo_mail_note" t-out="card.note"/>
                 </div>

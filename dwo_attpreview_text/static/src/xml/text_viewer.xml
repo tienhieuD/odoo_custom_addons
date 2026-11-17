@@ -114,11 +114,17 @@
             <!-- Preview -->
             <t t-elif="this.ui.mode === 'preview'">
                 <t t-if="this.group === 'markdown' or this.group === 'html' or this.group === 'notebook'">
-                    <div t-if="this.frame.blocked" class="o_dwo_txt_note alert alert-info mb-0 o_dwo_txt_blocked">
-                        <i class="oi me-2" data-icon="security" aria-hidden="true"/><t t-out="this.frame.blocked"/> picture(s) from the internet or other files are not loaded (privacy and safety). Download the file to see them.
+                    <div t-if="this.remote.status === 'loading' or this.remote.status === 'loaded'" class="o_dwo_txt_note alert alert-info mb-0 o_dwo_txt_blocked o_dwo_txt_proxied">
+                        <i class="oi me-2" data-icon="security" aria-hidden="true"/>Pictures from the internet are loaded through your Odoo server: your IP address and browser are not shown to their host.
+                        <t t-if="this.remote.status === 'loading'"> Loading...</t>
+                        <t t-elif="this.remote.failed"> <t t-out="this.remote.failed"/> could not be shown.</t>
                     </div>
-                    <iframe class="o_dwo_txt_frame" title="Preview" sandbox="allow-popups allow-popups-to-escape-sandbox"
-                            referrerpolicy="no-referrer" t-att-srcdoc="this.frame.html"/>
+                    <div t-elif="this.remote.status === 'blocked'" class="o_dwo_txt_note alert alert-info mb-0 o_dwo_txt_blocked">
+                        <i class="oi me-2" data-icon="security" aria-hidden="true"/>Pictures from the internet are not loaded (privacy).
+                        <button type="button" class="btn btn-link btn-sm p-0 ms-2 align-baseline o_dwo_txt_load_remote" t-on-click="() => this.loadRemote()">Load them through the server</button>
+                    </div>
+                    <iframe class="o_dwo_txt_frame" title="Preview" t-ref="this.frameEl" t-att-sandbox="this.frameSandbox"
+                            referrerpolicy="no-referrer" t-att-srcdoc="this.frameHtml"/>
                 </t>
                 <div t-elif="this.group === 'svg'" class="o_dwo_txt_svg">
                     <img t-att-src="this.svgUrl" alt="Picture"/>

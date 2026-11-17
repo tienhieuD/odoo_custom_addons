@@ -193,10 +193,20 @@ class TestRemoteRoute(HttpCase):
 
     def test_02_https_only_setting(self):
         self.authenticate("admin", "admin")
-        self.assertEqual(self.url_open(self.url(1)).status_code, 404, "plain http is off by default")
+        res = self.url_open(self.url(1))
+        self.assertEqual(res.status_code, 422, "plain http is off by default")
+        self.assertEqual(res.text, "scheme not allowed", "the reason is given to the viewer")
         self.env["ir.config_parameter"].sudo().set_bool("dwo_attpreview_mail.remote_https_only", False)
         remote.CACHE.clear()
         self.assertEqual(self.url_open(self.url(1)).status_code, 200)
+
+    def test_02b_programs_and_scripts_are_refused_before_any_download(self):
+        for url in ("https://x.example/a.exe", "https://x.example/run.sh?x=1", "https://x.example/p/app.JS",
+                    "https://x.example/logo.svg", "https://x.example/a.zip"):
+            with self.assertRaises(remote.RemoteImageError, msg=url) as ctx:
+                remote.check_url(url)
+            self.assertEqual(str(ctx.exception), "not a picture")
+        self.assertEqual(remote.check_url("https://x.example/pixel.php?id=1")[3], "/pixel.php?id=1")
 
     def test_03_access_of_the_email(self):
         new_test_user(self.env, login="dwo_remote_portal", password="dwo_remote_portal", groups="base.group_portal")

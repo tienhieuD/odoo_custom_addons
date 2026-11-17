@@ -50,7 +50,7 @@ class AttPreviewEngineText(models.AbstractModel):
             return {"type": "json", "data": data}
         if group == "html":
             if len(text) <= text_tools.MAX_HTML_PREVIEW:
-                data["html"], data["blocked_images"] = text_tools.preview_html(text)
+                data["html"], data["blocked_images"], data["remote_urls"] = text_tools.preview_html(text)
         elif group == "xml":
             try:
                 data["xml"] = text_tools.xml_tree(safe_xml(content))
