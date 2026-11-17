@@ -86,7 +86,7 @@ class AttPreviewEngineMail(models.AbstractModel):
     _dwo_engine_extensions = ("eml", "emlx", "msg", "oft", "ics", "vcf")
     _dwo_engine_output = "json"
     _dwo_engine_priority = 10
-    _dwo_engine_version = "3"
+    _dwo_engine_version = "4"
 
     _dwo_engine_size_groups = (
         ("mail_message", ("eml", "emlx", "msg", "oft"), 30),
