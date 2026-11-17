@@ -1,0 +1,23 @@
+<!-- Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The CSP (no network) is sent as a header by the asset route of the controller. -->
+<title>CAD preview</title>
+<link rel="stylesheet" href="/dwo_attpreview_webgl/asset/viewer/common.css">
+<link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<div id="bar">
+    <button type="button" id="reset" title="Fit the whole drawing in the view">Reset view</button>
+    <button type="button" id="layers-open" title="Show or hide layers" aria-expanded="false">Layers</button>
+    <button type="button" id="dark" title="Dark background" aria-pressed="false">Dark</button>
+    <span id="info"></span>
+</div>
+<div id="stage"></div>
+<div id="layers" hidden></div>
+<script type="module" src="viewer.js"></script>
+</body>
+</html>
