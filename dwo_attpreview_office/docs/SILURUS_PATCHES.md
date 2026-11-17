@@ -5,32 +5,34 @@
 
 | Package (npm, MIT) | Version | Used for | Local patch |
 |---|---|---|---|
-| `@silurus/ooxml` | 0.90.0 | docx, xlsx, pptx (and their variants), csv, tsv | `0003` (xlsx search highlight speed) |
-| `@silurus/ooxml-legacy-office` | 0.90.0 | doc, xls, ppt (optional add-on) | `0002` (relative import) |
-| `@silurus/ooxml-opendocument` | 0.90.0 | odt, ods, odp and ott, ots, otp (optional add-on, since 19.0.1.1.0, #84) | `0002` (relative import) |
+| `@silurus/ooxml` | 0.90.1 | docx, xlsx, pptx (and their variants), csv, tsv | `0003` (xlsx search highlight speed) |
+| `@silurus/ooxml-legacy-office` | 0.90.1 | doc, xls, ppt (optional add-on) | `0002` (relative import) |
+| `@silurus/ooxml-opendocument` | 0.90.1 | odt, ods, odp and ott, ots, otp (optional add-on, since 19.0.1.1.0, #84) | `0002` (relative import) |
 
 | Item | Value |
 |---|---|
-| Upstream | https://github.com/yukiyokotani/office-open-xml-viewer, tag `v0.90.0` |
-| Licences | `LICENSE` (main library), `LICENSE.ooxml-legacy-office`, `LICENSE.ooxml-opendocument`; Rust crate notices in `THIRD_PARTY_NOTICES.md`, `THIRD_PARTY_NOTICES.ooxml-legacy-office.md`, `THIRD_PARTY_NOTICES.ooxml-opendocument.md` (all copied unchanged from the 0.90.0 packages; not served by the asset route) |
+| Upstream | https://github.com/yukiyokotani/office-open-xml-viewer, tag `v0.90.1` |
+| Licences | `LICENSE` (main library), `LICENSE.ooxml-legacy-office`, `LICENSE.ooxml-opendocument`; Rust crate notices in `THIRD_PARTY_NOTICES.md`, `THIRD_PARTY_NOTICES.ooxml-legacy-office.md`, `THIRD_PARTY_NOTICES.ooxml-opendocument.md` (all copied unchanged from the 0.90.1 packages; not served by the asset route) |
 | Patches | `patches/silurus/0002-addons-relative-companion-import.patch`, `patches/silurus/0003-xlsx-find-overlay-visible-matches-only.patch` |
-| Files | only the files reachable from the entries the viewer imports (see "Upgrade" step 3): 157 files, about 25 MB (the wasm parsers are loaded only when a file of their type is opened) |
+| Files | only the files reachable from the entries the viewer imports (see "Upgrade" step 3): 153 files (plus the 6 licence/notice files), about 25 MB (the wasm parsers are loaded only when a file of their type is opened) |
 
 ## History
 - **0.89.11 + patch `0001`** (until 19.0.1.0.2): the xlsx parser dropped connector shapes (`xdr:cxnSp`) and the renderer drew no arrowheads. Fixed by a local source patch (Rust + TypeScript, rebuilt dist), reported upstream as issue #2240 / PR #2243.
 - **0.90.0** (19.0.1.1.0, #84): PR #2243 is merged upstream ("Excel: connectors and arrow heads", release notes of v0.90.0). Patch `0001`, its upstream-for-main copy and the custom build are gone: the main library is the stock npm `dist` again. Checked on `japan-labour-market-2024.xlsx`, sheet "Hiring Flow" (connectors, elbow lines and arrowheads drawn). The rotation part of the old patch (connectors rotated 90/270 in a stand-alone anchor) was never upstream; it was not verified against real Excel files either.
 - 0.90.0 deprecates `useGoogleFonts`: any value, even `false`, logs a warning. The viewer no longer passes it; without a `fonts` source the library requests no web font.
 
+- **0.90.1** (19.0.1.1.1, #94): compatible patch release (Word: a table without rows no longer fails with "Document page budget exceeded"; page/column breaks in header, footer, footnote, endnote no longer give "Unsupported story block"; a relative `wasmUrl` resolves against `document.baseURI`). Patches `0002` and `0003` re-applied by hand on the new hashed chunks (`legacy-source-DmlTJjiH.js`, `odf-source-Cee46vyi.js`, `xlsx-CW8XwM_M.js`); the code around both is unchanged, so the patch bodies are the same. The stock `internal-companion.mjs` already carries `"0.90.1"`. No new bare import, no CSP change; the selection walk gives the same 153 files as for 0.90.0 (only hashes changed).
+
 ## Patch `0002`: relative import of the companion runtime (legacy and OpenDocument add-ons)
 
 | Item | Value |
 |---|---|
-| Files | `legacy-source-CFRuXN53.js` (legacy add-on), `odf-source-CcsC38G5.js` (OpenDocument add-on): one string each |
-| Next to them | `internal-companion.mjs`, copied unchanged from the stock `@silurus/ooxml@0.90.0` `dist` (it imports `model-source-BwpDCGYU.js` of the same build) |
+| Files | `legacy-source-DmlTJjiH.js` (legacy add-on), `odf-source-Cee46vyi.js` (OpenDocument add-on): one string each |
+| Next to them | `internal-companion.mjs`, copied unchanged from the stock `@silurus/ooxml@0.90.1` `dist` (it imports `model-source-BwpDCGYU.js` of the same build) |
 
 **What is patched.** Both add-ons import the companion runtime by a bare specifier, `"@silurus/ooxml/internal/companion"`. A page without an import map cannot resolve it, and the viewer CSP has no `'unsafe-inline'` for scripts, so an inline import map is refused. The patch changes it to `"./internal-companion.mjs"`.
 
-**Version check.** `internal-companion.mjs` compares two hard-coded strings (`"0.90.0"` and `"ooxml-model-source-module/v2"`) with what the add-on declares; it does not measure the viewer actually loaded. A mismatched pair fails with `companion-runtime-mismatch`. **The add-ons must be upgraded together with `@silurus/ooxml`** (same version number; the chunk names carry hashes).
+**Version check.** `internal-companion.mjs` compares two hard-coded strings (`"0.90.1"` and `"ooxml-model-source-module/v2"`) with what the add-on declares; it does not measure the viewer actually loaded. A mismatched pair fails with `companion-runtime-mismatch`. **The add-ons must be upgraded together with `@silurus/ooxml`** (same version number; the chunk names carry hashes).
 
 **Other `@silurus/` strings.** `source-*.js` of the main library contains `Symbol.for("@silurus/ooxml/font-source")` and `Symbol.for("@silurus/ooxml/font-resolver-ids")`: these are symbol names, not imports; nothing to patch.
 
@@ -38,7 +40,7 @@
 
 | Item | Value |
 |---|---|
-| File | `xlsx-27RIKj9U.js` (built output), `updateOverlay()` of the XLSX find overlay |
+| File | `xlsx-CW8XwM_M.js` (built output), `updateOverlay()` of the XLSX find overlay |
 | Upstream | not reported yet |
 
 **What was wrong.** After `findText()`, each match of the current sheet got its own absolutely positioned `<div>`, appended one by one, while `cellRect()` reads the layout (`canvasArea.clientWidth`) for every match: the layout is recomputed after each append, so the time grows with the square of the match count. Measured on 0.89.11 with a 100,000-row sheet: 11,112 matches took 70 s for `findText` and 37 s more for `findNext`; 100,000 matches never finished. The code is the same in 0.90.0.
@@ -62,7 +64,7 @@ The viewer CSS keeps `#stage.xlsx canvas { margin: 0 }` (#76): the highlight box
    mkdir /tmp/silurus && cd /tmp/silurus && npm init -y
    npm i --ignore-scripts @silurus/ooxml@<V> @silurus/ooxml-legacy-office@<V> @silurus/ooxml-opendocument@<V>
    ```
-3. Merge the three `dist` folders (without `types/`) into one staging folder. Apply `0002` and `0003` there (`patch -p1 < ...`); the chunk names carry hashes, so on a new build edit by hand (`0002`: replace the bare companion import in each add-on chunk; `0003`: the two changes in `updateOverlay()`, search for `appendFind(` in the xlsx chunk) and regenerate the patches with `diff -u` against the stock files. Then keep only the files reachable from the entries the viewer uses: `xlsx.mjs docx.mjs pptx.mjs doc.mjs xls.mjs ppt.mjs odt.mjs ods.mjs odp.mjs` and the add-on `*-source-module.mjs`, following static and dynamic imports and `new URL("...", import.meta.url)` references (wasm files and `assets/render-worker-*.js` included), plus `internal-companion.mjs`. The script used for 0.90.0 is a 30-line regex walk; on 0.89.11 it gave exactly the shipped file list.
+3. Merge the three `dist` folders (without `types/`) into one staging folder. Apply `0002` and `0003` there (`patch -p1 < ...`); the chunk names carry hashes, so on a new build edit by hand (`0002`: replace the bare companion import in each add-on chunk; `0003`: the two changes in `updateOverlay()`, search for `appendFind(` in the xlsx chunk) and regenerate the patches with `diff -u` against the stock files. Then keep only the files reachable from the entries the viewer uses: `xlsx.mjs docx.mjs pptx.mjs doc.mjs xls.mjs ppt.mjs odt.mjs ods.mjs odp.mjs` and the add-on `*-source-module.mjs`, following static and dynamic imports and `new URL("...", import.meta.url)` references (wasm files and `assets/render-worker-*.js` included), plus `internal-companion.mjs`. The script used for 0.90.0 and 0.90.1 is a 30-line regex walk over every quoted `*.js`/`*.mjs`/`*.wasm` name (a plain `import`/`new URL` regex misses the wasm files, which are named in a helper call); on 0.89.11 it gave exactly the shipped file list.
 4. Replace the whole content of `static/lib/silurus/` with that selection (do not merge with old files). Copy the three `LICENSE` and `THIRD_PARTY_NOTICES.md` files under the names above. Update `README.md` and this file.
 5. Check: `grep -l '"@silurus/' static/lib/silurus/*.js static/lib/silurus/*.mjs` lists no import; update the chunk names in `tests/test_engine.py` (`test_03_asset_route...`); run the module tests and look in the Odoo log for a 404 on `/dwo_attpreview_office/asset/` (a chunk the selection missed). Open by hand a flowchart xlsx, a docx, a pptx, one old doc/xls/ppt and one odt/ods/odp.
 6. `dwo_attpreview_all_in_one` copies this folder (paused since 2026-11-15, kept in `_scratch/attpreview_backup/paused/`): when it comes back, rebuild it with `_tools/build_attpreview_bundles.py`.

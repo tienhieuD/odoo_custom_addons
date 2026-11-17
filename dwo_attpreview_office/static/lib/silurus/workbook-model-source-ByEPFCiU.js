@@ -2,7 +2,7 @@ import { n as e } from "./cjk-fallback-CxqXJu32.js";
 import { a as t, g as n } from "./renderer-D-5lFQlk.js";
 import { i as r, n as i } from "./resource-debug-D8EBjKbZ.js";
 import { t as a } from "./rejected-load-CS5sDp04.js";
-import { t as o } from "./bundled-asset-url-BMJ8vNHP.js";
+import { n as o } from "./bundled-asset-url-Cv8ajMAZ.js";
 import { n as s } from "./worksheet-policy-G1KBtmuQ.js";
 import { n as c, r as l } from "./worker-protocol-DQ4IlKqk.js";
 import { i as u, n as d, r as f, s as p } from "./model-source-BwpDCGYU.js";

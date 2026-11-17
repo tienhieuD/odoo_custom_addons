@@ -1,27 +1,27 @@
 From: Duotek
 Subject: [PATCH 0002] legacy and OpenDocument add-ons: relative import of the companion runtime
 
-@silurus/ooxml-legacy-office 0.90.0 (dist/legacy-source-CFRuXN53.js) and @silurus/ooxml-opendocument 0.90.0
-(dist/odf-source-CcsC38G5.js) import the companion runtime by the bare specifier "@silurus/ooxml/internal/companion".
+@silurus/ooxml-legacy-office 0.90.1 (dist/legacy-source-DmlTJjiH.js) and @silurus/ooxml-opendocument 0.90.1
+(dist/odf-source-Cee46vyi.js) import the companion runtime by the bare specifier "@silurus/ooxml/internal/companion".
 A page without an import map cannot resolve it, and the viewer CSP (script-src without 'unsafe-inline') forbids an
-inline import map. Point both at the copy of the stock file internal-companion.mjs (from @silurus/ooxml 0.90.0 dist)
+inline import map. Point both at the copy of the stock file internal-companion.mjs (from @silurus/ooxml 0.90.1 dist)
 that sits next to them in static/lib/silurus/. The patch changes one string in each file.
 Apply from static/lib/silurus/ with: patch -p1 < 0002-...patch   (paths below are a/ b/ relative)
 
 ---
---- a/legacy-source-CFRuXN53.js
-+++ b/legacy-source-CFRuXN53.js
+--- a/legacy-source-DmlTJjiH.js
++++ b/legacy-source-DmlTJjiH.js
 @@ -1,4 +1,4 @@
 -import { MODEL_SOURCE_MODULE_PROTOCOL as e, assertCompanionRuntime as t } from "@silurus/ooxml/internal/companion";
 +import { MODEL_SOURCE_MODULE_PROTOCOL as e, assertCompanionRuntime as t } from "./internal-companion.mjs";
  //#region ../core/src/internal/bundled-asset-url.ts
- function n(e, t) {
- 	if (e.startsWith("/") && globalThis.location?.href) {
---- a/odf-source-CcsC38G5.js
-+++ b/odf-source-CcsC38G5.js
+ function n() {
+ 	let e = globalThis, t = e.document?.baseURI ?? e.location?.href;
+--- a/odf-source-Cee46vyi.js
++++ b/odf-source-Cee46vyi.js
 @@ -1,4 +1,4 @@
 -import { MODEL_SOURCE_MODULE_PROTOCOL as e, assertCompanionRuntime as t } from "@silurus/ooxml/internal/companion";
 +import { MODEL_SOURCE_MODULE_PROTOCOL as e, assertCompanionRuntime as t } from "./internal-companion.mjs";
  //#region ../core/src/internal/bundled-asset-url.ts
- function n(e, t) {
- 	if (e.startsWith("/") && globalThis.location?.href) {
+ function n() {
+ 	let e = globalThis, t = e.document?.baseURI ?? e.location?.href;

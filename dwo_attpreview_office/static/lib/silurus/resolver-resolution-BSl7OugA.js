@@ -3,8 +3,8 @@ import { o as n } from "./resource-policy.generated-D_HlV2Rm.js";
 import { t as r } from "./substitute-script-COw3MRyd.js";
 import { t as i } from "./abort-JztSoyw2.js";
 import { t as a } from "./font-source-limit-sNrowgTE.js";
-import { c as o, f as s } from "./source-DncDPEPn.js";
-import { i as c, n as l, o as u, r as d } from "./resolver-failures-CpaXQWU6.js";
+import { c as o, f as s } from "./source-GXgH3t1X.js";
+import { i as c, n as l, o as u, r as d } from "./resolver-failures-0-_PZr5v.js";
 function f(e) {
 	let n = /* @__PURE__ */ new Map();
 	for (let r of e) {

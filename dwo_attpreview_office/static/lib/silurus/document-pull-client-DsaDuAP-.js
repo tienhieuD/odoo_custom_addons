@@ -13103,7 +13103,13 @@ function q_(e, t, n) {
 	n.computeTablePtLayout(d, c, t.availableInlineExtentPt, l);
 	let p = k_(a, l).acquisition;
 	if (t.cursor && t.cursor.kind !== "table") throw Error("Ordinary table acquisition received an adjacent-group cursor");
-	let m = t.cursor?.cursor ?? Ip(), h = a.pageH;
+	let m = t.cursor?.cursor ?? Ip();
+	if (m.rowIndex >= p.input.rows.length) return Object.freeze({
+		layout: p.layout,
+		blockExtentPt: 0,
+		nextCursor: null
+	});
+	let h = a.pageH;
 	if (u) return av(e, t, n, {
 		table: c,
 		sourceIndex: l,
