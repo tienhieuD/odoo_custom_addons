@@ -60,7 +60,7 @@ export class DwoHeaderFilter extends Component {
         }
         const item = this.activeItems[0];
         this.popover.open(ev.currentTarget, {
-            field: { ...this.field, name: this.props.column.name },
+            field: { ...this.field, name: this.props.column.name, string: this.props.column.label || this.field.string },
             kind: this.kind,
             initial: item ? item.dwoHf.state : null,
             onApply: (state) => this.apply(state),
@@ -74,7 +74,8 @@ export class DwoHeaderFilter extends Component {
 
     /** Replace the filter of this column by the one of ``state``; ``false`` when the state selects nothing. */
     apply(state) {
-        const field = { ...this.field, name: this.props.column.name };
+        // the facet says the name of the column, as the user reads it
+        const field = { ...this.field, name: this.props.column.name, string: this.props.column.label || this.field.string };
         const built = buildFilter(this.kind, field, state);
         if (!built) {
             return false;
