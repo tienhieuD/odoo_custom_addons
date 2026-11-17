@@ -3,7 +3,7 @@
 {
     "name": "Secure BIM Preview: IFC models",
     "version": "19.0.1.0.0",
-    "summary": "Preview BIM models (IFC) in Odoo without downloading: 3D view, storey tree, element properties. Files never leave your Odoo server. Keywords: ifc preview, ifc viewer, bim preview, bim viewer, building model viewer, revit ifc, archicad ifc, attachment preview.",
+    "summary": "Preview BIM models (IFC) in Odoo without downloading: 3D view, storey tree, element properties. Files never leave your Odoo server. Keywords: ifc preview, preview ifc, ifc viewer, bim preview, preview bim, bim viewer, building model viewer, revit ifc, archicad ifc, attachment preview.",
     "description": "Engine for Secure Attachment Preview (dwo_attpreview_core). Opens IFC building models (IFC2x3 and IFC4) from the chatter and from file fields in a large dialog: orbit and zoom, a tree of site, building and storeys with a show/hide switch for each storey, and the properties and property sets of the element you click. The viewer (web-ifc, MPL-2.0, and three.js, MIT) is bundled and runs in the browser inside a sandboxed iframe with no network access: nothing is uploaded to any service. Large models take time to open; the size limit is set in Settings.",
     "author": "DuoTEK",
     "website": "https://duotek.io.vn",

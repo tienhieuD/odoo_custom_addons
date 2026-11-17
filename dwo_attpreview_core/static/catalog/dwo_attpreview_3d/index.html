@@ -1,0 +1,146 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #1B2A48;">Secure 3D Preview: STL, STEP, OBJ, GLB, 3DM</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #1B2A48;">Open 3D models and CAD solids right inside Odoo.</p>
+        <p class="mb-4" style="font-size: 15px;">Rotate, zoom and inspect STL, OBJ, GLB, GLTF, 3MF, PLY, FBX, DAE, STEP, IGES and Rhino 3DM files from the chatter or a file field.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Click a 3D file in the chatter or in a file field and it opens in a large dialog. Drag to rotate, scroll to zoom, right-drag to pan. The toolbar fits the model in the view, switches the wireframe, a grid, the axes and a dark background, and shows the triangle count and the size of the model. Works with the free <strong>Secure Attachment Preview</strong> module, installed automatically.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: click a 3D file, Odoo checks the access rights and the size, the file goes to a sandboxed viewer frame, and the model is drawn in your browser" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #1B2A48;">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Eleven formats</h4>
+                    <p class="mb-0" style="font-size: 14px;">STL (binary and ASCII), OBJ, GLB, GLTF with the data inside, 3MF, PLY (also point clouds), FBX, DAE, STEP and STP, IGES and IGS, and Rhino 3DM.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">CAD solids from STEP and IGES</h4>
+                    <p class="mb-0" style="font-size: 14px;">Open CASCADE turns the solids and surfaces into meshes in your browser, with the colours of the file. Loaded only when such a file is opened.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Orbit, zoom, wireframe</h4>
+                    <p class="mb-0" style="font-size: 14px;">Reset view, wireframe, grid, axes and a dark background. Models stored with Z up are turned upright.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Files never leave your server</h4>
+                    <p class="mb-0" style="font-size: 14px;">The viewer is bundled in the module and runs in a sandboxed frame with no network access. Nothing is uploaded to a conversion service, a CDN or any other site.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Same rights as Odoo</h4>
+                    <p class="mb-0" style="font-size: 14px;">A user can preview a file only if Odoo lets them read that attachment or record. The check is made again when the file is handed to the viewer.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Size limits you control</h4>
+                    <p class="mb-0" style="font-size: 14px;">Each group of file types has its own limit in Settings, so a large model does not slow the server.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">A Mesh from a 3D Printer</h2>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-stl-gear.png" alt="A spur gear loaded from an STL file in the preview dialog, with a toolbar and the triangle count" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">STEP and IGES Solids</h2>
+    <div class="text-center mb-4">
+        <img src="screenshots/03-step-part.png" alt="A rounded cube loaded from a STEP file, turned with the mouse" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">More Screens</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_3d_shots_wire" role="tab" aria-controls="dwo_ap_3d_shots_wire" aria-selected="true">Wireframe</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_3d_shots_rhino" role="tab" aria-controls="dwo_ap_3d_shots_rhino" aria-selected="false">Rhino 3DM</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_3d_shots_ply" role="tab" aria-controls="dwo_ap_3d_shots_ply" aria-selected="false">PLY with colours</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_3d_shots_wire" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/02-glb-wireframe.png" alt="A glb gear shown as a wireframe to inspect the mesh" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_3d_shots_rhino" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/04-3dm-dark.png" alt="Three coloured objects from a Rhino file on a dark background" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_3d_shots_ply" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/05-ply-colours.png" alt="A ply gear with vertex colours and a grid under it" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Which files does it open?</h4>
+        <p class="mb-0" style="font-size: 14px;">STL, OBJ, GLB, GLTF, 3MF, PLY, FBX, DAE, STEP (stp), IGES (igs) and 3DM.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Why does my GLTF file not open?</h4>
+        <p class="mb-0" style="font-size: 14px;">A .gltf file that refers to separate .bin or image files cannot work, because the viewer receives one file. Use a .glb, or a .gltf with the data inside. The preview says so.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Are textures shown?</h4>
+        <p class="mb-0" style="font-size: 14px;">Colours and materials stored in the file are. Textures kept in separate files next to a model are not loaded.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Does a Rhino file always show?</h4>
+        <p class="mb-0" style="font-size: 14px;">Meshes and the render meshes that Rhino saves with solids are shown. A solid saved without a render mesh shows nothing, and the preview says the file has nothing to show.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Is anything sent to another server?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Even the STEP and Rhino readers run in your browser, from files of the module.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">How large can a file be?</h4>
+        <p class="mb-0" style="font-size: 14px;">Each group of formats has a limit in Settings: 50 MB for meshes and scenes, 25 MB for STEP and IGES and 50 MB for 3DM by default. A larger file is not previewed and can be downloaded.</p>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> 3d preview, preview 3d, 3d viewer, 3d model viewer, stl preview, preview stl, stl viewer, step preview, preview step, step viewer, stp viewer, iges viewer, obj viewer, glb viewer, gltf viewer, 3mf preview, 3d print preview, 3dm viewer, rhino viewer, fbx viewer, cad solid viewer, attachment preview</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #2F4B7C;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #2F4B7C;">Look at 3D models without leaving Odoo.</p>
+        <p class="mb-2" style="font-size: 15px;">Meshes, scenes and CAD solids, drawn in your browser. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
