@@ -25,6 +25,9 @@ lib/
 !dwo_attpreview_cad/static/lib/
 !dwo_attpreview_dwg/static/lib/
 !dwo_attpreview_bim/static/lib/
+# vendored libraries have build/ and dist/ folders of their own (three.js, libredwg-web): keep them
+!dwo_attpreview_*/static/lib/**/build/
+!dwo_attpreview_*/static/lib/**/dist/
 lib64/
 parts/
 sdist/
