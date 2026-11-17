@@ -56,7 +56,7 @@
             <div class="card h-100" style="border-top: 4px solid #0E7C66;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Checked before opening</h4>
-                    <p class="mb-0" style="font-size: 14px;">Size limit (default 20 MB, set in Settings). Office and OpenDocument files are checked as sane archives with limits on unpacked size and number of parts (zip bombs are refused). XML is read as data only. Old <code>.doc/.xls/.ppt</code> files are parsed in the browser, never in the Odoo server process.</p>
+                    <p class="mb-0" style="font-size: 14px;">Size limit per file type (defaults: Excel 50 MB, Word 30 MB, PowerPoint 30 MB, CSV 20 MB; each one is set in Settings). Office and OpenDocument files are checked as sane archives with limits on unpacked size and number of parts (zip bombs are refused). XML is read as data only. Old <code>.doc/.xls/.ppt</code> files are parsed in the browser, never in the Odoo server process.</p>
                 </div>
             </div>
         </div>
@@ -273,7 +273,7 @@
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">Requirements</h4>
             <p class="mb-2" style="font-size: 14px;">Odoo Community or Enterprise, on premise or on Odoo.sh. <strong>Odoo Online is not supported</strong> (it cannot install third-party modules).</p>
             <p class="mb-2" style="font-size: 14px;">Depends on <strong>Secure Attachment Preview</strong> (<code>dwo_attpreview_core</code>, free), installed automatically. No Python library to add, no system package, no internet access needed.</p>
-            <p class="mb-2" style="font-size: 14px;">A recent desktop browser (Chrome, Edge, Firefox, Safari) with WebAssembly. After installation the engine is ready: there is nothing to configure. The size limit is in <strong>Settings &rarr; Attachment Preview</strong>.</p>
+            <p class="mb-2" style="font-size: 14px;">A recent desktop browser (Chrome, Edge, Firefox, Safari) with WebAssembly. After installation the engine is ready: there is nothing to configure. The size limits (one per file type) are in <strong>Settings &rarr; Attachment Preview</strong>.</p>
         </div>
     </div>
 
