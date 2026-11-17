@@ -208,7 +208,7 @@ export class DwoHeaderFilterPopover extends Component {
         try {
             const limit = this.state.limit;
             const rows = await this.orm.call(field.relation, "name_search", [], {
-                name: term, args: [], operator: "ilike", limit: limit + 1,
+                name: term, operator: "ilike", limit: limit + 1,
             });
             this.state.more = rows.length > limit;
             this.state.options = rows.slice(0, limit).map(([id, name]) => ({ value: id, label: name }));
