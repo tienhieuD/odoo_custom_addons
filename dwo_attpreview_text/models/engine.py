@@ -24,7 +24,7 @@ class AttPreviewEngineText(models.AbstractModel):
     _dwo_engine_output = "json"
     # a generic reader: an engine made for one of these extensions (office for csv...) wins
     _dwo_engine_priority = 200
-    _dwo_engine_version = "1"
+    _dwo_engine_version = "2"
     _dwo_engine_max_size_mb = 0  # see _dwo_engine_size_groups; the text shown is cut at 10 MB
 
     _dwo_engine_size_groups = (("text", text_tools.EXTENSIONS, 10),)
