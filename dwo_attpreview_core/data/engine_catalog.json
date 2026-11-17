@@ -58,5 +58,28 @@
       "xz"
     ],
     "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_archive"
+  },
+  {
+    "module": "dwo_attpreview_text",
+    "name": "Secure Text & Code Preview: MD, HTML, XML, JSON, YAML, LOG",
+    "extensions": [
+      "md",
+      "html",
+      "xml",
+      "json",
+      "yaml",
+      "toml",
+      "ini",
+      "log",
+      "py",
+      "js",
+      "sql",
+      "diff",
+      "po",
+      "srt",
+      "ipynb",
+      "txt"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_text"
   }
 ]

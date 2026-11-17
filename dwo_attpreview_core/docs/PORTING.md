@@ -232,3 +232,17 @@ Differences from 19.0:
 - Tour `find_ods`: one extra step waits for `data-find-where*='Notes'` after the second search. Both searches of that
   tour have one match, so without it the check could read the result of the first search (it failed once on 20.0;
   19.0 has the same race, it passed there by timing).
+
+## #83 - text engine and shared tree view (text 17.0.1.0.0, core 17.0.1.3.0, archive: no version change)
+
+Port of the 18.0 commits (which are the 19.0 `7275ec8`, `cef91fb`, `8a66fd3` plus the 18 changes). Versions: text `17.0.1.0.0`,
+core `17.0.1.3.0`. Differences from 18.0:
+
+| File | 18.0 | 17.0 |
+|---|---|---|
+| `dwo_attpreview_text/models/engine.py` | `self.env._(...)` | `_(...)` (`from odoo import _`) |
+| `dwo_attpreview_text/static/tests/tours/text_tour.js` | `registry.category("web_tour.tours").add`, `run: "edit ..."` | `dwoAddTour` (core `tour_compat.js`), `run: "text ..."` |
+| `dwo_attpreview_text/tests/test_text.py` | `/odoo/res.partner/<id>` | `/web#id=<id>&model=res.partner&view_type=form`; `browser_size = "1366,768"` on the tour class |
+| `dwo_attpreview_text/static/src/js/attachment_list_patch.js` | wraps `this.fileViewer.open` in `setup()` | unchanged (17 has the same `fileViewer` in `AttachmentList`) |
+
+Core and archive changes (tree view in the core, archive uses it) and the vendored `static/lib/*` bundles are applied as is.
