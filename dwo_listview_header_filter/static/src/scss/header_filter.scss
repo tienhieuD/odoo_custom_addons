@@ -1,0 +1,132 @@
+// Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+// The filter icon lives in its own box in the header cell and takes no absolute position, so it does not touch what
+// other modules add to the cell (the pin button of the sticky header and column module is placed apart, see below).
+.o_list_renderer th .o_dwo_hf_btn {
+    flex: 0 0 auto;
+    line-height: 1;
+    padding: 2px 3px !important;
+    border-radius: 4px;
+    color: inherit;
+    opacity: .4;
+    font-size: .8em;
+    text-decoration: none;
+
+    &:hover, &:focus {
+        opacity: .9;
+    }
+
+    &.o_dwo_hf_active {
+        opacity: 1;
+        color: #fff;
+        background: var(--primary, #714b67);
+    }
+}
+
+// next to the pin button of listview_sticky_header_and_column (shown on hover, 24px from the right edge, 20px wide: it covers 24-44px):
+// keep the filter icon clear of it
+.o_list_renderer th:has(> .js_pin_this_column) .o_dwo_hf_btn {
+    margin-right: 46px;
+}
+
+.o_dwo_hf_popover .popover-body, .o_dwo_hf_popover .o_popover {
+    padding: 0;
+}
+
+.o_dwo_hf {
+    width: 280px;
+    max-width: 92vw;
+    padding: 10px;
+    font-size: .9rem;
+
+    .o_dwo_hf_title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .o_dwo_hf_bool {
+        display: flex;
+        gap: 8px;
+    }
+
+    .o_dwo_hf_presets {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        max-height: 230px;
+        overflow-y: auto;
+        margin-bottom: 8px;
+    }
+
+    .o_dwo_hf_preset {
+        border: 1px solid var(--border-color, #dee2e6);
+        background: transparent;
+        border-radius: 4px;
+        padding: 3px 6px;
+        text-align: left;
+        font-size: .82rem;
+
+        &:hover {
+            background: rgba(0, 0, 0, .05);
+        }
+
+        &.active {
+            background: var(--primary, #714b67);
+            border-color: var(--primary, #714b67);
+            color: #fff;
+        }
+    }
+
+    .o_dwo_hf_list {
+        max-height: 240px;
+        overflow-y: auto;
+        margin: 8px -2px 0;
+        padding: 0 2px;
+    }
+
+    .o_dwo_hf_selected {
+        border-bottom: 1px solid var(--border-color, #dee2e6);
+        margin-bottom: 4px;
+        padding-bottom: 4px;
+        background: rgba(113, 75, 103, .06);
+        border-radius: 4px;
+    }
+
+    .o_dwo_hf_row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 3px 6px;
+        margin: 0;
+        cursor: pointer;
+        border-radius: 4px;
+
+        &:hover {
+            background: rgba(0, 0, 0, .05);
+        }
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .o_dwo_hf_picked span {
+        font-weight: 600;
+    }
+
+    .o_dwo_hf_hint {
+        color: var(--bs-secondary-color, #6c757d);
+        padding: 6px;
+    }
+
+    .o_dwo_hf_footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 10px;
+    }
+}

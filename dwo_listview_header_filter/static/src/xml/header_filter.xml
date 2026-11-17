@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_listview_header_filter.Button">
+        <button type="button" class="o_dwo_hf_btn btn btn-link p-0 ms-1" t-att-class="{ o_dwo_hf_active: this.active }"
+                t-att-data-dwo-hf="this.props.column.name" t-att-title="this.title" t-att-aria-pressed="this.active ? 'true' : 'false'"
+                t-on-click.stop="(ev) => this.onClick(ev)" t-on-pointerup.stop="(ev) => this.swallow(ev)" t-on-pointerdown.stop="(ev) => this.swallow(ev)" t-on-dblclick.stop="(ev) => this.swallow(ev)">
+            <i class="fa fa-filter" role="img"/>
+        </button>
+    </t>
+
+    <t t-name="dwo_listview_header_filter.Popover">
+        <div class="o_dwo_hf" t-att-data-kind="this.props.kind" t-on-keydown="(ev) => this.onKeydown(ev)">
+            <div class="o_dwo_hf_title" t-esc="this.props.field.string or this.props.field.name"/>
+
+            <!-- text and number -->
+            <t t-if="this.props.kind === 'text' or this.props.kind === 'number'">
+                <div class="o_dwo_hf_body">
+                    <select class="form-select form-select-sm o_dwo_hf_op" t-on-change="(ev) => this.onOperator(ev)" t-att-value="this.state.op">
+                        <option t-foreach="this.operators" t-as="op" t-key="op.id" t-att-value="op.id" t-att-selected="op.id === this.state.op" t-esc="op.label"/>
+                    </select>
+                    <t t-if="this.operator.needsValue">
+                        <input t-if="this.props.kind === 'number'" type="number" t-att-step="this.numberStep" class="form-control form-control-sm mt-2 o_dwo_hf_value"
+                               t-ref="this.inputRef" t-att-value="this.state.value" t-on-input="(ev) => this.onValue(ev)" t-att-placeholder="this.operator.range ? 'From' : 'Value'"/>
+                        <input t-else="" type="text" class="form-control form-control-sm mt-2 o_dwo_hf_value" t-ref="this.inputRef"
+                               t-att-value="this.state.value" t-on-input="(ev) => this.onValue(ev)" placeholder="Value"/>
+                        <input t-if="this.operator.range" type="number" t-att-step="this.numberStep" class="form-control form-control-sm mt-2 o_dwo_hf_value2"
+                               t-att-value="this.state.value2" t-on-input="(ev) => this.onValue2(ev)" placeholder="To"/>
+                    </t>
+                </div>
+            </t>
+
+            <!-- boolean -->
+            <div t-elif="this.props.kind === 'boolean'" class="o_dwo_hf_body o_dwo_hf_bool">
+                <button type="button" class="btn btn-sm" t-att-class="this.state.value === true ? 'btn-primary' : 'btn-outline-secondary'" t-on-click="() => this.chooseBoolean(true)">Yes</button>
+                <button type="button" class="btn btn-sm" t-att-class="this.state.value === false ? 'btn-primary' : 'btn-outline-secondary'" t-on-click="() => this.chooseBoolean(false)">No</button>
+            </div>
+
+            <!-- date -->
+            <t t-elif="this.props.kind === 'date'">
+                <div class="o_dwo_hf_presets">
+                    <button t-foreach="this.presets" t-as="preset" t-key="preset[0]" type="button" class="o_dwo_hf_preset"
+                            t-att-class="{ active: this.state.preset === preset[0] }" t-att-data-preset="preset[0]"
+                            t-on-click="() => this.choosePreset(preset[0])" t-esc="preset[1]"/>
+                </div>
+                <div class="o_dwo_hf_body o_dwo_hf_dates">
+                    <div class="btn-group btn-group-sm w-100" role="group">
+                        <button type="button" class="btn" t-att-class="this.state.mode === 'day' ? 'btn-primary' : 'btn-outline-secondary'" t-on-click="() => this.setMode('day')">A day</button>
+                        <button type="button" class="btn" t-att-class="this.state.mode === 'range' ? 'btn-primary' : 'btn-outline-secondary'" t-on-click="() => this.setMode('range')">Between two days</button>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <input type="date" class="form-control form-control-sm o_dwo_hf_from" t-att-value="this.state.from" t-on-input="(ev) => this.onDate('from', ev)"/>
+                        <input t-if="this.state.mode === 'range'" type="date" class="form-control form-control-sm o_dwo_hf_to" t-att-value="this.state.to" t-on-input="(ev) => this.onDate('to', ev)"/>
+                    </div>
+                    <label t-if="this.canBeNotSet" class="o_dwo_hf_row mt-2">
+                        <input type="checkbox" class="form-check-input" t-att-checked="this.state.notSet" t-on-change="(ev) => this.toggleNotSetDate(ev)"/> <span>Not set</span>
+                    </label>
+                </div>
+            </t>
+
+            <!-- selection, many2one, many2many -->
+            <t t-elif="this.props.kind === 'choice'">
+                <div class="o_dwo_hf_body">
+                    <input type="search" class="form-control form-control-sm o_dwo_hf_search" t-ref="this.inputRef" t-att-value="this.state.search" t-on-input="(ev) => this.onSearch(ev)" placeholder="Search..."/>
+                </div>
+                <div class="o_dwo_hf_list">
+                    <div t-if="this.state.selected.length or this.state.notSet" class="o_dwo_hf_selected">
+                        <label t-if="this.state.notSet" class="o_dwo_hf_row o_dwo_hf_picked" data-value="__not_set">
+                            <input type="checkbox" class="form-check-input" checked="checked" t-on-change="() => { this.state.notSet = false; }"/> <span class="fst-italic">Not set</span>
+                        </label>
+                        <label t-foreach="this.state.selected" t-as="item" t-key="item.value" class="o_dwo_hf_row o_dwo_hf_picked" t-att-data-value="item.value">
+                            <input type="checkbox" class="form-check-input" checked="checked" t-on-change="() => this.drop(item.value)"/> <span t-esc="item.label"/>
+                        </label>
+                    </div>
+                    <label t-if="this.canBeNotSet and !this.state.notSet" class="o_dwo_hf_row" data-value="__not_set">
+                        <input type="checkbox" class="form-check-input" t-on-change="() => { this.state.notSet = true; }"/> <span class="fst-italic">Not set</span>
+                    </label>
+                    <label t-foreach="this.freeOptions" t-as="option" t-key="option.value" class="o_dwo_hf_row" t-att-data-value="option.value">
+                        <input type="checkbox" class="form-check-input" t-on-change="() => this.pick(option)"/> <span t-esc="option.label"/>
+                    </label>
+                    <div t-if="this.state.loading" class="o_dwo_hf_hint">Loading...</div>
+                    <div t-elif="!this.freeOptions.length and !this.state.selected.length" class="o_dwo_hf_hint">No value found.</div>
+                    <button t-if="this.state.more" type="button" class="btn btn-link btn-sm o_dwo_hf_more" t-on-click="(ev) => this.showMore(ev)">Show more</button>
+                </div>
+            </t>
+
+            <div class="o_dwo_hf_footer" t-if="this.props.kind !== 'boolean'">
+                <button type="button" class="btn btn-primary btn-sm o_dwo_hf_apply" t-att-disabled="!this.canApply" t-on-click="(ev) => this.apply(ev)">Apply</button>
+                <button type="button" class="btn btn-secondary btn-sm o_dwo_hf_reset" t-att-disabled="!this.hasFilter" t-on-click="(ev) => this.reset(ev)">Reset</button>
+            </div>
+            <div class="o_dwo_hf_footer" t-else="">
+                <button type="button" class="btn btn-secondary btn-sm o_dwo_hf_reset" t-att-disabled="!this.hasFilter" t-on-click="(ev) => this.reset(ev)">Reset</button>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="dwo_listview_header_filter.ListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="extension">
+        <xpath expr="//i[hasclass('o_list_sortable_icon')]" position="after">
+            <DwoHeaderFilter t-if="this.dwoHfEnabled(column)" column="column" list="this.props.list"/>
+        </xpath>
+    </t>
+</templates>
