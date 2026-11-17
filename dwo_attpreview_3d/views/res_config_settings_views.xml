@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.dwo.attpreview.3d</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="dwo_attpreview_core.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='dwo_attpreview_core']" position="inside">
+                <block title="3D model size limits" name="dwo_attpreview_3d_size_block">
+                    <setting id="dwo_attpreview_max_mb_model3d_mesh" string="Meshes: STL, OBJ, PLY" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_model3d_mesh"/> MB</div>
+                    </setting>
+                    <setting id="dwo_attpreview_max_mb_model3d_scene" string="Scenes: GLB, GLTF, 3MF, FBX, DAE" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_model3d_scene"/> MB</div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

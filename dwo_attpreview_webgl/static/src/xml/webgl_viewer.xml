@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 DuoTEK. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). -->
+<templates xml:space="preserve">
+    <t t-name="dwo_attpreview_webgl.Viewer">
+        <div class="o_dwo_webgl d-flex flex-column h-100" t-att-data-state="state.error ? 'error' : (state.loading ? 'loading' : 'ready')" t-att-data-stats="state.stats">
+            <div t-if="state.error" class="alert alert-warning m-3">
+                <span class="o_dwo_webgl_error">This file could not be displayed: <t t-esc="state.error"/></span>
+                <a t-if="props.downloadUrl" t-att-href="props.downloadUrl" class="btn btn-primary btn-sm ms-2 o_dwo_webgl_download">Download</a>
+            </div>
+            <div t-if="state.loading and !state.error" class="text-muted px-3 py-1">Loading...</div>
+            <iframe t-ref="frame" t-att-src="config.viewerUrl" sandbox="allow-scripts" class="w-100 border-0 flex-grow-1"
+                    t-att-class="{'d-none': state.error}" style="min-height:0"/>
+        </div>
+    </t>
+</templates>

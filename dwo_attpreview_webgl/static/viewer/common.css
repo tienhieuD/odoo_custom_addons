@@ -1,0 +1,10 @@
+/* Copyright 2026 DuoTEK. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3). */
+html, body { margin: 0; height: 100%; font: 14px system-ui, sans-serif; background: #f3f4f6; color: #222; }
+body { display: flex; flex-direction: column; }
+#bar { display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #fff; border-bottom: 1px solid #d8dadd; }
+#bar button { min-width: 30px; height: 28px; padding: 0 10px; border: 1px solid #c8cbd0; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; }
+#bar button:hover { background: #eef0f3; }
+#bar button.on { background: #dbe7ff; border-color: #8aa9e6; }
+#info { margin-left: auto; color: #555; font-size: 12px; }
+#stage { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+#stage canvas { display: block; touch-action: none; }
