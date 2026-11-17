@@ -67,7 +67,7 @@
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Normal: the chatter beside the form</h2>
-    <p class="mb-4" style="font-size: 16px;">The default Odoo layout on a large screen. The three buttons sit right after the pager, like the view switcher; the one in use is lit.</p>
+    <p class="mb-4" style="font-size: 16px;">The default Odoo layout on a sales order. The three buttons sit right after the pager, like the view switcher; the one in use is lit.</p>
     <div class="text-center mb-4">
         <img src="screenshots/01-normal.png" alt="A sales order form with the chatter on the right side, and three icon buttons after the pager with the first one lit" class="img-fluid rounded shadow"/>
     </div>
@@ -78,32 +78,42 @@
         <img src="screenshots/02-hide.png" alt="The same sales order with the chatter hidden: the order lines use the whole width" class="img-fluid rounded shadow"/>
     </div>
 
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Auto chatter: a bar on the right</h2>
+    <p class="mb-4" style="font-size: 16px;">The chatter is hidden and the form has the whole width. A bar on the right edge, with an arrow and the words Auto chatter, stays there.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/03-auto.png" alt="The sales order at full width with a vertical bar on the right edge showing an arrow and the words Auto chatter" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">A closer look at the controls</h2>
+    <p class="mb-4" style="font-size: 16px;">Normal, always hide and auto chatter: three icon buttons in a group, with a tooltip each. The bar is always there in auto mode.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/04-controls-detail.png" alt="A zoom on the three layout buttons after the pager, numbered and explained, and on the Auto chatter bar" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Auto chatter in motion</h2>
+    <p class="mb-4" style="font-size: 16px;">Click the bar: the chatter opens as a drawer under the control panel. Drag the handle on its left edge to make it as wide as you want, then click outside to close it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/07-auto-chatter.gif" alt="Animation: a click on the Auto chatter bar opens the chatter as a drawer over a dimmed background, the handle on its left edge is dragged to make it wider, and a click outside closes it" class="img-fluid rounded shadow"/>
+    </div>
+
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">More Screens</h2>
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_auto" role="tab" aria-controls="dwo_ffm_shots_auto" aria-selected="true">Auto chatter</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_drawer" role="tab" aria-controls="dwo_ffm_shots_drawer" aria-selected="false">Chatter drawer</a>
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_drawer" role="tab" aria-controls="dwo_ffm_shots_drawer" aria-selected="true">Chatter drawer</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_wide" role="tab" aria-controls="dwo_ffm_shots_wide" aria-selected="false">Wider drawer</a>
         </li>
     </ul>
     <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
-        <div class="tab-pane fade show active" id="dwo_ffm_shots_auto" role="tabpanel">
+        <div class="tab-pane fade show active" id="dwo_ffm_shots_drawer" role="tabpanel">
             <div class="text-center mb-3">
-                <img src="screenshots/03-auto.png" alt="The form at full width with a vertical bar on the right edge showing an arrow and the words Auto chatter" class="img-fluid rounded shadow"/>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="dwo_ffm_shots_drawer" role="tabpanel">
-            <div class="text-center mb-3">
-                <img src="screenshots/04-drawer.png" alt="The chatter opened as a drawer on the right over a dimmed background, with a close button and a handle on its left edge" class="img-fluid rounded shadow"/>
+                <img src="screenshots/05-drawer.png" alt="The chatter opened as a drawer on the right over a dimmed background, under the control panel, with a close button and a handle on its left edge" class="img-fluid rounded shadow"/>
             </div>
         </div>
         <div class="tab-pane fade" id="dwo_ffm_shots_wide" role="tabpanel">
             <div class="text-center mb-3">
-                <img src="screenshots/05-drawer-wide.png" alt="The drawer dragged wider with the handle on its left edge" class="img-fluid rounded shadow"/>
+                <img src="screenshots/06-drawer-wide.png" alt="The drawer dragged wider with the handle on its left edge" class="img-fluid rounded shadow"/>
             </div>
         </div>
     </div>
@@ -139,7 +149,7 @@
             <div class="card h-100" style="border-top: 4px solid #0E7C66;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Forms without a chatter</h4>
-                    <p class="mb-0" style="font-size: 14px;">A form that has no chatter shows no bar in auto mode; the buttons still change the width of the sheet.</p>
+                    <p class="mb-0" style="font-size: 14px;">A form that has no chatter (a country, a currency...) shows no buttons and no bar, whatever layout you chose: there is nothing to hide.</p>
                 </div>
             </div>
         </div>
@@ -173,6 +183,10 @@
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I change the width of the drawer?</h4>
         <p class="mb-0" style="font-size: 14px;">Yes, drag the handle on its left edge. It starts as wide as the chatter of Odoo and the width is remembered.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What about forms that have no chatter?</h4>
+        <p class="mb-0" style="font-size: 14px;">They are left alone: no buttons, no bar, and the sheet keeps its normal width.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Is the choice per form or for all forms?</h4>

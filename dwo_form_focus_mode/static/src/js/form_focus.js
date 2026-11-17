@@ -1,6 +1,6 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { Component, onMounted, onWillUnmount, useState, useSubEnv } from "@odoo/owl";
+import { Component, onMounted, onPatched, onWillUnmount, useState, useSubEnv } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
@@ -55,6 +55,11 @@ function applyTop() {
     document.documentElement.style.setProperty(TOP_VAR, `${top}px`);
 }
 
+/** Before the form is drawn: a model with a message_ids field most likely has a chatter (checked in the page right after). */
+function dwoFfmGuessChatter(props) {
+    return Boolean(props.fields && "message_ids" in props.fields);
+}
+
 function readWidth() {
     try {
         const value = Number(browser.localStorage.getItem(STORAGE_WIDTH));
@@ -72,7 +77,7 @@ function readWidth() {
 patch(FormController.prototype, {
     setup() {
         super.setup(...arguments);
-        this.dwoFfm = useState({ mode: readMode(), drawer: false });
+        this.dwoFfm = useState({ mode: readMode(), drawer: false, hasChatter: dwoFfmGuessChatter(this.props) });
         useHotkey("alt+shift+f", () => this.dwoFfmCycle(), { allowRepeat: false });
         // Esc closes the chatter drawer
         useHotkey("escape", () => {
@@ -86,13 +91,39 @@ patch(FormController.prototype, {
         // the control panel can change its height (a long breadcrumb): the top follows
         const onResize = () => applyTop();
         window.addEventListener("resize", onResize);
-        onMounted(() => applyTop());
+        // a form without a chatter has nothing to hide: no buttons, no bar (checked in the page, after each drawing)
+        const checkChatter = () => {
+            applyTop();
+            const has = Boolean(document.querySelector(".o_action_manager .o_form_view .o-mail-Form-chatter"));
+            if (has !== this.dwoFfm.hasChatter) {
+                this.dwoFfm.hasChatter = has;
+            }
+        };
+        let watcher = null;
+        let frame = 0;
+        onMounted(() => {
+            checkChatter();
+            // the chatter can be drawn a little later than the form (it loads its own parts): watch the page for it
+            const root = document.querySelector(".o_action_manager .o_form_view");
+            if (root) {
+                watcher = new MutationObserver(() => {
+                    cancelAnimationFrame(frame);
+                    frame = requestAnimationFrame(checkChatter);
+                });
+                watcher.observe(root, { childList: true, subtree: true });
+            }
+        });
+        onPatched(checkChatter);
+        onWillUnmount(() => {
+            watcher?.disconnect();
+            cancelAnimationFrame(frame);
+        });
         onWillUnmount(() => window.removeEventListener("resize", onResize));
     },
 
-    /** Not in a dialog and not on a phone: there the form already has the whole screen. */
+    /** Not in a dialog (nor on a phone: there the form already has the whole screen) and only when the form has a chatter. */
     get dwoFfmEnabled() {
-        return !this.env.inDialog && !this.env.isSmall;
+        return !this.env.inDialog && !this.env.isSmall && this.dwoFfm.hasChatter;
     },
 
     get dwoFfmMode() {
@@ -173,7 +204,8 @@ export class DwoFfmButton extends Component {
     }
 
     get ffm() {
-        this.layout.mode; // read: this component follows the layout
+        this.layout.mode; // read: this component follows the layout and the presence of a chatter
+        this.layout.hasChatter;
         return this.env.dwoFfm;
     }
 }
