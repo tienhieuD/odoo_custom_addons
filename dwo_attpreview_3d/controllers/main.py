@@ -12,7 +12,10 @@ class AttPreview3DController(http.Controller):
     @http.route("/dwo_attpreview_3d/asset/<path:path>", type="http", auth="none", cors="*")
     def asset(self, path, **kw):
         """The page of the sandboxed viewer and its script (three.js comes from dwo_attpreview_webgl)."""
-        return serve_asset(MODULE, path, ("viewer/",))
+        # only the page of the solid-model viewer gets 'unsafe-eval' (the WebAssembly glue of Open CASCADE and rhino3dm needs new Function);
+        # the page is sandboxed, has no network and runs only the files of this module
+        extra = " 'unsafe-eval'" if path == "viewer/solid.html" else ""
+        return serve_asset(MODULE, path, ("viewer/", "lib/occt/", "lib/rhino3dm/"), script_extra=extra)
 
     @http.route("/dwo_attpreview_3d/file/<int:attachment_id>", type="http", auth="user")
     def file(self, attachment_id, **kw):

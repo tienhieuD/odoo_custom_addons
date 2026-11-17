@@ -8,7 +8,7 @@
                 <a t-if="props.downloadUrl" t-att-href="props.downloadUrl" class="btn btn-primary btn-sm ms-2 o_dwo_webgl_download">Download</a>
             </div>
             <div t-if="state.loading and !state.error" class="text-muted px-3 py-1">Loading...</div>
-            <iframe t-ref="frame" t-att-src="config.viewerUrl" sandbox="allow-scripts" class="w-100 border-0 flex-grow-1"
+            <iframe t-ref="frame" t-att-src="viewerUrl" sandbox="allow-scripts" class="w-100 border-0 flex-grow-1"
                     t-att-class="{'d-none': state.error}" style="min-height:0"/>
         </div>
     </t>
