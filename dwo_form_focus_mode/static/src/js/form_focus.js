@@ -1,6 +1,6 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { Component, onWillUnmount, proxy, useEffect } from "@odoo/owl";
+import { Component, onWillUnmount, proxy } from "@odoo/owl";
 import { useSubEnv } from "@web/owl2/utils";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
@@ -9,40 +9,64 @@ import { patch } from "@web/core/utils/patch";
 import { FormController } from "@web/views/form/form_controller";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
 
-const MODES = ["normal", "wide", "focus"];
-const STORAGE = "dwo_form_focus_mode.mode.";
-const BODY_CLASS = "o_dwo_ffm_focus_body";
+// normal: the form as Odoo shows it (default); hide: the chatter is always hidden; auto: the chatter is hidden and a bar on
+// the right opens it as a drawer. The choice is for all the form views and is remembered.
+const MODES = ["normal", "hide", "auto"];
+const STORAGE_MODE = "dwo_form_focus_mode.mode";
+const STORAGE_WIDTH = "dwo_form_focus_mode.drawer_width";
+const DEFAULT_WIDTH = 530; // the width of the chatter beside the form in Odoo (px)
+const MIN_WIDTH = 360;
+const WIDTH_VAR = "--dwo-ffm-drawer-width";
 
-function readMode(resModel) {
+function readMode() {
     try {
-        const value = browser.localStorage.getItem(STORAGE + resModel);
+        const value = browser.localStorage.getItem(STORAGE_MODE);
         return MODES.includes(value) ? value : "normal";
     } catch {
         return "normal";
     }
 }
 
-function saveMode(resModel, mode) {
+function saveMode(mode) {
     try {
         if (mode === "normal") {
-            browser.localStorage.removeItem(STORAGE + resModel);
+            browser.localStorage.removeItem(STORAGE_MODE);
         } else {
-            browser.localStorage.setItem(STORAGE + resModel, mode);
+            browser.localStorage.setItem(STORAGE_MODE, mode);
         }
     } catch {
         // the layout still changes, it is just not remembered
     }
 }
 
+/** Width of the drawer, between the minimum and 92 percent of the window. */
+function clampWidth(width) {
+    return Math.round(Math.min(Math.max(width, MIN_WIDTH), window.innerWidth * 0.92));
+}
+
+function applyWidth(width) {
+    document.documentElement.style.setProperty(WIDTH_VAR, `${clampWidth(width)}px`);
+}
+
+function readWidth() {
+    try {
+        const value = Number(browser.localStorage.getItem(STORAGE_WIDTH));
+        return value >= MIN_WIDTH ? value : DEFAULT_WIDTH;
+    } catch {
+        return DEFAULT_WIDTH;
+    }
+}
+
 /**
- * Three layouts for a form view: normal, wide (chatter hidden, full width) and focus (also without the top bar). The
- * chatter comes back as a side drawer. The layout is a class of the form (see form_focus.scss), remembered by model.
+ * Three layouts for the form views, as buttons next to the pager: normal, chatter always hidden, and auto chatter (a bar
+ * on the right opens the chatter as a drawer, with a handle to change its width). The layout is a class of the form
+ * (see form_focus.scss); the choice and the width of the drawer are remembered for all the forms.
  */
 patch(FormController.prototype, {
     setup() {
         super.setup(...arguments);
         // Odoo 20 (Owl 3): proxy instead of useState
-        this.dwoFfm = proxy({ mode: readMode(this.props.resModel), drawer: false });
+        this.dwoFfm = proxy({ mode: readMode(), drawer: false });
         useHotkey("alt+shift+f", () => this.dwoFfmCycle(), { allowRepeat: false });
         // Esc closes the chatter drawer
         useHotkey("escape", () => {
@@ -50,13 +74,9 @@ patch(FormController.prototype, {
                 this.dwoFfm.drawer = false;
             }
         }, { bypassEditableProtection: true });
-        // the button is in the control panel (before the pager): it reads the layout from here
+        // the buttons are in the control panel (after the pager): they read the layout from here
         useSubEnv({ dwoFfm: this });
-        // Owl 3: useEffect re-runs by itself when the signals it reads change
-        useEffect(() => {
-            document.body.classList.toggle(BODY_CLASS, this.dwoFfmEnabled && this.dwoFfm.mode === "focus");
-        });
-        onWillUnmount(() => document.body.classList.remove(BODY_CLASS));
+        applyWidth(readWidth());
     },
 
     /** Not in a dialog and not on a phone: there the form already has the whole screen. */
@@ -68,32 +88,48 @@ patch(FormController.prototype, {
         return this.dwoFfmEnabled ? this.dwoFfm.mode : "normal";
     },
 
-    /** Name of a layout, for the tooltip of its button. */
+    /** What a button does, for its tooltip. */
     dwoFfmTitleOf(mode) {
         return {
-            normal: _t("Normal form (Alt+Shift+F cycles the layouts)"),
-            wide: _t("Wide form: hide the chatter and use the full width"),
-            focus: _t("Focus mode: also hide the top bar"),
+            normal: _t("Normal: the chatter is shown beside the form, as Odoo does."),
+            hide: _t("Always hide the chatter: the form uses the full width, on every form."),
+            auto: _t("Auto chatter: the chatter is hidden; a bar on the right opens it as a drawer."),
         }[mode];
     },
 
+    /** Choose a layout for all the forms. */
     dwoFfmSet(mode) {
         if (!this.dwoFfmEnabled || !MODES.includes(mode) || mode === this.dwoFfm.mode) {
             return;
         }
         this.dwoFfm.mode = mode;
         this.dwoFfm.drawer = false;
-        saveMode(this.props.resModel, mode);
+        saveMode(mode);
     },
 
     dwoFfmCycle() {
-        if (!this.dwoFfmEnabled) {
-            return;
-        }
-        const next = MODES[(MODES.indexOf(this.dwoFfm.mode) + 1) % MODES.length];
-        this.dwoFfm.mode = next;
-        this.dwoFfm.drawer = false;
-        saveMode(this.props.resModel, next);
+        this.dwoFfmSet(MODES[(MODES.indexOf(this.dwoFfm.mode) + 1) % MODES.length]);
+    },
+
+    /** The handle on the left edge of the drawer: drag it to change the width (remembered). */
+    dwoFfmStartResize(ev) {
+        ev.preventDefault();
+        let width = readWidth();
+        const move = (e) => {
+            width = clampWidth(window.innerWidth - e.clientX);
+            applyWidth(width);
+        };
+        const stop = () => {
+            window.removeEventListener("pointermove", move);
+            window.removeEventListener("pointerup", stop);
+            try {
+                browser.localStorage.setItem(STORAGE_WIDTH, String(width));
+            } catch {
+                // the width is used now, it is just not remembered
+            }
+        };
+        window.addEventListener("pointermove", move);
+        window.addEventListener("pointerup", stop);
     },
 
     dwoFfmToggleDrawer() {
@@ -113,10 +149,9 @@ patch(FormController.prototype, {
     },
 });
 
-/** The button of the control panel, before the pager of a form view (the form gives its layout in the environment). */
+/** The buttons of the control panel, after the pager of a form view (the form gives its layout in the environment). */
 export class DwoFfmButton extends Component {
     static template = "dwo_form_focus_mode.Button";
-
     // Owl 3: the layout is a proxy of the form controller; reading it in the template makes this component follow it
     get ffm() {
         return this.env.dwoFfm;

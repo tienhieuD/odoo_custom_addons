@@ -1,13 +1,13 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-// Layouts of a form view: the class is set by form_focus.js on the form (o_dwo_ffm_wide / o_dwo_ffm_focus).
+// Layouts of a form view: the class is set by form_focus.js on the form (o_dwo_ffm_hide / o_dwo_ffm_auto).
 
-// the three layout buttons of the control panel (before the pager), like the view switcher
+// the three buttons of the control panel (after the pager), like the view switcher
 .o_dwo_ffm_switch .o_dwo_ffm_icon {
     vertical-align: -3px;
 }
 
-// wide and focus: no chatter in the page, the sheet takes the width
-.o_dwo_ffm_wide, .o_dwo_ffm_focus {
+// hide and auto: no chatter in the page, the sheet takes the width
+.o_dwo_ffm_hide, .o_dwo_ffm_auto {
     .o-mail-Form-chatter {
         display: none;
     }
@@ -15,21 +15,21 @@
     .o_form_renderer, .o_form_sheet_bg {
         max-width: none;
     }
-
-    // the chatter button only exists when the form has a chatter
-    &:not(:has(.o-mail-Form-chatter)) .o_dwo_ffm_drawer_btn {
-        display: none;
-    }
 }
 
-// the chatter as a side drawer
-.o_dwo_ffm_drawer .o-mail-Form-chatter {
+// auto chatter: the room of the bar on the right
+.o_dwo_ffm_auto .o_content, .o_dwo_ffm_auto .o_control_panel {
+    padding-right: 30px;
+}
+
+// the chatter as a side drawer (auto chatter)
+.o_dwo_ffm_auto.o_dwo_ffm_drawer .o-mail-Form-chatter {
     display: block;
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
-    width: 460px;
+    width: var(--dwo-ffm-drawer-width, 530px);
     max-width: 92vw;
     margin: 0;
     padding: 3.5rem 0 0;
@@ -47,28 +47,67 @@
     background: rgba(0, 0, 0, .35);
 }
 
-// the button that opens the drawer, with its label
-.o_dwo_ffm_drawer_btn {
+// the handle on the left edge of the drawer
+.o_dwo_ffm_resizer {
     position: fixed;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 1050;
-    border-radius: 2rem;
-    padding: .45rem .9rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+    top: 0;
+    bottom: 0;
+    right: calc(var(--dwo-ffm-drawer-width, 530px) - 3px);
+    width: 7px;
+    z-index: 1045;
+    cursor: ew-resize;
+    touch-action: none;
 
-    &.o_dwo_ffm_open {
-        top: .75rem;
-        bottom: auto;
-        width: 2rem;
-        height: 2rem;
-        padding: 0;
-        border-radius: 50%;
+    &:hover, &:active {
+        background: var(--primary, #714b67);
+        opacity: .55;
     }
 }
 
-// focus: without the top navigation bar
-body.o_dwo_ffm_focus_body .o_main_navbar {
-    display: none;
+.o_dwo_ffm_drawer_close {
+    position: fixed;
+    top: .75rem;
+    right: 1rem;
+    z-index: 1050;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border-radius: 50%;
 }
 
+// the bar on the right edge of the screen: an arrow and the words "Auto chatter" written along it
+.o_dwo_ffm_edge {
+    position: fixed;
+    top: 46px;
+    right: 0;
+    bottom: 0;
+    z-index: 1030;
+    width: 30px;
+    padding: 1rem 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .6rem;
+    color: var(--primary, #714b67);
+    background: var(--o-view-background-color, #fff);
+    border: 0;
+    border-left: 1px solid var(--border-color, #dee2e6);
+    cursor: pointer;
+
+    &:hover, &:focus-visible {
+        background: rgba(113, 75, 103, .1);
+    }
+
+    .o_dwo_ffm_edge_label {
+        writing-mode: vertical-rl;
+        font-size: .8rem;
+        font-weight: 600;
+        letter-spacing: .06em;
+        white-space: nowrap;
+    }
+
+    // the form has no chatter: no bar
+    .o_dwo_ffm_auto:not(:has(.o-mail-Form-chatter)) & {
+        display: none;
+    }
+}
