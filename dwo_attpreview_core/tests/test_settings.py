@@ -11,7 +11,8 @@ from .sample_engine import patch_sample_engine
 
 SETTINGS_FIELDS = {"dwo_attpreview_max_file_size_mb", "dwo_attpreview_engines",
                    "module_dwo_attpreview_office", "module_dwo_attpreview_mail", "module_dwo_attpreview_archive",
-                   "module_dwo_attpreview_text"}
+                   "module_dwo_attpreview_text", "module_dwo_attpreview_3d", "module_dwo_attpreview_cad",
+                   "module_dwo_attpreview_dwg", "module_dwo_attpreview_bim"}
 REMOVED_FIELDS = ("dwo_attpreview_render_timeout", "dwo_attpreview_cache_ttl_days", "dwo_attpreview_cache_max_mb",
                   "dwo_attpreview_cache_count", "dwo_attpreview_cache_size_mb")
 
@@ -35,7 +36,8 @@ class TestAttPreviewSettings(TransactionCase):
         self.assertEqual(app.xpath(".//button"), [], "no button (Clear cache, Manage engines) any more")
         widgets = {f.get("name"): f.get("widget") for f in app.iter("field")}
         for name in ("module_dwo_attpreview_office", "module_dwo_attpreview_mail", "module_dwo_attpreview_archive",
-                     "module_dwo_attpreview_text"):
+                     "module_dwo_attpreview_text", "module_dwo_attpreview_3d", "module_dwo_attpreview_cad",
+                     "module_dwo_attpreview_dwg", "module_dwo_attpreview_bim"):
             self.assertEqual(widgets[name], "dwo_attpreview_engine_boolean")
         for name in REMOVED_FIELDS:
             self.assertNotIn(name, self.Settings._fields)
@@ -54,7 +56,8 @@ class TestAttPreviewSettings(TransactionCase):
     def test_04_every_catalog_entry_has_a_tick_and_facts(self):
         entries = catalog.load_catalog()
         self.assertEqual({e["module"] for e in entries}, {"dwo_attpreview_office", "dwo_attpreview_mail", "dwo_attpreview_archive",
-                                                           "dwo_attpreview_text"})
+                                                           "dwo_attpreview_text", "dwo_attpreview_3d", "dwo_attpreview_cad",
+                                                           "dwo_attpreview_dwg", "dwo_attpreview_bim"})
         for entry in entries:
             self.assertIn("module_" + entry["module"], self.Settings._fields)
             self.assertEqual(entry["store_url"], "https://apps.odoo.com/apps/modules/" + entry["module"])
