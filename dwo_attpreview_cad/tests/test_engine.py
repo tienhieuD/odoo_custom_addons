@@ -3,6 +3,8 @@ from odoo.exceptions import UserError
 from odoo.tests import HttpCase, TransactionCase, tagged
 from odoo.tools import file_path
 
+from .test_tour import _AssetRoutesWithoutTestCookie
+
 MODULE = "dwo_attpreview_cad"
 
 
@@ -41,7 +43,7 @@ class TestCadEngine(TransactionCase):
 
 
 @tagged("post_install", "-at_install")
-class TestCadRoutes(HttpCase):
+class TestCadRoutes(_AssetRoutesWithoutTestCookie, HttpCase):
 
     def test_01_asset_route_serves_only_the_viewer_and_its_library(self):
         for path, ok in (("viewer/viewer.html", True), ("viewer/viewer.js", True), ("lib/dxf-viewer/dxf-viewer.bundle.js", True),

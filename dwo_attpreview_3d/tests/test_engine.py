@@ -5,6 +5,8 @@ from odoo.exceptions import UserError
 from odoo.tests import HttpCase, TransactionCase, tagged
 from odoo.tools import file_path
 
+from .test_tour import _AssetRoutesWithoutTestCookie
+
 MODULE = "dwo_attpreview_3d"
 KINDS = ("stl", "obj", "ply", "glb", "gltf", "3mf", "fbx", "dae", "step", "stp", "iges", "igs", "3dm")
 FIXTURES = {"step": "rounded-cube.step", "stp": "rounded-cube.step", "iges": "cube-10x10.igs", "igs": "cube-10x10.igs",
@@ -87,7 +89,7 @@ class Test3DEngine(TransactionCase):
 
 
 @tagged("post_install", "-at_install")
-class Test3DRoutes(HttpCase):
+class Test3DRoutes(_AssetRoutesWithoutTestCookie, HttpCase):
 
     def _att(self, name, content):
         return self.env["ir.attachment"].create({"name": name, "raw": content})

@@ -3,6 +3,8 @@ from odoo.exceptions import UserError
 from odoo.tests import HttpCase, TransactionCase, tagged
 from odoo.tools import file_path
 
+from .test_tour import _AssetRoutesWithoutTestCookie
+
 MODULE = "dwo_attpreview_dwg"
 SAMPLES = ("sample_2000.dwg", "sample_2018.dwg")
 
@@ -38,7 +40,7 @@ class TestDwgEngine(TransactionCase):
 
 
 @tagged("post_install", "-at_install")
-class TestDwgRoutes(HttpCase):
+class TestDwgRoutes(_AssetRoutesWithoutTestCookie, HttpCase):
 
     def test_01_asset_route_serves_only_the_viewer_and_the_libraries(self):
         for path, ok in (("viewer/viewer.html", True), ("viewer/viewer.js", True),
