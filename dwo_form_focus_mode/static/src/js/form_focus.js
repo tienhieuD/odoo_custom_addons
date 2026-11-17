@@ -1,11 +1,12 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { onWillUnmount, useEffect, useState } from "@odoo/owl";
+import { Component, onWillUnmount, useEffect, useState, useSubEnv } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { patch } from "@web/core/utils/patch";
 import { FormController } from "@web/views/form/form_controller";
+import { ControlPanel } from "@web/search/control_panel/control_panel";
 
 const MODES = ["normal", "wide", "focus"];
 const STORAGE = "dwo_form_focus_mode.mode.";
@@ -41,6 +42,8 @@ patch(FormController.prototype, {
         super.setup(...arguments);
         this.dwoFfm = useState({ mode: readMode(this.props.resModel), drawer: false });
         useHotkey("alt+shift+f", () => this.dwoFfmCycle(), { allowRepeat: false });
+        // the button is in the control panel (before the pager): it reads the layout from here
+        useSubEnv({ dwoFfm: this });
         useEffect(
             (active) => {
                 document.body.classList.toggle(BODY_CLASS, active);
@@ -59,11 +62,16 @@ patch(FormController.prototype, {
         return this.dwoFfmEnabled ? this.dwoFfm.mode : "normal";
     },
 
+    /** What a click does, as the label of the button. */
+    get dwoFfmLabel() {
+        return { normal: _t("Wide form"), wide: _t("Focus mode"), focus: _t("Normal form") }[this.dwoFfmMode];
+    },
+
     get dwoFfmTitle() {
         return {
-            normal: _t("Wide form (hide the chatter)"),
-            wide: _t("Focus mode (also hide the top bar)"),
-            focus: _t("Back to the normal form"),
+            normal: _t("Wide form: hide the chatter and use the full width (Alt+Shift+F)"),
+            wide: _t("Focus mode: also hide the top bar (Alt+Shift+F)"),
+            focus: _t("Back to the normal form (Alt+Shift+F)"),
         }[this.dwoFfmMode];
     },
 
@@ -96,4 +104,24 @@ patch(FormController.prototype, {
         }
         return result;
     },
+});
+
+/** The button of the control panel, before the pager of a form view (the form gives its layout in the environment). */
+export class DwoFfmButton extends Component {
+    static template = "dwo_form_focus_mode.Button";
+    static props = {};
+
+    setup() {
+        // renders again when the layout changes (the state is the one of the form controller)
+        this.layout = useState(this.env.dwoFfm.dwoFfm);
+    }
+
+    get ffm() {
+        this.layout.mode; // read: this component follows the layout
+        return this.env.dwoFfm;
+    }
+}
+
+patch(ControlPanel, {
+    components: { ...ControlPanel.components, DwoFfmButton },
 });

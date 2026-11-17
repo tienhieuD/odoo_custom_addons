@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="dwo_form_focus_mode.FormView" t-inherit="web.FormView" t-inherit-mode="extension">
-        <xpath expr="//CogMenu" position="before">
-            <button t-if="dwoFfmEnabled" type="button" class="btn btn-link px-2 o_dwo_ffm_toggle" t-att-data-mode="dwoFfmMode"
-                    t-att-title="dwoFfmTitle" t-on-click.stop="dwoFfmCycle">
-                <i class="fa" t-att-class="dwoFfmIcon" role="img"/>
-            </button>
-        </xpath>
         <xpath expr="//div[@t-ref='root']" position="inside">
             <button t-if="dwoFfmEnabled and dwoFfmMode !== 'normal'" type="button" class="btn btn-secondary o_dwo_ffm_drawer_btn"
                     t-att-title="dwoFfm.drawer ? 'Close the chatter' : 'Open the chatter'" t-on-click.stop="dwoFfmToggleDrawer">
                 <i class="fa" t-att-class="dwoFfm.drawer ? 'fa-times' : 'fa-comments'" role="img"/>
             </button>
+        </xpath>
+    </t>
+
+    <t t-name="dwo_form_focus_mode.Button">
+        <button t-if="ffm.dwoFfmEnabled" type="button" class="btn btn-secondary o_dwo_ffm_toggle" t-att-class="{ active: ffm.dwoFfmMode !== 'normal' }"
+                t-att-data-mode="ffm.dwoFfmMode" t-att-data-tooltip="ffm.dwoFfmTitle" t-on-click.stop="() => ffm.dwoFfmCycle()">
+            <i class="fa me-1" t-att-class="ffm.dwoFfmIcon" role="img"/><span class="o_dwo_ffm_label d-none d-xl-inline" t-esc="ffm.dwoFfmLabel"/>
+        </button>
+    </t>
+
+    <t t-name="dwo_form_focus_mode.ControlPanel" t-inherit="web.ControlPanel" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_cp_pager')]" position="before">
+            <DwoFfmButton t-if="env.dwoFfm"/>
         </xpath>
     </t>
 </templates>
