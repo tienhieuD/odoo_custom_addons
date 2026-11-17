@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2026 DuoTEK. Licensed under the GNU General Public License v3.0 (GPL-3).
-from odoo import models
+# Odoo 17: _() from odoo (env._ only exists from 18)
+from odoo import _, models
 from odoo.exceptions import UserError
 
 # AutoCAD release signatures: AC1012 (R13) ... AC1032 (2018 and later), and the older AC1.50 / AC2.x
@@ -24,8 +25,8 @@ class AttPreviewDwgEngine(models.AbstractModel):
 
     def _dwo_render(self, content, filename):
         if not content:
-            raise UserError(self.env._("The file is empty."))
+            raise UserError(_("The file is empty."))
         if not content.startswith(KNOWN_PREFIXES):
-            raise UserError(self.env._(
+            raise UserError(_(
                 "This is not a valid DWG file (it may be damaged or saved in another format)."))
         return {"type": "text", "data": "dwg"}

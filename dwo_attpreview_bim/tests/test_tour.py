@@ -13,4 +13,4 @@ class TestBimTour(HttpCase):
         # the sandboxed iframe (opaque origin) loads its scripts without cookies: in test mode Odoo ignores such
         # requests unless all requests are allowed
         self.http_request_allow_all = True
-        self.start_tour("/odoo/action-base.action_attachment/%d" % att.id, "dwo_attpreview_bim_tour", login="admin")
+        self.start_tour("/web#action=base.action_attachment&id=%d&view_type=form" % att.id, "dwo_attpreview_bim_tour", login="admin")

@@ -4,7 +4,8 @@ import io
 import json
 import zipfile
 
-from odoo import models
+# Odoo 17: _() from odoo (env._ only exists from 18)
+from odoo import _, models
 from odoo.exceptions import UserError
 
 MAX_3MF_UNPACKED = 512 * 1024 * 1024
@@ -39,15 +40,15 @@ class AttPreview3DEngine(models.AbstractModel):
     def _dwo_render(self, content, filename):
         kind = (filename or "").rsplit(".", 1)[-1].lower()
         if not content:
-            raise UserError(self.env._("The file is empty."))
+            raise UserError(_("The file is empty."))
         check = getattr(self, "_dwo_check_" + kind, None)
         if check is None:
-            raise UserError(self.env._("Unsupported file type."))
+            raise UserError(_("Unsupported file type."))
         check(content)
         return {"type": "text", "data": kind}
 
     def _dwo_bad(self, kind):
-        return UserError(self.env._(
+        return UserError(_(
             "This is not a valid %s file (it may be damaged or saved in another format).", kind.upper()))
 
     @staticmethod
@@ -85,7 +86,7 @@ class AttPreview3DEngine(models.AbstractModel):
         for item in list(doc.get("buffers", [])) + list(doc.get("images", [])):
             uri = item.get("uri") if isinstance(item, dict) else None
             if uri and not uri.startswith("data:"):
-                raise UserError(self.env._(
+                raise UserError(_(
                     "This glTF file refers to separate files (%s). Use a .glb file, or a .gltf with the data inside.",
                     str(uri)[:80]))
 
@@ -123,8 +124,8 @@ class AttPreview3DEngine(models.AbstractModel):
         try:
             infos = zipfile.ZipFile(io.BytesIO(content)).infolist()
         except (zipfile.BadZipFile, ValueError, OSError):
-            raise UserError(self.env._("The file is damaged and cannot be opened."))
+            raise UserError(_("The file is damaged and cannot be opened."))
         if len(infos) > MAX_3MF_ENTRIES or sum(i.file_size for i in infos) > MAX_3MF_UNPACKED:
-            raise UserError(self.env._("This file is too large once unpacked to be previewed."))
+            raise UserError(_("This file is too large once unpacked to be previewed."))
         if not any(i.filename.lower().endswith(".model") for i in infos):
             raise self._dwo_bad("3mf")

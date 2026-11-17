@@ -49,7 +49,9 @@ def serve_file(attachment_id, engine_code):
 
     att = request.env["ir.attachment"].browse(attachment_id)
     try:
-        att.check_access("read")
+        # Odoo 17: check_access_rights + check_access_rule (check_access only exists from 18)
+        att.check_access_rights("read")
+        att.check_access_rule("read")
         att.name  # record rules / existence
     except (AccessError, MissingError):
         return plain("Forbidden", 403)
