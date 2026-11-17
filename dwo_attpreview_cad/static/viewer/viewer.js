@@ -1,6 +1,6 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 // Sandboxed DXF viewer page: the parent sends the bytes of the file (postMessage), dxf-viewer draws them here.
-import { THREE, bridge } from "/dwo_attpreview_webgl/asset/viewer/common.js";
+import { THREE, bridge, requireWebGL } from "/dwo_attpreview_webgl/asset/viewer/common.js";
 import { DxfViewer } from "/dwo_attpreview_cad/asset/lib/dxf-viewer/dxf-viewer.bundle.js";
 
 const FONTS = ["noto-sans-latin-400-normal.woff", "noto-sans-latin-ext-400-normal.woff", "noto-sans-vietnamese-400-normal.woff"]
@@ -50,6 +50,7 @@ document.getElementById("dark").addEventListener("click", (ev) => {
 
 bridge("dwo_attpreview_cad", async (kind, buffer) => {
     // the stage is made when the file arrives: a browser without WebGL then gets a clear message
+    requireWebGL();
     viewer = new DxfViewer(stageEl, {
         autoResize: true, clearColor: new THREE.Color("#ffffff"), canvasAlpha: false, antialias: true,
         colorCorrection: true, blackWhiteInversion: true,

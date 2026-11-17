@@ -38,14 +38,27 @@ export function bridge(source, onLoad) {
 const BG = { light: 0xf3f4f6, dark: 0x20232a };
 const MAX_PIXEL_RATIO = 2;
 
+/**
+ * Throw a clear error when the browser has no WebGL. Probe first: three.js and dxf-viewer log a console error when they
+ * cannot create a context, and a missing WebGL (old or remote browsers, disabled hardware acceleration) is a normal
+ * case that gets a message in the dialog (with the Download button).
+ */
+export function requireWebGL() {
+    const probe = document.createElement("canvas");
+    if (!(probe.getContext("webgl2") || probe.getContext("webgl"))) {
+        throw new Error("WebGL is not available in this browser, so this file cannot be drawn. You can download it instead.");
+    }
+}
+
 /** A WebGL stage: scene, camera, orbit controls, lights, toolbar (reset, wireframe, grid, axes, background). */
 export function createStage(root) {
     const canvas = document.createElement("canvas");
     let renderer;
+    requireWebGL();
     try {
         renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     } catch (e) {
-        throw new Error("WebGL is not available in this browser.");
+        throw new Error("WebGL is not available in this browser, so this file cannot be drawn. You can download it instead.");
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO));
     root.appendChild(canvas);
