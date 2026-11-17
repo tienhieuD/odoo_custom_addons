@@ -300,6 +300,8 @@ const FIND = {
         check("Cell A6 of the first sheet", (w) => expect(w.sheet === 0 && w.ref === "A6", "ods: " + JSON.stringify(w))),
         // "Finance" is only on the second sheet ("Notes"): the viewer switches to it
         ...search("finance", 1),
+        // both searches find one match: wait for the result of the second one, or the check could read the first
+        { content: "The result of the new search", trigger: `${OFFICE}[data-find-where*='Notes']`, timeout: 60000 },
         check("The viewer switched to the sheet of the match", (w) => expect(w.sheet === 1 && w.shownSheet === 1 && w.sheetName === "Notes", "ods sheet: " + JSON.stringify(w))),
     ],
     // "Milestone" is on slide 2 only (title and last line): the viewer goes to slide 2
