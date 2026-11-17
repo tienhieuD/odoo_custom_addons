@@ -4,11 +4,11 @@
     <div class="text-center pt-5 pb-3 border-bottom">
         <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Form Focus Mode</h1>
         <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Wider forms, one click.</p>
-        <p class="mb-4" style="font-size: 15px;">Order lines, long forms and wide tables need room. One button gives the form view the whole width, and the chatter is still one click away.</p>
+        <p class="mb-4" style="font-size: 15px;">Order lines, long forms and wide tables need room. Pick a layout with three icons next to the pager, and the chatter stays one click away on the right.</p>
     </div>
 
     <div class="my-5">
-        <p class="mb-4" style="font-size: 17px;">On a large screen Odoo keeps the chatter beside the form and limits the width of the sheet, so wide order lines and many columns get squeezed. <strong>Form Focus Mode</strong> adds three small icon buttons, like the view switcher, to the control panel of every form, just before the pager, to choose between three layouts. Nothing to configure.</p>
+        <p class="mb-4" style="font-size: 17px;">On a large screen Odoo keeps the chatter beside the form and limits the width of the sheet, so wide order lines and many columns get squeezed. <strong>Form Focus Mode</strong> adds three small icon buttons, like the view switcher, right after the pager of every form. They choose the layout for all your forms. Nothing to configure.</p>
         <div class="text-center mb-4">
             <img src="flow.png" alt="Widen a form in four steps" class="img-fluid rounded shadow-sm"/>
         </div>
@@ -20,23 +20,31 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Three layouts</h4>
-                    <p class="mb-0" style="font-size: 14px;"><strong>Normal</strong>: the form as Odoo shows it. <strong>Wide</strong>: the chatter is out of the page and the sheet uses the full width. <strong>Focus</strong>: the same, and the top navigation bar is hidden too.</p>
+                    <p class="mb-0" style="font-size: 14px;"><strong>Normal</strong> (the default): the form as Odoo shows it. <strong>Always hide</strong>: the chatter is gone and the sheet uses the full width. <strong>Auto chatter</strong>: the chatter is hidden and a bar on the right, with an arrow and the words Auto chatter, opens it when you need it.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Chatter as a drawer</h4>
-                    <p class="mb-0" style="font-size: 14px;">While the chatter is hidden, a <strong>Chatter</strong> button opens it as a drawer on the right, over a dimmed background: messages, notes, activities, followers and attachments, without leaving the form. Click the dimmed background (or press Esc) and the drawer closes.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">A drawer, not a page change</h4>
+                    <p class="mb-0" style="font-size: 14px;">A click on the bar opens the chatter as a drawer on the right over a dimmed background: messages, notes, activities, followers and attachments, without leaving the form. Click the dimmed background, the close button or press Esc and it closes.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Remembered per model</h4>
-                    <p class="mb-0" style="font-size: 14px;">Sales orders can stay in focus mode while contacts stay normal. The layout is kept in your browser for each model and comes back the next time you open a form of that model.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">As wide as you want</h4>
+                    <p class="mb-0" style="font-size: 14px;">The drawer is at least as wide as the chatter of Odoo (530 px) and has a handle on its left edge: drag it to make it wider or narrower. The width is remembered.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Remembered on every form</h4>
+                    <p class="mb-0" style="font-size: 14px;">The layout is one choice for all your form views: open another record or another model and it stays as you left it. It is kept in your browser.</p>
                 </div>
             </div>
         </div>
@@ -44,7 +52,7 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Keyboard shortcut</h4>
-                    <p class="mb-0" style="font-size: 14px;">Alt+Shift+F cycles the layouts (Ctrl+Shift+F on a Mac, where Odoo reads Ctrl as Alt). The three buttons before the pager, like the view switcher, show the layout in use: normal, wide or focus.</p>
+                    <p class="mb-0" style="font-size: 14px;">Alt+Shift+F goes to the next layout (Ctrl+Shift+F on a Mac, where Odoo reads Ctrl as Alt). Each button has a tooltip that says what it does.</p>
                 </div>
             </div>
         </div>
@@ -52,50 +60,50 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Safe for your data</h4>
-                    <p class="mb-0" style="font-size: 14px;">It only changes how the form is laid out in the browser. No models, no fields, no menus, no data; it depends only on the standard <code>web</code> module.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100" style="border-top: 4px solid #875A7B;">
-                <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Leaves dialogs and phones alone</h4>
-                    <p class="mb-0" style="font-size: 14px;">Forms in a dialog, and forms on a phone, keep their normal layout: there the form already has the whole screen.</p>
+                    <p class="mb-0" style="font-size: 14px;">It only changes how the form is laid out in the browser. No models, no fields, no menus, no data; it depends only on the standard <code>web</code> module. Forms in a dialog or on a phone are left alone.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Normal: the chatter beside the form</h2>
-    <p class="mb-4" style="font-size: 16px;">The default Odoo layout on a large screen. The three new buttons, like the view switcher, sit just before the pager: normal, wide and focus.</p>
+    <p class="mb-4" style="font-size: 16px;">The default Odoo layout on a large screen. The three buttons sit right after the pager, like the view switcher; the one in use is lit.</p>
     <div class="text-center mb-4">
-        <img src="screenshots/01-normal.png" alt="A sales order form with the chatter on the right side, the form narrowed and the Wide form button before the pager" class="img-fluid rounded shadow"/>
+        <img src="screenshots/01-normal.png" alt="A sales order form with the chatter on the right side, and three icon buttons after the pager with the first one lit" class="img-fluid rounded shadow"/>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Wide: the whole width for the form</h2>
-    <p class="mb-4" style="font-size: 16px;">The chatter is out of the page, the lines and columns have room, and a Chatter button at the bottom right brings the chatter back when you need it.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Always hide: the whole width for the form</h2>
+    <p class="mb-4" style="font-size: 16px;">The chatter is out of the page and the lines and columns have room. This layout never shows the chatter, on any form.</p>
     <div class="text-center mb-4">
-        <img src="screenshots/02-wide.png" alt="The same sales order with the chatter hidden: the order lines use the whole width and a round chat button sits at the bottom right" class="img-fluid rounded shadow"/>
+        <img src="screenshots/02-hide.png" alt="The same sales order with the chatter hidden: the order lines use the whole width" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">More Screens</h2>
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_drawer" role="tab" aria-controls="dwo_ffm_shots_drawer" aria-selected="true">Chatter drawer</a>
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_auto" role="tab" aria-controls="dwo_ffm_shots_auto" aria-selected="true">Auto chatter</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_focus" role="tab" aria-controls="dwo_ffm_shots_focus" aria-selected="false">Focus mode</a>
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_drawer" role="tab" aria-controls="dwo_ffm_shots_drawer" aria-selected="false">Chatter drawer</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ffm_shots_wide" role="tab" aria-controls="dwo_ffm_shots_wide" aria-selected="false">Wider drawer</a>
         </li>
     </ul>
     <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
-        <div class="tab-pane fade show active" id="dwo_ffm_shots_drawer" role="tabpanel">
+        <div class="tab-pane fade show active" id="dwo_ffm_shots_auto" role="tabpanel">
             <div class="text-center mb-3">
-                <img src="screenshots/03-drawer.png" alt="The chatter opened as a drawer on the right side of the wide form, with a close button" class="img-fluid rounded shadow"/>
+                <img src="screenshots/03-auto.png" alt="The form at full width with a vertical bar on the right edge showing an arrow and the words Auto chatter" class="img-fluid rounded shadow"/>
             </div>
         </div>
-        <div class="tab-pane fade" id="dwo_ffm_shots_focus" role="tabpanel">
+        <div class="tab-pane fade" id="dwo_ffm_shots_drawer" role="tabpanel">
             <div class="text-center mb-3">
-                <img src="screenshots/04-focus.png" alt="The sales order in focus mode: no top navigation bar, no chatter, the form from edge to edge" class="img-fluid rounded shadow"/>
+                <img src="screenshots/04-drawer.png" alt="The chatter opened as a drawer on the right over a dimmed background, with a close button and a handle on its left edge" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ffm_shots_wide" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/05-drawer-wide.png" alt="The drawer dragged wider with the handle on its left edge" class="img-fluid rounded shadow"/>
             </div>
         </div>
     </div>
@@ -107,15 +115,15 @@
             <div class="card h-100" style="border-top: 4px solid #0E7C66;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Remembered in the browser</h4>
-                    <p class="mb-0" style="font-size: 14px;">The layout is stored in the browser (local storage), per model: it is not shared between devices or browsers, and a private window starts in the normal layout.</p>
+                    <p class="mb-0" style="font-size: 14px;">The layout and the width of the drawer are stored in the browser (local storage), for all forms: they are not shared between devices or browsers, and a private window starts in the normal layout.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-6 mb-4">
             <div class="card h-100" style="border-top: 4px solid #0E7C66;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Focus hides the top bar</h4>
-                    <p class="mb-0" style="font-size: 14px;">In focus mode the app menu is hidden. Click the button (or press the shortcut) to bring it back, or use the breadcrumb in the control panel to leave the form.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Forms in dialogs and on phones</h4>
+                    <p class="mb-0" style="font-size: 14px;">A form in a dialog, and a form on a phone, keep their normal layout: there the form already has the whole screen.</p>
                 </div>
             </div>
         </div>
@@ -130,8 +138,8 @@
         <div class="col-md-6 mb-4">
             <div class="card h-100" style="border-top: 4px solid #0E7C66;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Large screens</h4>
-                    <p class="mb-0" style="font-size: 14px;">On a narrow window Odoo already puts the chatter under the form; the button still hides it and the drawer still shows it.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Forms without a chatter</h4>
+                    <p class="mb-0" style="font-size: 14px;">A form that has no chatter shows no bar in auto mode; the buttons still change the width of the sheet.</p>
                 </div>
             </div>
         </div>
@@ -159,12 +167,16 @@
         <p class="mb-0" style="font-size: 14px;">No. It only changes the layout of form views in the browser.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Where do I find the chatter in wide and focus mode?</h4>
-        <p class="mb-0" style="font-size: 14px;">The Chatter button at the bottom right opens it as a drawer on the right side of the screen. Click the dimmed background, the close button or press Esc to close it.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">How do I get the chatter back in auto mode?</h4>
+        <p class="mb-0" style="font-size: 14px;">Click the bar on the right edge (the arrow and the words Auto chatter): the chatter opens as a drawer. Click outside it, the close button or press Esc to close it.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I choose a layout for every model?</h4>
-        <p class="mb-0" style="font-size: 14px;">Yes, it is remembered per model: use the button or Alt+Shift+F (Ctrl+Shift+F on a Mac) on a form and the choice stays for that model.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I change the width of the drawer?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes, drag the handle on its left edge. It starts as wide as the chatter of Odoo and the width is remembered.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Is the choice per form or for all forms?</h4>
+        <p class="mb-0" style="font-size: 14px;">For all your forms: open another record or model and the layout stays.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Which Odoo versions?</h4>
@@ -172,7 +184,7 @@
     </div></div>
 
     <div class="mt-5">
-        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> full screen form view, fullscreen form, wide form view, hide chatter, chatter toggle, form view width, focus mode, form view layout, maximize form, chatter drawer, form view full width</p>
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> full screen form view, fullscreen form, wide form view, hide chatter, chatter toggle, form view width, auto chatter, chatter drawer, form view layout, maximize form</p>
     </div>
     <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
         <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Give your forms room.</p>
