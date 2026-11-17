@@ -11,6 +11,8 @@ from odoo import models
 from odoo.exceptions import UserError
 from odoo.tools.mail import html_sanitize
 
+from odoo.addons.dwo_attpreview_core.remote_image import mark_bad_images, restore_bad_images
+
 from ..parsers import MailParseError, parse_email, parse_ics, parse_vcf
 
 CID_SRC = re.compile(r"""(src\s*=\s*)(["']?)cid:([^"'\s>]+)\2""", re.I)
@@ -176,9 +178,11 @@ class AttPreviewEngineMail(models.AbstractModel):
             return '%s""' % match.group(1)
 
         html = CID_SRC.sub(inline, html)
+        html, bad_alts = mark_bad_images(html)  # a script, file: or path as the address: shown as an error (#87)
         html = _keep_backgrounds(html)
         html = str(html_sanitize(html, sanitize_attributes=True, sanitize_style=True, sanitize_form=True,
                                  strip_classes=False))
+        html = restore_bad_images(html, bad_alts)
         remote_urls = []
 
         def mark(match):
@@ -193,5 +197,5 @@ class AttPreviewEngineMail(models.AbstractModel):
         cleaned = CSS_URL.sub("none", cleaned)
         remote = bool(remote_urls) or cleaned != marked
         cleaned = IMG_WITHOUT_SRC.sub(
-            lambda m: m.group(0) if "data-dwo-remote=" in m.group(0) else "", cleaned)  # no broken pictures
+            lambda m: m.group(0) if "data-dwo-remote=" in m.group(0) or "data-dwo-bad=" in m.group(0) else "", cleaned)  # no broken pictures
         return cleaned, used, remote, remote_urls

@@ -9,6 +9,7 @@ reading notebooks (their HTML outputs are sanitized here too).
 """
 import base64
 import codecs
+import html as html_lib
 import json
 import re
 
@@ -254,29 +255,42 @@ def _keep_backgrounds(html):
     return lxml_html.tostring(doc, encoding="unicode") if changed else html
 
 
+MAX_REMOTE_PICTURES = 100
+
+
 def preview_html(html):
     """Odoo's ``html_sanitize`` (no script, event handler, form, unsafe style), then every picture that is not a
-    ``data:`` URI is replaced by a small placeholder (its address in the tooltip): the preview frame loads nothing
-    from the network. Returns ``(html, number of pictures not loaded)``."""
+    ``data:`` URI loses its address: a web picture becomes ``<img data-dwo-remote="N" hidden>`` (the viewer asks the
+    server to fetch it, see controllers/main.py) and any other address (a script, a file, a path) becomes
+    ``<img data-dwo-bad="..." hidden>`` (the viewer shows an error). The frame loads nothing from the network.
+    Returns ``(html, number of pictures not inline, addresses of the web pictures in order)``."""
     from odoo.tools.mail import html_sanitize
     if not html.strip():
-        return "", 0
+        return "", 0, []
+    from odoo.addons.dwo_attpreview_core.remote_image import mark_bad_images, restore_bad_images
+    html, bad_alts = mark_bad_images(html)
     clean = str(html_sanitize(_keep_backgrounds(html), sanitize_attributes=True, sanitize_style=True,
                               sanitize_form=True, strip_classes=False) or "")
-    blocked = 0
+    clean = restore_bad_images(clean, bad_alts)
+    blocked = len(bad_alts)
+    urls = []
 
     def block(match):
         nonlocal blocked
         tag = match.group(0)
         src = _SRC.search(tag)
-        if src and src.group(1).lower().startswith("data:image/"):
+        value = html_lib.unescape(src.group(1)) if src else ""
+        if value.lower().startswith("data:image/") or "data-dwo-bad=" in tag:
             return tag
         blocked += 1
         alt = _ALT.search(tag)
-        return '<img src="%s" alt="%s" title="%s" width="48" height="36" data-dwo-blocked="1">' % (
-            BLOCKED_PICTURE, alt.group(1) if alt else "", src.group(1) if src else "")
+        alt = ' alt="%s"' % alt.group(1) if alt else ""
+        if re.match(r"https?://", value, re.I) and len(urls) < MAX_REMOTE_PICTURES:
+            urls.append(value)
+            return '<img data-dwo-remote="%d" hidden%s>' % (len(urls) - 1, alt)
+        return '<img data-dwo-bad="unsupported address" hidden%s>' % alt
 
-    return _IMG.sub(block, clean), blocked
+    return _IMG.sub(block, clean), blocked, urls
 
 
 def _clean(value):
@@ -346,8 +360,8 @@ def notebook(text):
                         outputs.append({"kind": "image", "src": "data:%s;base64,%s" % (picture, raw)})
                         continue
                 if "text/html" in bundle:
-                    html, _blocked = preview_html(_joined(bundle["text/html"]))
-                    outputs.append({"kind": "html", "html": html})
+                    html, _blocked, urls = preview_html(_joined(bundle["text/html"]))
+                    outputs.append({"kind": "html", "html": html, "urls": urls})
                 elif "text/markdown" in bundle:
                     outputs.append({"kind": "markdown", "text": _joined(bundle["text/markdown"])})
                 elif "text/plain" in bundle:

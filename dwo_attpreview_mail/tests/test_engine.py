@@ -133,6 +133,17 @@ class TestMailEngine(TransactionCase):
         self.assertEqual((d["remote_images"], d["remote_insecure"]), (1, 0))
         self.assertTrue(d["remote_blocked"])
 
+    def test_02c_pictures_with_a_strange_address_become_visible_errors(self):
+        html = ('<p>x</p><img src="javascript:alert(1)" alt="js"><img src="file:///etc/passwd">'
+                '<img src="evil.sh" alt="script"><img src="https://x.example/ok.png">')
+        raw = ("Subject: s\nContent-Type: text/html; charset=utf-8\n\n" + html).encode()
+        body = self.render(raw, "a.eml")["body_html"]
+        self.assertEqual(body.count("data-dwo-bad="), 3, "each one is kept as an error marker, not dropped")
+        self.assertEqual(body.count('data-dwo-remote="0"'), 1)
+        for text in ("javascript:", "file:", "evil.sh", "passwd"):
+            self.assertNotIn(text, body, "the strange address itself is never kept")
+        self.assertIn('alt="script"', body, "the alt text is kept for the message")
+
     def test_03_plain_text_email_and_bogus_charset(self):
         raw = b"Subject: s\nContent-Type: text/plain; charset=x-unknown-cs\n\n<b>caf\xc3\xa9</b>\n"
         d = self.render(raw, "a.eml")
