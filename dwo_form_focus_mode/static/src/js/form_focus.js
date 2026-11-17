@@ -1,11 +1,13 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { onWillUnmount, proxy, useEffect } from "@odoo/owl";
+import { Component, onWillUnmount, proxy, useEffect } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { patch } from "@web/core/utils/patch";
 import { FormController } from "@web/views/form/form_controller";
+import { ControlPanel } from "@web/search/control_panel/control_panel";
 
 const MODES = ["normal", "wide", "focus"];
 const STORAGE = "dwo_form_focus_mode.mode.";
@@ -42,6 +44,8 @@ patch(FormController.prototype, {
         // Odoo 20 (Owl 3): proxy instead of useState
         this.dwoFfm = proxy({ mode: readMode(this.props.resModel), drawer: false });
         useHotkey("alt+shift+f", () => this.dwoFfmCycle(), { allowRepeat: false });
+        // the button is in the control panel (before the pager): it reads the layout from here
+        useSubEnv({ dwoFfm: this });
         // Owl 3: useEffect re-runs by itself when the signals it reads change
         useEffect(() => {
             document.body.classList.toggle(BODY_CLASS, this.dwoFfmEnabled && this.dwoFfm.mode === "focus");
@@ -58,11 +62,16 @@ patch(FormController.prototype, {
         return this.dwoFfmEnabled ? this.dwoFfm.mode : "normal";
     },
 
+    /** What a click does, as the label of the button. */
+    get dwoFfmLabel() {
+        return { normal: _t("Wide form"), wide: _t("Focus mode"), focus: _t("Normal form") }[this.dwoFfmMode];
+    },
+
     get dwoFfmTitle() {
         return {
-            normal: _t("Wide form (hide the chatter)"),
-            wide: _t("Focus mode (also hide the top bar)"),
-            focus: _t("Back to the normal form"),
+            normal: _t("Wide form: hide the chatter and use the full width (Alt+Shift+F)"),
+            wide: _t("Focus mode: also hide the top bar (Alt+Shift+F)"),
+            focus: _t("Back to the normal form (Alt+Shift+F)"),
         }[this.dwoFfmMode];
     },
 
@@ -95,4 +104,18 @@ patch(FormController.prototype, {
         }
         return result;
     },
+});
+
+/** The button of the control panel, before the pager of a form view (the form gives its layout in the environment). */
+export class DwoFfmButton extends Component {
+    static template = "dwo_form_focus_mode.Button";
+
+    // Owl 3: the layout is a proxy of the form controller; reading it in the template makes this component follow it
+    get ffm() {
+        return this.env.dwoFfm;
+    }
+}
+
+patch(ControlPanel, {
+    components: { ...ControlPanel.components, DwoFfmButton },
 });

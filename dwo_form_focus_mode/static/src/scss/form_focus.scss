@@ -1,18 +1,14 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 // Layouts of a form view: the class is set by form_focus.js on the form (o_dwo_ffm_wide / o_dwo_ffm_focus).
 
-// the toggle button of the control panel
+// the toggle button of the control panel (before the pager)
 .o_dwo_ffm_toggle {
-    color: inherit;
-    opacity: .7;
+    white-space: nowrap;
 
-    &:hover {
-        opacity: 1;
-    }
-
-    &:not([data-mode='normal']) {
-        opacity: 1;
-        color: var(--primary, #714b67);
+    &.active {
+        color: #fff;
+        background-color: var(--primary, #714b67);
+        border-color: var(--primary, #714b67);
     }
 }
 
