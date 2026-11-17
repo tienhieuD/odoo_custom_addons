@@ -5,9 +5,10 @@
 .o_dwo_ffm_toggle {
     white-space: nowrap;
 
-    &.active {
-        color: #fff;
-        background-color: var(--primary, #714b67);
+    // outline only, also while a layout is on: the colour of the theme tells it
+    &.active, &.active:hover, &.active:focus {
+        color: var(--primary, #714b67);
+        background-color: transparent;
         border-color: var(--primary, #714b67);
     }
 }
