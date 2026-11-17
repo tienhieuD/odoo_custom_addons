@@ -31,7 +31,7 @@ class TestDwgEngine(TransactionCase):
                 self.engine._dwo_render(content, "a.dwg")
 
     def test_03_core_refuses_a_big_file_before_the_engine(self):
-        self.env["ir.config_parameter"].sudo().set_param("dwo_attpreview.max_mb.dwg", "0")
+        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_mb.dwg", 0)
         att = self.env["ir.attachment"].create({"name": "plan.dwg", "raw": _fixture("sample_2000.dwg")})
         with self.assertRaises(UserError):
             self.env["dwo.attpreview.cache"]._render(att, self.engine)

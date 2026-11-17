@@ -34,7 +34,7 @@ class TestCadEngine(TransactionCase):
         self.assertIn("ASCII", str(cm.exception.args[0]))
 
     def test_04_core_refuses_a_big_file_before_the_engine(self):
-        self.env["ir.config_parameter"].sudo().set_param("dwo_attpreview.max_mb.cad_dxf", "0")
+        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_mb.cad_dxf", 0)
         att = self.env["ir.attachment"].create({"name": "plan.dxf", "raw": _fixture("floor-plan.dxf")})
         with self.assertRaises(UserError):
             self.env["dwo.attpreview.cache"]._render(att, self.engine)

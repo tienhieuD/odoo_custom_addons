@@ -29,7 +29,7 @@ class TestBimEngine(TransactionCase):
                 self.engine._dwo_render(content, "a.ifc")
 
     def test_04_core_refuses_a_big_file_before_the_engine(self):
-        self.env["ir.config_parameter"].sudo().set_param("dwo_attpreview.max_mb.bim_ifc", "0")
+        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_mb.bim_ifc", 0)
         att = self.env["ir.attachment"].create({"name": "model.ifc", "raw": _fixture("office-building.ifc")})
         with self.assertRaises(UserError):
             self.env["dwo.attpreview.cache"]._render(att, self.engine)

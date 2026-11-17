@@ -80,7 +80,7 @@ class Test3DEngine(TransactionCase):
             self._render("a.3dm", b"PK\x03\x04" + b"0" * 50)
 
     def test_07_core_refuses_a_big_file_before_the_engine(self):
-        self.env["ir.config_parameter"].sudo().set_param("dwo_attpreview.max_mb.model3d_mesh", "0")
+        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_mb.model3d_mesh", 0)
         att = self.env["ir.attachment"].create({"name": "gear.stl", "raw": _fixture("spur-gear.stl")})
         with self.assertRaises(UserError):
             self.env["dwo.attpreview.cache"]._render(att, self.engine)

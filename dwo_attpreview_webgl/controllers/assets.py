@@ -3,7 +3,8 @@
 """Serving the files of a sandboxed viewer page. Shared by the viewer modules (3D, CAD, BIM, DWG)."""
 import os
 
-from odoo.http import Stream, request
+from odoo.http import request
+from odoo.http.stream import Stream  # Odoo 20: odoo.http is a package, Stream lives in odoo.http.stream
 
 ASSET_EXT = (".html", ".css", ".js", ".mjs", ".wasm", ".json", ".woff", ".ttf")
 
@@ -60,7 +61,7 @@ def serve_file(attachment_id, engine_code):
     rec = request.env["dwo.attpreview.cache"]._get_or_render(sudo, engine)
     if rec.error:
         return plain(rec.error, 422)
-    return request.make_response(sudo.raw or b"", headers=[
+    return request.make_response(bytes(sudo.raw or b""), headers=[
         ("Content-Type", "application/octet-stream"),
         ("X-Content-Type-Options", "nosniff"),
         ("Cache-Control", "private, max-age=0, must-revalidate"),

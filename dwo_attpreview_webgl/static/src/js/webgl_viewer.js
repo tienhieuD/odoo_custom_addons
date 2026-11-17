@@ -1,6 +1,6 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3).
-import { Component, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, proxy, signal, useProps } from "@odoo/owl";
 
 const LOAD_TIMEOUT_MS = 120000;
 
@@ -14,17 +14,13 @@ const LOAD_TIMEOUT_MS = 120000;
 export class DwoWebglViewer extends Component {
     static template = "dwo_attpreview_webgl.Viewer";
     static config = { viewerUrl: "", source: "", fileUrl: () => "" };
-    static props = {
-        content: String,
-        attachmentId: { type: Number, optional: true },
-        downloadUrl: { type: String, optional: true },
-        fileUrl: { type: String, optional: true },
-        "*": true,
-    };
+    // Odoo 20 (Owl 3): no static props; the Core reads this list to know the viewer takes fileUrl
+    static dwoAttPreviewProps = ["content", "attachmentId", "downloadUrl", "fileUrl"];
+    props = useProps();
 
     setup() {
-        this.frame = useRef("frame");
-        this.state = useState({ loading: true, error: "", stats: "" });
+        this.frame = signal.ref(); // Odoo 20: a signal ref, read with this.frame()
+        this.state = proxy({ loading: true, error: "", stats: "" });
         this.config = this.constructor.config;
         this.onMessage = this.onMessage.bind(this);
         onMounted(() => {
@@ -51,7 +47,7 @@ export class DwoWebglViewer extends Component {
     }
 
     async onMessage(ev) {
-        const frame = this.frame.el;
+        const frame = this.frame();
         if (!frame || ev.source !== frame.contentWindow || !ev.data || ev.data.source !== this.config.source) {
             return;
         }
@@ -78,7 +74,7 @@ export class DwoWebglViewer extends Component {
                 throw new Error(await response.text());
             }
             const buffer = await response.arrayBuffer();
-            this.frame.el.contentWindow.postMessage(
+            this.frame().contentWindow.postMessage(
                 { source: this.config.source + "_parent", type: "load", kind: this.props.content, buffer },
                 "*",
                 [buffer]
