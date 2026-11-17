@@ -7,9 +7,9 @@ const toggle = (mode) => `.o_dwo_ffm_toggle[data-mode='${mode}']`;
 // normal -> wide (chatter hidden, drawer) -> focus (no top bar) -> normal again with the keyboard shortcut
 registry.category("web_tour.tours").add("dwo_form_focus_mode_tour", {
     steps: () => [
-        { content: "The toggle is in the control panel of the form", trigger: `.o_form_view ${toggle("normal")}`, run: () => {} },
+        { content: "The toggle is in the control panel of the form", trigger: `.o_control_panel ${toggle("normal")}`, run: () => {} },
         { trigger: `${toggle("normal")}`, run: "click" },
-        { content: "Wide: the form got its class", trigger: `.o_form_view.o_dwo_ffm_wide ${toggle("wide")}`, run: () => {} },
+        { content: "Wide: the form got its class", trigger: `.o_form_view.o_dwo_ffm_wide, ${toggle("wide")}`, run: () => {} },
         {
             content: "The chatter (when the form has one) is out of the page and the sheet is not limited in width",
             trigger: ".o_form_view.o_dwo_ffm_wide .o_form_sheet_bg",
@@ -36,7 +36,7 @@ registry.category("web_tour.tours").add("dwo_form_focus_mode_tour", {
             }
         } },
         { trigger: toggle("wide"), run: "click" },
-        { content: "Focus: the top bar is hidden", trigger: `.o_form_view.o_dwo_ffm_focus ${toggle("focus")}`, run: () => {} },
+        { content: "Focus: the top bar is hidden", trigger: `.o_form_view.o_dwo_ffm_focus, ${toggle("focus")}`, run: () => {} },
         { trigger: "body.o_dwo_ffm_focus_body", run() {
             const navbar = document.querySelector(".o_main_navbar");
             if (navbar && getComputedStyle(navbar).display !== "none") {
@@ -53,7 +53,8 @@ registry.category("web_tour.tours").add("dwo_form_focus_mode_tour", {
                 }));
             },
         },
-        { trigger: `.o_form_view:not(.o_dwo_ffm) ${toggle("normal")}`, run: () => {} },
+        { trigger: `${toggle("normal")}`, run: () => {} },
+        { trigger: ".o_form_view:not(.o_dwo_ffm)", run: () => {} },
         { trigger: "body:not(.o_dwo_ffm_focus_body)", run() {
             const navbar = document.querySelector(".o_main_navbar");
             if (navbar && getComputedStyle(navbar).display === "none") {
