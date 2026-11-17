@@ -1,0 +1,63 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #1B2A48;">Secure WebGL Preview Base</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #1B2A48;">The shared base of the Secure 3D, CAD, BIM and DWG preview modules.</p>
+        <p class="mb-4" style="font-size: 15px;">Installed automatically with them. It previews no file by itself.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">This module holds what the design-file preview modules share: <strong>three.js</strong> (MIT), the sandboxed viewer frame with orbit controls, fit-to-view, wireframe, grid, axes and background switches, and the routes that hand a file to the frame after the access checks. Install <strong>Secure 3D Preview</strong>, <strong>Secure CAD Preview</strong>, <strong>Secure BIM Preview</strong> or the free <strong>Secure DWG Preview</strong> to open files.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: a design file is opened, the file goes to a sandboxed viewer frame and three.js draws it in your browser" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #1B2A48;">What It Provides</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">One copy of three.js</h4>
+                    <p class="mb-0" style="font-size: 14px;">The 3D, CAD, BIM and DWG modules draw with the same copy, so it is downloaded once.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Sandboxed frame</h4>
+                    <p class="mb-0" style="font-size: 14px;">Files are drawn in an iframe with no network access and no access to your Odoo session.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Files never leave your server</h4>
+                    <p class="mb-0" style="font-size: 14px;">The viewer is bundled in the module and runs in a sandboxed frame with no network access. Nothing is uploaded to a conversion service, a CDN or any other site.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Do I need to install it?</h4>
+        <p class="mb-0" style="font-size: 14px;">It is installed automatically when you install one of the design-file preview modules.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Which files does it open?</h4>
+        <p class="mb-0" style="font-size: 14px;">None by itself. The modules that depend on it open STL, STEP, DXF, DWG, IFC and other design files.</p>
+    </div></div>
+
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #2F4B7C;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #2F4B7C;">The base of the design-file previews.</p>
+        <p class="mb-2" style="font-size: 15px;">Free and open source. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
