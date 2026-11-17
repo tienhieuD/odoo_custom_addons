@@ -35,8 +35,18 @@ export function defaults(object) {
         if (o.isMesh && (!o.material || (Array.isArray(o.material) && !o.material.length))) {
             o.material = material(o.geometry);
         }
-        if (o.isMesh && o.material && !Array.isArray(o.material)) {
-            o.material.side = THREE.DoubleSide;
+        if (o.isMesh && o.material) {
+            for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+                m.side = THREE.DoubleSide;
+                // a texture kept in a separate file is never loaded (no network), and a pure black colour (the default
+                // of some CAD files) shows nothing but a silhouette: both get the neutral colour
+                if (m.map && !m.map.image) {
+                    m.map = null;
+                }
+                if (!m.map && !m.vertexColors && m.color && m.color.r + m.color.g + m.color.b < 0.03) {
+                    m.color.set(0x9aa7b8);
+                }
+            }
         }
     });
 }

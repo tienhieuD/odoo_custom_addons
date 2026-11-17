@@ -267,6 +267,39 @@ async function buildTree() {
     return storeys;
 }
 
+/**
+ * Box of the building: the elements far from the others (a survey point, a grid, a misplaced object) are left out, so the
+ * view is not zoomed out to show them. The tail is cut at three times the 75th percentile of the distances to the median.
+ */
+function mainBox() {
+    const boxes = new Map();
+    for (const part of parts) {
+        const pos = part.mesh.geometry.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            const id = part.ids[i];
+            let b = boxes.get(id);
+            if (!b) {
+                b = new THREE.Box3();
+                boxes.set(id, b);
+            }
+            b.expandByPoint(new THREE.Vector3().fromBufferAttribute(pos, i));
+        }
+    }
+    const items = [...boxes.values()].map((b) => ({ b, c: b.getCenter(new THREE.Vector3()) }));
+    const all = new THREE.Box3();
+    items.forEach((it) => all.union(it.b));
+    if (items.length < 4) {
+        return all;
+    }
+    const median = (axis) => items.map((it) => it.c[axis]).sort((a, b) => a - b)[items.length >> 1];
+    const mid = new THREE.Vector3(median("x"), median("y"), median("z"));
+    const dist = items.map((it) => it.c.distanceTo(mid)).sort((a, b) => a - b);
+    const limit = Math.max(dist[Math.floor(dist.length * 0.75)] * 3, 1e-6);
+    const kept = new THREE.Box3();
+    items.forEach((it) => it.c.distanceTo(mid) <= limit && kept.union(it.b));
+    return kept.isEmpty() ? all : kept;
+}
+
 // --- load -----------------------------------------------------------------------------------------------------------
 bridge("dwo_attpreview_bim", async (kind, buffer) => {
     getStage();
@@ -283,6 +316,7 @@ bridge("dwo_attpreview_bim", async (kind, buffer) => {
     }
     // web-ifc already gives Y-up coordinates (the IFC Z axis is mapped to Y), no rotation is needed
     stage.content.updateMatrixWorld(true);
+    stage.fitBox = mainBox();
     stage.fit();
     const storeys = await buildTree();
     stage.renderer.domElement.addEventListener("click", (ev) => {

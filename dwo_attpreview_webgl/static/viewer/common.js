@@ -111,7 +111,8 @@ export function createStage(root) {
 
     /** Put the camera where the whole content is visible (the model, or the drawing), looking from a corner. */
     stage.fit = (flat = false) => {
-        const box = new THREE.Box3().setFromObject(content);
+        // a viewer can give the box that matters (stage.fitBox): a stray far object must not shrink the model
+        const box = stage.fitBox ? stage.fitBox.clone() : new THREE.Box3().setFromObject(content);
         if (box.isEmpty()) {
             return;
         }
