@@ -9,7 +9,7 @@
             <xpath expr="//form" position="inside">
                 <app string="Attachment Preview" name="dwo_attpreview_core" groups="base.group_system">
                     <block title="Attachment Preview">
-                        <setting string="Max file size (MB)" help="Larger files are not previewed.">
+                        <setting string="Max file size, other types (MB)" help="Larger files are not previewed. Each preview module has its own limits for its file types, below.">
                             <div class="content-group">
                                 <div class="mt8"><field name="dwo_attpreview_max_file_size_mb"/></div>
                             </div>
