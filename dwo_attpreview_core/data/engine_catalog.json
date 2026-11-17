@@ -81,5 +81,49 @@
       "txt"
     ],
     "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_text"
+  },
+  {
+    "module": "dwo_attpreview_3d",
+    "name": "Secure 3D Preview: STL, STEP, OBJ, GLB, 3DM",
+    "extensions": [
+      "stl",
+      "step",
+      "stp",
+      "iges",
+      "igs",
+      "obj",
+      "glb",
+      "gltf",
+      "3mf",
+      "ply",
+      "fbx",
+      "dae",
+      "3dm"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_3d"
+  },
+  {
+    "module": "dwo_attpreview_cad",
+    "name": "Secure CAD Preview: DXF drawings",
+    "extensions": [
+      "dxf"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_cad"
+  },
+  {
+    "module": "dwo_attpreview_dwg",
+    "name": "Secure DWG Preview: AutoCAD drawings (free)",
+    "extensions": [
+      "dwg"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_dwg"
+  },
+  {
+    "module": "dwo_attpreview_bim",
+    "name": "Secure BIM Preview: IFC models",
+    "extensions": [
+      "ifc"
+    ],
+    "store_url": "https://apps.odoo.com/apps/modules/dwo_attpreview_bim"
   }
 ]

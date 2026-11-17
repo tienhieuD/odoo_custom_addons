@@ -1,0 +1,125 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #1B2A48;">Secure BIM Preview: IFC models</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #1B2A48;">Open IFC building models right inside Odoo.</p>
+        <p class="mb-4" style="font-size: 15px;">Orbit around a building, hide storeys and read the properties of any element, from the chatter or a file field.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Click an IFC file in the chatter or in a file field and the model opens in a large dialog. Drag to orbit, scroll to zoom. The <strong>Structure</strong> panel lists the project, site, building and storeys with a switch to show or hide each one. Click an element to highlight it and read its type, its GlobalId and its property sets. Works with the free <strong>Secure Attachment Preview</strong> module, installed automatically.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: click an IFC file, Odoo checks the access rights and the size, the file goes to a sandboxed viewer frame, and the model is read and drawn in your browser" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #1B2A48;">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">3D view with the colours of the model</h4>
+                    <p class="mb-0" style="font-size: 14px;">Walls, slabs, columns, windows and the rest are drawn with the colours and the transparency stored in the file.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Building structure</h4>
+                    <p class="mb-0" style="font-size: 14px;">Project, site, building and storeys as a tree; untick a storey to look inside the one below.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Element properties</h4>
+                    <p class="mb-0" style="font-size: 14px;">Click an element to highlight it and see its type, name, GlobalId and its property sets.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Files never leave your server</h4>
+                    <p class="mb-0" style="font-size: 14px;">The viewer is bundled in the module and runs in a sandboxed frame with no network access. Nothing is uploaded to a conversion service, a CDN or any other site.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Same rights as Odoo</h4>
+                    <p class="mb-0" style="font-size: 14px;">A user can preview a file only if Odoo lets them read that attachment or record. The check is made again when the file is handed to the viewer.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Size limits you control</h4>
+                    <p class="mb-0" style="font-size: 14px;">Each group of file types has its own limit in Settings, so a large model does not slow the server.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">A Building with Its Storeys</h2>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-ifc-building.png" alt="A two-storey office building model with the structure tree on the left" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">More Screens</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_bim_shots_props" role="tab" aria-controls="dwo_ap_bim_shots_props" aria-selected="true">Properties</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_bim_shots_storey" role="tab" aria-controls="dwo_ap_bim_shots_storey" aria-selected="false">Hide a storey</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_bim_shots_props" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/02-ifc-properties.png" alt="A wall highlighted in orange with its type, GlobalId and property set on the right" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_bim_shots_storey" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/03-ifc-hide-storey.png" alt="The first floor switched off in the tree to look into the ground floor" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Which files does it open?</h4>
+        <p class="mb-0" style="font-size: 14px;">IFC files (IFC2x3 and IFC4) that web-ifc can read. Compressed ifczip and ifcxml files are not opened. Models made in Revit, ArchiCAD and similar tools can be exported to IFC.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Can it open Revit (rvt) or SketchUp (skp) files?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Export the model to IFC, or to GLB for the Secure 3D Preview module.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Is anything sent to another server?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. The model is read and drawn in your browser, in a sandboxed frame with no network access.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">How large can a file be?</h4>
+        <p class="mb-0" style="font-size: 14px;">100 MB by default; change it in Settings. Large models take time to open and use the memory of the computer of the person who opens them.</p>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> ifc preview, preview ifc, ifc viewer, bim preview, preview bim, bim viewer, building model viewer, revit ifc, archicad ifc, attachment preview</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #2F4B7C;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #2F4B7C;">Look inside a building model without BIM software.</p>
+        <p class="mb-2" style="font-size: 15px;">IFC models with storeys and properties, drawn in your browser. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>

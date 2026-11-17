@@ -1,0 +1,129 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #1B2A48;">Secure CAD Preview: DXF drawings</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #1B2A48;">Open DXF drawings right inside Odoo.</p>
+        <p class="mb-4" style="font-size: 15px;">Pan, zoom and switch layers of a 2D drawing from the chatter or a file field, without CAD software.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Click a DXF file in the chatter or in a file field and the drawing opens in a large dialog. Drag to pan, scroll to zoom, and use the <strong>Layers</strong> list to show or hide each layer. <strong>Reset view</strong> fits the whole drawing. Works with the free <strong>Secure Attachment Preview</strong> module, installed automatically. For DWG files, the free <strong>Secure DWG Preview</strong> module does the same.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="How it works: click a DXF file, Odoo checks the access rights and the size, the file goes to a sandboxed viewer frame, and the drawing is drawn in your browser" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #1B2A48;">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Drawings, not pictures</h4>
+                    <p class="mb-0" style="font-size: 14px;">Lines, polylines, arcs, circles, ellipses, splines, hatches, blocks, dimensions and text are drawn as vectors, so you can zoom in without losing sharpness.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Layers</h4>
+                    <p class="mb-0" style="font-size: 14px;">A list with the colour of each layer and a switch to show or hide it. Black and white entities are inverted on a dark background so they stay visible.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Text in any language</h4>
+                    <p class="mb-0" style="font-size: 14px;">Text is drawn with a bundled font that covers Latin, extended Latin and Vietnamese letters.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Files never leave your server</h4>
+                    <p class="mb-0" style="font-size: 14px;">The viewer is bundled in the module and runs in a sandboxed frame with no network access. Nothing is uploaded to a conversion service, a CDN or any other site.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Same rights as Odoo</h4>
+                    <p class="mb-0" style="font-size: 14px;">A user can preview a file only if Odoo lets them read that attachment or record. The check is made again when the file is handed to the viewer.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1B2A48;">Size limits you control</h4>
+                    <p class="mb-0" style="font-size: 14px;">Each group of file types has its own limit in Settings, so a large model does not slow the server.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">A Floor Plan in the Chatter</h2>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-dxf-floor-plan.png" alt="A DXF floor plan with walls, a door, furniture and labels in the preview dialog" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">More Screens</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_cad_shots_layers" role="tab" aria-controls="dwo_ap_cad_shots_layers" aria-selected="true">Layers</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_cad_shots_dark" role="tab" aria-controls="dwo_ap_cad_shots_dark" aria-selected="false">Dark background</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ap_cad_shots_layers" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/02-dxf-layers.png" alt="The layer list with the text layer switched off, and the drawing without its labels" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_cad_shots_dark" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/03-dxf-dark.png" alt="The same drawing on a dark background" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #1B2A48;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Which files does it open?</h4>
+        <p class="mb-0" style="font-size: 14px;">ASCII DXF files. A binary DXF is refused with a message that asks for an ASCII DXF. For .dwg files install the free Secure DWG Preview module.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Is everything in the drawing shown?</h4>
+        <p class="mb-0" style="font-size: 14px;">The common 2D entities are. 3D solids and pictures are not drawn.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Do fonts match the original?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Text is drawn with the bundled font, so shapes and widths can differ from the CAD program.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">Is anything sent to another server?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. The drawing is read and drawn in your browser, in a sandboxed frame with no network access.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #1B2A48;">How large can a file be?</h4>
+        <p class="mb-0" style="font-size: 14px;">30 MB by default; change it in Settings. A larger file is not previewed and can be downloaded.</p>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> dxf preview, preview dxf, dxf viewer, cad preview, preview cad, cad viewer, autocad preview, drawing viewer, 2d drawing preview, technical drawing viewer, attachment preview</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #2F4B7C;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #2F4B7C;">Check a drawing without opening CAD software.</p>
+        <p class="mb-2" style="font-size: 15px;">DXF drawings with layers, drawn in your browser. Works with Odoo Community and Enterprise.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
