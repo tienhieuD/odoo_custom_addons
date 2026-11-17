@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 {
-    "name": "Form Focus Mode: Wider Forms",
+    "name": "Form Focus Mode",
     "version": "19.0.1.0.0",
-    "summary": "One click gives the form view the whole screen: hide the chatter, widen the sheet, even hide the top bar, and bring the chatter back as a side drawer. Remembered per model. Keywords: full screen form view, fullscreen form, wide form view, hide chatter, chatter toggle, form view width, focus mode, form view layout, maximize form.",
+    "summary": "One click gives the form view the whole screen: hide the chatter, widen the sheet, hide the top bar, and bring the chatter back as a side drawer. Remembered per model. Keywords: full screen form view, fullscreen form, wide form view, hide chatter, chatter toggle, form view width, focus mode, form view layout, maximize form, chatter drawer, form view full width.",
     "description": "A small button in the control panel of every form view cycles three layouts: normal, wide (the chatter is "
                    "hidden and the sheet uses the full width) and focus (the same, and the top navigation bar is hidden "
                    "too). While the chatter is hidden a floating button opens it as a side drawer, so the history is one "
