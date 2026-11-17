@@ -39,6 +39,17 @@ registry.category("web_tour.tours").add("dwo_listview_header_filter_tour", {
         { trigger: ".o_list_renderer:not(:has(.o_data_row:contains('dwo-hf-a.txt')))", run: () => {} },
         { content: "Removing the facet in the search bar puts the icon out", trigger: `${facet("Type: URL")} .o_facet_remove`, run: "click" },
         { trigger: `${btn("type")}:not(.o_dwo_hf_active)`, run: () => {} },
+        // many2one: the records of the related model, with a search box
+        { trigger: btn("create_uid"), run: "click" },
+        { content: "Many2one values are loaded from the related model", trigger: ".o_dwo_hf[data-kind=choice] .o_dwo_hf_row[data-value]:not([data-value=__not_set])", run: () => {} },
+        { trigger: ".o_dwo_hf .o_dwo_hf_search", run: "edit a" },
+        { content: "The search box narrows the values", trigger: ".o_dwo_hf .o_dwo_hf_row[data-value]:not([data-value=__not_set])", run: "click" },
+        { trigger: ".o_dwo_hf .o_dwo_hf_selected .o_dwo_hf_picked", run: () => {} },
+        { trigger: ".o_dwo_hf .o_dwo_hf_apply", run: "click" },
+        { trigger: facet("Created by:"), run: () => {} },
+        { content: "Reset from the icon", trigger: btn("create_uid"), run: "click" },
+        { trigger: ".o_dwo_hf .o_dwo_hf_reset", run: "click" },
+        { trigger: `${btn("create_uid")}:not(.o_dwo_hf_active)`, run: () => {} },
         // text: operators of the Odoo filters
         { trigger: btn("name"), run: "click" },
         { content: "Operators of a text field", trigger: ".o_dwo_hf[data-kind=text] select.o_dwo_hf_op", run() { if (!this.anchor.querySelector("option[value='not ilike']")) { throw new Error("no 'does not contain' operator"); } } },

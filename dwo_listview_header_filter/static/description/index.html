@@ -1,0 +1,213 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">List Header Filter: Quick Column Filter</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Filter a list from the column you are looking at.</p>
+        <p class="mb-4" style="font-size: 15px;">A small funnel in every column header. Click it, pick the values or dates you want, and the list is filtered: no need to open the search bar, add a custom filter and build the condition.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">To filter a list in Odoo you normally open the search bar menu, add a custom filter, choose the field, the operator and the value, then apply. This module puts that work where you are already looking: <strong>a filter icon in each column header</strong>. The filter you make is a normal facet of the search bar, so you can still see it, edit it, save it as a favourite or remove it from there.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="Filter a column in four steps" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Checkboxes with search</h4>
+                    <p class="mb-0" style="font-size: 14px;">Selection, many2one and many2many columns list their values with checkboxes and a search box. Ticked values move into an area on top; untick one to drop it. A &quot;Not set&quot; choice is there for fields that can be empty.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Quick dates and fiscal year</h4>
+                    <p class="mb-0" style="font-size: 14px;">Date and datetime columns offer Today, Yesterday, Tomorrow, this and last week, month, quarter and year, the last or next 7 and 30 days, and the fiscal year (1 April to 31 March). Or pick one day, or a range of days.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Odoo's own operators</h4>
+                    <p class="mb-0" style="font-size: 14px;">Text columns: contains, does not contain, equals, does not equal, is set, is not set. Numbers: equals, not equal, greater, lower, between. Yes or No for checkboxes.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">One search bar</h4>
+                    <p class="mb-0" style="font-size: 14px;">Each filtered column becomes a facet of the search bar and is combined with the other facets. Remove the facet there, or click Reset in the header, and the other side follows. The icon lights up while the column is filtered.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Right time zone</h4>
+                    <p class="mb-0" style="font-size: 14px;">Days start and end in your browser's time zone, the one Odoo uses to show dates and times, and are sent to the server in UTC. A filter on Today at the end of the evening still means your today.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Plays well with others</h4>
+                    <p class="mb-0" style="font-size: 14px;">Installed with the DuoTEK list sticky header and column freeze module, the two icons sit side by side, both work and a frozen column stays frozen when you filter.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Filters on the column headers</h2>
+    <p class="mb-4" style="font-size: 16px;">The icon of a filtered column is lit and its condition is a facet in the search bar, next to the ones you typed or chose there.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-header-filters.png" alt="A contacts list with filter icons in the column headers, two of them lit, and the matching facets in the search bar" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Checkboxes, chosen values on top</h2>
+    <p class="mb-4" style="font-size: 16px;">Many2one, many2many and selection columns. The values you tick go to the area on top, so you always see what the filter contains; untick a value there to remove it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/02-checkbox-selected-on-top.png" alt="A popover with a search box, an area with two ticked countries on top and the other countries below with checkboxes" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">More Screens</h2>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_lhf_shots_dates" role="tab" aria-controls="dwo_lhf_shots_dates" aria-selected="true">Dates</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_lhf_shots_text" role="tab" aria-controls="dwo_lhf_shots_text" aria-selected="false">Operators</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_lhf_shots_sticky" role="tab" aria-controls="dwo_lhf_shots_sticky" aria-selected="false">With sticky header</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_lhf_shots_dates" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/03-quick-dates.png" alt="A date popover with quick ranges, a fiscal year option, a day or two days to choose and a Not set checkbox" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_lhf_shots_text" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/04-text-operators.png" alt="A text popover with the operator list open and a value box" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_lhf_shots_sticky" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/05-with-sticky.png" alt="A list header showing the filter icon and the pin button of the sticky header and column module side by side" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Limitations</h2>
+    <p class="mb-4" style="font-size: 16px;">What to expect, so there are no surprises.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Lists with a search bar</h4>
+                    <p class="mb-0" style="font-size: 14px;">The icons are on the lists that have a search bar: an action's list, or a list in a selection dialog. A list embedded in a form (order lines and other x2many fields) has no search bar to join, so it gets no icons.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Fields that can be searched</h4>
+                    <p class="mb-0" style="font-size: 14px;">Text, number, checkbox, date, selection, many2one, many2many and one2many fields that Odoo can search. A computed field that is not searchable has no icon.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Fixed fiscal year</h4>
+                    <p class="mb-0" style="font-size: 14px;">The fiscal year is 1 April to 31 March, it is not read from the company settings. Weeks start on Monday.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Ranges are fixed when applied</h4>
+                    <p class="mb-0" style="font-size: 14px;">Today, This week and the other quick ranges are turned into dates when you click them, like a filter built by hand. A list left open overnight keeps the day it was filtered on.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Editing the facet</h4>
+                    <p class="mb-0" style="font-size: 14px;">If you change the facet with Odoo's own domain editor, it keeps filtering but is no longer tied to the header icon; use the icon's Reset or remove the facet.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Related values</h4>
+                    <p class="mb-0" style="font-size: 14px;">Many2one and many2many values come from the related model with Odoo's name search, so they follow your access rights; long lists are loaded 30 at a time with a Show more button.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">The module depends only on the standard <code>web</code> module and needs no external Python library.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#lhf_install" role="tab" aria-controls="lhf_install" aria-selected="true">Install</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="lhf_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
+            <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_listview_header_filter</code> folder into an add-ons path of your Odoo server.</p>
+            <p class="mb-2" style="font-size: 14px;">2. Restart Odoo, activate the developer mode, update the apps list, and install <strong>List Header Filter: Quick Column Filter</strong>.</p>
+            <p class="mb-2" style="font-size: 14px;">3. Open any list view: the funnel is in each column header. No settings, menus or data are added.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it change my data or add fields?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It only adds filters to the list views you already use, the same domains you could build by hand in the search bar. It adds no models, fields, menus or settings.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I save a header filter as a favourite?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. It is a normal facet of the search bar, so Save current search keeps it, together with the other facets.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Several values in one column?</h4>
+        <p class="mb-0" style="font-size: 14px;">Tick as many as you like: the column shows the records that have any of them. Filters on different columns are combined with AND.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it work with the sticky header and column freeze module?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes, it is made to be installed next to it: the pin button and the filter icon do not overlap and a frozen column stays frozen when you filter.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Which Odoo versions?</h4>
+        <p class="mb-0" style="font-size: 14px;">The same module is published for the recent Odoo releases, Community and Enterprise: pick your version in the version selector of this page.</p>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> list header filter, column filter, header filter, header search, list view filter, tree view filter, table filter, excel filter, filter by column, quick filter, list filter popover, fiscal year filter, date quick filter, multi select filter, search bar facet</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Filter where you look.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it, click the funnel in a column header and pick what you want to see.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
