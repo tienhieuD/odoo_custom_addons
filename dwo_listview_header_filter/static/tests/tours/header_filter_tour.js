@@ -2,7 +2,16 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import { registry } from "@web/core/registry";
 
-const btn = (name) => `.o_list_renderer th[data-name='${name}'] .o_dwo_hf_btn`;
+const th = (name) => `.o_list_renderer th[data-name='${name}']`;
+const btn = (name) => `${th(name)} .o_dwo_hf_btn`;
+// the icon shows when the pointer is on the header (not reproduced here): click it from the header cell
+const press = (name, content) => ({
+    ...(content ? { content } : {}),
+    trigger: th(name),
+    run() {
+        (this.anchor || this.$anchor[0]).querySelector(".o_dwo_hf_btn").click();
+    },
+});
 const facet = (text) => `.o_searchview_facet:contains('${text}')`;
 
 function rowCount(expected) {
@@ -28,8 +37,8 @@ registry.category("web_tour.tours").add("dwo_listview_header_filter_tour", {
                 document.querySelector(".o_switch_view.o_list:not(.active)")?.click();
             },
         },
-        { content: "A filter icon in the header of a text, a selection and a date column", trigger: `${btn("name")}, ${btn("type")}, ${btn("create_date")}`, run: () => {} },
-        { trigger: `${btn("type")}`, run: "click" },
+        { content: "A filter icon in the header of a text, a selection and a date column", trigger: `${th("name")}:has(.o_dwo_hf_btn)`, run: () => {} },
+        press("type"),
         { content: "Checkboxes of the selection field", trigger: ".o_dwo_hf[data-kind=choice] .o_dwo_hf_row:contains('URL')", run: "click" },
         { content: "The ticked value moves to the area on top", trigger: ".o_dwo_hf .o_dwo_hf_selected .o_dwo_hf_picked:contains('URL')", run: () => {} },
         { trigger: ".o_dwo_hf .o_dwo_hf_apply", run: "click" },
@@ -38,37 +47,37 @@ registry.category("web_tour.tours").add("dwo_listview_header_filter_tour", {
         { content: "Only the URL attachment is left", trigger: ".o_list_renderer .o_data_row:contains('dwo-hf-link')", run: () => {} },
         { trigger: ".o_list_renderer:not(:has(.o_data_row:contains('dwo-hf-a.txt')))", run: () => {} },
         { content: "Removing the facet in the search bar puts the icon out", trigger: `${facet("Type: URL")} .o_facet_remove`, run: "click" },
-        { trigger: `${btn("type")}:not(.o_dwo_hf_active)`, run: () => {} },
+        { trigger: `${th("type")}:not(:has(.o_dwo_hf_active))`, run: () => {} },
         // many2one: the records of the related model, with a search box
-        { trigger: btn("create_uid"), run: "click" },
+        press("create_uid"),
         { content: "Many2one values are loaded from the related model", trigger: ".o_dwo_hf[data-kind=choice] .o_dwo_hf_row[data-value]:not([data-value=__not_set])", run: () => {} },
         { trigger: ".o_dwo_hf .o_dwo_hf_search", run: "text a" },
         { content: "The search box narrows the values", trigger: ".o_dwo_hf .o_dwo_hf_row[data-value]:not([data-value=__not_set])", run: "click" },
         { trigger: ".o_dwo_hf .o_dwo_hf_selected .o_dwo_hf_picked", run: () => {} },
         { trigger: ".o_dwo_hf .o_dwo_hf_apply", run: "click" },
         { trigger: facet("Created by:"), run: () => {} },
-        { content: "Reset from the icon", trigger: btn("create_uid"), run: "click" },
+        press("create_uid", "Reset from the icon"),
         { trigger: ".o_dwo_hf .o_dwo_hf_reset", run: "click" },
-        { trigger: `${btn("create_uid")}:not(.o_dwo_hf_active)`, run: () => {} },
+        { trigger: `${th("create_uid")}:not(:has(.o_dwo_hf_active))`, run: () => {} },
         // text: operators of the Odoo filters
-        { trigger: btn("name"), run: "click" },
+        press("name"),
         { content: "Operators of a text field", trigger: ".o_dwo_hf[data-kind=text] select.o_dwo_hf_op", run() { if (!this.$anchor[0].querySelector("option[value='not ilike']")) { throw new Error("no 'does not contain' operator"); } } },
         { trigger: ".o_dwo_hf .o_dwo_hf_value", run: "text dwo-hf-a" },
         { trigger: ".o_dwo_hf .o_dwo_hf_apply", run: "click" },
         { trigger: facet("Name: contains dwo-hf-a"), run: () => {} },
         rowCount(1),
         // the filter of the icon can be changed: it reopens with its values
-        { trigger: btn("name"), run: "click" },
+        press("name"),
         { content: "Reopened with the value of the filter", trigger: ".o_dwo_hf .o_dwo_hf_value", run() { if (this.$anchor[0].value !== "dwo-hf-a") { throw new Error("value not restored: " + this.$anchor[0].value); } } },
         { trigger: ".o_dwo_hf .o_dwo_hf_reset", run: "click" },
         { content: "Reset removes the facet", trigger: ".o_searchview:not(:has(.o_searchview_facet:contains('dwo-hf-a')))", run: () => {} },
         // date: a quick range
-        { trigger: btn("create_date"), run: "click" },
+        press("create_date"),
         { content: "Quick dates, with the fiscal year", trigger: ".o_dwo_hf[data-kind=date] .o_dwo_hf_preset[data-preset=this_fiscal_year]", run: () => {} },
         { trigger: ".o_dwo_hf .o_dwo_hf_preset[data-preset=today]", run: "click" },
         { trigger: facet("Created on: Today"), run: () => {} },
         { trigger: `${btn("create_date")}.o_dwo_hf_active`, run: () => {} },
         { content: "Clear the whole search bar: every icon goes out", trigger: ".o_searchview .o_searchview_facet .o_facet_remove", run: "click" },
-        { trigger: `${btn("create_date")}:not(.o_dwo_hf_active)`, run: () => {} },
+        { trigger: `${th("create_date")}:not(:has(.o_dwo_hf_active))`, run: () => {} },
     ],
 });

@@ -44,7 +44,7 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">One search bar</h4>
-                    <p class="mb-0" style="font-size: 14px;">Each filtered column becomes a facet of the search bar and is combined with the other facets. Remove the facet there, or click Reset in the header, and the other side follows. The icon lights up while the column is filtered.</p>
+                    <p class="mb-0" style="font-size: 14px;">Each filtered column becomes a facet of the search bar and is combined with the other facets. Remove the facet there, or click Reset in the popover, and the other side follows. The icon of a filtered column stays lit; the others show it only when the pointer is on the header, so the lists stay clean.</p>
                 </div>
             </div>
         </div>
@@ -60,16 +60,16 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Plays well with others</h4>
-                    <p class="mb-0" style="font-size: 14px;">Installed with the DuoTEK list sticky header and column freeze module, the two icons sit side by side, both work and a frozen column stays frozen when you filter.</p>
+                    <p class="mb-0" style="font-size: 14px;">Installed with the DuoTEK list sticky header and column freeze module, the two small boxes sit side by side on the header, both work and a frozen column stays frozen when you filter.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Filters on the column headers</h2>
-    <p class="mb-4" style="font-size: 16px;">The icon of a filtered column is lit and its condition is a facet in the search bar, next to the ones you typed or chose there.</p>
+    <p class="mb-4" style="font-size: 16px;">The funnel shows when the pointer is on a column header, in a small framed box like the pin button. A filtered column keeps its icon lit in the colour of your theme, and its condition is a facet in the search bar, next to the ones you typed or chose there.</p>
     <div class="text-center mb-4">
-        <img src="screenshots/01-header-filters.png" alt="A contacts list with filter icons in the column headers, two of them lit, and the matching facets in the search bar" class="img-fluid rounded shadow"/>
+        <img src="screenshots/01-header-filters.png" alt="A contacts list with two filtered columns whose icons are lit, the icon appearing on the header under the pointer, and the matching facets in the search bar" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Checkboxes, chosen values on top</h2>
@@ -156,6 +156,14 @@
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Related values</h4>
                     <p class="mb-0" style="font-size: 14px;">Many2one and many2many values come from the related model with Odoo's name search, so they follow your access rights; long lists are loaded 30 at a time with a Show more button.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Shown on hover</h4>
+                    <p class="mb-0" style="font-size: 14px;">The funnel of a column that is not filtered shows only while the pointer is on its header; on a touch screen tap the header first. Columns whose value is not a plain field (activity icons, drag handles) have none.</p>
                 </div>
             </div>
         </div>
