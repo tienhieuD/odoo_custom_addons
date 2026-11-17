@@ -36,7 +36,7 @@
             <div class="card h-100" style="border-top: 4px solid #2E86AB;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #14304F;">Safe to open</h4>
-                    <p class="mb-0" style="font-size: 14px;">Scripts are removed and remote pictures are downloaded by your Odoo server, so the sender never sees the IP address or browser of the user. The email is shown in an isolated frame, and Odoo access rights apply at every level.</p>
+                    <p class="mb-0" style="font-size: 14px;">Scripts are removed and remote pictures are downloaded by your Odoo server, so the sender never sees the IP address or browser of the user. Only real pictures are shown: an address that is a program or a script (.exe, .sh or a script address) is refused with a visible error. A link in the email asks for confirmation and opens in a new tab. The email is shown in an isolated frame, and Odoo access rights apply at every level.</p>
                 </div>
             </div>
         </div>
@@ -58,6 +58,12 @@
             <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_mail_shots_msg" role="tab" aria-controls="dwo_ap_mail_shots_msg" aria-selected="true">Outlook .msg</a>
         </li>
         <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_mail_shots_errors" role="tab" aria-controls="dwo_ap_mail_shots_errors" aria-selected="false">Blocked pictures</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_mail_shots_linkcheck" role="tab" aria-controls="dwo_ap_mail_shots_linkcheck" aria-selected="false">Link check</a>
+        </li>
+        <li class="nav-item" role="presentation">
             <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ap_mail_shots_forward" role="tab" aria-controls="dwo_ap_mail_shots_forward" aria-selected="false">Forwarded email</a>
         </li>
         <li class="nav-item" role="presentation">
@@ -71,6 +77,16 @@
         <div class="tab-pane fade show active" id="dwo_ap_mail_shots_msg" role="tabpanel">
             <div class="text-center mb-3">
                 <img src="screenshots/06-outlook-msg.png" alt="An Outlook .msg email previewed in Odoo with its pictures inside the body" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_mail_shots_errors" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/07-picture-errors.png" alt="An email whose logo is shown and whose pictures that are programs or scripts are replaced by red error messages with the reason" class="img-fluid rounded shadow"/>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="dwo_ap_mail_shots_linkcheck" role="tabpanel">
+            <div class="text-center mb-3">
+                <img src="screenshots/08-link-confirm.png" alt="A dialog that shows the full address of a clicked link and asks before opening it in a new tab" class="img-fluid rounded shadow"/>
             </div>
         </div>
         <div class="tab-pane fade" id="dwo_ap_mail_shots_forward" role="tabpanel">
