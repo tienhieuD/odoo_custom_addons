@@ -10,6 +10,7 @@
     "support": "hello@duotek.io.vn",
     "category": "Productivity/Documents",
     "depends": ["dwo_attpreview_core"],
+    "data": ["views/res_config_settings_views.xml"],
     "price": 80,
     "assets": {
         "web.assets_backend": [

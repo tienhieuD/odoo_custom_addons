@@ -81,7 +81,7 @@ class AttPreviewCache(models.Model):
 
     @api.model
     def _render(self, attachment, engine, filename=None):
-        max_mb = engine._dwo_engine_max_size_mb or self._param("max_file_size_mb", 20)
+        max_mb = self.env["dwo.attpreview.engine"]._dwo_limit_for(engine, filename or attachment.name)
         if attachment.file_size > max_mb * 1024 * 1024:
             raise UserError(self.env._("File is larger than the preview limit (%s MB).", max_mb))
         content = attachment.raw or b""
