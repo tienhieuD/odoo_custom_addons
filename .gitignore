@@ -19,6 +19,11 @@ lib/
 !dwo_attpreview_office/static/lib/
 !dwo_attpreview_text/static/lib/
 !dwo_attpreview_core/static/lib/
+!dwo_attpreview_webgl/static/lib/
+!dwo_attpreview_3d/static/lib/
+!dwo_attpreview_cad/static/lib/
+!dwo_attpreview_dwg/static/lib/
+!dwo_attpreview_bim/static/lib/
 !dwo_attpreview_archive/static/lib/
 !dwo_attpreview_text/static/lib/
 !dwo_attpreview_core/static/lib/
