@@ -18,10 +18,12 @@ def viewer_csp(origin, extra_script=""):
         "style-src %(o)s 'unsafe-inline'; frame-ancestors 'self'" % {"o": origin, "x": extra_script})
 
 
-def serve_asset(module, path, allowed_dirs):
+def serve_asset(module, path, allowed_dirs, script_extra=""):
     """The file ``static/<path>`` of ``module`` when ``path`` is in one of ``allowed_dirs`` (and has a known
     extension), else a 404. Public (no session): the files are not secret; the viewer page runs in a sandbox
-    without allow-same-origin, so the browser demands a CORS header (set by the route, ``cors="*"``)."""
+    without allow-same-origin, so the browser demands a CORS header (set by the route, ``cors="*"``).
+    ``script_extra``: more ``script-src`` sources for the page, only for a viewer that needs them (the DWG viewer:
+    the WebAssembly glue of LibreDWG builds functions with ``new Function``)."""
     rel = os.path.normpath(path).replace(os.sep, "/")
     if rel.startswith("..") or not rel.startswith(tuple(allowed_dirs)) or not rel.lower().endswith(ASSET_EXT):
         return request.not_found()
@@ -32,7 +34,7 @@ def serve_asset(module, path, allowed_dirs):
     response = stream.get_response(max_age=86400)
     response.headers["X-Content-Type-Options"] = "nosniff"
     if rel.endswith(".html"):
-        response.headers["Content-Security-Policy"] = viewer_csp(request.httprequest.host_url.rstrip("/"))
+        response.headers["Content-Security-Policy"] = viewer_csp(request.httprequest.host_url.rstrip("/"), script_extra)
     return response
 
 
