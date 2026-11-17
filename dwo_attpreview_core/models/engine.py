@@ -22,6 +22,10 @@ class AttPreviewEngine(models.AbstractModel):
     _dwo_engine_priority = 10  # lower wins when several engines match
     _dwo_engine_version = "1"  # bump to invalidate cached results
     _dwo_engine_max_size_mb = 0  # 0 = use the global limit
+    # Size limits by group of file types: ``((key, extensions, default_mb), ...)``. The limit of a group is the
+    # system parameter ``dwo_attpreview.max_mb.<key>`` (Settings, one field per group) or ``default_mb``. A file
+    # whose extension is in no group uses ``_dwo_engine_max_size_mb`` or the global limit.
+    _dwo_engine_size_groups = ()
     # width of the preview dialog for this engine's files: "wide" (95% of the window: sheets, documents, slides),
     # "medium" (about 1080px: emails, cards, text) or "narrow" (about 640px)
     _dwo_engine_dialog_width = "wide"
@@ -51,6 +55,32 @@ class AttPreviewEngine(models.AbstractModel):
         (for example "old format, limited support"), or ``False`` for none. ``extension``: lowercase, no dot.
         Use ``self.env._()`` so the text follows the language of the user."""
         return False
+
+    @api.model
+    def _dwo_limit_for(self, engine, filename=""):
+        """The size limit (MB) of ``engine`` for this file name: its group of file types, else the engine, else the
+        global one. ``engine`` may be a plain object (an engine of the tests) without the groups."""
+        name = filename or ""
+        ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
+        param = self.env["ir.config_parameter"].sudo()
+        for key, extensions, default in getattr(engine, "_dwo_engine_size_groups", ()):
+            if ext in extensions:
+                return param.get_int("dwo_attpreview.max_mb." + key, default)  # Odoo 20: typed getters
+        return getattr(engine, "_dwo_engine_max_size_mb", 0) or self.env["dwo.attpreview.cache"]._param(
+            "max_file_size_mb", 20)
+
+    def _dwo_size_limit_mb(self, filename=""):
+        return self._dwo_limit_for(self, filename)
+
+    @api.model
+    def _dwo_max_limit_mb(self):
+        """The largest limit of any file type: a file above it is refused before an engine is chosen."""
+        limits = [self.env["dwo.attpreview.cache"]._param("max_file_size_mb", 20)]
+        for engine in self._dwo_get_engines():
+            limits.append(self._dwo_limit_for(engine, ""))
+            for _key, extensions, _default in getattr(engine, "_dwo_engine_size_groups", ()):
+                limits.extend(self._dwo_limit_for(engine, "x." + ext) for ext in extensions)
+        return max(limits)
 
     # --- registry lookup -------------------------------------------------
     @api.model

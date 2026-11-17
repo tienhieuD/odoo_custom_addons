@@ -10,6 +10,14 @@ from odoo.tests import HttpCase, TransactionCase, tagged
 from odoo.tools import file_path
 
 MODULE = "dwo_attpreview_office"
+OFFICE_LIMIT_KEYS = ("office_sheet", "office_doc", "office_slide", "office_csv")
+
+
+def _set_limits(env, value):
+    """Size limit (MB) of every Office file group; ``None`` = not set (the default of the group)."""
+    param = env["ir.config_parameter"].sudo()
+    for key in OFFICE_LIMIT_KEYS:
+        param.set_int("dwo_attpreview.max_mb." + key, value)  # Odoo 20: typed setters (False clears it)
 
 
 def _fixture(name):
@@ -187,17 +195,17 @@ class TestOfficeEngine(TransactionCase):
         self.assertIn("too many parts", rec.error)
 
     def test_07_core_size_limit_applies(self):
-        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_file_size_mb", "0")  # Odoo 20: set_param is gone, typed setters
+        _set_limits(self.env, "0")
         rec = self._render("big.xlsx", _fixture("sample.xlsx"))
         self.assertIn("larger than the preview limit", rec.error)
         self.assertFalse(rec.data)
 
     def test_08_engine_size_override(self):
-        with patch.object(type(self.engine), "_dwo_engine_max_size_mb", 1):
-            rec = self._render("ok.xlsx", _fixture("sample.xlsx"))
-            self.assertFalse(rec.error)
-            big = _zip([("xl/workbook.xml", b"<w/>"), ("x.bin", os.urandom(1100 * 1024))])
-            self.assertIn("larger than the preview limit", self._render("big2.xlsx", big).error)
+        _set_limits(self.env, "1")  # 1 MB for each group of Office files
+        rec = self._render("ok.xlsx", _fixture("sample.xlsx"))
+        self.assertFalse(rec.error)
+        big = _zip([("xl/workbook.xml", b"<w/>"), ("x.bin", os.urandom(1100 * 1024))])
+        self.assertIn("larger than the preview limit", self._render("big2.xlsx", big).error)
 
     def test_09_xxe_main_part_is_only_data(self):
         # The server never parses the XML; the file is accepted and the library (browser side) decides.
@@ -238,14 +246,14 @@ class TestOfficeEngine(TransactionCase):
             self.assertEqual(rec.error, "The file is empty.", name)
 
     def test_14_legacy_size_limit(self):
-        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_file_size_mb", "0")  # Odoo 20: set_param is gone, typed setters
+        _set_limits(self.env, "0")
         for name in ("legacy_sample.doc", "legacy_sample.xls", "legacy_sample.ppt"):
             rec = self._render(name, _fixture(name))
             self.assertIn("larger than the preview limit", rec.error, name)
-        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_file_size_mb", "20")  # Odoo 20: set_param is gone, typed setters
-        with patch.object(type(self.engine), "_dwo_engine_max_size_mb", 1):
-            big = _fixture("legacy_sample.xls") + b"\0" * (1100 * 1024)
-            self.assertIn("larger than the preview limit", self._render("big.xls", big).error)
+        _set_limits(self.env, False)
+        _set_limits(self.env, "1")  # 1 MB for each group of Office files
+        big = _fixture("legacy_sample.xls") + b"\0" * (1100 * 1024)
+        self.assertIn("larger than the preview limit", self._render("big.xls", big).error)
 
     def test_15_the_zip_check_still_applies_to_the_new_formats_only_by_name(self):
         # an OLE file named .xlsx is still refused (old container, not a zip); a real xlsx named .xls is not OLE
@@ -292,7 +300,7 @@ class TestOfficeEngine(TransactionCase):
         self.assertEqual(self._render("empty.tsv", b"").error, "The file is empty.")
 
     def test_21_csv_size_limit(self):
-        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_file_size_mb", "0")  # Odoo 20: set_param is gone, typed setters
+        _set_limits(self.env, "0")
         self.assertIn("larger than the preview limit", self._render("a.csv", _fixture("sample.csv")).error)
 
     def test_22_ooxml_variants_are_checked_as_their_base_type(self):
@@ -415,7 +423,7 @@ class TestOfficeRoutes(HttpCase):
         _p, bad = self._att("bad.docx", b"PK not really")
         self.assertEqual(self.url_open("/dwo_attpreview_office/file/%d" % bad.id).status_code, 422)
         _p, ok = self._att("ok.xlsx", _fixture("sample.xlsx"))
-        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_file_size_mb", "0")  # Odoo 20: set_param is gone, typed setters
+        _set_limits(self.env, "0")
         self.assertEqual(self.url_open("/dwo_attpreview_office/file/%d" % ok.id).status_code, 422)
 
     def test_02b_file_route_for_legacy_files(self):
@@ -809,10 +817,10 @@ class TestOfficeFieldPreview(HttpCase):
         out = self._field_info("res.partner", partner.id, "x_dwo_office_file", "x_dwo_office_file_name")
         self.assertEqual(out["mode"], "error")  # the Core refuses it before any dialog (toast)
         partner.x_dwo_office_file = base64.b64encode(_fixture("sample.docx")).decode()  # Odoo 20: base64 as str (bytes raise)
-        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_file_size_mb", "0")  # Odoo 20: set_param is gone, typed setters
+        _set_limits(self.env, "0")
         out = self._field_info("res.partner", partner.id, "x_dwo_office_file", "x_dwo_office_file_name")
         self.assertEqual(out["mode"], "error")
-        self.env["ir.config_parameter"].sudo().set_int("dwo_attpreview.max_file_size_mb", "20")  # Odoo 20: set_param is gone, typed setters
+        _set_limits(self.env, False)
         # a user who cannot read the record gets nothing, neither the answer nor the file
         server = self.env["ir.mail_server"].create({
             "name": "secret.xlsx", "smtp_host": "localhost", "smtp_authentication": "certificate",

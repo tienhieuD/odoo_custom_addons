@@ -1,2 +1,3 @@
 # Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 from . import test_archive
+from . import test_size_limits

@@ -17,6 +17,14 @@
                         <field name="dwo_attpreview_mail_remote_https_only"/>
                     </setting>
                 </block>
+                <block title="Email size limits" name="dwo_attpreview_mail_size_block">
+                    <setting id="dwo_attpreview_max_mb_mail_message" string="Emails: EML, MSG, OFT, EMLX" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_mail_message"/> MB</div>
+                    </setting>
+                    <setting id="dwo_attpreview_max_mb_mail_card" string="Calendar and contact cards: ICS, VCF" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_mail_card"/> MB</div>
+                    </setting>
+                </block>
             </xpath>
         </field>
     </record>

@@ -130,7 +130,7 @@ class AttPreviewController(http.Controller):
         # Odoo 20: the field reads as raw bytes (BinaryValue), no longer base64
         value = record.sudo()[field]
         size = value.size if value else 0
-        max_mb = cache._param("max_file_size_mb", 20)
+        max_mb = env["dwo.attpreview.engine"]._dwo_max_limit_mb()
         mimetype = ""
         if size <= max_mb * 1024 * 1024:
             raw = bytes(value or b"")
@@ -139,7 +139,7 @@ class AttPreviewController(http.Controller):
             mimetype = mimetypes.guess_type(name)[0] or "application/octet-stream"
 
         def render(engine):
-            limit = engine._dwo_engine_max_size_mb or max_mb
+            limit = env["dwo.attpreview.engine"]._dwo_limit_for(engine, name)
             if size > limit * 1024 * 1024:
                 return {"error": env._("File is larger than the preview limit (%s MB).", limit)}
             try:
@@ -216,7 +216,7 @@ class AttPreviewController(http.Controller):
             else:
                 value = record.sudo()[fdef.name]  # Odoo 20: raw bytes (BinaryValue), no longer base64
                 size, read = (value.size if value else 0), lambda: bytes(value or b"")
-        max_mb = env["dwo.attpreview.cache"]._param("max_file_size_mb", 20)
+        max_mb = env["dwo.attpreview.engine"]._dwo_max_limit_mb()
         if size > max_mb * 1024 * 1024:
             raise UserError(env._("File is larger than the preview limit (%s MB).", max_mb))
         return name, read()
@@ -295,7 +295,7 @@ class AttPreviewController(http.Controller):
         max_mb = cache._param("max_file_size_mb", 20)
 
         def render(engine):
-            limit = engine._dwo_engine_max_size_mb or max_mb
+            limit = env["dwo.attpreview.engine"]._dwo_limit_for(engine, name)
             if len(content) > limit * 1024 * 1024:
                 return {"error": env._("File is larger than the preview limit (%s MB).", limit)}
             try:
