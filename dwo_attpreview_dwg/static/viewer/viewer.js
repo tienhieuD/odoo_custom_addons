@@ -1,7 +1,7 @@
 // Copyright 2026 DuoTEK. Licensed under the GNU General Public License v3.0 (GPL-3).
 // Sandboxed DWG viewer page: the parent sends the bytes of the file (postMessage), LibreDWG (WebAssembly) converts them
 // to DXF here and dxf-viewer draws the result.
-import { THREE, bridge } from "/dwo_attpreview_webgl/asset/viewer/common.js";
+import { THREE, bridge, requireWebGL } from "/dwo_attpreview_webgl/asset/viewer/common.js";
 import { DxfViewer } from "/dwo_attpreview_dwg/asset/lib/dxf-viewer/dxf-viewer.bundle.js";
 import { LibreDwg } from "/dwo_attpreview_dwg/asset/lib/libredwg/dist/libredwg-web.js";
 
@@ -52,6 +52,7 @@ document.getElementById("dark").addEventListener("click", (ev) => {
 
 bridge("dwo_attpreview_dwg", async (kind, buffer) => {
     // the stage is made when the file arrives: a browser without WebGL then gets a clear message
+    requireWebGL();
     viewer = new DxfViewer(stageEl, {
         autoResize: true, clearColor: new THREE.Color("#ffffff"), canvasAlpha: false, antialias: true,
         colorCorrection: true, blackWhiteInversion: true,
