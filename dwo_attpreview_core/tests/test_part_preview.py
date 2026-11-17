@@ -13,8 +13,8 @@ REQUEST = "odoo.addons.dwo_attpreview_core.controllers.main.request"
 PNG = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=")
 SVG = b'<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><script>alert(2)</script></svg>'
-# a.sample (text), inner.box (a box inside the box: deep.sample), pic.png, page.html
-BOX_FILE = b"a.sample=hello;inner.box=deep.sample=deep text;pic.svg=" + SVG.replace(b";", b"|") + b";page.html=<b>x</b>"
+# a.sample (text), inner.box (a box inside the box: deep.sample), pic.png, page.html, data.xyz (no engine)
+BOX_FILE = b"a.sample=hello;inner.box=deep.sample=deep text;pic.svg=" + SVG.replace(b";", b"|") + b";page.html=<b>x</b>;data.xyz=x"
 
 
 @tagged("post_install", "-at_install")
@@ -41,7 +41,7 @@ class TestPartInfo(TransactionCase):
         out = self._call("info", self.att.id)
         self.assertEqual((out["mode"], out["type"], out["engine"]), ("rendered", "json", "box"))
         data = json.loads(out["content"])
-        self.assertEqual(data["files"], ["a.sample", "inner.box", "pic.svg", "page.html"])
+        self.assertEqual(data["files"], ["a.sample", "inner.box", "pic.svg", "page.html", "data.xyz"])
         self.assertEqual(data["html"], "<script>x</script>", "json is the engine's job: not touched by the Core")
         self.assertEqual(out["source_ref"], {"attachment_id": self.att.id})
 
@@ -68,7 +68,8 @@ class TestPartInfo(TransactionCase):
         out = self._call("part_info", {"attachment_id": self.att.id}, [2])
         self.assertEqual((out["mode"], out["mimetype"]), ("native", "image/svg+xml"))
         self.assertIn("download=false", out["url"])
-        out = self._call("part_info", {"attachment_id": self.att.id}, "3")
+        # (not page.html: the text engine previews html when it is installed)
+        out = self._call("part_info", {"attachment_id": self.att.id}, "4")
         self.assertEqual((out["mode"], out["reason"]), ("unsupported", "no_engine"))
 
     def test_05_bad_paths(self):

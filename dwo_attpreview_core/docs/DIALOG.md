@@ -90,3 +90,17 @@ The server tells the dialog how wide to be (`info.width`), the dialog adds `o_dw
 
 An engine sets `_dwo_engine_dialog_width`; native files get `narrow` for audio and `wide` otherwise. Full screen
 mode ignores the width.
+
+## Shared tree view (#83)
+
+`DwoTreeView` (`@dwo_attpreview_core/js/tree_view`, template `dwo_attpreview_core.TreeView`): a virtualized tree
+(Headless Tree + TanStack Virtual, `static/lib/tree_libs`, global `DwoTreeLibs`, in the backend assets) used by the
+archive engine (folder tree) and the text engine (JSON / XML / YAML trees, Markdown outline, files of a diff).
+
+- Props: `rootId`, `getChildren(id)`, `isFolder(id)`, `row(id)` -> `{name, icon, badge, badgeClass, count, muted,
+  title, nameClass, <column keys>}`, `onOpen(id)` (Enter / click on a leaf), `version` (bump after changing what
+  `getChildren` returns), `expanded`, `label`, `nameLabel`, `columns` (`[{key, label, width, align, classKey}]`),
+  `onReady(api)` (`expandAll`, `collapseAll`, `expandItems(ids)`), `onFocus(id)`, `onDownload(id)`, `folderIcon(expanded)`.
+- Rules (bugs found on #82): never call `tree.rebuildTree()` while rendering (it is done in `onWillUpdateProps`);
+  change the state with `tree.applySubStateUpdate(...)`; keep big data outside reactive state (the parent gives
+  functions). Only the visible rows are in the page: 100 000 rows stay smooth.

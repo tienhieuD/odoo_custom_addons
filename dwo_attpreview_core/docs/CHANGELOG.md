@@ -1,5 +1,25 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-17 - 20.0.1.3.0 - shared tree view, text engine (#83)
+
+Port of 19.0.1.3.0 (Owl 3: `DwoTreeView` uses `useProps()`, `proxy`, `signal.ref()`; template with `this.`, `t-out`, `oi`
+icons), see `docs/PORTING.md` (section "#83").
+
+- **Tree view in the core** (moved from `dwo_attpreview_archive`, now LGPL-3): `static/src/js/tree_view.js`
+  (`DwoTreeView`, import `@dwo_attpreview_core/js/tree_view`), template `dwo_attpreview_core.TreeView`
+  (`static/src/xml/tree_view.xml`), styles `static/src/scss/tree_view.scss`, libraries
+  `static/lib/tree_libs/tree_libs.min.js` (Headless Tree 1.8.0 + TanStack Virtual 3.19.11, MIT, global
+  `DwoTreeLibs`), added to `web.assets_backend`. Generalised for other engines: `columns` prop (extra columns
+  `{key, label, width, align, classKey}`; the archive passes Size and Modified), `nameLabel`, row `badge` /
+  `badgeClass` / `nameClass` / `count` on any row, `onFocus(id)` after a render when the focused row changed, `onOpen`
+  optional; same class names as before. The text engine also uses `DwoTreeLibs.Virtualizer` for its lines.
+- Settings and catalog: tick `module_dwo_attpreview_text` "Secure Text & Code Preview: MD, HTML, XML, JSON, YAML,
+  LOG"; catalog copy of its description page.
+- Icons: more extensions mapped (mdx; xslt, rss, atom, plist, kml, gpx, wsdl, xlf, xliff, resx, jsonl, webmanifest,
+  pyi, cxx, hh, kts, pm, cmd, mk to code; err, text, adoc, asciidoc to text).
+- Tests: `test_part_preview` uses an extension no engine reads for its "no engine" part (`page.html` is read by the
+  text engine when installed).
+
 ## 2026-11-16 - office engine with OpenDocument (#84)
 
 - Catalog (`data/engine_catalog.json`) and Settings label of `module_dwo_attpreview_office`: `Secure Office Preview: DOCX,

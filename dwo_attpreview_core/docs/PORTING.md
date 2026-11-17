@@ -151,3 +151,43 @@ Differences from 19.0:
 - Tour `find_ods`: one extra step waits for `data-find-where*='Notes'` after the second search. Both searches of that
   tour have one match, so without it the check could read the result of the first search (it failed once on 20.0;
   19.0 has the same race, it passed there by timing).
+
+## #83 - shared tree view and text engine (core 20.0.1.3.0, text 20.0.1.0.0, archive: code only)
+
+Port of 19.0 `7275ec8` (core 19.0.1.3.0), `cef91fb` (archive uses the core tree) and `8a66fd3` (`dwo_attpreview_text`
+19.0.1.0.0). Copied as is: Python (`text_tools.py`, `models/engine.py`; the engine gets `bytes`, the messages use
+`self.env._`), `static/lib/text_libs` and `static/lib/tree_libs` (framework-agnostic bundles), `static/src/js/formats.js`,
+the listing, screenshots and catalog copy, `tests/test_text.py` (it already writes `raw` as bytes), the catalog entry,
+Settings tick and `file_kind.js` of the Core. `.gitignore`: `!dwo_attpreview_text/static/lib/` and
+`!dwo_attpreview_core/static/lib/` (the generic `lib/` rule would drop the vendored libraries).
+
+**dwo_attpreview_core 20.0.1.3.0:**
+- `__manifest__.py`: version `20.0.1.3.0`; `static/lib/tree_libs/tree_libs.min.js` in `web.assets_backend`.
+- `static/src/js/tree_view.js` (`DwoTreeView`, now in the Core; same Owl 3 changes as the archive copy had in #82):
+  `props = useProps()` instead of `static props` (props: rootId, getChildren, isFolder, row, onOpen, version, expanded,
+  label, nameLabel, columns, onReady, onFocus, onDownload, folderIcon); `this.ticks = proxy({n: 0})`;
+  `this.scroll` / `this.list` are `signal.ref()` read as `this.scroll()` / `this.list()`. Rules kept: `rebuildTree()` only in
+  `onMounted` / `onWillUpdateProps` / `expandItems`, state through `applySubStateUpdate`, big data outside reactive state.
+- `static/src/xml/tree_view.xml`: `this.` for every member, `t-ref="this.scroll"` / `"this.list"`, `t-out`; chevron
+  `oi` `arrow_drop_down` / `arrow_right` (was `fa-caret-*`), download `oi` `download`.
+
+**dwo_attpreview_archive (no version change):** the local `tree_view.js`, template, styles and `static/lib/tree_libs` are
+removed; `archive_viewer.js` imports `@dwo_attpreview_core/js/tree_view` and passes `columns`; the template passes
+`columns="this.columns"`; `test_09` uses `.xyz` files. The #82 Owl 3 changes of the tree moved to the Core as is.
+
+**dwo_attpreview_text 20.0.1.0.0:**
+- `__manifest__.py`: version `20.0.1.0.0`.
+- `static/src/js/text_viewer.js`: `static dwoAttPreviewProps = ["content", "attachmentId", "downloadUrl", "fileUrl",
+  "source"]` + `props = useProps()` instead of `static props`; `this.ui = proxy({...})` instead of `useState`;
+  `this.root = signal.ref()` read as `this.root()` (was `useRef("root").el`); `useListener(window, "keydown", ..., {capture:
+  true})` instead of `useExternalListener` (gone in Owl 3). The text, lines and trees stay in plain fields.
+- `static/src/js/line_view.js` (`DwoLineView`): `useProps()`, `proxy`, `signal.ref()` as the tree view.
+- `static/src/xml/text_viewer.xml`: `this.` for every member, `t-ref="this.root"` / `"this.scroll"` / `"this.list"`,
+  `t-out`, handlers as arrow functions (`(ev) => this.onFindInput(ev)`), `.bind="this.method"` props; icons `oi`:
+  `search`, `wrap_text`, `content_copy`, `keyboard_arrow_up` / `keyboard_arrow_down`, `close`, `warning`, `security`.
+- `static/src/scss/text_viewer.scss`: `.o_dwo_txt_search > .oi` (was `.fa`).
+- `static/src/js/attachment_list_patch.js`: reads `attachmentGroups`, leaves selection clicks (`isSelecting`) to Odoo,
+  and falls back to Odoo's own viewer (`onUnavailable`) when the engine cannot read the file.
+- `dwo_attpreview_text/static/tests/tours/text_tour.js` (two steps, race on 20.0; 19.0 passed by timing): the JSON tour
+  waits for the path of the root row (`.o_dwo_txt_path_text:contains('$.orders')`) before pressing End; the log tour
+  checks the number of rows in the step after the counter (the virtual list draws its rows a step later).
