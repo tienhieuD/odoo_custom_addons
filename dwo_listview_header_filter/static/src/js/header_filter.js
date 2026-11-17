@@ -10,6 +10,9 @@ import { patch } from "@web/core/utils/patch";
 import { DwoHeaderFilterPopover } from "./filter_popover";
 import { buildFilter, filterKind } from "./filter_logic";
 
+// columns that show something else than the value of their field: no filter icon
+const NO_FILTER_WIDGETS = ["handle", "list_activity", "kanban_activity", "activity_exception", "badge_ribbon"];
+
 /**
  * The filter icon of a list column header. A filter is a search item of the search bar (a facet) marked with
  * ``dwoHf = {field, kind, state}``: the icon is lit while such an item is in the query, so removing the facet (or
@@ -120,6 +123,9 @@ patch(ListRenderer.prototype, {
         const searchModel = this.env.searchModel;
         const list = this.props.list;
         if (!searchModel || searchModel.resModel !== list.resModel || column.type !== "field" || !column.hasLabel) {
+            return false;
+        }
+        if (NO_FILTER_WIDGETS.includes(column.widget)) {
             return false;
         }
         return Boolean(filterKind(list.fields[column.name]));
