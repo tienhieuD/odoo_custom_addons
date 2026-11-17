@@ -25,17 +25,21 @@ function fewRows(selector, max) {
     };
 }
 
-/** The preview frame: sandboxed without scripts nor same origin, with the CSP, and none of the payloads. */
+/** The preview frame: sandboxed (only the link-guard script, by nonce), no same origin, no popups, with the CSP, and none of the payloads. */
 function checkFrame(forbidden) {
     return function () {
         const frame = this.anchor;
         const sandbox = frame.getAttribute("sandbox") || "";
-        if (sandbox.includes("allow-scripts") || sandbox.includes("allow-same-origin") || !frame.hasAttribute("sandbox")) {
+        if (sandbox.includes("allow-same-origin") || sandbox.includes("allow-popups") || !frame.hasAttribute("sandbox")) {
             throw new Error(`unsafe sandbox: "${sandbox}"`);
         }
         const doc = frame.getAttribute("srcdoc") || "";
         if (!doc.includes("Content-Security-Policy") || !doc.includes("default-src 'none'")) {
             throw new Error("no CSP in the preview frame");
+        }
+        const scripts = doc.match(/<script\b[^>]*>/g) || [];
+        if (scripts.length !== 1 || !/nonce="[A-Za-z0-9]{16,}"/.test(scripts[0]) || !doc.includes("script-src 'nonce-")) {
+            throw new Error("the frame must have exactly one script, allowed by a nonce");
         }
         for (const bad of forbidden) {
             if (doc.includes(bad)) {
@@ -52,9 +56,9 @@ dwoAddTour("dwo_attpreview_text_safety_tour", {
         {
             content: "Markdown preview in a sandboxed frame",
             trigger: ".modal .o_dwo_txt[data-format=markdown][data-mode=preview] iframe.o_dwo_txt_frame",
-            run: checkFrame(["<script", 'href="javascript', "<img src=\"x\"", "<img src=x", 'src="https://evil']),
+            run: checkFrame(["<script>", 'href="javascript', "<img src=\"x\"", "<img src=x", 'src="https://evil']),
         },
-        { content: "The remote picture is not loaded", trigger: ".modal .o_dwo_txt_blocked:contains('1 picture')" },
+        { content: "The remote picture goes through the server, not the browser", trigger: ".modal .o_dwo_txt_proxied:not(:contains('Loading'))" },
         { trigger: ".modal .o_dwo_txt_view[data-view=structure]", run: "click" },
         { content: "Outline of the headings", trigger: ".modal .o_dwo_tree_row:contains('Part B')" },
         { trigger: ".modal .o_dwo_tree_row:contains('Part A')", run: "click" },
@@ -67,9 +71,9 @@ dwoAddTour("dwo_attpreview_text_safety_tour", {
         {
             content: "HTML preview: sanitized, in a sandboxed frame",
             trigger: ".modal .o_dwo_txt[data-format=html] iframe.o_dwo_txt_frame",
-            run: checkFrame(["<script", "onclick", 'src="https://evil', "dwoPwned"]),
+            run: checkFrame(["<script>", "onclick", 'src="https://evil', "dwoPwned"]),
         },
-        { trigger: ".modal .o_dwo_txt_blocked:contains('1 picture')" },
+        { trigger: ".modal .o_dwo_txt_proxied:not(:contains('Loading'))" },
         { trigger: ".modal .o_dwo_txt_view[data-view=structure]", run: "click" },
         { content: "Elements of the page", trigger: ".modal .o_dwo_tree_row:contains('body')" },
         close,

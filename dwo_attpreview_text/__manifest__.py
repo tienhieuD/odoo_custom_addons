@@ -8,14 +8,15 @@
                    "preview dialog: Raw (line numbers, syntax colours, wrap, find, go to line, copy), Preview "
                    "(Markdown, HTML, Jupyter notebooks, logs coloured by level, diffs side by side, subtitles, PO "
                    "translations) and Structure (JSON, XML, YAML, TOML, INI trees, Markdown outline), fast with very "
-                   "large files. HTML and Markdown are shown in a sandboxed frame: no script runs and nothing is "
-                   "loaded from the internet. No CDN, nothing sent outside your server.",
+                   "large files. HTML and Markdown are shown in a sandboxed frame: no script of the file runs, pictures "
+                   "from the internet are downloaded by your Odoo server (never by the browser) and only real "
+                   "pictures are shown, and a link asks for confirmation before it opens in a new tab. No CDN.",
     "author": "DuoTEK",
     "website": "https://duotek.io.vn",
     "support": "hello@duotek.io.vn",
     "category": "Productivity/Documents",
     "depends": ["dwo_attpreview_core"],
-    "data": ["views/res_config_settings_views.xml"],
+    "data": ["data/ir_config_parameter.xml", "views/res_config_settings_views.xml"],
     "assets": {
         "web.assets_backend": [
             "dwo_attpreview_text/static/src/js/*.js",

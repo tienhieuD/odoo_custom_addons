@@ -7,6 +7,16 @@
         <field name="inherit_id" ref="dwo_attpreview_core.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//app[@name='dwo_attpreview_core']" position="inside">
+                <block title="Text and code pictures" name="dwo_attpreview_text_remote_block">
+                    <setting id="dwo_attpreview_text_remote_images" string="Load web pictures through the server"
+                             help="Pictures that a Markdown, HTML or notebook file links from the internet are downloaded by your Odoo server and shown from there; only real pictures are shown (programs and scripts are refused). The browser of the user never contacts the picture's website. When off, they are blocked and can be loaded per file with a button.">
+                        <field name="dwo_attpreview_text_remote_images"/>
+                    </setting>
+                    <setting id="dwo_attpreview_text_remote_https_only" string="Only secure (HTTPS) pictures"
+                             help="Load only pictures served over HTTPS. Pictures over plain HTTP stay blocked.">
+                        <field name="dwo_attpreview_text_remote_https_only"/>
+                    </setting>
+                </block>
                 <block title="Text and code size limits" name="dwo_attpreview_text_size_block">
                     <setting id="dwo_attpreview_max_mb_text" string="Text and code files" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
                         <div class="mt8"><field name="dwo_attpreview_max_mb_text"/> MB</div>

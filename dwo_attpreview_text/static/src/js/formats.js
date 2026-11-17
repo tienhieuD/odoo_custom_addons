@@ -3,6 +3,7 @@
 // Readers of the text viewer, without OWL: line splitting, syntax colours by line, JSON / YAML / TOML / INI values,
 // trees, logs, diffs, subtitles, PO files, and the documents of the sandboxed preview frame (Markdown, HTML,
 // notebooks). Nothing here runs the content of a file.
+import { frameParts, pictureError } from "@dwo_attpreview_core/js/safe_frame";
 
 /** Libraries of static/lib/text_libs (highlight.js, markdown-it, js-yaml, smol-toml), loaded on demand. */
 export const TEXT_LIBS_URL = "/dwo_attpreview_text/static/lib/text_libs/text_libs.min.js";
@@ -12,8 +13,8 @@ export const libs = () => window.DwoTextLibs;
 export const HIGHLIGHT_MAX_CHARS = 1_500_000;
 export const HIGHLIGHT_MAX_LINES = 40_000;
 export const MAX_TREE_NODES = 1_000_000;
-// policy of the preview frame: no script (sandbox), nothing from the network; inline styles and data: pictures only
-export const FRAME_CSP = "default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:";
+// the frame policy and its one script (the link guard) are in safe_frame.js: nothing from the network, data: pictures only
+const MAX_REMOTE_PICTURES = 100;
 
 const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 export function escapeHtml(text) {
@@ -518,8 +519,8 @@ function slug(text, used) {
 
 /**
  * markdown-it set up for the preview frame: raw HTML off (shown as text), links checked by markdown-it (no
- * javascript:), outside links open in a new tab, pictures that are not data: URIs are not loaded (counted in
- * env.blocked), headings get an id (env.headings) for the table of contents, code blocks get syntax colours.
+ * javascript:), a click on a link asks the user first (safe_frame.js), pictures that are not data: URIs are left to
+ * the server (env.pics) or shown as an error (counted in env.blocked), headings get an id (env.headings) for the table of contents, code blocks get syntax colours.
  */
 export function makeMarkdown() {
     const L = libs();
@@ -547,7 +548,13 @@ export function makeMarkdown() {
             return `<img src="${escapeHtml(src)}" alt="${alt}">`;
         }
         env.blocked = (env.blocked || 0) + 1;
-        return `<span class="dwo-blocked" title="${escapeHtml(src)}">\u{1F5BC} ${alt || "picture"}</span>`;
+        env.pics = env.pics || [];
+        if (/^https?:\/\//i.test(src) && env.pics.length < MAX_REMOTE_PICTURES) {
+            // fetched by the Odoo server (see safe_frame.js, remote_image.py); the frame never loads an address itself
+            env.pics.push(src);
+            return `<img data-dwo-remote="${env.pics.length - 1}" hidden alt="${alt}">`;
+        }
+        return `<img data-dwo-bad="unsupported address" hidden alt="${alt}">`;
     };
     const defaultLink = md.renderer.rules.link_open || ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
     md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
@@ -637,16 +644,15 @@ hr{border:0;border-top:1px solid #d1d9e0}
 .dwo-md{padding:0 4px}
 `;
 
-/** Full document of the preview frame: CSP first, no script, links open in a new tab. */
+/** Full document of the preview frame: CSP first, one script (the link guard), links are asked about before opening. */
 export function frameDocument(body, { toc = null, plain = false } = {}) {
+    const { head, tail } = frameParts();
     if (plain) {
         // an HTML page keeps its own look (its inline styles): only a neutral base
         return (
-            `<!DOCTYPE html><html><head><meta charset="utf-8">` +
-            `<meta http-equiv="Content-Security-Policy" content="${FRAME_CSP}">` +
-            `<meta name="referrer" content="no-referrer"><base target="_blank">` +
+            `<!DOCTYPE html><html><head>${head}` +
             `<style>:root{color-scheme:light}body{margin:16px;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#222}img{max-width:100%}</style>` +
-            `</head><body>${body}</body></html>`
+            `</head><body>${body}${tail}</body></html>`
         );
     }
     const css = FRAME_STYLE + (libs()?.hljsCss || "");
@@ -656,18 +662,31 @@ export function frameDocument(body, { toc = null, plain = false } = {}) {
             .join("")}</nav>`
         : "";
     return (
-        `<!DOCTYPE html><html><head><meta charset="utf-8">` +
-        `<meta http-equiv="Content-Security-Policy" content="${FRAME_CSP}">` +
-        `<meta name="referrer" content="no-referrer"><base target="_blank">` +
-        `<style>${css}</style></head><body><div class="dwo-page">${nav}<main class="dwo-main">${body}</main></div></body></html>`
+        `<!DOCTYPE html><html><head>${head}<style>${css}</style></head><body>` +
+        `<div class="dwo-page">${nav}<main class="dwo-main">${body}</main></div>${tail}</body></html>`
     );
 }
 
-/** The Markdown preview: {html (frame document), blocked (pictures not loaded), headings}. */
+const PIC_MARK = /<img data-dwo-remote="(\d+)" hidden([^>]*)>/g;
+const BAD_MARK = /<img data-dwo-bad="([^"]*)" hidden([^>]*)>/g;
+const altOf = (rest) => (/\salt="([^"]*)"/.exec(rest || "") || [])[1] || "";
+
+/**
+ * The document of a frame (``{body, opts, pics}`` made below) with the pictures the server fetched
+ * (``pictures[i]`` a data: URI) or why it could not (``errors[i]``). A picture still waiting stays hidden.
+ */
+export function renderFrame(frame, { pictures = {}, errors = {} } = {}) {
+    const body = frame.body
+        .replace(PIC_MARK, (match, i, rest) => (pictures[i] ? `<img src="${pictures[i]}"${rest}>` : errors[i] ? pictureError(errors[i], altOf(rest)) : match))
+        .replace(BAD_MARK, (match, code, rest) => pictureError(code, altOf(rest)));
+    return frameDocument(body, frame.opts);
+}
+
+/** The Markdown preview: {body, opts (for renderFrame), pics (addresses to fetch), blocked, headings}. */
 export function markdownDocument(text) {
     const env = {};
     const body = makeMarkdown().render(text, env);
-    return { html: frameDocument(body, { toc: env.headings }), blocked: env.blocked || 0, headings: env.headings || [] };
+    return { body, opts: { toc: env.headings }, pics: env.pics || [], blocked: env.blocked || 0, headings: env.headings || [] };
 }
 
 /** A notebook of the server (cells with sanitized outputs) as a frame document. */
@@ -696,7 +715,13 @@ export function notebookDocument(notebook) {
                 return /^data:image\//.test(out.src) ? `<img src="${escapeHtml(out.src)}" alt="output">` : "";
             }
             if (out.kind === "html") {
-                return `<div>${out.html}</div>`; // sanitized by the server (html_sanitize), shown in this frame
+                // sanitized by the server (html_sanitize), shown in this frame; its web pictures join the list of the page
+                env.pics = env.pics || [];
+                const html = out.html.replace(/data-dwo-remote="(\d+)"/g, (m, n) => {
+                    env.pics.push(out.urls[Number(n)]);
+                    return `data-dwo-remote="${env.pics.length - 1}"`;
+                });
+                return `<div>${html}</div>`;
             }
             if (out.kind === "markdown") {
                 return md.render(out.text, env);
@@ -711,12 +736,12 @@ export function notebookDocument(notebook) {
             `</div>`
         );
     });
-    return { html: frameDocument(cells.join("")), blocked: env.blocked || 0 };
+    return { body: cells.join(""), opts: {}, pics: env.pics || [], blocked: env.blocked || 0 };
 }
 
 /** The HTML preview: the page sanitized by the server, in the frame (its own styles were removed by the sanitizer). */
-export function htmlDocument(sanitized) {
-    return frameDocument(sanitized, { plain: true });
+export function htmlDocument(sanitized, pics = [], blocked = 0) {
+    return { body: sanitized, opts: { plain: true }, pics, blocked };
 }
 
 // --- logs ---------------------------------------------------------------------------------------------------------

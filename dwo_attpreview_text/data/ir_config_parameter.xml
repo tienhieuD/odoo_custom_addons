@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<odoo noupdate="1">
+    <!-- both on by default (#87); unticking in Settings removes the parameter -->
+    <record id="param_remote_images" model="ir.config_parameter">
+        <field name="key">dwo_attpreview_text.remote_images</field>
+        <field name="value">True</field>
+    </record>
+    <record id="param_remote_https_only" model="ir.config_parameter">
+        <field name="key">dwo_attpreview_text.remote_https_only</field>
+        <field name="value">True</field>
+    </record>
+</odoo>

@@ -113,11 +113,17 @@
             <!-- Preview -->
             <t t-elif="ui.mode === 'preview'">
                 <t t-if="group === 'markdown' or group === 'html' or group === 'notebook'">
-                    <div t-if="frame.blocked" class="o_dwo_txt_note alert alert-info mb-0 o_dwo_txt_blocked">
-                        <i class="fa fa-shield me-2" aria-hidden="true"/><t t-esc="frame.blocked"/> picture(s) from the internet or other files are not loaded (privacy and safety). Download the file to see them.
+                    <div t-if="remote.status === 'loading' or remote.status === 'loaded'" class="o_dwo_txt_note alert alert-info mb-0 o_dwo_txt_blocked o_dwo_txt_proxied">
+                        <i class="fa fa-shield me-2" aria-hidden="true"/>Pictures from the internet are loaded through your Odoo server: your IP address and browser are not shown to their host.
+                        <t t-if="remote.status === 'loading'"> Loading...</t>
+                        <t t-elif="remote.failed"> <t t-esc="remote.failed"/> could not be shown.</t>
                     </div>
-                    <iframe class="o_dwo_txt_frame" title="Preview" sandbox="allow-popups allow-popups-to-escape-sandbox"
-                            referrerpolicy="no-referrer" t-att-srcdoc="frame.html"/>
+                    <div t-elif="remote.status === 'blocked'" class="o_dwo_txt_note alert alert-info mb-0 o_dwo_txt_blocked">
+                        <i class="fa fa-shield me-2" aria-hidden="true"/>Pictures from the internet are not loaded (privacy).
+                        <button type="button" class="btn btn-link btn-sm p-0 ms-2 align-baseline o_dwo_txt_load_remote" t-on-click="() => this.loadRemote()">Load them through the server</button>
+                    </div>
+                    <iframe class="o_dwo_txt_frame" title="Preview" t-ref="frame" t-att-sandbox="frameSandbox"
+                            referrerpolicy="no-referrer" t-att-srcdoc="frameHtml"/>
                 </t>
                 <div t-elif="group === 'svg'" class="o_dwo_txt_svg">
                     <img t-att-src="svgUrl" alt="Picture"/>
