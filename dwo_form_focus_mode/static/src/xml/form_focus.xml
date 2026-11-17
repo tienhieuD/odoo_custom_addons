@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_form_focus_mode.FormView" t-inherit="web.FormView" t-inherit-mode="extension">
+        <xpath expr="//CogMenu" position="before">
+            <button t-if="this.dwoFfmEnabled" type="button" class="btn btn-link px-2 o_dwo_ffm_toggle" t-att-data-mode="this.dwoFfmMode"
+                    t-att-title="this.dwoFfmTitle" t-on-click.stop="() => this.dwoFfmCycle()">
+                <i class="fa" t-att-class="this.dwoFfmIcon" role="img"/>
+            </button>
+        </xpath>
+        <xpath expr="//div[@t-ref='this.rootRef']" position="inside">
+            <button t-if="this.dwoFfmEnabled and this.dwoFfmMode !== 'normal'" type="button" class="btn btn-secondary o_dwo_ffm_drawer_btn"
+                    t-att-title="this.dwoFfm.drawer ? 'Close the chatter' : 'Open the chatter'" t-on-click.stop="() => this.dwoFfmToggleDrawer()">
+                <i class="fa" t-att-class="this.dwoFfm.drawer ? 'fa-times' : 'fa-comments'" role="img"/>
+            </button>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,98 @@
+/** @odoo-module **/
+// Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+import { onWillUnmount, proxy, useEffect } from "@odoo/owl";
+import { browser } from "@web/core/browser/browser";
+import { _t } from "@web/core/l10n/translation";
+import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
+import { patch } from "@web/core/utils/patch";
+import { FormController } from "@web/views/form/form_controller";
+
+const MODES = ["normal", "wide", "focus"];
+const STORAGE = "dwo_form_focus_mode.mode.";
+const BODY_CLASS = "o_dwo_ffm_focus_body";
+
+function readMode(resModel) {
+    try {
+        const value = browser.localStorage.getItem(STORAGE + resModel);
+        return MODES.includes(value) ? value : "normal";
+    } catch {
+        return "normal";
+    }
+}
+
+function saveMode(resModel, mode) {
+    try {
+        if (mode === "normal") {
+            browser.localStorage.removeItem(STORAGE + resModel);
+        } else {
+            browser.localStorage.setItem(STORAGE + resModel, mode);
+        }
+    } catch {
+        // the layout still changes, it is just not remembered
+    }
+}
+
+/**
+ * Three layouts for a form view: normal, wide (chatter hidden, full width) and focus (also without the top bar). The
+ * chatter comes back as a side drawer. The layout is a class of the form (see form_focus.scss), remembered by model.
+ */
+patch(FormController.prototype, {
+    setup() {
+        super.setup(...arguments);
+        // Odoo 20 (Owl 3): proxy instead of useState
+        this.dwoFfm = proxy({ mode: readMode(this.props.resModel), drawer: false });
+        useHotkey("alt+shift+f", () => this.dwoFfmCycle(), { allowRepeat: false });
+        // Owl 3: useEffect re-runs by itself when the signals it reads change
+        useEffect(() => {
+            document.body.classList.toggle(BODY_CLASS, this.dwoFfmEnabled && this.dwoFfm.mode === "focus");
+        });
+        onWillUnmount(() => document.body.classList.remove(BODY_CLASS));
+    },
+
+    /** Not in a dialog and not on a phone: there the form already has the whole screen. */
+    get dwoFfmEnabled() {
+        return !this.env.inDialog && !this.ui.isSmall;
+    },
+
+    get dwoFfmMode() {
+        return this.dwoFfmEnabled ? this.dwoFfm.mode : "normal";
+    },
+
+    get dwoFfmTitle() {
+        return {
+            normal: _t("Wide form (hide the chatter)"),
+            wide: _t("Focus mode (also hide the top bar)"),
+            focus: _t("Back to the normal form"),
+        }[this.dwoFfmMode];
+    },
+
+    get dwoFfmIcon() {
+        return this.dwoFfmMode === "normal" ? "fa-expand" : this.dwoFfmMode === "wide" ? "fa-arrows-alt" : "fa-compress";
+    },
+
+    dwoFfmCycle() {
+        if (!this.dwoFfmEnabled) {
+            return;
+        }
+        const next = MODES[(MODES.indexOf(this.dwoFfm.mode) + 1) % MODES.length];
+        this.dwoFfm.mode = next;
+        this.dwoFfm.drawer = false;
+        saveMode(this.props.resModel, next);
+    },
+
+    dwoFfmToggleDrawer() {
+        this.dwoFfm.drawer = !this.dwoFfm.drawer;
+    },
+
+    get className() {
+        const result = super.className;
+        if (this.dwoFfmMode !== "normal") {
+            result[`o_dwo_ffm_${this.dwoFfmMode}`] = true;
+            result["o_dwo_ffm"] = true;
+            if (this.dwoFfm.drawer) {
+                result["o_dwo_ffm_drawer"] = true;
+            }
+        }
+        return result;
+    },
+});
