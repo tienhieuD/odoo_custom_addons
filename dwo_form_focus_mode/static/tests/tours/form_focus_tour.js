@@ -34,13 +34,17 @@ registry.category("web_tour.tours").add("dwo_form_focus_mode_tour", {
             }
         } },
         { trigger: toggle("auto"), run: "click" },
-        { content: "Auto chatter: the bar on the right with its words, the chatter hidden", trigger: ".o_form_view.o_dwo_ffm_auto", run() {
+        { content: "Auto chatter: the button is lit, the bar on the right with its words starts under the control panel, the chatter hidden", trigger: `.o_form_view.o_dwo_ffm_auto, ${toggle("auto")}.active`, run() {
             if (!document.querySelector(".o_form_view .o-mail-Form-chatter")) {
                 return; // no Discuss: no chatter, no bar
             }
             const bar = document.querySelector(".o_dwo_ffm_edge");
             if (!bar || !bar.textContent.includes("Auto chatter")) {
                 throw new Error("no bar with the words Auto chatter");
+            }
+            const panel = document.querySelector(".o_form_view .o_control_panel");
+            if (panel && bar.getBoundingClientRect().top < panel.getBoundingClientRect().bottom - 1) {
+                throw new Error("the bar covers the control panel");
             }
         } },
         {
@@ -60,6 +64,14 @@ registry.category("web_tour.tours").add("dwo_form_focus_mode_tour", {
                 const wanted = Math.min(530, window.innerWidth * 0.92);
                 if (drawer.getBoundingClientRect().width < wanted - 2) {
                     throw new Error("the drawer is narrower than the chatter of Odoo: " + drawer.getBoundingClientRect().width);
+                }
+                const panel = document.querySelector(".o_form_view .o_control_panel");
+                if (panel && drawer.getBoundingClientRect().top < panel.getBoundingClientRect().bottom - 1) {
+                    throw new Error("the drawer covers the control panel (New, breadcrumb, pager)");
+                }
+                const barTop = document.querySelector(".o_dwo_ffm_backdrop").getBoundingClientRect().top;
+                if (panel && barTop < panel.getBoundingClientRect().bottom - 1) {
+                    throw new Error("the dimmed background covers the control panel");
                 }
                 const handle = document.querySelector(".o_dwo_ffm_resizer");
                 if (!handle) {

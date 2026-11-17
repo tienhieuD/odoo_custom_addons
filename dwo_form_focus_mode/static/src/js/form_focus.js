@@ -1,6 +1,6 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { Component, onWillUnmount, useState, useSubEnv } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, useState, useSubEnv } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
@@ -16,6 +16,7 @@ const STORAGE_WIDTH = "dwo_form_focus_mode.drawer_width";
 const DEFAULT_WIDTH = 530; // the width of the chatter beside the form in Odoo (px)
 const MIN_WIDTH = 360;
 const WIDTH_VAR = "--dwo-ffm-drawer-width";
+const TOP_VAR = "--dwo-ffm-top";
 
 function readMode() {
     try {
@@ -47,6 +48,13 @@ function applyWidth(width) {
     document.documentElement.style.setProperty(WIDTH_VAR, `${clampWidth(width)}px`);
 }
 
+/** The bar, the drawer and the dimmed background start under the control panel (New, breadcrumb, pager), never over it. */
+function applyTop() {
+    const content = document.querySelector(".o_form_view .o_content");
+    const top = content ? Math.max(Math.round(content.getBoundingClientRect().top), 0) : 106;
+    document.documentElement.style.setProperty(TOP_VAR, `${top}px`);
+}
+
 function readWidth() {
     try {
         const value = Number(browser.localStorage.getItem(STORAGE_WIDTH));
@@ -75,6 +83,11 @@ patch(FormController.prototype, {
         // the buttons are in the control panel (after the pager): they read the layout from here
         useSubEnv({ dwoFfm: this });
         applyWidth(readWidth());
+        // the control panel can change its height (a long breadcrumb): the top follows
+        const onResize = () => applyTop();
+        window.addEventListener("resize", onResize);
+        onMounted(() => applyTop());
+        onWillUnmount(() => window.removeEventListener("resize", onResize));
     },
 
     /** Not in a dialog and not on a phone: there the form already has the whole screen. */
@@ -103,6 +116,7 @@ patch(FormController.prototype, {
         this.dwoFfm.mode = mode;
         this.dwoFfm.drawer = false;
         saveMode(mode);
+        setTimeout(applyTop); // the edge bar needs the top once the form is drawn
     },
 
     dwoFfmCycle() {
@@ -131,6 +145,7 @@ patch(FormController.prototype, {
     },
 
     dwoFfmToggleDrawer() {
+        applyTop();
         this.dwoFfm.drawer = !this.dwoFfm.drawer;
     },
 
