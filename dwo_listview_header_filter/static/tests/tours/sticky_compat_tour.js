@@ -16,18 +16,23 @@ registry.category("web_tour.tours").add("dwo_listview_header_filter_sticky_tour"
         },
         { content: "Both icons are in the header (the pin button shows on hover only)", trigger: `${th("name")}:has(.js_pin_this_column):has(.o_dwo_hf_btn)` },
         {
-            content: "The pin button (shown on hover) does not cover the filter icon",
-            trigger: `${th("name")} .o_dwo_hf_btn`,
+            content: "The pin button and the filter icon (both shown on hover) do not overlap",
+            trigger: th("name"),
             run() {
-                const header = this.anchor.closest("th");
+                const header = this.anchor || this.$anchor[0];
                 const pin = header.querySelector(".js_pin_this_column");
-                pin.style.setProperty("display", "block", "important");
-                const a = this.anchor.getBoundingClientRect();
+                const filter = header.querySelector(".o_dwo_hf_btn");
+                for (const el of [pin, filter]) {
+                    el.style.setProperty("display", "block", "important");
+                }
+                const a = filter.getBoundingClientRect();
                 const b = pin.getBoundingClientRect();
-                pin.style.removeProperty("display");
+                for (const el of [pin, filter]) {
+                    el.style.removeProperty("display");
+                }
                 const overlap = a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-                if (overlap) {
-                    throw new Error(`the filter icon and the pin button overlap: ${JSON.stringify([a, b])}`);
+                if (!a.width || !b.width || overlap) {
+                    throw new Error(`the filter icon and the pin button overlap or are not drawn: ${JSON.stringify([a, b])}`);
                 }
             },
         },
@@ -39,7 +44,9 @@ registry.category("web_tour.tours").add("dwo_listview_header_filter_sticky_tour"
                 throw new Error("the header is not sticky");
             }
         } },
-        { trigger: `${th("type")} .o_dwo_hf_btn`, run: "click" },
+        { trigger: th("type"), run() {
+            (this.anchor || this.$anchor[0]).querySelector(".o_dwo_hf_btn").click();
+        } },
         { trigger: ".o_dwo_hf[data-kind=choice] .o_dwo_hf_row:contains('URL')", run: "click" },
         { trigger: ".o_dwo_hf .o_dwo_hf_apply", run: "click" },
         { trigger: `.o_searchview_facet:contains('Type: URL')` },
