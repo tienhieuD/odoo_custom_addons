@@ -1,0 +1,74 @@
+// Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+// Layouts of a form view: the class is set by form_focus.js on the form (o_dwo_ffm_wide / o_dwo_ffm_focus).
+
+// the toggle button of the control panel
+.o_dwo_ffm_toggle {
+    color: inherit;
+    opacity: .7;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    &:not([data-mode='normal']) {
+        opacity: 1;
+        color: var(--primary, #714b67);
+    }
+}
+
+// wide and focus: no chatter in the page, the sheet takes the width
+.o_dwo_ffm_wide, .o_dwo_ffm_focus {
+    .o-mail-Form-chatter {
+        display: none;
+    }
+
+    .o_form_renderer, .o_form_sheet_bg {
+        max-width: none;
+    }
+
+    // the chatter button only exists when the form has a chatter
+    &:not(:has(.o-mail-Form-chatter)) .o_dwo_ffm_drawer_btn {
+        display: none;
+    }
+}
+
+// the chatter as a side drawer
+.o_dwo_ffm_drawer .o-mail-Form-chatter {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 460px;
+    max-width: 92vw;
+    margin: 0;
+    padding: 3.5rem 0 0;
+    overflow-y: auto;
+    z-index: 1040;
+    background: var(--o-view-background-color, #fff);
+    box-shadow: -6px 0 24px rgba(0, 0, 0, .18);
+}
+
+.o_dwo_ffm_drawer_btn {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1050;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+
+.o_dwo_ffm_drawer .o_dwo_ffm_drawer_btn {
+    top: .75rem;
+    bottom: auto;
+    width: 2rem;
+    height: 2rem;
+}
+
+// focus: without the top navigation bar
+body.o_dwo_ffm_focus_body .o_main_navbar {
+    display: none;
+}
