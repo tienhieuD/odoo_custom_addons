@@ -1,5 +1,12 @@
 # CHANGELOG - dwo_attpreview_archive
 
+## 2026-11-17 - the tree view comes from the core (#83)
+
+- `DwoTreeView`, its template, styles and the libraries (`tree_libs.min.js`) moved to `dwo_attpreview_core` 20.0.1.3.0
+  (shared with the text engine); the viewer imports `@dwo_attpreview_core/js/tree_view` and passes its columns (Size,
+  Modified). Same look and behaviour; no version change of the module (needs core 20.0.1.3.0).
+- Test `test_09`: the files of the big zip end in `.xyz` (a `.txt` file is read by the text engine when installed).
+
 ## 2026-11-16 - 20.0.1.0.0 - 20.0 port of 19.0.1.0.0 (#82)
 
 Same features and behaviour as 19.0.1.0.0 (below), for core 20.0.1.2.0. Odoo 20 differences: Owl 3 components

@@ -6,13 +6,17 @@ import { useService } from "@web/core/utils/hooks";
 import { download } from "@web/core/network/download";
 import { _t } from "@web/core/l10n/translation";
 import { dwoAttPreviewIconUrl, dwoAttPreviewSpecialIconUrl } from "@dwo_attpreview_core/js/file_kind";
-import { DwoTreeView } from "./tree_view";
+import { DwoTreeView } from "@dwo_attpreview_core/js/tree_view";
 
 const { DateTime } = luxon;
 const F_ENCRYPTED = 1;
 const F_SPECIAL = 2;
 const MAX_EXPAND_ALL = 3000; // folders: "Expand all" is offered up to this many
 const MAX_MATCH_EXPAND = 5000;
+const ARCHIVE_COLUMNS = [
+    { key: "size", label: "Size", width: "6.5rem", align: "right" },
+    { key: "date", label: "Modified", width: "10rem" },
+];
 
 export function dwoArchiveSize(bytes) {
     if (bytes < 1024) return `${bytes} B`;
@@ -129,6 +133,10 @@ export class ArchiveViewer extends Component {
             size: dwoArchiveSize(d.size || 0),
             packed: dwoArchiveSize(d.packed || 0),
         };
+    }
+
+    get columns() {
+        return ARCHIVE_COLUMNS;
     }
 
     get canExpandAll() {

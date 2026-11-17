@@ -2,47 +2,6 @@
 <!-- Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
 <!-- Odoo 20: templates read the component through this., icons are .oi (Font Awesome is gone), t-out for t-esc -->
 <templates xml:space="preserve">
-    <t t-name="dwo_attpreview_archive.TreeView">
-        <div class="o_dwo_tree">
-            <div class="o_dwo_tree_head" aria-hidden="true">
-                <span class="o_dwo_tree_col_name">Name</span>
-                <span class="o_dwo_tree_col_size">Size</span>
-                <span class="o_dwo_tree_col_date">Modified</span>
-                <span class="o_dwo_tree_col_act"/>
-            </div>
-            <div class="o_dwo_tree_scroll" t-ref="this.scroll">
-                <div class="o_dwo_tree_list" t-ref="this.list" role="tree" t-att-aria-label="this.props.label or 'Files'"
-                     t-attf-style="height: {{ this.totalHeight }}px;">
-                    <div t-foreach="this.rows" t-as="row" t-key="row.key" class="o_dwo_tree_row"
-                         t-att-class="{ 'o_dwo_tree_focused': row.focused, 'o_dwo_tree_folder': row.folder, 'o_dwo_tree_muted': row.info.muted }"
-                         t-att-data-tree-id="row.id" role="treeitem" t-att-aria-level="row.level + 1"
-                         t-att-aria-expanded="row.ariaExpanded"
-                         t-att-aria-setsize="row.setsize" t-att-aria-posinset="row.posinset" aria-selected="false"
-                         t-att-tabindex="row.focused ? 0 : -1" t-att-title="row.info.title or row.info.name"
-                         t-attf-style="transform: translateY({{ row.top }}px);"
-                         t-on-click="(ev) => this.onRowClick(ev, row.id)">
-                        <span class="o_dwo_tree_col_name" t-attf-style="padding-left: {{ 6 + row.level * 18 }}px;">
-                            <i t-if="row.folder" class="o_dwo_tree_chevron oi" t-att-data-icon="row.expanded ? 'arrow_drop_down' : 'arrow_right'" aria-hidden="true"/>
-                            <span t-else="" class="o_dwo_tree_chevron"/>
-                            <img class="o_dwo_tree_icon" alt="" t-att-src="row.folder ? this.props.folderIcon(row.expanded) : row.info.icon"/>
-                            <span class="o_dwo_tree_name" t-out="row.info.name"/>
-                            <span t-if="row.folder" class="o_dwo_tree_count" t-out="row.info.count"/>
-                        </span>
-                        <span class="o_dwo_tree_col_size" t-out="row.info.size"/>
-                        <span class="o_dwo_tree_col_date" t-out="row.info.date"/>
-                        <span class="o_dwo_tree_col_act">
-                            <button t-if="!row.folder and this.props.onDownload and !row.info.muted" type="button"
-                                    class="btn btn-link btn-sm o_dwo_tree_download" t-att-title="'Download ' + row.info.name"
-                                    aria-label="Download" t-on-click.stop="() => this.props.onDownload(row.id)">
-                                <i class="oi" data-icon="download" aria-hidden="true"/>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </t>
-
     <t t-name="dwo_attpreview_archive.ArchiveViewer">
         <div class="o_dwo_arc" t-ref="this.root">
             <div class="o_dwo_arc_bar">
@@ -70,7 +29,7 @@
             <div t-if="this.data.encrypted" class="o_dwo_arc_note alert alert-secondary mb-0">
                 <t t-out="this.data.encrypted"/> file(s) are protected by a password and cannot be opened.
             </div>
-            <DwoTreeView rootId="'d0'" label="'Files of the archive'" version="this.ui.version" expanded="this.initialExpanded"
+            <DwoTreeView rootId="'d0'" label="'Files of the archive'" columns="this.columns" version="this.ui.version" expanded="this.initialExpanded"
                          getChildren.bind="this.getChildren" isFolder.bind="this.isFolder" row.bind="this.row" onOpen.bind="this.onOpen"
                          onDownload.bind="this.onDownload" onReady.bind="this.onTreeReady" folderIcon.bind="this.folderIcon"/>
             <div t-if="this.ui.filter and !this.ui.matchCount" class="o_dwo_arc_empty text-muted">No file name contains this text.</div>
