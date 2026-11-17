@@ -6,7 +6,13 @@ from odoo.tests import HttpCase, TransactionCase, tagged
 from odoo.tools import file_path
 
 MODULE = "dwo_attpreview_3d"
-KINDS = ("stl", "obj", "ply", "glb", "gltf", "3mf", "fbx", "dae")
+KINDS = ("stl", "obj", "ply", "glb", "gltf", "3mf", "fbx", "dae", "step", "stp", "iges", "igs", "3dm")
+FIXTURES = {"step": "rounded-cube.step", "stp": "rounded-cube.step", "iges": "cube-10x10.igs", "igs": "cube-10x10.igs",
+            "3dm": "rhino-parts.3dm"}
+
+
+def _sample(kind):
+    return _fixture(FIXTURES.get(kind) or "spur-gear." + kind)
 
 
 def _fixture(name):
@@ -27,7 +33,7 @@ class Test3DEngine(TransactionCase):
 
     def test_01_samples_are_accepted(self):
         for kind in KINDS:
-            out = self._render("gear." + kind, _fixture("spur-gear." + kind))
+            out = self._render("gear." + kind, _sample(kind))
             self.assertEqual(out, {"type": "text", "data": kind})
 
     def test_02_engine_is_found_by_extension(self):
@@ -64,6 +70,15 @@ class Test3DEngine(TransactionCase):
         with self.assertRaises(UserError):
             self._render("a.3mf", b"PK not really")
 
+    def test_06b_step_iges_3dm_signatures(self):
+        for name in ("a.step", "a.stp"):
+            with self.assertRaises(UserError):
+                self._render(name, b"ISO-10303-21;\nHEADER;\nENDSEC;")  # no FILE_SCHEMA
+        with self.assertRaises(UserError):
+            self._render("a.iges", b"x" * 100)
+        with self.assertRaises(UserError):
+            self._render("a.3dm", b"PK\x03\x04" + b"0" * 50)
+
     def test_07_core_refuses_a_big_file_before_the_engine(self):
         self.env["ir.config_parameter"].sudo().set_param("dwo_attpreview.max_mb.model3d_mesh", "0")
         att = self.env["ir.attachment"].create({"name": "gear.stl", "raw": _fixture("spur-gear.stl")})
@@ -89,6 +104,16 @@ class Test3DRoutes(HttpCase):
         self.assertNotIn("unsafe-eval", csp.replace("wasm-unsafe-eval", ""))
         self.assertEqual(res.headers["Access-Control-Allow-Origin"], "*")
         self.assertEqual(res.headers["X-Content-Type-Options"], "nosniff")
+
+    def test_01b_only_the_solid_page_may_use_unsafe_eval(self):
+        for page, eval_ok in (("viewer.html", False), ("solid.html", True)):
+            csp = self.url_open("/dwo_attpreview_3d/asset/viewer/" + page).headers["Content-Security-Policy"]
+            self.assertEqual(" 'unsafe-eval'" in csp, eval_ok, page)
+            self.assertIn("default-src 'none'", csp)
+        for path in ("lib/occt/occt-import-js.bundle.js", "lib/occt/occt-import-js.wasm", "lib/rhino3dm/rhino3dm.module.min.js",
+                     "lib/rhino3dm/rhino3dm.wasm"):
+            self.assertEqual(self.url_open("/dwo_attpreview_3d/asset/" + path).status_code, 200, path)
+        self.assertEqual(self.url_open("/dwo_attpreview_3d/asset/lib/occt/LICENSE-LGPL-2.1.txt").status_code, 404)
 
     def test_02_webgl_asset_route_serves_three_and_nothing_else(self):
         for path, ok in (("lib/three/build/three.module.js", True), ("viewer/common.js", True),

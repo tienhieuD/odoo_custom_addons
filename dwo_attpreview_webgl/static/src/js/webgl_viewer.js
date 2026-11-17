@@ -37,6 +37,12 @@ export class DwoWebglViewer extends Component {
         });
     }
 
+    /** The page of the viewer: ``config.viewerUrl`` is a string, or a function of the kind of the file. */
+    get viewerUrl() {
+        const url = this.config.viewerUrl;
+        return typeof url === "function" ? url(this.props.content) : url;
+    }
+
     fail(message) {
         console.warn("[%s] cannot display the file:", this.config.source, message);
         clearTimeout(this.timer);

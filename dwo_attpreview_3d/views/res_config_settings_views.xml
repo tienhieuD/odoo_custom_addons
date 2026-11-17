@@ -14,6 +14,12 @@
                     <setting id="dwo_attpreview_max_mb_model3d_scene" string="Scenes: GLB, GLTF, 3MF, FBX, DAE" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
                         <div class="mt8"><field name="dwo_attpreview_max_mb_model3d_scene"/> MB</div>
                     </setting>
+                    <setting id="dwo_attpreview_max_mb_model3d_step" string="CAD solids: STEP, IGES" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_model3d_step"/> MB</div>
+                    </setting>
+                    <setting id="dwo_attpreview_max_mb_model3d_rhino" string="Rhino: 3DM" help="Larger files are not previewed. Applies to the file you open; a file inside another file is checked by its own type.">
+                        <div class="mt8"><field name="dwo_attpreview_max_mb_model3d_rhino"/> MB</div>
+                    </setting>
                 </block>
             </xpath>
         </field>
