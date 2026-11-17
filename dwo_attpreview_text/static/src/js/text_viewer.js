@@ -1,5 +1,6 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+import { rpc } from "@web/core/network/rpc";
 import { Component, onMounted, onWillStart, onWillUnmount, useExternalListener, useRef, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { loadJS } from "@web/core/assets";
@@ -7,10 +8,11 @@ import { useService } from "@web/core/utils/hooks";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { DwoTreeView } from "@dwo_attpreview_core/js/tree_view";
+import { FRAME_SANDBOX, fetchPictures, onLinkClick, useFrameLinks } from "@dwo_attpreview_core/js/safe_frame";
 import { DwoLineView } from "./line_view";
 import {
     TEXT_LIBS_URL, FlatTree, LOG_LEVELS, ValueTree, elementPath, escapeHtml, highlightLines, htmlDocument, htmlNodes,
-    humanSize, logLevels, markHighlighted, markLine, markdownDocument, markdownOutline, notebookDocument, parseDiff, parseIni,
+    humanSize, logLevels, markHighlighted, markLine, markdownDocument, markdownOutline, notebookDocument, parseDiff, parseIni, renderFrame,
     parseJson, parseNdjson, parsePo, parseSubtitles, parseToml, parseYaml, splitLines, xmlNodes,
 } from "./formats";
 
@@ -71,6 +73,10 @@ export class TextViewer extends Component {
     setup() {
         this.notification = useService("notification");
         this.rootRef = useRef("root");
+        // pictures of a Markdown / HTML / notebook preview: fetched by the Odoo server, never by the browser itself
+        this.remote = useState({ status: "idle", pictures: {}, errors: {}, failed: 0 });
+        this.frameRef = useRef("frame");
+        this.links = useFrameLinks(() => this.frameRef.el);
         try {
             this.data = JSON.parse(this.props.content || "{}") || {};
         } catch {
@@ -112,6 +118,7 @@ export class TextViewer extends Component {
             this.prepare();
         });
         onMounted(() => {
+            this.maybeRemote();
             // syntax colours after the first paint: the plain lines show at once
             this.hlTimer = setTimeout(() => this.highlight(), 30);
         });
@@ -209,6 +216,62 @@ export class TextViewer extends Component {
         }
         this.ui.mode = mode;
         this.closeFind();
+        this.maybeRemote();
+    }
+
+    // --- pictures of the preview frame, through the server -----------------------------------------------------
+    async maybeRemote() {
+        if (this.ui.mode !== "preview" || this._remoteStarted || !["markdown", "html", "notebook"].includes(this.group)) {
+            return;
+        }
+        if (!this.frame.pics.length || !this.props.source) {
+            return;
+        }
+        this._remoteStarted = true;
+        let settings = { auto: false };
+        try {
+            settings = await rpc("/dwo_attpreview_text/remote_settings", {});
+        } catch {
+            // keep them blocked
+        }
+        if (settings.auto) {
+            this.loadRemote();
+        } else {
+            this.remote.status = "blocked";
+        }
+    }
+
+    remoteUrl(index) {
+        const params = new URLSearchParams();
+        for (const [key, value] of Object.entries(this.props.source || {})) {
+            if (value) {
+                params.set(key, value);
+            }
+        }
+        params.set("url", this.frame.pics[index]);
+        return `/dwo_attpreview_text/remote_image?${params.toString()}`;
+    }
+
+    async loadRemote() {
+        this.remote.status = "loading";
+        const { pictures, errors } = await fetchPictures((i) => this.remoteUrl(i), this.frame.pics.length);
+        this.remote.pictures = pictures;
+        this.remote.errors = errors;
+        this.remote.failed = Object.keys(errors).length;
+        this.remote.status = "loaded";
+    }
+
+    get frameHtml() {
+        // made again only when the pictures change: a new document (new nonce) would reload the frame
+        if (!this._frameHtml || this._frameKey !== this.remote.status) {
+            this._frameKey = this.remote.status;
+            this._frameHtml = renderFrame(this.frame, this.remote);
+        }
+        return this._frameHtml;
+    }
+
+    get frameSandbox() {
+        return FRAME_SANDBOX;
     }
 
     get lineMode() {
@@ -667,7 +730,7 @@ export class TextViewer extends Component {
             } else if (this.group === "notebook") {
                 this._frame = notebookDocument(this.data.notebook);
             } else {
-                this._frame = { html: htmlDocument(this.data.html || ""), blocked: this.data.blocked_images || 0 };
+                this._frame = htmlDocument(this.data.html || "", this.data.remote_urls || [], this.data.blocked_images || 0);
             }
         }
         return this._frame;

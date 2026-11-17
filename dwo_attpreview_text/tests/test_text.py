@@ -112,11 +112,22 @@ class TestTextEngine(TransactionCase):
                     "evil.example/x.png", 'src="https://evil'):
             self.assertNotIn(bad, html, bad)
         self.assertEqual(data["blocked_images"], 1)
-        self.assertIn('title="https://evil.example/track.gif"', html, "the address of a blocked picture is in its tooltip")
+        self.assertEqual(data["remote_urls"], ["https://evil.example/track.gif"], "fetched by the server on request (#87)")
+        self.assertIn('<img data-dwo-remote="0" hidden', html, "the address itself is not in the page")
         self.assertIn('src="data:image/png;base64,iVBORw0KGgo="', html, "inline pictures are kept")
         self.assertIn("background-color:#1f5a96", html, "background shorthand kept as a colour")
         self.assertIn('href="https://ok.example/"', html)
         self.assertIn("<script>alert(1)</script>", data["text"], "the raw text is the file as it is (shown escaped)")
+
+    def test_06b_strange_picture_addresses_become_visible_errors(self):
+        page = (b'<p>x</p><img src="javascript:alert(1)" alt="js"><img src="file:///etc/passwd">'
+                b'<img src="evil.sh" alt="script"><img src="https://a.example/ok.png">')
+        data = self.render(page, "page.html")
+        html = data["html"]
+        self.assertEqual(html.count("data-dwo-bad="), 3)
+        self.assertEqual(data["remote_urls"], ["https://a.example/ok.png"])
+        for text in ("javascript:", "file:", "evil.sh", "passwd"):
+            self.assertNotIn(text, html, text)
 
     # --- XML --------------------------------------------------------------------------------------------------
     def test_07_xml_tree(self):
@@ -261,3 +272,74 @@ class TestTextTour(HttpCase):
                               ("talk.srt", srt, "text/plain"), ("conf.yaml", b"server:\n  port: 8069\n  workers: [1, 2]\n", "text/plain"),
                               ("export.txt", "Köln office\t12\n".encode("utf-16"), "text/plain")])
         self.start_tour("/odoo/res.partner/%d" % partner.id, "dwo_attpreview_text_formats_tour", login="admin")
+
+
+def _png(size=(4, 3)):
+    import io
+    from PIL import Image
+    out = io.BytesIO()
+    Image.new("RGB", size, (200, 30, 30)).save(out, "PNG")
+    return out.getvalue()
+
+
+@tagged("post_install", "-at_install")
+class TestTextRemoteRoute(HttpCase):
+    """The picture route of Markdown / HTML / notebooks (#87): only addresses written in the file, clean pictures,
+    the reason of a refusal, the settings."""
+
+    MD = (b"# T\n\n![A](https://cdn.example.com/a.png)\n\n![B](https://cdn.example.com/dir/my%20pic.png)\n\n"
+          b"![S](https://cdn.example.com/run.sh)\n\n![H](http://plain.example.com/h.png)\n")
+
+    def setUp(self):
+        super().setUp()
+        from odoo.addons.dwo_attpreview_core import remote_image
+        remote_image.CACHE.clear()
+        partner = self.env["res.partner"].create({"name": "Text pictures"})
+        self.att = self.env["ir.attachment"].create({"name": "doc.md", "raw": self.MD, "res_model": "res.partner",
+                                                     "res_id": partner.id})
+        self.fetched = []
+
+        def fake(url, https_only=True):
+            remote_image.check_url(url, https_only)
+            self.fetched.append(url)
+            return _png(), "image/png"
+
+        patcher = patch("odoo.addons.dwo_attpreview_core.remote_image.fetch_picture", fake)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def url(self, address):
+        from urllib.parse import quote
+        return "/dwo_attpreview_text/remote_image?attachment_id=%d&url=%s" % (self.att.id, quote(address, safe=""))
+
+    def test_01_settings_are_on_by_default(self):
+        self.authenticate("admin", "admin")
+        res = self.url_open("/dwo_attpreview_text/remote_settings", data='{"jsonrpc":"2.0","params":{}}',
+                            headers={"Content-Type": "application/json"})
+        self.assertEqual(res.json()["result"], {"auto": True, "https_only": True})
+
+    def test_02_only_addresses_written_in_the_file(self):
+        self.authenticate("admin", "admin")
+        res = self.url_open(self.url("https://cdn.example.com/a.png"))
+        self.assertEqual((res.status_code, res.headers["Content-Type"]), (200, "image/png"))
+        self.assertEqual(res.headers.get("X-Content-Type-Options"), "nosniff")
+        self.assertEqual(self.url_open(self.url("https://cdn.example.com/dir/my pic.png")).status_code, 200,
+                         "a space in the file and %20 on the way are the same address")
+        for other in ("http://169.254.169.254/", "https://evil.example/a.png", "https://cdn.example.com/b.png"):
+            self.assertEqual(self.url_open(self.url(other)).status_code, 404, other)
+        self.assertEqual(self.url_open("/dwo_attpreview_text/remote_image?attachment_id=%d" % self.att.id).status_code, 404)
+
+    def test_03_refusals_give_a_reason(self):
+        self.authenticate("admin", "admin")
+        res = self.url_open(self.url("https://cdn.example.com/run.sh"))
+        self.assertEqual((res.status_code, res.text), (422, "not a picture"), "a script is refused, with the reason")
+        res = self.url_open(self.url("http://plain.example.com/h.png"))
+        self.assertEqual((res.status_code, res.text), (422, "scheme not allowed"))
+        self.assertEqual(self.fetched, [])
+
+    def test_04_access_of_the_file(self):
+        from odoo.tests import new_test_user
+        new_test_user(self.env, login="dwo_text_portal", password="dwo_text_portal", groups="base.group_portal")
+        self.authenticate("dwo_text_portal", "dwo_text_portal")
+        self.assertEqual(self.url_open(self.url("https://cdn.example.com/a.png")).status_code, 404)
+        self.assertEqual(self.fetched, [])

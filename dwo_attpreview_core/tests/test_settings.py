@@ -32,7 +32,7 @@ class TestAttPreviewSettings(TransactionCase):
         # the fields of the Core, plus the own settings an engine module may add to the app (dwo_attpreview_<engine>_...)
         self.assertEqual(names & SETTINGS_FIELDS, SETTINGS_FIELDS)
         extra = names - SETTINGS_FIELDS
-        self.assertFalse([n for n in extra if not n.startswith(("dwo_attpreview_mail_", "dwo_attpreview_office_", "dwo_attpreview_max_mb_"))], extra)
+        self.assertFalse([n for n in extra if not n.startswith(("dwo_attpreview_mail_", "dwo_attpreview_text_", "dwo_attpreview_office_", "dwo_attpreview_max_mb_"))], extra)
         self.assertEqual(app.xpath(".//button"), [], "no button (Clear cache, Manage engines) any more")
         widgets = {f.get("name"): f.get("widget") for f in app.iter("field")}
         for name in ("module_dwo_attpreview_office", "module_dwo_attpreview_mail", "module_dwo_attpreview_archive",

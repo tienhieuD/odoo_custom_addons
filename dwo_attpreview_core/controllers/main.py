@@ -10,6 +10,8 @@ from odoo.exceptions import AccessError, MissingError, UserError
 from odoo.http import request
 from odoo.tools.mimetypes import guess_mimetype
 
+from .. import remote_image
+
 _logger = logging.getLogger(__name__)
 
 NATIVE_MIMES = (
@@ -24,6 +26,27 @@ SOURCE_KEYS = ("attachment_id", "model", "res_id", "field", "filename_field")
 
 
 class AttPreviewController(http.Controller):
+
+    @staticmethod
+    def _dwo_picture_response(url, https_only, label=""):
+        """The clean picture at ``url`` fetched by the server (the image proxy of the Mail and Text previews), as a
+        response. A refused or failed picture answers ``422`` with the short reason as plain text (the viewer shows
+        it), so the user sees why a picture is missing instead of an empty frame."""
+        try:
+            data, mimetype = remote_image.cached_picture(url, https_only)
+        except remote_image.RemoteImageError as e:
+            _logger.info("Preview: remote picture of %s not loaded (%s)", label, e)
+            response = request.make_response(str(e), headers=[
+                ("Content-Type", "text/plain; charset=utf-8"), ("X-Content-Type-Options", "nosniff"),
+                ("Cache-Control", "no-store")])
+            response.status_code = 422
+            return response
+        stream = http.Stream(type="data", data=data, mimetype=mimetype, size=len(data), etag=False,
+                             max_age=3600, as_attachment=False)
+        response = stream.get_response()
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
 
     def _get_attachment(self, attachment_id):
         att = request.env["ir.attachment"].browse(int(attachment_id))

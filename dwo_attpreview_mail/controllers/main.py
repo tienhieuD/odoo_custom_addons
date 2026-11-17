@@ -8,8 +8,6 @@ from odoo.http import request
 
 from odoo.addons.dwo_attpreview_core.controllers.main import SOURCE_KEYS, AttPreviewController
 
-from ..parsers import remote
-
 _logger = logging.getLogger(__name__)
 PARAM_AUTO = "dwo_attpreview_mail.remote_images"
 PARAM_HTTPS = "dwo_attpreview_mail.remote_https_only"
@@ -54,13 +52,4 @@ class MailPreviewController(AttPreviewController):
             urls = []
         if not 0 <= index < len(urls):
             raise request.not_found()
-        try:
-            data, mimetype = remote.cached_picture(urls[index], self._dwo_mail_settings()["https_only"])
-        except remote.RemoteImageError as e:
-            _logger.info("Email preview: remote picture %s of %s not loaded (%s)", index, name, e)
-            raise request.not_found()
-        stream = http.Stream(type="data", data=data, mimetype=mimetype, size=len(data), etag=False,
-                             max_age=3600, as_attachment=False)
-        response = stream.get_response()
-        response.headers["Referrer-Policy"] = "no-referrer"
-        return response
+        return self._dwo_picture_response(urls[index], self._dwo_mail_settings()["https_only"], name)

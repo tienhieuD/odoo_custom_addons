@@ -39,18 +39,22 @@ registry.category("web_tour.tours").add("dwo_attpreview_mail_tour", {
             },
         },
         {
-            content: "Body frame: no script, no same origin, CSP without network",
+            content: "Body frame: only the link script (nonce), no same origin, no popups, CSP without network",
             trigger: ".modal iframe.o_dwo_mail_body",
             run() {
                 const sandbox = this.anchor.getAttribute("sandbox") || "";
-                if (sandbox.includes("allow-scripts") || sandbox.includes("allow-same-origin")) {
+                if (sandbox.includes("allow-same-origin") || sandbox.includes("allow-popups") || sandbox.includes("allow-top-navigation")) {
                     throw new Error("unsafe sandbox: " + sandbox);
                 }
                 const doc = this.anchor.getAttribute("srcdoc") || "";
                 if (!doc.includes("Content-Security-Policy") || !doc.includes("default-src 'none'")) {
                     throw new Error("no CSP in the body frame");
                 }
-                if (doc.includes("<script") || doc.includes("evil.example")) {
+                const scripts = doc.match(/<script\b[^>]*>/g) || [];
+                if (scripts.length !== 1 || !/nonce="[A-Za-z0-9]{16,}"/.test(scripts[0]) || !/script-src 'nonce-/.test(doc)) {
+                    throw new Error("the frame must have exactly one script, allowed by a nonce");
+                }
+                if (doc.includes("alert(") || doc.includes("evil.example")) {
                     throw new Error("unsafe content in the body frame");
                 }
             },
