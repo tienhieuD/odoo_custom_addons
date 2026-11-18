@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_dwo" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.dwo.session</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Secure Session" string="Secure Session" name="dwo_session_security" groups="base.group_system">
+                    <block title="General" name="dwo_general">
+                        <setting string="Session security" help="Master switch. Switch it off to disable every rule of the module at once (rescue: set the system parameter dwo_session.enabled to 0).">
+                            <field name="dwo_enabled"/>
+                        </setting>
+                    </block>
+                    <block title="Lock screen and time limits" name="dwo_limits" invisible="not dwo_enabled">
+                        <setting string="Lock the screen when idle" help="Users who have a PIN get a lock page after this many minutes without activity. The lock is enforced by the server.">
+                            <field name="dwo_lock_enabled"/>
+                            <div class="mt-2" invisible="not dwo_lock_enabled">
+                                <field name="dwo_lock_after_min" class="oe_inline"/> minutes
+                            </div>
+                        </setting>
+                        <setting string="Sign out when idle (server side)" help="Minutes without activity before the session ends. 0 = never.">
+                            <field name="dwo_idle_logout_min" class="oe_inline"/> minutes
+                        </setting>
+                        <setting string="Maximum session duration" help="Minutes after the sign-in when the session ends, whatever the activity. 0 = never.">
+                            <field name="dwo_absolute_min" class="oe_inline"/> minutes
+                        </setting>
+                        <setting string="Warn before the session ends" help="A message with a countdown appears before the end of the session.">
+                            <field name="dwo_warn_enabled"/>
+                            <div class="mt-2" invisible="not dwo_warn_enabled">
+                                <field name="dwo_warn_min" class="oe_inline"/> minutes before the end
+                            </div>
+                        </setting>
+                        <setting string="Let users extend the session" help="The warning has an Extend button (only for the maximum duration).">
+                            <field name="dwo_extend_enabled"/>
+                            <div class="mt-2" invisible="not dwo_extend_enabled">
+                                Add <field name="dwo_extend_min" class="oe_inline"/> minutes, at most
+                                <field name="dwo_extend_max" class="oe_inline"/> times
+                            </div>
+                        </setting>
+                        <setting string="Closing the browser ends the session" help="The session cookie is a browser-session cookie and the server watches the heartbeat of the tabs. Chrome option Continue where you left off can keep cookies: see the documentation.">
+                            <field name="dwo_close_browser"/>
+                            <div class="mt-2" invisible="not dwo_close_browser">
+                                Browser counts as closed after <field name="dwo_browser_grace_sec" class="oe_inline"/> seconds without heartbeat
+                            </div>
+                        </setting>
+                        <setting string="Try to save the open form before locking" help="Off by default. The lock often comes when nobody is there: saving would write data nobody confirmed. When off, unsaved changes are lost at the lock; when on, a form that cannot be saved is lost anyway.">
+                            <field name="dwo_save_before_lock"/>
+                        </setting>
+                    </block>
+                    <block title="PIN" name="dwo_pin" invisible="not dwo_enabled">
+                        <setting string="PIN length" help="Users choose their PIN in Preferences, Security tab.">
+                            <field name="dwo_pin_digits"/>
+                        </setting>
+                        <setting string="Wrong PIN limit" help="After 3 wrong PINs in a row the page pauses; after this many, the user is signed out.">
+                            <field name="dwo_pin_max_tries" class="oe_inline"/> tries, pause
+                            <field name="dwo_pin_lock_sec" class="oe_inline"/> seconds
+                        </setting>
+                    </block>
+                    <block title="Forgot the PIN" name="dwo_forgot" invisible="not dwo_enabled">
+                        <setting string="Sign in again (password)" help="Forgot PIN: enter the account password, or sign in again through the login page (SSO, 2FA).">
+                            <field name="dwo_forgot_relogin"/>
+                            <div class="mt-2" invisible="not dwo_forgot_relogin">
+                                <field name="dwo_force_new_pin_after_relogin"/> <label for="dwo_force_new_pin_after_relogin" string="Choose a new PIN afterwards"/>
+                            </div>
+                        </setting>
+                        <setting string="Ask an administrator to reset the PIN" help="The user sends a request to the approvers (toast, email, activity); the old PIN is removed when approved.">
+                            <field name="dwo_forgot_admin"/>
+                            <div class="mt-2" invisible="not dwo_forgot_admin">
+                                At most <field name="dwo_reset_request_limit" class="oe_inline"/> requests per day
+                            </div>
+                        </setting>
+                        <setting string="Email a code" help="A 6-digit code (valid 10 minutes, 3 per hour) is sent to the email of the user, who then chooses a new PIN.">
+                            <field name="dwo_forgot_otp"/>
+                        </setting>
+                        <setting string="Temporary PIN from an administrator" help="Adds the button Temporary PIN on the user form. The user must change it at the first unlock.">
+                            <field name="dwo_forgot_temp"/>
+                        </setting>
+                    </block>
+                    <block title="Session approval" name="dwo_approval" invisible="not dwo_enabled">
+                        <setting string="Require approval of new sessions" help="Users of the group Session security: sign-in needs approval wait on a screen after the sign-in until an approver accepts. Administrators are exempt.">
+                            <field name="dwo_approval_enabled"/>
+                            <div class="mt-2" invisible="not dwo_approval_enabled">
+                                Refuse after <field name="dwo_approval_timeout_min" class="oe_inline"/> minutes
+                            </div>
+                        </setting>
+                        <setting string="Notify the approvers" help="How the approvers learn about a request (approval or PIN reset).">
+                            <div><field name="dwo_notify_toast"/> <label for="dwo_notify_toast" string="Pop-up in Odoo (toast)"/></div>
+                            <div><field name="dwo_notify_email"/> <label for="dwo_notify_email" string="Email"/></div>
+                            <div><field name="dwo_notify_activity"/> <label for="dwo_notify_activity" string="Activity on the request"/></div>
+                        </setting>
+                    </block>
+                    <block title="Log" name="dwo_log" invisible="not dwo_enabled">
+                        <setting string="Keep the log" help="Days the log is kept. 0 = forever.">
+                            <field name="dwo_log_days" class="oe_inline"/> days
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_dwo_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'dwo_session_security', 'bin_size': False}</field>
+    </record>
+    <menuitem id="menu_dwo_settings" name="Settings" parent="menu_dwo_root" action="action_dwo_settings" groups="base.group_system" sequence="40"/>
+</odoo>
