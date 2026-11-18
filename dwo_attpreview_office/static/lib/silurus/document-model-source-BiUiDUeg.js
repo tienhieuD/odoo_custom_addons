@@ -5,14 +5,14 @@ import { n as i } from "./cjk-fallback-CxqXJu32.js";
 import { n as a } from "./renderer-module-contract-BuTx2FWJ.js";
 import { i as o, n as s } from "./resource-debug-D8EBjKbZ.js";
 import { t as c } from "./rejected-load-CS5sDp04.js";
-import { u as l } from "./source-DncDPEPn.js";
-import { t as u } from "./bundled-asset-url-BMJ8vNHP.js";
+import { n as l } from "./bundled-asset-url-Cv8ajMAZ.js";
+import { u } from "./source-GXgH3t1X.js";
 import { t as d } from "./deferred-D2gd0MY2.js";
-import { _ as f, d as p, g as m, h, l as g, t as _, v } from "./document-abbaKFrB.js";
-import { C as y, T as b, a as x, d as S, f as C, g as w, h as T, l as E, o as D, s as O } from "./document-pull-client-DdaEa4hT.js";
+import { _ as f, d as p, g as m, h, l as g, t as _, v } from "./document-CexDucFg.js";
+import { C as y, T as b, a as x, d as S, f as C, g as w, h as T, l as E, o as D, s as O } from "./document-pull-client-DsaDuAP-.js";
 import { i as k, n as A, r as j, s as M } from "./model-source-BwpDCGYU.js";
 function N(e) {
-	let t = u(new URL("./docx-source-worker.mjs", import.meta.url).href, import.meta.url);
+	let t = l(new URL("./docx-source-worker.mjs", import.meta.url).href, import.meta.url);
 	return e.transfer.length > 0 ? {
 		source: e.module,
 		sourceTransfer: e.transfer,
@@ -29,13 +29,13 @@ function P(e, t) {
 	let a = b(i.currentDateMs, r.defaultCurrentDateMs, t);
 	r.activeLayoutOptions = a, e._progressive && (e._progressive.layoutOptions = a);
 }
-async function F(u, k = {}, N) {
+async function F(l, k = {}, N) {
 	let F = N?.signal, L = () => {
 		if (F?.aborted) throw new w();
 	};
 	L();
 	let R = i(k.cjkFallback), z = o(k), B = Date.now(), V = k.mode ?? "main";
-	V === "main" && k.fonts && import("./font-source-load-CCT3ElKw.js").catch(() => void 0);
+	V === "main" && k.fonts && import("./font-source-load-DtHoLLYl.js").catch(() => void 0);
 	let H = new s({
 		enabled: !0,
 		format: "docx",
@@ -47,11 +47,11 @@ async function F(u, k = {}, N) {
 	try {
 		if (V === "worker" && (typeof Worker > "u" || typeof OffscreenCanvas > "u")) throw Error("mode: 'worker' requires Worker and OffscreenCanvas support");
 		let i;
-		if (typeof u == "string") {
-			let e = await fetch(u, { signal: F });
+		if (typeof l == "string") {
+			let e = await fetch(l, { signal: F });
 			if (!e.ok) throw Error(`Failed to fetch: ${e.status} ${e.statusText}`);
 			i = await e.arrayBuffer();
-		} else i = u;
+		} else i = l;
 		L();
 		let o = M(j(k.legacyDoc, k.odt), "docx", new Uint8Array(i));
 		if (!o) return _.load(i, {
@@ -62,10 +62,10 @@ async function F(u, k = {}, N) {
 		let s = A(o, "docx");
 		try {
 			H.setSourceBytes(i.byteLength), H.checkpoint("container ready");
-			let o = V === "worker" ? (await import("./render-worker-host-BX-G4Sw2.js")).createRenderWorker() : new (await (import("./worker-source-Z57e-fLF.js"))).default(), u, A, j = !1, M = () => {
-				j || !u || (j = !0, u.destroy());
+			let o = V === "worker" ? (await import("./render-worker-host-BPvvLDas.js")).createRenderWorker() : new (await (import("./worker-source-Z57e-fLF.js"))).default(), l, A, j = !1, M = () => {
+				j || !l || (j = !0, l.destroy());
 			}, U = I(o, s, k, (e) => {
-				u && P(u, e);
+				l && P(l, e);
 			}), W = V === "worker" ? a(k) : void 0, G = V === "worker" && !!k.progressiveLayout;
 			try {
 				A = Reflect.construct(_, [
@@ -73,9 +73,9 @@ async function F(u, k = {}, N) {
 					V,
 					B,
 					k.wasmUrl
-				]), u = A, F?.addEventListener("abort", M, { once: !0 }), L(), u._metrics = H, u._cjkFallback = R, u._allowFootnoteContinuation = k.allowFootnoteContinuation !== !1;
-				let a = n(u), o = b(k.currentDate, a.defaultCurrentDateMs, k.showTrackedChanges === !0);
-				a.activeLayoutOptions = o, await u._parse(i, z.policy, V === "worker" ? k.fonts : void 0, k.workerTimeoutMs, (e) => H.observeUsage(e), W, G ? {
+				]), l = A, F?.addEventListener("abort", M, { once: !0 }), L(), l._metrics = H, l._cjkFallback = R, l._allowFootnoteContinuation = k.allowFootnoteContinuation !== !1;
+				let a = n(l), o = b(k.currentDate, a.defaultCurrentDateMs, k.showTrackedChanges === !0);
+				a.activeLayoutOptions = o, await l._parse(i, z.policy, V === "worker" ? k.fonts : void 0, k.workerTimeoutMs, (e) => H.observeUsage(e), W, G ? {
 					onPartial: k.onLayoutPartial,
 					onComplete: k.onLayoutComplete,
 					onProgress: k.onLayoutProgress,
@@ -84,14 +84,14 @@ async function F(u, k = {}, N) {
 					firstPublication: d(),
 					published: !1,
 					settled: !1
-				} : void 0), V === "worker" && u._mode === "main" && (H.setMode("main"), console.warn(m(u._mainThreadFallbackReason))), k.math && u._mode === "worker" && !W?.math && console.warn("[ooxml] a custom math renderer cannot cross the worker boundary; equations will be skipped in mode: 'worker'. Use the math renderer from @silurus/ooxml/math."), k.threeD && u._mode === "worker" && !W?.threeD && console.warn("[ooxml] a custom 3-D chart renderer cannot cross the worker boundary; charts use their 2-D family fallback in mode: 'worker'. Use the renderer from @silurus/ooxml/three-d."), u._threeD = u._mode === "worker" ? void 0 : k.threeD, k.regionMap && u._mode === "worker" && !W?.regionMap && console.warn("[ooxml] a custom Region Map renderer cannot cross the worker boundary; geospatial charts use the unsupported-chart placeholder in mode: 'worker'. Use the renderer from @silurus/ooxml/region-map."), u._regionMap = u._mode === "worker" ? void 0 : k.regionMap, k.chartEx && u._mode === "worker" && !W?.chartEx && console.warn("[ooxml] a custom ChartEx renderer cannot cross the worker boundary; ChartEx charts use the unsupported-chart placeholder in mode: 'worker'. Use the renderer from @silurus/ooxml/chart-ex."), u._chartEx = u._mode === "worker" ? void 0 : k.chartEx, k.tiff && u._mode === "worker" && !W?.tiff && console.warn("[ooxml] a custom TIFF codec cannot cross the worker boundary; recognized TIFF images will use an unavailable-image placeholder in mode: 'worker'. Use the codec from @silurus/ooxml/tiff to display them."), u._tiff = u._mode === "worker" ? void 0 : k.tiff;
+				} : void 0), V === "worker" && l._mode === "main" && (H.setMode("main"), console.warn(m(l._mainThreadFallbackReason))), k.math && l._mode === "worker" && !W?.math && console.warn("[ooxml] a custom math renderer cannot cross the worker boundary; equations will be skipped in mode: 'worker'. Use the math renderer from @silurus/ooxml/math."), k.threeD && l._mode === "worker" && !W?.threeD && console.warn("[ooxml] a custom 3-D chart renderer cannot cross the worker boundary; charts use their 2-D family fallback in mode: 'worker'. Use the renderer from @silurus/ooxml/three-d."), l._threeD = l._mode === "worker" ? void 0 : k.threeD, k.regionMap && l._mode === "worker" && !W?.regionMap && console.warn("[ooxml] a custom Region Map renderer cannot cross the worker boundary; geospatial charts use the unsupported-chart placeholder in mode: 'worker'. Use the renderer from @silurus/ooxml/region-map."), l._regionMap = l._mode === "worker" ? void 0 : k.regionMap, k.chartEx && l._mode === "worker" && !W?.chartEx && console.warn("[ooxml] a custom ChartEx renderer cannot cross the worker boundary; ChartEx charts use the unsupported-chart placeholder in mode: 'worker'. Use the renderer from @silurus/ooxml/chart-ex."), l._chartEx = l._mode === "worker" ? void 0 : k.chartEx, k.tiff && l._mode === "worker" && !W?.tiff && console.warn("[ooxml] a custom TIFF codec cannot cross the worker boundary; recognized TIFF images will use an unavailable-image placeholder in mode: 'worker'. Use the codec from @silurus/ooxml/tiff to display them."), l._tiff = l._mode === "worker" ? void 0 : k.tiff;
 				let c, j;
-				if (u._mode === "main" && u._document?.embeddedFonts?.length) {
-					let t = u, n = await h(u._document, (e) => t.getFontBytes(e));
+				if (l._mode === "main" && l._document?.embeddedFonts?.length) {
+					let t = l, n = await h(l._document, (e) => t.getFontBytes(e));
 					if (F?.aborted) throw e(n.faces), new w();
-					f(u, n.diagnostics), u._embeddedFontFaces = n.faces, c = n.metrics, j = n.routes;
+					f(l, n.diagnostics), l._embeddedFontFaces = n.faces, c = n.metrics, j = n.routes;
 				}
-				let P = u._mode === "main" && u._document ? await v(C(u._document, {
+				let P = l._mode === "main" && l._document ? await v(C(l._document, {
 					fontDemand: !!k.fonts,
 					cjkFallback: R
 				}).filter((e) => e.presenceOnly || !j?.some((t) => t.requestedFamily.toLowerCase() === e.family.toLowerCase() && t.weight === (e.weight ?? 400) && t.style === (e.style ?? "normal")))) : {
@@ -99,13 +99,13 @@ async function F(u, k = {}, N) {
 					routes: {}
 				};
 				if (F?.aborted) throw t(P.faces), new w();
-				u._officeFontFaces = P.faces;
-				let { installedSubstituteFamilies: I, sourceFonts: K } = await u._loadFontSources(k.fonts, R, P, F), q;
-				if (u._mode === "main" && k.math && u._document && D(u._document) && (q = await O(u._document, k.math)), L(), u._mode === "main" && u._document && u._source) {
-					let e = u, i = n(u), a = {
-						allowFootnoteContinuation: u._allowFootnoteContinuation,
+				l._officeFontFaces = P.faces;
+				let { installedSubstituteFamilies: I, sourceFonts: K } = await l._loadFontSources(k.fonts, R, P, F), q;
+				if (l._mode === "main" && k.math && l._document && D(l._document) && (q = await O(l._document, k.math)), L(), l._mode === "main" && l._document && l._source) {
+					let e = l, i = n(l), a = {
+						allowFootnoteContinuation: l._allowFootnoteContinuation,
 						fontMetrics: c,
-						fontSubstitutes: r(l(k.fonts)),
+						fontSubstitutes: r(u(k.fonts)),
 						cjkFallback: R,
 						embeddedRoutes: j,
 						officeRoutes: Object.values(P.routes),
@@ -114,25 +114,25 @@ async function F(u, k = {}, N) {
 						installedFamilies: "installed" in P ? P.installed : void 0,
 						mathResources: q?.records,
 						mathDrawables: q?.drawables
-					}, o = await S(u._source, u._document, {
-						fontSubstitutes: r(l(k.fonts)),
+					}, o = await S(l._source, l._document, {
+						fontSubstitutes: r(u(k.fonts)),
 						cjkFallback: R
 					});
 					if (F?.aborted) throw t(o.faces), new w();
-					u._officeFontFaces = [...u._officeFontFaces, ...o.faces], i.services = E(u._source, {
+					l._officeFontFaces = [...l._officeFontFaces, ...o.faces], i.services = E(l._source, {
 						...a,
 						nativeRouteMetrics: o.nativeRouteMetrics
 					});
-					let s = i.services, f = y(u._source, F);
+					let s = i.services, f = y(l._source, F);
 					f && await f;
-					let m = x(u._source, s, i.defaultCurrentDateMs), h = u._source.fatalParse === null, _ = i.activeLayoutOptions;
+					let m = x(l._source, s, i.defaultCurrentDateMs), h = l._source.fatalParse === null, _ = i.activeLayoutOptions;
 					if (!_) throw Error("Active layout view was not recorded at load");
 					let v = { onProgress: k.onLayoutProgress ? (t) => e._layoutObservers.notify("onLayoutProgress", k.onLayoutProgress, { committedUnits: t }) : void 0 };
 					if (h && k.progressiveLayout) {
-						let e = m.layoutVariants, t = u, n = new AbortController();
+						let e = m.layoutVariants, t = l, n = new AbortController();
 						t._layoutAbort = n;
 						let r = d(), i = null, a = !0;
-						t._layoutCompletion = p(u._source.bodyLayoutInput, s, _, {
+						t._layoutCompletion = p(l._source.bodyLayoutInput, s, _, {
 							scheduler: {
 								...v,
 								signal: n.signal
@@ -192,9 +192,9 @@ async function F(u, k = {}, N) {
 							let e = N.requestedView();
 							r || e === void 0 || e === !0 == (t.showTrackedChanges === !0) || (r = !0, n.abort());
 						});
-						u._layoutAbort = n;
+						l._layoutAbort = n;
 						try {
-							let e = await T(u._source.bodyLayoutInput, s, t, {
+							let e = await T(l._source.bodyLayoutInput, s, t, {
 								...v,
 								signal: n.signal
 							});
@@ -205,14 +205,14 @@ async function F(u, k = {}, N) {
 							if (e instanceof w && r && !F?.aborted) continue;
 							throw e;
 						} finally {
-							a?.(), u._layoutAbort = null;
+							a?.(), l._layoutAbort = null;
 						}
 					}
 					else m.layoutVariants.layoutFor(_);
 				}
-				return L(), await u._resourceUsage(k.workerTimeoutMs ?? 1e3).then((e) => H.observeUsage(e), () => void 0), H.checkpoint("model and layout ready"), L(), H.succeed({ pages: u.pageCount }), s.release(), A;
+				return L(), await l._resourceUsage(k.workerTimeoutMs ?? 1e3).then((e) => H.observeUsage(e), () => void 0), H.checkpoint("model and layout ready"), L(), H.succeed({ pages: l.pageCount }), s.release(), A;
 			} catch (e) {
-				throw c(o, u ? M : void 0), e;
+				throw c(o, l ? M : void 0), e;
 			} finally {
 				F?.removeEventListener("abort", M);
 			}

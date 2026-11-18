@@ -1,4 +1,4 @@
-import { n as e, r as t, t as n } from "./odf-source-CcsC38G5.js";
+import { n as e, r as t, t as n } from "./odf-source-Cee46vyi.js";
 //#region src/wasm-ods/opendocument_ods_bg.wasm?url
 var r = new URL("opendocument_ods_bg.wasm", import.meta.url).href, i = new URL("ods-source-module.mjs", import.meta.url).href;
 //#endregion

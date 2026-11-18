@@ -1,6 +1,6 @@
 import { t as e } from "./font-registry-CA7E7o7P.js";
-import { a as t, r as n, s as r, t as i } from "./resolver-failures-CpaXQWU6.js";
-import { a, o, r as s, t as c } from "./face-download-BHdh7H0H.js";
+import { a as t, r as n, s as r, t as i } from "./resolver-failures-0-_PZr5v.js";
+import { a, o, r as s, t as c } from "./face-download-BGnp7NTs.js";
 import { n as l, t as u } from "./resolver-bridge-messages-DyLfptik.js";
 var d = (e) => typeof e == "number" && Number.isSafeInteger(e) && e >= 0, f = class {
 	options;
@@ -144,7 +144,7 @@ var d = (e) => typeof e == "number" && Number.isSafeInteger(e) && e >= 0, f = cl
 		});
 	}
 	ensureResponder(e) {
-		return this.responder ??= (e.loadResponder ?? (() => import("./resolver-bridge-responder-CecT57lE.js")))().then(({ FontResolverResponder: t }) => this.disposed || !this.options?.sources ? null : new t({
+		return this.responder ??= (e.loadResponder ?? (() => import("./resolver-bridge-responder-BEe__NxL.js")))().then(({ FontResolverResponder: t }) => this.disposed || !this.options?.sources ? null : new t({
 			post: e.post,
 			sources: e.sources ?? [],
 			resolverFailures: this.failures

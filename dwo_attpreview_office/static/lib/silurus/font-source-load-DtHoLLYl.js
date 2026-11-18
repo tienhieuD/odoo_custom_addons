@@ -9,7 +9,7 @@ import { t as x } from "./open-type-metrics-BlHDsmjh.js";
 import { t as S } from "./cjk-fallback-CxqXJu32.js";
 import { t as ae } from "./symbol-font-Cf7Xu0_f.js";
 import { t as oe } from "./unicode-range-CD3UJT9S.js";
-import { n as se, t as ce } from "./metafile-font-demand-Chgq_8Lm.js";
+import { n as se, t as ce } from "./metafile-font-demand-CmEiy4lu.js";
 import { t as le } from "./chart-font-sources-B96UtO2E.js";
 import { t as ue } from "./scalar-demand-bzQ71V_C.js";
 import { t as de } from "./chart-paint-texts-C9chlISz.js";

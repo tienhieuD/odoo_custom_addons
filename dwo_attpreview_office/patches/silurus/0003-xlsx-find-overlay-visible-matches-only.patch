@@ -1,11 +1,11 @@
 From: Duotek
 Subject: [PATCH 0003] xlsx find: highlight only the visible matches, append the boxes at once
 
-@silurus/ooxml 0.90.0 (dist/xlsx-27RIKj9U.js, class of the XLSX find overlay, updateOverlay()). After a search,
+@silurus/ooxml 0.90.1 (dist/xlsx-CW8XwM_M.js, class of the XLSX find overlay, updateOverlay()). After a search,
 every match of the current sheet got an absolutely positioned <div>, appended one by one, and cellRect() reads the
 layout (canvasArea.clientWidth) for each match: the browser recomputes the layout after every append, so the time
 grows with the square of the match count (11,112 matches in a 100,000-row sheet: 70 s for findText, 37 s more for
-findNext; 100,000 matches: the page hangs; measured on 0.89.11, the code is the same in 0.90.0). The overlay is
+findNext; 100,000 matches: the page hangs; measured on 0.89.11, the code is the same in 0.90.1). The overlay is
 rebuilt on every scroll as well.
 The patch skips the matches outside the visible area (no box; their cell is not drawn anyway) and appends the boxes
 through one DocumentFragment. Measured after the patch on 0.89.11: 11,112 matches 1.1 s, 100,000 matches 1.0 s.
@@ -13,12 +13,12 @@ The new local names start with "dwo" so they cannot shadow a minified name of th
 Apply from static/lib/silurus/ with: patch -p1 < 0003-...patch   (paths below are a/ b/ relative)
 
 ---
---- a/xlsx-27RIKj9U.js
-+++ b/xlsx-27RIKj9U.js
-@@ -3078,14 +3078,18 @@
+--- a/xlsx-CW8XwM_M.js
++++ b/xlsx-CW8XwM_M.js
+@@ -3079,14 +3079,18 @@
  		let t = this.host.worksheet();
  		if (!t) return;
- 		let n = this.host.scale(), r = (e) => Math.round(e * n), i = r(50), a = r(22), o = t.freezeRows ?? 0, s = t.freezeCols ?? 0, c = F(t).roundedFrozenExtent(n), l = i + c.width, u = a + c.height, d = this.host.highlightColors(), f = zi(!1, d), p = zi(!0, d);
+ 		let n = this.host.scale(), r = (e) => Math.round(e * n), i = r(50), a = r(22), o = t.freezeRows ?? 0, s = t.freezeCols ?? 0, c = F(t).roundedFrozenExtent(n), l = i + c.width, u = a + c.height, d = this.host.highlightColors(), f = Bi(!1, d), p = Bi(!0, d);
 +		// [dwo patch 0003] only the cells inside the visible area get a highlight box, and the boxes are appended at once
 +		// (appending one by one while cellRect() reads the layout made thousands of matches quadratic: minutes).
 +		let dwoW = e.find.clientWidth || Infinity, dwoH = e.find.clientHeight || Infinity, dwoFrag = this.host.ownerDocument.createDocumentFragment();

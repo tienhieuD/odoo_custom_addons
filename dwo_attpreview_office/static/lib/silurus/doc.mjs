@@ -1,4 +1,4 @@
-import { n as e, r as t, t as n } from "./legacy-source-CFRuXN53.js";
+import { n as e, r as t, t as n } from "./legacy-source-DmlTJjiH.js";
 //#region src/wasm-direct-doc/legacy_doc_direct_bg.wasm?url
 var r = new URL("legacy_doc_direct_bg.wasm", import.meta.url).href, i = new URL("legacy-doc-source-module.mjs", import.meta.url).href;
 //#endregion

@@ -2,7 +2,7 @@ import { n as e } from "./substitutions-_KDT_mVq.js";
 import { c as t } from "./resource-policy.generated-D_HlV2Rm.js";
 import { t as n } from "./abort-JztSoyw2.js";
 import { t as r } from "./font-source-limit-sNrowgTE.js";
-import { n as i } from "./source-DncDPEPn.js";
+import { n as i } from "./source-GXgH3t1X.js";
 function a(e, t) {
 	let n = /* @__PURE__ */ new Map(), r = 0;
 	return (i) => {

@@ -16,11 +16,11 @@ It replaces the old server-side engines `dwo_attpreview_word`, `dwo_attpreview_s
 | | |
 |---|---|
 | Library | `@silurus/ooxml` (Office Open XML viewer, Rust/WebAssembly parser + Canvas renderer) |
-| Version (pinned) | **0.90.0** (stock npm build) **+ local patch 0003** (XLSX search highlight speed). See `docs/SILURUS_PATCHES.md` and `patches/silurus/` |
+| Version (pinned) | **0.90.1** (stock npm build) **+ local patch 0003** (XLSX search highlight speed). See `docs/SILURUS_PATCHES.md` and `patches/silurus/` |
 | License | MIT (c) 2026 Yuki Yokotani, see `static/lib/silurus/LICENSE` |
 | Third-party notices | `static/lib/silurus/THIRD_PARTY_NOTICES.md` |
-| Legacy add-on | `@silurus/ooxml-legacy-office` 0.90.0 (MIT, same author) for `doc`, `xls`, `ppt`, with local patch 0002 (relative import). Licence `static/lib/silurus/LICENSE.ooxml-legacy-office`, notices `THIRD_PARTY_NOTICES.ooxml-legacy-office.md`. Must be upgraded together with the main library: see `docs/SILURUS_PATCHES.md` |
-| OpenDocument add-on | `@silurus/ooxml-opendocument` 0.90.0 (MIT, same author) for `odt`, `ods`, `odp` and their templates, with the same local patch 0002. Licence `static/lib/silurus/LICENSE.ooxml-opendocument`, notices `THIRD_PARTY_NOTICES.ooxml-opendocument.md`. Same version as the main library |
+| Legacy add-on | `@silurus/ooxml-legacy-office` 0.90.1 (MIT, same author) for `doc`, `xls`, `ppt`, with local patch 0002 (relative import). Licence `static/lib/silurus/LICENSE.ooxml-legacy-office`, notices `THIRD_PARTY_NOTICES.ooxml-legacy-office.md`. Must be upgraded together with the main library: see `docs/SILURUS_PATCHES.md` |
+| OpenDocument add-on | `@silurus/ooxml-opendocument` 0.90.1 (MIT, same author) for `odt`, `ods`, `odp` and their templates, with the same local patch 0002. Licence `static/lib/silurus/LICENSE.ooxml-opendocument`, notices `THIRD_PARTY_NOTICES.ooxml-opendocument.md`. Same version as the main library |
 | Home | https://ooxml.silurus.dev |
 
 Only the files the viewers need are shipped (the `dist` folders without type definitions and without the unused entry points). The library carries local patches 0002 (add-on import) and 0003 (XLSX search highlight); the former patch 0001 (XLSX connectors) is merged upstream since 0.90.0: see `docs/SILURUS_PATCHES.md`.

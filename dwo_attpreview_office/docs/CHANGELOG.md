@@ -1,5 +1,17 @@
 # CHANGELOG - dwo_attpreview_office
 
+## 2026-11-18 - 20.0.1.1.1 - silurus 0.90.1 (#94)
+
+**Library:** `@silurus/ooxml`, `@silurus/ooxml-legacy-office`, `@silurus/ooxml-opendocument` 0.90.0 -> **0.90.1** (compatible
+patch release, no migration). Fixes for the customer: Word tables without rows (`w:tbl` without `w:tr`, common in
+template-generated files) no longer fail with "Document page budget exceeded"; page/column breaks in header, footer,
+footnote and endnote no longer give "Unsupported story block"; relative `wasmUrl` resolves against `document.baseURI`.
+Patches `0002` (relative companion import) and `0003` (xlsx search highlight) re-applied by hand on the new hashed chunks
+(`legacy-source-DmlTJjiH.js`, `odf-source-Cee46vyi.js`, `xlsx-CW8XwM_M.js`); patch files regenerated; the stock
+`internal-companion.mjs` already says 0.90.1. `static/lib/silurus/` replaced whole (153 files + 6 licence/notice files,
+about 25 MB). No code, field, view or migration change. `tests/test_engine.py` (`test_03`) uses the new chunk names.
+Details: `docs/SILURUS_PATCHES.md`.
+
 ## 2026-11-16 - 20.0.1.1.0 - silurus 0.90.0, OpenDocument (ODT, ODS, ODP) (#84)
 
 20.0 port of 19.0.1.1.0 (same behaviour; see `dwo_attpreview_core/docs/PORTING.md`, "#84").
