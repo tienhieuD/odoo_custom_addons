@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<odoo>
+    <!-- The announcement; its HTML is sanitized by the module (tools.sanitize_notice), at save and at render time -->
+    <template id="notice" name="Login announcement">
+        <t t-set="notice" t-value="request.env['dwo.login.theme'].sudo().get_context().get('notice') if (request and request.db) else None"/>
+        <div t-if="notice" t-attf-class="dwo_notice dwo_notice_#{notice['kind']} dwo_notice_pos_#{notice['pos']}" role="note"
+             t-att-data-dwo-notice="notice['key']">
+            <div class="dwo_notice_body"><t t-out="notice['html']"/></div>
+            <button t-if="notice['dismiss']" type="button" class="dwo_notice_close" aria-label="Close">&#215;</button>
+        </div>
+    </template>
+
+    <!-- Only the look of the standard layout changes: classes, a background layer, an intro panel, text. The card,
+         the logo block, the slot of the form (t-out 0) and the footer links of Odoo stay where they are. -->
+    <template id="login_layout" inherit_id="web.login_layout" name="Login page themes">
+        <xpath expr="//t[@t-call='web.frontend_layout']" position="before">
+            <t t-set="dwo" t-value="request.env['dwo.login.theme'].sudo().get_context() if (request and request.db) else {}"/>
+        </xpath>
+        <xpath expr="//div[hasclass('container')]" position="attributes">
+            <attribute name="t-attf-class">container py-5 {{ dwo.get('root_class') or '' }}</attribute>
+            <attribute name="t-att-data-dwo-title">dwo.get('page_title') or None</attribute>
+            <attribute name="t-att-data-dwo-favicon">dwo.get('favicon_url') or None</attribute>
+            <attribute name="t-att-data-dwo-pwd">'1' if dwo.get('pwd_toggle') else None</attribute>
+        </xpath>
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]" position="before">
+            <t t-if="dwo.get('theme')">
+                <t t-out="dwo['style']"/>
+                <div t-attf-class="dwo_bg #{'dwo_bg_multi' if len(dwo['images']) &gt; 1 else ''}" aria-hidden="true">
+                    <div t-foreach="dwo['images']" t-as="dwo_img" class="dwo_bg_img"
+                         t-attf-style="background-image:url('#{dwo_img}');--dwo-i:#{dwo_img_index}"/>
+                </div>
+                <div class="dwo_aside" t-if="dwo['intro_title'] or dwo['intro_items']">
+                    <h2 class="dwo_aside_title" t-if="dwo['intro_title']" t-out="dwo['intro_title']"/>
+                    <ul class="dwo_aside_list" t-if="dwo['intro_items']">
+                        <li t-foreach="dwo['intro_items']" t-as="dwo_item" t-out="dwo_item"/>
+                    </ul>
+                </div>
+            </t>
+            <t t-if="dwo.get('notice') and dwo['notice']['pos'] == 'top' and not dwo.get('form_page')">
+                <t t-call="dwo_login_themes.notice"/>
+            </t>
+        </xpath>
+        <xpath expr="//img[contains(@t-attf-src, 'company_logo')]" position="attributes">
+            <attribute name="t-attf-src">{{ dwo.get('logo_url') or ('/web/binary/company_logo' + ('?dbname=' + db if db else '')) }}</attribute>
+        </xpath>
+        <xpath expr="//t[@t-out='0']" position="before">
+            <div class="dwo_welcome" t-if="dwo.get('theme') and (dwo.get('welcome_title') or dwo.get('welcome_text'))">
+                <h2 class="dwo_welcome_title" t-if="dwo.get('welcome_title')" t-out="dwo['welcome_title']"/>
+                <p class="dwo_welcome_text" t-if="dwo.get('welcome_text')" t-out="dwo['welcome_text']"/>
+            </div>
+            <t t-if="dwo.get('notice') and dwo['notice']['pos'] == 'above' and not dwo.get('form_page')">
+                <t t-call="dwo_login_themes.notice"/>
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-out='0']" position="after">
+            <t t-if="dwo.get('notice') and dwo['notice']['pos'] == 'below' and not dwo.get('form_page')">
+                <t t-call="dwo_login_themes.notice"/>
+            </t>
+        </xpath>
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]" position="after">
+            <div class="dwo_footer" t-if="dwo.get('theme') and dwo.get('footer_text')" t-out="dwo['footer_text']"/>
+        </xpath>
+    </template>
+
+    <!-- The login form page draws the announcement itself, inside the slot of the layout: it then also shows when the
+         Website app replaces the standard layout. The other pages that use the layout (reset password, sign up) get it
+         from the layout, above. -->
+    <template id="login" inherit_id="web.login" name="Login announcement">
+        <xpath expr="//form[@role='form']" position="before">
+            <t t-set="dwo_n" t-value="request.env['dwo.login.theme'].sudo().get_context().get('notice') if (request and request.db) else None"/>
+            <t t-if="dwo_n and dwo_n['pos'] in ('above', 'top')">
+                <t t-call="dwo_login_themes.notice"/>
+            </t>
+        </xpath>
+        <xpath expr="//form[@role='form']" position="after">
+            <t t-set="dwo_n" t-value="request.env['dwo.login.theme'].sudo().get_context().get('notice') if (request and request.db) else None"/>
+            <t t-if="dwo_n and dwo_n['pos'] == 'below'">
+                <t t-call="dwo_login_themes.notice"/>
+            </t>
+        </xpath>
+    </template>
+</odoo>

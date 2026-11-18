@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.dwo.login.themes</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Login Page Themes" name="dwo_login_themes" groups="base.group_system">
+                    <block title="Login page layout">
+                        <setting string="Apply the theme" help="Switch it off to show the standard login page of Odoo again. The form, the buttons and the other sign-in options of Odoo never change: only the look does.">
+                            <field name="dwo_login_enabled"/>
+                        </setting>
+                        <div class="o_dwo_login_wide">
+                            <div class="o_dwo_login_title">Pick a layout</div>
+                            <div class="o_dwo_login_tiles">
+                                <field name="dwo_login_layout" widget="radio" nolabel="1"/>
+                            </div>
+                        </div>
+                    </block>
+                    <block title="Colours">
+                        <div class="o_dwo_login_wide">
+                            <div class="o_dwo_login_title">Colour preset (one click)</div>
+                            <div class="o_dwo_login_presets">
+                                <field name="dwo_login_preset" widget="radio" nolabel="1"/>
+                            </div>
+                        </div>
+                        <setting string="Main colour" help="Links and the highlight of the fields.">
+                            <field name="dwo_login_primary" widget="color"/>
+                        </setting>
+                        <setting string="Button colour" help="The Log in button.">
+                            <field name="dwo_login_button" widget="color"/>
+                        </setting>
+                        <setting string="Text colour" help="Text on the form card.">
+                            <field name="dwo_login_text" widget="color"/>
+                        </setting>
+                        <setting string="Form card colour" help="Background of the form card.">
+                            <field name="dwo_login_card_bg" widget="color"/>
+                        </setting>
+                    </block>
+                    <block title="Background">
+                        <setting string="Background" help="A bundled image, your own image, a solid colour or a gradient.">
+                            <field name="dwo_login_bg_type" widget="radio" nolabel="1"/>
+                        </setting>
+                        <setting string="Dark overlay and blur" help="Make the image calmer so the form is easy to read.">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_overlay"/> %</div>
+                                <div class="mt8"><field name="dwo_login_blur"/> px blur</div>
+                            </div>
+                        </setting>
+                        <div class="o_dwo_login_wide" invisible="dwo_login_bg_type != 'gallery'">
+                            <div class="o_dwo_login_title">Bundled images (free, made by DuoTEK)</div>
+                            <div class="o_dwo_login_thumbs">
+                                <field name="dwo_login_bg_image" widget="radio" nolabel="1"/>
+                            </div>
+                        </div>
+                        <setting string="Image rotation" help="Choose the image yourself, or let the login page change it. The server clock and the time zone of the main company decide the time of day." invisible="dwo_login_bg_type != 'gallery'">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_bg_mode"/></div>
+                                <div class="mt8" invisible="dwo_login_bg_mode in ('single', 'timeofday')"><field name="dwo_login_bg_pool"/></div>
+                            </div>
+                        </setting>
+                        <setting string="My background image" help="JPEG, PNG or WebP, up to 6 MB. It is checked and recompressed (at most 1920 px wide) to keep the login page light." invisible="dwo_login_bg_type != 'upload'">
+                            <field name="dwo_login_bg_upload" widget="image" options="{'size': [320, 180]}"/>
+                        </setting>
+                        <setting string="Solid colour" invisible="dwo_login_bg_type != 'color'">
+                            <field name="dwo_login_bg_color" widget="color"/>
+                        </setting>
+                        <setting string="Gradient" invisible="dwo_login_bg_type != 'gradient'">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_bg_grad_from" widget="color"/> from</div>
+                                <div class="mt8"><field name="dwo_login_bg_grad_to" widget="color"/> to</div>
+                                <div class="mt8"><field name="dwo_login_bg_grad_angle"/> degrees</div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Logo, texts and tab">
+                        <setting string="Logo of the login form" help="Default: the logo of the company. JPEG, PNG or WebP; a transparent PNG or WebP works best.">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_logo_upload" widget="image" options="{'size': [200, 100]}"/></div>
+                                <div class="mt8"><field name="dwo_login_logo_size"/></div>
+                            </div>
+                        </setting>
+                        <setting string="Welcome text" help="Shown under the logo.">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_welcome_title" placeholder="Welcome back"/></div>
+                                <div class="mt8"><field name="dwo_login_welcome_text" placeholder="Sign in to continue"/></div>
+                            </div>
+                        </setting>
+                        <setting string="Intro panel" help="A title and up to six points beside the form. It appears in the split, side column and intro panel layouts.">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_intro_title" placeholder="Everything in one place"/></div>
+                                <div class="mt8"><field name="dwo_login_intro_items" placeholder="One point per line"/></div>
+                            </div>
+                        </setting>
+                        <setting string="Footer text" help="A line of text at the bottom of the page, for example your company name.">
+                            <field name="dwo_login_footer_text"/>
+                        </setting>
+                        <setting string="Browser tab" help="The title and the icon of the browser tab on the login page.">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_page_title" placeholder="My Company - Sign in"/></div>
+                                <div class="mt8"><field name="dwo_login_favicon_upload" widget="image" options="{'size': [64, 64]}"/></div>
+                            </div>
+                        </setting>
+                        <setting string="Show / hide password" help="A small eye button in the password field, when Odoo does not already have one.">
+                            <field name="dwo_login_pwd_toggle"/>
+                        </setting>
+                    </block>
+                    <block title="Login announcement" help="A message that stays on the login page for everybody, signed in or not. The HTML is cleaned when you save and again every time the page is shown: only simple text tags and http, https and mailto links are kept; scripts, forms, frames and images are removed.">
+                        <setting string="Show the announcement" help="It is hidden when this is off, when the text is empty or outside the dates below.">
+                            <field name="dwo_login_ann_enabled"/>
+                        </setting>
+                        <setting string="Kind and position">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_ann_kind"/></div>
+                                <div class="mt8"><field name="dwo_login_ann_pos"/></div>
+                            </div>
+                        </setting>
+                        <setting string="Visitors can close it" help="A close button; the browser remembers it until the text changes.">
+                            <field name="dwo_login_ann_dismiss"/>
+                        </setting>
+                        <setting string="Show between" help="Leave empty to show it all the time.">
+                            <div class="content-group">
+                                <div class="mt8"><field name="dwo_login_ann_start" placeholder="From (date and time)"/></div>
+                                <div class="mt8"><field name="dwo_login_ann_end" placeholder="Until (date and time)"/></div>
+                            </div>
+                        </setting>
+                        <div class="o_dwo_login_wide">
+                            <div class="o_dwo_login_title">Announcement text (HTML)</div>
+                            <field name="dwo_login_ann_html" nolabel="1" placeholder="&lt;p&gt;&lt;strong&gt;Planned maintenance&lt;/strong&gt; on Sunday from 22:00 to 23:00.&lt;/p&gt;"/>
+                            <div class="o_dwo_login_title mt-3">Preview (what visitors will see)</div>
+                            <div class="o_dwo_login_preview"><field name="dwo_login_ann_preview" nolabel="1"/></div>
+                        </div>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>
