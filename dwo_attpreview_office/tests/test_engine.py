@@ -509,9 +509,9 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
         self.assertIn("javascript", mjs.headers["Content-Type"])
         # the legacy add-on: modules, wasm, shared chunk and the companion runtime next to them
         # and the OpenDocument add-on (#84): same companion runtime
-        for name in ("doc.mjs", "xls.mjs", "ppt.mjs", "internal-companion.mjs", "legacy-source-CFRuXN53.js",
+        for name in ("doc.mjs", "xls.mjs", "ppt.mjs", "internal-companion.mjs", "legacy-source-DmlTJjiH.js",
                      "legacy-doc-source-module.mjs", "legacy-xls-source-module.mjs", "legacy-ppt-source-module.mjs",
-                     "odt.mjs", "ods.mjs", "odp.mjs", "odf-source-CcsC38G5.js", "odt-source-module.mjs",
+                     "odt.mjs", "ods.mjs", "odp.mjs", "odf-source-Cee46vyi.js", "odt-source-module.mjs",
                      "ods-source-module.mjs", "odp-source-module.mjs"):
             res = self.url_open(base + "lib/silurus/" + name)
             self.assertEqual(res.status_code, 200, name)

@@ -2,7 +2,7 @@ import { t as e } from "./ooxml-error-DbICW35n.js";
 import { s as t } from "./resource-policy.generated-D_HlV2Rm.js";
 import { t as n } from "./abort-JztSoyw2.js";
 import { t as r } from "./font-source-limit-sNrowgTE.js";
-import { f as i, o as a, p as o, u as s } from "./resolver-failures-CpaXQWU6.js";
+import { f as i, o as a, p as o, u as s } from "./resolver-failures-0-_PZr5v.js";
 var c = Symbol("font deadline");
 function l(e) {
 	return e.url !== void 0 && /^(?:https?|blob):/i.test(e.url);

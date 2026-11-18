@@ -2,33 +2,34 @@ import { n as e } from "./own-key-CzMRhMxt.js";
 import { a as t, n } from "./substitutions-_KDT_mVq.js";
 import { o as r, s as i, u as a } from "./resource-policy.generated-D_HlV2Rm.js";
 import { t as o } from "./font-source-limit-sNrowgTE.js";
-var s = "ooxml-font-source/v1", c = 64;
-function l(e, t) {
+import { t as s } from "./bundled-asset-url-Cv8ajMAZ.js";
+var c = "ooxml-font-source/v1", l = 64;
+function u(e, t) {
 	if (!e || typeof e != "object" || Array.isArray(e)) throw TypeError(`${t} must be an object`);
 	return e;
 }
-function u(e, t, n) {
+function d(e, t, n) {
 	for (let r of Object.keys(e)) if (!t.includes(r)) throw TypeError(`${n} has unknown property "${r}"`);
 }
-function d(e, t) {
+function f(e, t) {
 	if (typeof e != "string" || e.trim() === "" || e.trim() !== e) throw TypeError(`${t} must be a non-empty string without surrounding white space`);
 	return e;
 }
-function f(e, t) {
+function p(e, t) {
 	if (e !== void 0) {
 		if (typeof e != "string" || e.trim() === "") throw TypeError(`${t} must be a non-empty string`);
 		return e;
 	}
 }
-function p(e, t) {
+function m(e, t) {
 	if (e === void 0 || e === "omit" || e === "same-origin") return e;
 	throw TypeError(`${t} must be 'omit' or 'same-origin'`);
 }
-function m(e, t) {
+function h(e, t) {
 	return e ? Object.getOwnPropertyDescriptor(e, t)?.get : void 0;
 }
-var h = m(ArrayBuffer.prototype, "byteLength"), g = m(ArrayBuffer.prototype, "detached"), _ = m(ArrayBuffer.prototype, "resizable"), v = m(globalThis.SharedArrayBuffer?.prototype, "byteLength");
-function y(e, t) {
+var g = h(ArrayBuffer.prototype, "byteLength"), _ = h(ArrayBuffer.prototype, "detached"), v = h(ArrayBuffer.prototype, "resizable"), y = h(globalThis.SharedArrayBuffer?.prototype, "byteLength");
+function b(e, t) {
 	if (!e) return !1;
 	try {
 		return Reflect.apply(e, t, []), !0;
@@ -36,19 +37,19 @@ function y(e, t) {
 		return !1;
 	}
 }
-function b(e, t) {
+function x(e, t) {
 	if (typeof e != "object" || !e) throw TypeError(`${t} must be an ArrayBuffer`);
 	if (ArrayBuffer.isView(e)) throw TypeError(`${t} must be an ArrayBuffer, not a view`);
-	if (y(v, e)) throw TypeError(`${t} must be an ArrayBuffer, not a SharedArrayBuffer`);
-	if (!y(h, e)) throw TypeError(`${t} must be an ArrayBuffer`);
-	if (g && Reflect.apply(g, e, []) === !0) throw TypeError(`${t} must not be detached`);
-	if (_ && Reflect.apply(_, e, []) === !0) throw TypeError(`${t} must not be resizable`);
-	let n = Reflect.apply(h, e, []);
+	if (b(y, e)) throw TypeError(`${t} must be an ArrayBuffer, not a SharedArrayBuffer`);
+	if (!b(g, e)) throw TypeError(`${t} must be an ArrayBuffer`);
+	if (_ && Reflect.apply(_, e, []) === !0) throw TypeError(`${t} must not be detached`);
+	if (v && Reflect.apply(v, e, []) === !0) throw TypeError(`${t} must not be resizable`);
+	let n = Reflect.apply(g, e, []);
 	if (n === 0) throw TypeError(`${t} must not be empty or detached`);
 	return n;
 }
-var x = (e) => e === 9 || e === 10 || e === 12 || e === 13 || e === 32, S = (e) => e >= 48 && e <= 57 ? e - 48 : e >= 65 && e <= 70 ? e - 55 : e >= 97 && e <= 102 ? e - 87 : -1;
-function C(e) {
+var S = (e) => e === 9 || e === 10 || e === 12 || e === 13 || e === 32, C = (e) => e >= 48 && e <= 57 ? e - 48 : e >= 65 && e <= 70 ? e - 55 : e >= 97 && e <= 102 ? e - 87 : -1;
+function w(e) {
 	let t = e.length;
 	for (; t > 0 && e.charCodeAt(t - 1) <= 32;) t--;
 	let n = 0;
@@ -74,10 +75,10 @@ function C(e) {
 			u++;
 			return;
 		}
-		x(e) || (u++, d = e === 61 ? d + 1 : 0);
+		S(e) || (u++, d = e === 61 ? d + 1 : 0);
 	};
 	for (let n = s(); n !== -1 && n !== 35; n = s()) if (n === 37) {
-		let e = i, t = S(s()), n = t < 0 ? -1 : S(s());
+		let e = i, t = C(s()), n = t < 0 ? -1 : C(s());
 		if (n >= 0) {
 			f(t * 16 + n);
 			continue;
@@ -92,15 +93,11 @@ function C(e) {
 	}
 	return l ? (u % 4 == 0 && (u -= Math.min(d, 2)), Math.floor(u * 3 / 4)) : u;
 }
-function w() {
-	let e = globalThis, t = e.document?.baseURI ?? e.location?.href;
-	return typeof t == "string" ? t : void 0;
-}
 function T(e, t, n, r) {
 	if (typeof e != "string" || e.trim() === "") throw TypeError(`${t} must be a non-empty URL string`);
 	let s = /^data:/i.test(e);
 	if (s && n.includes("data:")) {
-		let n = C(e);
+		let n = w(e);
 		if (n === void 0) throw TypeError(`${t} must be a data: URL with a body`);
 		if (n > 31457280) throw o("face", i, n);
 	} else if (e.length > 8192) throw o("url", a, e.length);
@@ -125,8 +122,8 @@ function k(e, t) {
 	if (e !== void 0) {
 		if (!Array.isArray(e)) throw TypeError(`${t} must be an array`);
 		return Object.freeze(e.map((e, n) => {
-			let r = `${t}[${n}]`, i = l(e, r);
-			u(i, [
+			let r = `${t}[${n}]`, i = u(e, r);
+			d(i, [
 				"for",
 				"use",
 				"script"
@@ -134,16 +131,16 @@ function k(e, t) {
 			let a = i.script;
 			if (a !== void 0 && !(typeof a == "string" && Object.prototype.hasOwnProperty.call(O, a))) throw TypeError(`${r}.script must be one of: ${Object.keys(O).join(", ")}`);
 			return Object.freeze({
-				for: d(i.for, `${r}.for`),
-				use: d(i.use, `${r}.use`),
+				for: f(i.for, `${r}.for`),
+				use: f(i.use, `${r}.use`),
 				...a === void 0 ? {} : { script: a }
 			});
 		}));
 	}
 }
 function A(e, t = "font face declaration", n = void 0, r = !1) {
-	let a = l(e, t);
-	r || u(a, [
+	let a = u(e, t);
+	r || d(a, [
 		"family",
 		"url",
 		"data",
@@ -152,21 +149,21 @@ function A(e, t = "font face declaration", n = void 0, r = !1) {
 		"stretch",
 		"unicodeRange"
 	], t);
-	let s = d(a.family, `${t}.family`), c = a.url !== void 0;
+	let s = f(a.family, `${t}.family`), c = a.url !== void 0;
 	if (c === (a.data !== void 0)) throw TypeError(`${t} must have exactly one of url or data`);
-	let p, m;
-	if (c) p = T(a.url, `${t}.url`, D, n);
+	let l, m;
+	if (c) l = T(a.url, `${t}.url`, D, n);
 	else {
-		let e = b(a.data, `${t}.data`);
+		let e = x(a.data, `${t}.data`);
 		if (e > 31457280) throw o("face", i, e);
 		m = a.data;
 	}
 	let h = r && typeof a.weight == "number";
 	if (h && !(a.weight >= 1 && a.weight <= 1e3)) throw TypeError(`${t}.weight must be a number from 1 to 1000 or a non-empty string`);
-	let g = f(h ? String(a.weight) : a.weight, `${t}.weight`), _ = f(a.style, `${t}.style`), v = f(a.stretch, `${t}.stretch`), y = f(a.unicodeRange, `${t}.unicodeRange`);
+	let g = p(h ? String(a.weight) : a.weight, `${t}.weight`), _ = p(a.style, `${t}.style`), v = p(a.stretch, `${t}.stretch`), y = p(a.unicodeRange, `${t}.unicodeRange`);
 	return Object.freeze({
 		family: s,
-		...p === void 0 ? {} : { url: p },
+		...l === void 0 ? {} : { url: l },
 		...m === void 0 ? {} : { data: m },
 		...g === void 0 ? {} : { weight: g },
 		..._ === void 0 ? {} : { style: _ },
@@ -176,7 +173,7 @@ function A(e, t = "font face declaration", n = void 0, r = !1) {
 }
 var j = /\{[^{}]*\}/g;
 function M(t, r) {
-	u(t, [
+	d(t, [
 		"protocol",
 		"kind",
 		"urlTemplate",
@@ -188,12 +185,12 @@ function M(t, r) {
 		"parallelFaceDownloads"
 	], r);
 	let i = t.parallelFaceDownloads;
-	if (i !== void 0 && (typeof i != "number" || !Number.isInteger(i) || i < 1 || i > c)) throw TypeError(`${r}.parallelFaceDownloads must be an integer from 1 to ${c}`);
-	let m;
+	if (i !== void 0 && (typeof i != "number" || !Number.isInteger(i) || i < 1 || i > l)) throw TypeError(`${r}.parallelFaceDownloads must be an integer from 1 to ${l}`);
+	let s;
 	if (t.sharedSubsetMetricFamilies !== void 0) {
 		let e = t.sharedSubsetMetricFamilies;
 		if (!Array.isArray(e) || e.some((e) => typeof e != "string" || !n(e))) throw TypeError(`${r}.sharedSubsetMetricFamilies must be an array of family names`);
-		m = Object.freeze([...e]);
+		s = Object.freeze([...e]);
 	}
 	let h = t.urlTemplate;
 	if (typeof h != "string" || h.trim() === "") throw TypeError(`${r}.urlTemplate must be a non-empty string`);
@@ -203,12 +200,12 @@ function M(t, r) {
 	if (!g.includes("{family}")) throw TypeError(`${r}.urlTemplate must contain {family}`);
 	if (/[{}]/.test(h.replace(j, ""))) throw TypeError(`${r}.urlTemplate has an unbalanced brace`);
 	T(Q(h, "family", "query"), `${r}.urlTemplate`, E, void 0);
-	let _ = f(t.query, `${r}.query`), v;
+	let _ = p(t.query, `${r}.query`), v;
 	if (t.families !== void 0) {
-		let i = l(t.families, `${r}.families`), a = /* @__PURE__ */ new Set(), o = e();
+		let i = u(t.families, `${r}.families`), a = /* @__PURE__ */ new Set(), o = e();
 		for (let [e, t] of Object.entries(i)) {
 			let i = `${r}.families[${JSON.stringify(e)}]`;
-			d(e, `${i} key`);
+			f(e, `${i} key`);
 			let s = n(e);
 			if (a.has(s)) throw TypeError(`${i} duplicates another family`);
 			if (a.add(s), t !== !0 && (typeof t != "string" || t.trim() === "")) throw TypeError(`${i} must be true or a non-empty query string`);
@@ -219,30 +216,30 @@ function M(t, r) {
 	if (g.includes("{query}") && _ === void 0 && (!v || Object.values(v).some((e) => e === !0))) throw TypeError(`${r}.query is required when urlTemplate contains {query}`);
 	if (v) for (let [e, t] of Object.entries(v)) $(h, e, t === !0 ? _ : t);
 	else $(h, "", _);
-	let y = k(t.substitutions, `${r}.substitutions`), b = p(t.credentials, `${r}.credentials`);
+	let y = k(t.substitutions, `${r}.substitutions`), b = m(t.credentials, `${r}.credentials`);
 	return Object.freeze({
-		protocol: s,
+		protocol: c,
 		kind: "font-css-api",
 		urlTemplate: h,
 		..._ === void 0 ? {} : { query: _ },
 		...v === void 0 ? {} : { families: v },
 		...y === void 0 ? {} : { substitutions: y },
 		...b === void 0 ? {} : { credentials: b },
-		...m === void 0 ? {} : { sharedSubsetMetricFamilies: m },
+		...s === void 0 ? {} : { sharedSubsetMetricFamilies: s },
 		...i === void 0 ? {} : { parallelFaceDownloads: i }
 	});
 }
 function N(e, t, n) {
-	u(e, [
+	d(e, [
 		"protocol",
 		"kind",
 		"url",
 		"substitutions",
 		"credentials"
 	], t);
-	let r = T(e.url, `${t}.url`, E, n), i = k(e.substitutions, `${t}.substitutions`), a = p(e.credentials, `${t}.credentials`);
+	let r = T(e.url, `${t}.url`, E, n), i = k(e.substitutions, `${t}.substitutions`), a = m(e.credentials, `${t}.credentials`);
 	return Object.freeze({
-		protocol: s,
+		protocol: c,
 		kind: "font-css",
 		url: r,
 		...i === void 0 ? {} : { substitutions: i },
@@ -250,7 +247,7 @@ function N(e, t, n) {
 	});
 }
 function P(e, t, n) {
-	u(e, [
+	d(e, [
 		"protocol",
 		"kind",
 		"faces",
@@ -260,18 +257,18 @@ function P(e, t, n) {
 	let i = e.faces;
 	if (!Array.isArray(i) || i.length === 0) throw TypeError(`${t}.faces must be a non-empty array`);
 	if (i.length > 2048) throw o("declarations", r, i.length);
-	let a = Object.freeze(i.map((e, r) => A(e, `${t}.faces[${r}]`, n))), c = k(e.substitutions, `${t}.substitutions`), l = p(e.credentials, `${t}.credentials`);
+	let a = Object.freeze(i.map((e, r) => A(e, `${t}.faces[${r}]`, n))), s = k(e.substitutions, `${t}.substitutions`), l = m(e.credentials, `${t}.credentials`);
 	return Object.freeze({
-		protocol: s,
+		protocol: c,
 		kind: "font-files",
 		faces: a,
-		...c === void 0 ? {} : { substitutions: c },
+		...s === void 0 ? {} : { substitutions: s },
 		...l === void 0 ? {} : { credentials: l }
 	});
 }
 var F = /^font-resolver:[1-9]\d*$/;
 function I(e, t) {
-	if (u(e, [
+	if (d(e, [
 		"protocol",
 		"kind",
 		"id",
@@ -279,14 +276,14 @@ function I(e, t) {
 	], t), typeof e.id != "string" || !F.test(e.id)) throw TypeError(`${t}.id must be a font resolver id`);
 	let n = k(e.substitutions, `${t}.substitutions`);
 	return Object.freeze({
-		protocol: s,
+		protocol: c,
 		kind: "font-resolver",
 		id: e.id,
 		...n === void 0 ? {} : { substitutions: n }
 	});
 }
 function L(e, t, n) {
-	let r = l(e, t);
+	let r = u(e, t);
 	if (r.protocol !== "ooxml-font-source/v1") throw TypeError(`${t} has unsupported protocol ${String(r.protocol)}`);
 	switch (r.kind) {
 		case "font-css-api": return M(r, t);
@@ -307,8 +304,8 @@ function V(e) {
 	return t === !0 || typeof t == "function" ? t : void 0;
 }
 function H(e, t, n) {
-	let r = l(e, `${t}() options`);
-	return u(r, n, `${t}() options`), r;
+	let r = u(e, `${t}() options`);
+	return d(r, n, `${t}() options`), r;
 }
 function U(e) {
 	return B(M({
@@ -319,7 +316,7 @@ function U(e) {
 			"substitutions",
 			"credentials"
 		]),
-		protocol: s,
+		protocol: c,
 		kind: "font-css-api"
 	}, "fontCssApi()"));
 }
@@ -334,7 +331,7 @@ function W(e, t) {
 		]),
 		...t.sharedSubsetMetricFamilies ? { sharedSubsetMetricFamilies: t.sharedSubsetMetricFamilies } : {},
 		...t.parallelFaceDownloads === void 0 ? {} : { parallelFaceDownloads: t.parallelFaceDownloads },
-		protocol: s,
+		protocol: c,
 		kind: "font-css-api"
 	}, "fontCssApi()"));
 }
@@ -345,9 +342,9 @@ function G(e) {
 			"substitutions",
 			"credentials"
 		]),
-		protocol: s,
+		protocol: c,
 		kind: "font-css"
-	}, "fontCss()", w()));
+	}, "fontCss()", s()));
 }
 function K(e) {
 	return B(P({
@@ -356,9 +353,9 @@ function K(e) {
 			"substitutions",
 			"credentials"
 		]),
-		protocol: s,
+		protocol: c,
 		kind: "font-files"
-	}, "fontFiles()", w()));
+	}, "fontFiles()", s()));
 }
 var q = /* @__PURE__ */ new WeakMap(), J = globalThis[Symbol.for("@silurus/ooxml/font-resolver-ids")] ??= { next: 1 };
 function Y(e, t = {}) {
@@ -366,7 +363,7 @@ function Y(e, t = {}) {
 	let n = H(t, "fontResolver", ["substitutions"]), r = q.get(e);
 	return r === void 0 && (r = `font-resolver:${J.next++}`, q.set(e, r)), B(I({
 		...n,
-		protocol: s,
+		protocol: c,
 		kind: "font-resolver",
 		id: r
 	}, "fontResolver()"), e);
@@ -429,4 +426,4 @@ function re(e, r, i = "all") {
 	}
 	return o;
 }
-export { re as a, X as c, W as d, A as f, U as i, Z as l, C as n, K as o, G as r, Y as s, te as t, ee as u };
+export { re as a, X as c, W as d, A as f, U as i, Z as l, w as n, K as o, G as r, Y as s, te as t, ee as u };

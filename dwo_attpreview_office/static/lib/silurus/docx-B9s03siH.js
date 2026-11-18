@@ -7,14 +7,14 @@ import { o } from "./units-BBDOirYi.js";
 import { f as s, u as c } from "./pixel-budget-DI82Hn3R.js";
 import { i as l, t as u } from "./tiff-contract-DEd8CGuz.js";
 import { _ as d, a as f, c as p, g as m, h, i as g, l as _, n as v, o as y, r as b, s as x, t as S, u as C, v as ee, x as te } from "./canvas-viewer-mechanics-DrH37lzF.js";
-import { a as ne, o as re } from "./chart-context-BsUQiKpW.js";
+import { a as ne, o as re } from "./chart-context-DqNY4BWJ.js";
 import { S as w, T as ie, _ as ae, a as oe, b as se, c as ce, d as le, f as ue, g as de, h as fe, i as pe, l as me, m as he, n as ge, o as _e, p as ve, r as ye, t as be, u as xe, v as Se, w as Ce, x as T, y as we } from "./comment-overlay-controller-ByvOX8Dp.js";
 import { r as E } from "./hyperlink-BOJHX05H.js";
 import { n as Te, t as D } from "./highlight-rect-CuBeY9DT.js";
-import { i as Ee, o as De, r as Oe, s as ke } from "./source-DncDPEPn.js";
+import { i as Ee, o as De, r as Oe, s as ke } from "./source-GXgH3t1X.js";
 import { n as O, s as k } from "./part-failures-pZSloLZv.js";
-import { a as A, c as j, f as Ae, i as M, m as je, n as N, o as P, p as F, r as I, s as L, t as R, u as z } from "./document-abbaKFrB.js";
-import { y as B } from "./document-pull-client-DdaEa4hT.js";
+import { a as A, c as j, f as Ae, i as M, m as je, n as N, o as P, p as F, r as I, s as L, t as R, u as z } from "./document-CexDucFg.js";
+import { y as B } from "./document-pull-client-DsaDuAP-.js";
 import { n as V, r as Me } from "./comments-B3a2O0op.js";
 function H(e, t) {
 	if (!e.eastAsianVert) return 1;

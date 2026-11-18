@@ -3,7 +3,7 @@ import { t as n } from "./font-registry-CA7E7o7P.js";
 import { B as r } from "./renderer-D3GIB31w.js";
 import { _ as i } from "./duotone-bitmap-by-path-B_pNKO0M.js";
 import { t as a } from "./abort-JztSoyw2.js";
-import { d as o, l as s } from "./source-DncDPEPn.js";
+import { d as o, l as s } from "./source-GXgH3t1X.js";
 import { n as c } from "./resolver-bridge-messages-DyLfptik.js";
 import { u as l } from "./part-failures-pZSloLZv.js";
 function u() {
@@ -264,7 +264,7 @@ var w = "font resolver bridge unavailable", T = (e) => typeof e == "number" && N
 		this.readyDeadline = Date.now() + n, this.timer = setTimeout(() => this.unavailable(r), n);
 		let i;
 		try {
-			i = (e.loadHost ?? (() => import("./resolver-bridge-host-BwZL8I8d.js")))();
+			i = (e.loadHost ?? (() => import("./resolver-bridge-host-B11hjWzE.js")))();
 		} catch (e) {
 			i = Promise.reject(e);
 		}
