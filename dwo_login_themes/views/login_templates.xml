@@ -22,6 +22,7 @@
             <attribute name="t-att-data-dwo-title">dwo.get('page_title') or None</attribute>
             <attribute name="t-att-data-dwo-favicon">dwo.get('favicon_url') or None</attribute>
             <attribute name="t-att-data-dwo-pwd">'1' if dwo.get('pwd_toggle') else None</attribute>
+            <attribute name="t-att-data-dwo-hidebrand">'1' if dwo.get('hide_brand') else None</attribute>
         </xpath>
         <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]" position="before">
             <t t-if="dwo.get('theme')">

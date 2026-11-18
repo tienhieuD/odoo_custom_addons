@@ -78,6 +78,9 @@ body:has(.dwo_lc) { background: var(--dwo-page-bg, #e9ecef) !important; margin: 
     padding: .25rem .9rem; border-radius: 99px; background: rgba(0, 0, 0, .4); color: #fff; font-size: .8rem;
     text-align: center; backdrop-filter: blur(6px); }
 .dwo_pwd_btn { background: transparent; }
+// "Powered by Odoo" hidden by the option of the module (class set by login_theme.js; nothing is removed from the page)
+.dwo_brand_off { display: none !important; }
+.dwo_brand_row > a.border-end { border: 0 !important; margin: 0 !important; padding-right: 0 !important; }
 
 @keyframes dwo_fade { 0% { opacity: 0; } 5% { opacity: 1; } 25% { opacity: 1; } 31% { opacity: 0; } 100% { opacity: 0; } }
 @keyframes dwo_gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }

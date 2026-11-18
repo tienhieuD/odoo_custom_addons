@@ -18,7 +18,43 @@
             return null;
         }
     }
+    // Hides the "Powered by Odoo" link when the option is on (the layout puts data-dwo-hidebrand="1" on the container).
+    // Only a class is added: no node is removed, no template is replaced, so it does not fight with other
+    // debranding modules. If the link is already gone, nothing happens.
+    function hideBrand(scope) {
+        var found = scope.querySelectorAll(".o_brand_promotion, a[href*='odoo.com']");
+        for (var i = 0; i < found.length; i++) {
+            var el = found[i];
+            if (!el.classList.contains("o_brand_promotion") && !/powered by/i.test(el.textContent || "")) {
+                continue;
+            }
+            el.classList.add("dwo_brand_off");
+            var row = el.parentNode;
+            if (row && row !== scope && row.classList && row.classList.contains("small") && row.classList.contains("border-top")) {
+                row.classList.add("dwo_brand_row");
+                var visible = false;
+                for (var j = 0; j < row.children.length; j++) {
+                    if (!row.children[j].classList.contains("dwo_brand_off")) {
+                        visible = true;
+                    }
+                }
+                if (!visible) {
+                    row.classList.add("dwo_brand_off");
+                }
+            }
+        }
+    }
     ready(function () {
+        var brandRoot = document.querySelector("[data-dwo-hidebrand='1']");
+        if (brandRoot) {
+            hideBrand(document);
+            if (window.MutationObserver) {
+                // a debranding tool may draw the link again later: only classes are changed here, so no loop
+                new MutationObserver(function () {
+                    hideBrand(document);
+                }).observe(brandRoot, {childList: true, subtree: true});
+            }
+        }
         var notice = document.querySelector(".dwo_notice[data-dwo-notice]");
         if (notice) {
             var key = "dwo_login_notice_closed_" + notice.getAttribute("data-dwo-notice");

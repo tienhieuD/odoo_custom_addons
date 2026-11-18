@@ -106,6 +106,9 @@
                         <setting string="Show / hide password" help="A small eye button in the password field, when Odoo does not already have one.">
                             <field name="dwo_login_pwd_toggle"/>
                         </setting>
+                        <setting string="Hide &quot;Powered by Odoo&quot;" help="Hides the &quot;Powered by Odoo&quot; link under the login form. Off by default. It only hides the link on the page: nothing is removed from the form or from Odoo.">
+                            <field name="dwo_login_hide_brand"/>
+                        </setting>
                     </block>
                     <block title="Login announcement" help="A message that stays on the login page for everybody, signed in or not. The HTML is cleaned when you save and again every time the page is shown: only simple text tags and http, https and mailto links are kept; scripts, forms, frames and images are removed.">
                         <setting string="Show the announcement" help="It is hidden when this is off, when the text is empty or outside the dates below.">
