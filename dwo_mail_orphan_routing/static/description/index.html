@@ -1,0 +1,271 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Orphan Mail Router</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Never lose an email that Odoo cannot place.</p>
+        <p class="mb-4" style="font-size: 15px;">Emails that match no alias, no reply and no record are kept in an inbox instead of being refused or lost. The module suggests the right record, moves the email into its chatter in one click, and can do the same by itself with rules.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">A customer writes to the catch-all, to an address that does not exist any more, or replies from another mailbox: Odoo cannot attach the email to anything, so it is refused or bounced and the message is gone. <strong>Orphan Mail Router</strong> keeps every such email (text, sender, headers and attachments) in an <strong>Orphan inbox</strong>. For each one it proposes up to three records, found from the reply headers, from a code in the subject and from the sender. One click posts the email in the chatter of the record, and the usual notifications follow.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="An email that no alias takes lands in the orphan inbox, then is routed to a record" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The inbox of lost emails</h2>
+    <p class="mb-4" style="font-size: 16px;">Date, sender, subject, a preview of the text, the address that received it, the number of attachments and the state. Filter by status, alias, sender, date or text, and group by address, sender or week.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-inbox.png" alt="The Orphan inbox list with the date, sender, subject, a preview of the text, the address the email was sent to, the number of files, and the state New" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The three best records, one click away</h2>
+    <p class="mb-4" style="font-size: 16px;">Each suggestion says why it was chosen and how well it fits: <em>replies to a message of this record</em>, <em>code S00001 in the subject</em>, <em>recent record of the sender</em>. Route here posts the email in the chatter of that record.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/02-suggestions.png" alt="An orphan email form with a list of suggested records: a sales order matched by the code in the subject and the contact of the sender, each with a Route here button" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The email arrives in the chatter</h2>
+    <p class="mb-4" style="font-size: 16px;">The email becomes a normal message of the record, with the original sender as author, the same Message-Id, the attachments and the date of the email. If the customer replies later, Odoo threads the answer on the record by itself.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/03b-chatter.png" alt="A sales order with the customer email posted in its chatter with the subject and the text" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Route many emails at once</h2>
+    <p class="mb-4" style="font-size: 16px;">Select emails in the list, choose the model and the record, and tick the options to take along the other new emails of the same senders or of the same threads. The window shows how many emails will move.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/04-bulk-route.png" alt="The Route to a record window with the chosen emails, the target model Lead, the target record, and options to include the new emails of the same senders and of the same threads" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Rules that handle the routine</h2>
+    <p class="mb-4" style="font-size: 16px;">A rule has conditions on the sender, the subject and the address that received the email, and does one of two things: route to a chosen record, or ignore (spam, notices). Rules are tried in order, when the email arrives.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/05-rule.png" alt="A rule form: when the sender contains maple-studio.example and the subject contains invoice, route to a sales order" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">How many emails are lost, and where</h2>
+    <p class="mb-4" style="font-size: 16px;">A graph and a pivot of the orphan emails per week and per receiving address show which alias or mailbox needs a better setup.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/06-report.png" alt="A stacked bar chart of orphan emails per week, one colour for each receiving address" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Settings in one place</h2>
+    <p class="mb-4" style="font-size: 16px;">Switch the module on or off, choose the models an email can be routed to and searched in, add the sender as follower, send one daily digest to the managers, and choose how long handled emails are kept.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/07-settings.png" alt="The Orphan Mail settings: keep orphan emails, allowed target models, add the sender as follower, daily digest, keep handled emails for 90 days" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Each person sees the aliases assigned</h2>
+    <p class="mb-4" style="font-size: 16px;">A manager sees every orphan email, or only the emails of the aliases you assign. Useful when sales and support share the same server but not the same mail.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/08-access.png" alt="A list of users with a switch All aliases and a field Only these aliases" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The view of a restricted manager</h2>
+    <p class="mb-4" style="font-size: 16px;">The same inbox for a person assigned to one alias: only that alias is listed.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/09-restricted-user.png" alt="The orphan inbox of a restricted user, showing only the email received at the inquiries address" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">An inbox for lost emails</h4>
+                    <p class="mb-0" style="font-size: 14px;">Emails that Odoo cannot route are stored with their sender, recipients, text, headers and attachments. Duplicates (same Message-Id) are stored once.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Suggested records</h4>
+                    <p class="mb-0" style="font-size: 14px;">Up to three records, scored from the reply headers, a code in the subject (matched with the name, reference or number of the records of the models you allow), the alias and the sender.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Route, route again, ignore</h4>
+                    <p class="mb-0" style="font-size: 14px;">Post the email in the chatter of any record you may edit, many emails at once, move it again if it was a mistake, or ignore it and restore it later.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Rules</h4>
+                    <p class="mb-0" style="font-size: 14px;">Sender, subject or receiving address contains a text: route to a record or ignore. They run when the email arrives.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Daily digest and report</h4>
+                    <p class="mb-0" style="font-size: 14px;">One email a day to the managers instead of one per lost email, and a weekly graph per receiving address.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Access by alias</h4>
+                    <p class="mb-0" style="font-size: 14px;">Group Orphan Mail Manager, an optional list of aliases for each manager, and routing only to records the user can edit.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Safe by design</h2>
+    <p class="mb-4" style="font-size: 16px;">The standard flow of Odoo is kept.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Nothing runs from an email</h4>
+                    <p class="mb-0" style="font-size: 14px;">The text of every email is sanitised before it is stored and shown: scripts, event handlers and active content are removed.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Standard replies stay standard</h4>
+                    <p class="mb-0" style="font-size: 14px;">Emails that Odoo can route are routed as before. The module only acts when no route exists, and if it cannot store an email it leaves the standard behaviour alone.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Permissions are respected</h4>
+                    <p class="mb-0" style="font-size: 14px;">Routing needs write access to the target record, checked for the user who presses the button. Rules run with the rights of the system.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Easy to switch off</h4>
+                    <p class="mb-0" style="font-size: 14px;">One switch in Settings gives the standard behaviour back. Uninstalling the module removes its data and nothing else.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Limitations</h2>
+    <p class="mb-4" style="font-size: 16px;">What to expect, so there are no surprises.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Only new emails</h4>
+                    <p class="mb-0" style="font-size: 14px;">Emails that arrived before the installation were already refused and cannot be recovered.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">The sender is no longer refused</h4>
+                    <p class="mb-0" style="font-size: 14px;">When no route exists the gateway used to refuse the email. With the module on, it is accepted and kept. The standard bounce answer of the catch-all is still sent.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Suggestions use exact codes</h4>
+                    <p class="mb-0" style="font-size: 14px;">A code in the subject must equal the name, reference or number of a record of an allowed model. Free text is not searched.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Inline images</h4>
+                    <p class="mb-0" style="font-size: 14px;">Pictures embedded in the text of an email are stored as attachments and may not show inside the text after routing.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Followers are notified as usual</h4>
+                    <p class="mb-0" style="font-size: 14px;">A routed email is a normal message of the record, so its followers receive the usual notification.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">The module depends only on the standard <code>mail</code> module. It needs no external library.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_oor_install" role="tab" aria-controls="dwo_oor_install" aria-selected="true">Install</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_oor_how" role="tab" aria-controls="dwo_oor_how" aria-selected="false">How it works</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_oor_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
+            <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_mail_orphan_routing</code> folder into an add-ons path of your server.<br/>2. Restart Odoo and update the apps list.<br/>3. Install <strong>Orphan Mail Router</strong>.</p>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Set it up</h4>
+            <p class="mb-2" style="font-size: 14px;">Open <strong>Settings</strong>, then <strong>Orphan Mail</strong>. Choose the models an email can be routed to (a few common ones are pre-selected when they are installed), the daily digest and how long handled emails are kept. Administrators are managers; add other people to the group <em>Orphan Mail Manager</em>. The <strong>Orphan Mail</strong> app has the Inbox, Reporting and Configuration menus.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_oor_how" role="tabpanel">
+            <p class="mb-2" style="font-size: 14px;">The module extends the incoming mail routing of the <code>mail</code> module. When Odoo finds no route for an email (no alias, no reply to a known message, no fallback model) or answers with a catch-all bounce, the email is stored as an orphan email and the usual flow ends there. If a rule matches, it is applied at once; otherwise the suggestions are computed. Routing posts the email with <code>message_post</code> on the target record.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it change how Odoo routes normal emails?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Replies, aliases and the fallback model work as before. Only an email that would have been refused or bounced is kept.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Which records can I route to?</h4>
+        <p class="mb-0" style="font-size: 14px;">The models chosen in Settings, as long as they have a chatter (a mail thread). The user needs write access to the record.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I route an email again?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. The message already posted is moved to the new record; no second copy is created.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Who sees the orphan emails?</h4>
+        <p class="mb-0" style="font-size: 14px;">The group Orphan Mail Manager. By default a manager sees all of them; in Settings, Access by alias, you can limit a manager to some aliases.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Is the text of an email safe to display?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. It is sanitised when it is stored: scripts and active content are removed.</p>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Changelog</h2>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-18</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release: orphan inbox, suggestions, routing and bulk routing, rules, daily digest, report, access by alias, settings.</p></div>
+        </div>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> lost messages, lost emails, orphan emails, orphan mail, unrouted email, unrouted emails, unmatched email, catchall, catch-all, catch-all mailbox, email routing, route email, route email manually, manual routing, manual email routing, incoming email, incoming emails, mail gateway, email inbox, reassign email, move email to record, move message to record, email to chatter, mail alias, alias bounce, bounce catchall, fetchmail, email rules, email digest, routing rules</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Give every lost email a home.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it, choose the target models in Settings and open the Orphan inbox.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
