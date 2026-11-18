@@ -32,3 +32,37 @@ def _make_test(layout):
 for _layout in LAYOUTS:
     _test = _make_test(_layout)
     setattr(TestLoginTour, _test.__name__, _test)
+
+
+@tagged("post_install", "-at_install")
+class TestHideBrand(HttpCase):
+    """The option "Hide Powered by Odoo": the layout emits a flag, the small script of the module hides the link."""
+
+    def setUp(self):
+        super().setUp()
+        if self.env["ir.module.module"].search([("name", "=", "website"), ("state", "=", "installed")]):
+            self.skipTest("with Website the login page is drawn in the layout of Website")
+        self.icp = self.env["ir.config_parameter"].sudo()
+
+    def test_01_off_by_default_no_flag(self):
+        html = self.url_open("/web/login").text
+        self.assertNotIn("data-dwo-hidebrand", html)
+        self.assertIn("Powered by", html)  # the link of Odoo is untouched in the HTML
+
+    def test_02_flag_emitted_with_and_without_theme(self):
+        for theme in ("1", "0"):
+            tools.icp_set(self.icp, "dwo_login.enabled", theme)
+            tools.icp_set(self.icp, "dwo_login.hide_brand", "1")
+            html = self.url_open("/web/login").text
+            self.assertIn('data-dwo-hidebrand="1"', html, theme)
+            self.assertIn("Powered by", html)  # hidden by the script, never removed from the page
+            self.assertIn('name="login"', html)
+            tools.icp_set(self.icp, "dwo_login.hide_brand", "0")
+            self.assertNotIn("data-dwo-hidebrand", self.url_open("/web/login").text, theme)
+
+    def test_03_js_hides_the_link(self):
+        tools.icp_set(self.icp, "dwo_login.hide_brand", "1")
+        self.start_tour("/web/login", "dwo_login_themes_brand_hidden_tour")
+
+    def test_04_js_leaves_the_link_when_off(self):
+        self.start_tour("/web/login", "dwo_login_themes_brand_shown_tour")

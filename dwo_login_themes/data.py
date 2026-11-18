@@ -104,6 +104,7 @@ DEFAULTS = {
     "footer_text": "",
     "page_title": "",
     "pwd_toggle": True,
+    "hide_brand": False,
     "ann_enabled": False,
     "ann_html": "",
     "ann_kind": "info",
