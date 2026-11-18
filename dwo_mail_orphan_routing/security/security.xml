@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_dwo_orphan_manager" model="res.groups">
+        <field name="name">Orphan Mail Manager</field>
+        <field name="comment">Members see the orphan emails, route them to records they can edit and manage the rules.</field>
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_dwo_orphan_manager'))]"/>
+    </record>
+
+    <record id="rule_dwo_orphan_alias" model="ir.rule">
+        <field name="name">Orphan mail: only the aliases assigned to the user</field>
+        <field name="model_id" ref="model_dwo_mail_orphan"/>
+        <field name="groups" eval="[(4, ref('group_dwo_orphan_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)] if user.dwo_orphan_all_aliases else [('alias_id', 'in', user.dwo_orphan_alias_ids.ids)]</field>
+    </record>
+    <record id="rule_dwo_orphan_suggestion_alias" model="ir.rule">
+        <field name="name">Orphan mail suggestion: only the aliases assigned to the user</field>
+        <field name="model_id" ref="model_dwo_mail_orphan_suggestion"/>
+        <field name="groups" eval="[(4, ref('group_dwo_orphan_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)] if user.dwo_orphan_all_aliases else [('orphan_id.alias_id', 'in', user.dwo_orphan_alias_ids.ids)]</field>
+    </record>
+</odoo>

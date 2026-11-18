@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_dwo_mail_orphan_route_wizard_form" model="ir.ui.view">
+        <field name="name">dwo.mail.orphan.route.wizard.form</field>
+        <field name="model">dwo.mail.orphan.route.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="allowed_model_ids" invisible="1"/>
+                <field name="res_model" invisible="1"/>
+                <group>
+                    <field name="orphan_ids" widget="many2many_tags" readonly="1"/>
+                    <field name="model_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="res_id" invisible="not res_model"/>
+                    <field name="follow_sender"/>
+                    <field name="include_same_sender"/>
+                    <field name="include_same_thread"/>
+                    <field name="total_count"/>
+                </group>
+                <footer>
+                    <button name="action_route" type="object" string="Route" class="btn-primary" data-hotkey="q"/>
+                    <button special="cancel" string="Cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

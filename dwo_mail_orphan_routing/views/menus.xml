@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_dwo_orphan_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'dwo_mail_orphan_routing', 'bin_size': False}</field>
+    </record>
+    <menuitem id="menu_dwo_orphan_root" name="Orphan Mail" web_icon="dwo_mail_orphan_routing,static/description/icon.png"
+              groups="group_dwo_orphan_manager" sequence="75"/>
+    <menuitem id="menu_dwo_orphan_inbox" name="Inbox" parent="menu_dwo_orphan_root"
+              action="action_dwo_mail_orphan" sequence="10"/>
+    <menuitem id="menu_dwo_orphan_report" name="Reporting" parent="menu_dwo_orphan_root"
+              action="action_dwo_mail_orphan_report" sequence="20"/>
+    <menuitem id="menu_dwo_orphan_config" name="Configuration" parent="menu_dwo_orphan_root" sequence="90"/>
+    <menuitem id="menu_dwo_orphan_rules" name="Rules" parent="menu_dwo_orphan_config"
+              action="action_dwo_mail_orphan_rule" sequence="10"/>
+    <menuitem id="menu_dwo_orphan_access" name="Access by alias" parent="menu_dwo_orphan_config"
+              action="action_dwo_orphan_access" groups="base.group_system" sequence="20"/>
+    <menuitem id="menu_dwo_orphan_settings" name="Settings" parent="menu_dwo_orphan_config"
+              action="action_dwo_orphan_settings" groups="base.group_system" sequence="30"/>
+</odoo>
