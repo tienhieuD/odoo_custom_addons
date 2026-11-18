@@ -112,9 +112,11 @@ export const dwoSessionService = {
                 ConfirmationDialog,
                 {
                     title: _t("Session ended"),
-                    body: _t("Your session has ended. %(why)s Sign in again to go back to the screen you were on.", {
-                        why,
-                    }),
+                    body: why
+                        ? _t("Your session has ended. %(why)s Sign in again to go back to the screen you were on.", {
+                              why,
+                          })
+                        : _t("Your session has ended. Sign in again to go back to the screen you were on."),
                     confirmLabel: _t("Sign in again"),
                     confirm: back,
                     dismiss: back,
@@ -181,6 +183,11 @@ export const dwoSessionService = {
         // -- lock -------------------------------------------------------------------------------------------
         async function trySave() {
             try {
+                // a field that still has the focus has not told its form yet: blur it first, as a click elsewhere would
+                if (document.activeElement && document.activeElement.blur) {
+                    document.activeElement.blur();
+                }
+                await new Promise((resolve) => setTimeout(resolve, 80));
                 const callbacks = [];
                 env.bus.trigger("CLEAR-UNCOMMITTED-CHANGES", callbacks);
                 await Promise.race([

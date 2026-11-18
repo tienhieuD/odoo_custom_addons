@@ -23,6 +23,8 @@ First version. One module, all features.
 - Rescue: set the system parameter `dwo_session.enabled` to 0 (Settings, Technical, System Parameters, or `UPDATE ir_config_parameter SET value='0' WHERE key='dwo_session.enabled'`); every rule is off at once.
 - "Save the open form before locking": option, off by default (see the setting help). The lock often comes when nobody can confirm; saving would write data nobody checked. With the option on, the client triggers Odoo's `CLEAR-UNCOMMITTED-CHANGES` (4 s limit) before the lock; a form that cannot be saved is lost. A server-side idle lock (the browser was not running) never saves.
 
+**Versions**: one code base for Odoo 17 to 20. Differences handled in `models/compat.py` (session store and logout moved in 20), `models/util.py` (`icp_get`/`icp_set`: typed parameters in 20), the JSON route type (`json` before 19, `jsonrpc` from 19), the constraint syntax (19+), `res.users.authenticate` (class method before 19), view tags (`tree` in 17) and the access file (`security/ir.access.csv` in 20). Sign out from the lock page is a POST form with a CSRF token (Odoo 20 refuses GET).
+
 **Tests**: HTTP tests (server refusal while locked / waiting, rate limit, redirect safety, CSRF, approval, forgot-PIN ways, timeouts, close browser, cookie header, bus) and two tours in Chrome (expiry dialog back to the same screen, warning toast with Extend). The lock page and the waiting page load no tours: they are covered by the HTTP tests and by a Playwright script run by hand.
 
 **Limits (honest)**

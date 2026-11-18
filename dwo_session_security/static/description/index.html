@@ -1,0 +1,283 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Secure Session Login</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Protect the Odoo session, not only the login.</p>
+        <p class="mb-4" style="font-size: 15px;">Lock the screen with a PIN after an idle time, end sessions that are idle or too long, warn people before the end, sign out when the browser is closed, and let an administrator approve new sessions. The lock is kept on the server: a locked session cannot call anything, even with the browser developer tools open.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">A password protects the door; <strong>Secure Session Login</strong> protects the room when somebody leaves it. After an idle time the screen locks and a PIN (4 or 6 digits, chosen in Preferences) opens it again, on the same screen. The state of every session (<em>active</em>, <em>locked</em>, <em>waiting for approval</em> or <em>ended</em>) is stored on the server and checked on every request. The lock page is a plain page drawn by the server: it does not load the Odoo web client and holds no record.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="Lock, unlock with a PIN and come back to the same screen" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">A lock page without the application</h2>
+    <p class="mb-4" style="font-size: 16px;">When the screen locks, the browser leaves the web client for this page. It carries no menu, no record and no Odoo script, so the developer tools show nothing of the screen you left. Reload it, open the address in another tab or press Back: you get this page again until the PIN is entered.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/01-lock-page.png" alt="A dark page with a white card: a padlock, the words Screen locked, the name of the user, a PIN field, an Unlock button and a Forgot the PIN link" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Forgot the PIN? You choose the ways out</h2>
+    <p class="mb-4" style="font-size: 16px;">Each way is a switch in Settings: the account password or a new sign in (SSO and two-factor users go through the normal login page), a request to an administrator, a 6-digit code by email, or a temporary PIN from an administrator. After every way the user chooses a new PIN.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/02-forgot-pin.png" alt="The lock page with the Forgot the PIN list open: enter the account password, sign in again, ask an administrator to reset the PIN, email me a code" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The session ended: a dialog, then back to the same screen</h2>
+    <p class="mb-4" style="font-size: 16px;">When the idle time or the maximum duration is over, the page hides the screen and shows this dialog. The button opens the login page; after the sign in you are back on the screen you were on (only internal addresses are accepted).</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/03-session-ended.png" alt="A dialog titled Session ended with the text Your session has ended. You were inactive for too long, and a Sign in again button" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">A warning before the end, with a countdown</h2>
+    <p class="mb-4" style="font-size: 16px;">The warning appears a number of minutes before the end (30 by default, you can change it or switch it off). The Extend button adds time when the administrator allows it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/04-warning-toast.png" alt="An Odoo list view with a yellow notification: Session ending soon, Your session ends in about 20 minutes, and an Extend button" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Approve new sessions</h2>
+    <p class="mb-4" style="font-size: 16px;">For the users you choose, a correct password is not enough: they wait on this page until an administrator approves, and Odoo opens by itself when that happens. Nothing of Odoo can be called while they wait.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/05-waiting-screen.png" alt="A page with a white card, an hourglass and the words Waiting for approval, with a spinner and a Cancel and sign out link" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requests for the administrators</h2>
+    <p class="mb-4" style="font-size: 16px;">Session approvals and PIN reset requests arrive in one list. Approvers are told by a pop-up in Odoo, by email or by an activity, as you choose; every decision is logged.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/06-requests.png" alt="A list of requests: a session approval and a PIN reset, with the user, IP address, browser, state and Approve and Reject buttons" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Every open session, and a button to close it</h2>
+    <p class="mb-4" style="font-size: 16px;">User, IP address, browser, sign-in time, last activity and state. Select sessions and press Force sign-out: the session file is removed and the user sees the Session ended dialog. Each user can see and close their own sessions from Preferences.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/07-sessions.png" alt="A list of sessions with user, IP address, browser, login time, last activity and state, and a Force sign-out button" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">All the rules in one Settings screen</h2>
+    <p class="mb-4" style="font-size: 16px;">Idle lock, idle sign-out, maximum duration, the warning, closing the browser, PIN length and tries, the ways to recover a PIN, session approval and the notification channels. A master switch turns everything off at once.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/08-settings.png" alt="The Secure Session settings: lock after minutes, sign out when idle, maximum duration, warning, closing the browser, PIN length and limits" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Each user chooses a PIN in Preferences</h2>
+    <p class="mb-4" style="font-size: 16px;">4 or 6 digits, confirmed with the account password. The PIN is stored as a salted hash; nobody, administrators included, can read it. Easy PINs (0000, 1234, 1990, repeated digits) are refused.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/09-pin-preferences.png" alt="The Set the lock PIN dialog with the account password, the PIN and a repeat field, over the Security tab of the preferences" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Lock screen with a PIN</h4>
+                    <p class="mb-0" style="font-size: 14px;">After the idle time you set, the screen locks. The PIN is only for unlocking a session that is already signed in: it can never sign anybody in.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Idle and maximum time</h4>
+                    <p class="mb-0" style="font-size: 14px;">End the session after an idle time and after a maximum duration since the sign in, both checked by the server, with a group of users that is exempt.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Warning before the end</h4>
+                    <p class="mb-0" style="font-size: 14px;">A pop-up with the minutes left, 30 minutes before by default, on or off, with an Extend button you can allow or not.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Close the browser, sign in again</h4>
+                    <p class="mb-0" style="font-size: 14px;">The session cookie is a browser-session cookie and the server watches a heartbeat of the tabs, so a browser that is closed and opened again asks for the password.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Session approval</h4>
+                    <p class="mb-0" style="font-size: 14px;">A switch, off by default: chosen users wait for an administrator after the sign in. Toast, email or activity tell the approvers; decisions are logged; requests expire.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Ways to recover a PIN</h4>
+                    <p class="mb-0" style="font-size: 14px;">Account password or sign in again, a request to an administrator, a code by email, a temporary PIN: each one on or off, all logged, with limits against abuse.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Sessions and a log</h4>
+                    <p class="mb-0" style="font-size: 14px;">A list of the open sessions with a Force sign-out button, a list of requests, and a log of locks, unlocks, wrong PINs, resets, approvals and sign-outs.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Same screen after the sign in</h4>
+                    <p class="mb-0" style="font-size: 14px;">The address you were on is kept (on the server for a lock, in the link for an expiry). Only internal paths are accepted, so the link cannot send people to another site.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Enforced on the server</h2>
+    <p class="mb-4" style="font-size: 16px;">A lock that only covers the screen can be taken off with the browser tools. This one does not live in the browser.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Every request is checked</h4>
+                    <p class="mb-0" style="font-size: 14px;">While a session is locked, waiting for approval or ended, the server refuses RPC calls, pages, files, images and websocket connections. Only the lock page, the waiting page, the PIN forms and the sign out are allowed.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">No application in the lock page</h4>
+                    <p class="mb-0" style="font-size: 14px;">The web client leaves for a server-drawn page, clears its IndexedDB and Cache Storage, and reloads when the Back button brings an old page back. Signed-in HTML and JSON answers are sent with no-store.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">The PIN is protected</h4>
+                    <p class="mb-0" style="font-size: 14px;">Salted hash (the same method Odoo uses for passwords), no read access for any group, easy PINs refused, a pause after 3 wrong PINs and a sign out after the limit you set (5 by default). Forms carry a CSRF token.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Safe by construction</h4>
+                    <p class="mb-0" style="font-size: 14px;">A new sign in gets a new session record, the return address is checked, an administrator is never asked for approval, and a system parameter switches every rule off if somebody is locked out.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Limitations</h2>
+    <p class="mb-4" style="font-size: 16px;">What to expect, so there are no surprises.</p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">What is already on the screen</h4>
+                    <p class="mb-0" style="font-size: 14px;">Data that the browser loaded before the lock cannot be recalled. The module leaves the page and clears the caches it can reach, but a person who stops the script of the page before it leaves (developer tools, an extension) keeps what was on screen. After the lock the server answers nothing.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Closing the browser</h4>
+                    <p class="mb-0" style="font-size: 14px;">The server cannot see a browser close. It sees that no tab sent a heartbeat or a goodbye for the grace time (3 minutes by default). A browser that restores its tabs and cookies and is opened again within that time keeps the session, and a laptop that sleeps for longer than the grace time ends the session.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Idle time is measured in the browser</h4>
+                    <p class="mb-0" style="font-size: 14px;">Mouse, keys and scroll in the page. A script can fake them, but it can never go beyond the maximum duration. Background calls of Odoo do not count as activity.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #0E7C66;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Unsaved forms</h4>
+                    <p class="mb-0" style="font-size: 14px;">When the screen locks, a form that has not been saved is lost, unless you switch on the option to try to save it first (off by default, because the lock often comes when nobody is there to confirm). A form that cannot be saved is lost anyway.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">The module depends on the standard <code>web</code>, <code>mail</code> and <code>bus</code> modules. It needs no external library.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ss_install" role="tab" aria-controls="dwo_ss_install" aria-selected="true">Install</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#dwo_ss_rescue" role="tab" aria-controls="dwo_ss_rescue" aria-selected="false">If somebody is locked out</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="dwo_ss_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
+            <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_session_security</code> folder into an add-ons path of your server.<br/>2. Restart Odoo and update the apps list.<br/>3. Install <strong>Secure Session Login</strong>.</p>
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Set it up</h4>
+            <p class="mb-2" style="font-size: 14px;">Open <strong>Settings</strong>, then <strong>Secure Session</strong>. Defaults: lock after 15 minutes, sign out after 4 hours idle, maximum 12 hours, warning 30 minutes before, closing the browser ends the session. Each user sets a PIN in <strong>Preferences, Security</strong>; users without a PIN are not locked.</p>
+        </div>
+        <div class="tab-pane fade" id="dwo_ss_rescue" role="tabpanel">
+            <p class="mb-2" style="font-size: 14px;">Every user can always sign out and sign in again. To switch all the rules off at once, set the system parameter <code>dwo_session.enabled</code> to <code>0</code> (Settings, Technical, System Parameters, or in the database). Administrators are never asked for a session approval, and the group <em>Session security: exempt from time limits</em> removes the time limits for chosen users.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can somebody open the developer tools and read the screen I locked?</h4>
+        <p class="mb-0" style="font-size: 14px;">The browser leaves the page when the lock starts, and the server refuses every call afterwards, so nothing new can be read. What was already loaded in the page before it left cannot be recalled by any web module: see Limitations.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can the PIN sign somebody in?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It only unlocks a session that is already signed in. The password, SSO and two-factor stay the way to sign in.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What about users who sign in with SSO or two-factor?</h4>
+        <p class="mb-0" style="font-size: 14px;">Forgot the PIN sends them to the normal login page, so the whole sign in (SSO, two-factor) happens again, then they choose a new PIN.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it work with several tabs?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. Locking one tab locks the others, and unlocking one opens the others. The idle time counts the activity of every tab.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can an administrator read a PIN?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. Only a salted hash is stored and no group has access to it. An administrator can give a temporary PIN (if you allow it) that the user must change at once.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does the lock page work on a phone?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes, it is a small responsive page.</p>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Changelog</h2>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-18</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release: PIN lock screen, idle and maximum session time, warning before the end, closing the browser ends the session, session approval, ways to recover a PIN, sessions list and log.</p></div>
+        </div>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> session timeout, idle logout, auto logout, inactivity timeout, idle timeout, inactive session, lock screen, screen lock, auto lock screen, pin lock, unlock with pin, session lock, lock odoo, session security, secure login, login security, session expiry, session expired, logout warning, session warning, session approval, login approval, approve login, approve session, session manager, session management, active sessions, user sessions, force logout, kill session, close browser logout, browser close logout, session cookie, maximum session duration, session duration, session limit, forgot pin, pin reset, auto lock, idle session, lock session, session timeout warning, logout after inactivity, logout inactive users</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Keep the session as safe as the sign in.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it, set the times in Settings and ask your people to choose a PIN.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>
