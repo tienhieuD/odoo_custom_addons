@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_dwo_orphan" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.dwo.orphan</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Orphan Mail" string="Orphan Mail" name="dwo_mail_orphan_routing" groups="base.group_system">
+                    <block title="Orphan mail" name="dwo_orphan_general">
+                        <setting string="Keep orphan emails" help="Switch off to get the standard Odoo behaviour back (bounce or refusal, nothing is kept).">
+                            <field name="dwo_orphan_enabled"/>
+                        </setting>
+                        <setting string="Allowed target models" help="The documents an orphan email can be routed to, and the documents searched for suggestions.">
+                            <div class="mt-2"><field name="dwo_orphan_model_ids" widget="many2many_tags" options="{'no_create': True}"/></div>
+                        </setting>
+                        <setting string="Add the sender as follower" help="Default of the routing window: subscribe the sender contact to the target record.">
+                            <field name="dwo_orphan_follow_sender"/>
+                        </setting>
+                    </block>
+                    <block title="Notifications and retention" name="dwo_orphan_keep">
+                        <setting string="Daily digest" help="One email a day to the Orphan Mail Managers with the new orphan emails, instead of one email each.">
+                            <field name="dwo_orphan_digest"/>
+                        </setting>
+                        <setting string="Keep handled emails" help="Routed and ignored emails are deleted after this many days. New emails are never deleted. 0 = keep for ever.">
+                            <div class="mt-2"><field name="dwo_orphan_keep_days" class="oe_inline"/> days</div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>
