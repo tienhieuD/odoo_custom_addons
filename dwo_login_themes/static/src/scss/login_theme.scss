@@ -141,21 +141,45 @@ body:has(.dwo_lc) { background: var(--dwo-page-bg, #e9ecef) !important; margin: 
     .o_database_list a { color: #c9c2ff; }
     .o_database_list .text-muted, .o_database_list em, .o_database_list i:not(.fa) { color: #aeb4c8 !important; }
 }
-// 11. Top bar: the form in a horizontal bar, the image below. The form keeps its own display rules (d-none).
-@include dwo_layout(topbar) { align-items: flex-start; padding: 0 !important;
+// 11. Top bar: the form in one horizontal row (logo | email | password | Log in | other sign-in buttons), the image below.
+// The form keeps its own display rules (d-none). Every control has the same height and the row is aligned on the bottom of
+// the controls, so the fields and the buttons share one baseline whatever sits above them (labels, "Reset Password").
+@include dwo_layout(topbar) { align-items: flex-start; padding: 0 !important; --dwo-ctl-h: 36px;
     .o_database_list { max-width: none !important; border-radius: 0; box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
-        .card-body { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; max-width: 1240px; margin: 0 auto; padding: 1rem 2rem; }
-        .card-body > div:first-child { flex: 0 0 auto; max-width: 220px; margin: 0 !important; padding: 0 !important; border: 0 !important;
+        .card-body { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 2rem; max-width: 1240px; margin: 0 auto; padding: 1rem 2rem .75rem; }
+        .card-body > div:first-child { flex: 0 0 auto; max-width: 220px; margin: 1.5rem 0 0 !important; padding: 0 !important; border: 0 !important;
             img[alt="Logo"] { max-height: 44px !important; max-width: 220px; } }
         .card-body > .dwo_welcome, .card-body > .dwo_notice { flex: 0 0 100%; margin: 0; }
+        // The form is ONE flat row: the groups of the buttons (display: contents) dissolve, so Log in, the links, "- or -",
+        // the OAuth buttons and the passkey button are items of the same row as the fields (Odoo 17 to 20 differ in the markup).
         .card-body > .oe_login_form:not(.d-none), .card-body > form:not(.d-none) { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .75rem 1rem; flex: 1 1 560px; margin: 0;
-            > .mb-3, > div { flex: 1 1 200px; margin: 0 !important; }
-            > .alert, > p { flex: 0 0 100%; margin: 0; }
-            > .oe_login_buttons { flex: 0 0 auto; padding: 0 !important; display: flex !important; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0 !important;
-                > .btn, > a, > div { width: auto; margin: 0; } }
-            > input[type="hidden"] { display: none; } }
-        .card-body > .text-center.small { flex: 0 0 100%; margin: 0 !important; padding: 0 !important; border: 0 !important; } }
+            > .mb-3, > .o_caps_lock_warning { flex: 1 1 200px; margin: 0 !important; min-width: 0; }
+            > .alert { flex: 0 0 100%; margin: 0; }
+            // Odoo 18: a second "- or -" before the passkey button; the one of the OAuth block is enough on the row
+            > em { display: none !important; }
+            > input[type="hidden"] { display: none; }
+            // the label rows (Email, Password + Reset Password) get the same height, the fields no extra margin
+            label.form-label { display: flex; align-items: center; justify-content: space-between; min-height: 24px; margin: 0 0 .25rem; line-height: 1.2; .btn { padding: 0; line-height: 1.2; } }
+            .o_caps_lock_warning { position: relative; > .d-flex { align-items: center !important; min-height: 24px; margin: 0 0 .25rem; label.form-label { margin: 0; min-height: 0; } .btn { padding: 0; line-height: 1.2; } }
+                .o_caps_lock_warning_text { position: absolute; left: 0; top: 100%; white-space: nowrap; font-size: .75rem; } }
+            .input-group { margin: 0 !important; flex-wrap: nowrap; }
+            .form-control, .input-group > .btn { height: var(--dwo-ctl-h); }
+            // items of the row after the fields: same height, same bottom edge
+            .oe_login_buttons, .o_login_auth, .o_login_auth > .list-group { display: contents !important; }
+            .oe_login_buttons > .btn, .oe_login_buttons > a, .oe_login_buttons > .d-flex, > div.text-center:not(.mb-3):not(.oe_login_buttons), > p:not(.alert), .o_login_auth > em, .o_login_auth .list-group-item {
+                flex: 0 0 auto; width: auto; height: var(--dwo-ctl-h); margin: 0 !important; display: inline-flex !important; align-items: center; justify-content: center; white-space: nowrap; padding-top: 0; padding-bottom: 0; }
+            .oe_login_buttons > .btn-link, > p > .btn-link { padding-left: .25rem; padding-right: .25rem; }
+            .oe_login_buttons > .d-flex { gap: .75rem; }
+            .o_login_auth > em { line-height: var(--dwo-ctl-h); padding: 0 .25rem; }
+            .list-group-item, button.passkey_login_link { padding: 0 .75rem !important; border: 1px solid var(--bs-border-color, #dee2e6) !important; border-radius: var(--bs-border-radius, .375rem) !important; > span { margin: 0 !important; } }
+            button.passkey_login_link { height: var(--dwo-ctl-h); background: transparent; } }
+        // the footer links: one centred row under the whole bar
+        .card-body > .text-center.small { flex: 0 0 100%; margin: .25rem 0 0 !important; padding: .5rem 0 0 !important; border: 0 !important;
+            border-top: 1px solid color-mix(in srgb, var(--dwo-text) 12%, transparent) !important; text-align: center; } }
     @include dwo_aside_on; .dwo_aside { left: 0; right: 0; top: 160px; align-items: center; text-align: center; .dwo_aside_list { text-align: left; } } }
+@media (max-width: 1099.98px) and (min-width: 768px) {
+    .container.dwo_lc.dwo_l_topbar .dwo_aside { top: 340px; }
+}
 // 12. Bottom-right corner (SaaS style)
 @include dwo_layout(corner) { justify-content: flex-end; align-items: flex-end; padding: 32px !important;
     .o_database_list { max-width: 390px !important; }
@@ -191,5 +215,18 @@ body:has(.dwo_l_material) { background: color-mix(in srgb, var(--dwo-primary, #7
     }
     .container.dwo_lc.dwo_l_topbar .o_database_list .card-body > .oe_login_form:not(.d-none) { display: block; > .mb-3, > div { margin-bottom: 1rem !important; } }
     .container.dwo_lc.dwo_l_topbar .o_database_list { border-radius: var(--dwo-radius); }
+    .container.dwo_lc.dwo_l_topbar .o_database_list .card-body > div:first-child { margin: 0 0 1rem !important; }
+    .container.dwo_lc.dwo_l_topbar .o_database_list .card-body > .text-center.small { margin: 1.5rem 0 0 !important; padding-top: 1rem !important; }
+    .container.dwo_lc.dwo_l_topbar .o_database_list .card-body > .oe_login_form:not(.d-none) {
+        .form-control, .input-group > .btn { height: auto; }
+        .oe_login_buttons { display: grid !important; gap: 0; }
+        .o_login_auth { display: block !important; > .list-group { display: flex !important; flex-direction: column; } }
+        .oe_login_buttons > .btn, .oe_login_buttons > a, .oe_login_buttons > .d-flex, > div.text-center:not(.mb-3):not(.oe_login_buttons), > p:not(.alert), .o_login_auth > em, .o_login_auth .list-group-item, button.passkey_login_link {
+            height: auto; width: 100%; padding-top: .375rem; padding-bottom: .375rem; white-space: normal; }
+        > em { display: block !important; margin: 1rem 0 !important; padding: 0; text-align: center; }
+        .o_login_auth > em { display: block !important; margin: 1rem 0 !important; padding: 0; line-height: inherit; }
+        .o_login_auth .list-group-item { margin-top: .5rem !important; justify-content: flex-start; padding: .5rem .75rem !important; }
+        > div.text-center:not(.mb-3):not(.oe_login_buttons), > p:not(.alert) { display: flex !important; }
+        button.passkey_login_link { border: 0 !important; } }
     body:has(.dwo_l_material) { background: var(--dwo-page-bg) !important; }
 }
