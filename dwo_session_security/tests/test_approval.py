@@ -33,7 +33,8 @@ class TestApproval(SessionCase):
         self.assertEqual(self.url_open("/web/image/res.users/%s/avatar_128" % self.user.id, allow_redirects=False).status_code, 403)
         page = self.go("/dwo/session/waiting")
         self.assertIn("Waiting for approval", page.text)
-        self.assertNotIn("web.assets", page.text)
+        self.assertNotIn("web.assets_web", page.text)
+        self.assertNotIn("<script src", page.text)
         self.assertEqual(self.beat()["state"], "pending_approval")
         # the lock page is not a way in
         self.assertEqual(self.go("/dwo/session/locked").headers["Location"], "/dwo/session/waiting")
