@@ -1,0 +1,12 @@
+Login Page Themes (dwo_login_themes) - credits and licences
+
+Background images (static/src/img/bg/*.webp and thumb/*.webp)
+  Made by DuoTEK with a Python script (Pillow): gradients, blurred colour fields and geometric patterns.
+  No photograph and no third-party artwork is used. They are part of this module and under its licence (OPL-1).
+
+Fonts and icons
+  None bundled. The show/hide password button uses the Font Awesome icons that Odoo already ships.
+
+Code
+  Written by DuoTEK. No third-party code is copied. The ideas of other login modules (show/hide password, background
+  rotation, welcome text, footer text, tab icon) are common features, implemented from scratch.
