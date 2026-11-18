@@ -25,4 +25,4 @@ class ResConfigSettings(models.TransientModel):
     def set_values(self):
         super().set_values()
         names = ",".join(sorted(self.dwo_orphan_model_ids.mapped("model"))) or "-"
-        self.env["ir.config_parameter"].sudo().set_param(PARAM + "target_models", names)
+        self.env["dwo.mail.orphan"]._icp_set("target_models", names)

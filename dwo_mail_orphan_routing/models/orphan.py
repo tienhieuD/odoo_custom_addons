@@ -1,5 +1,4 @@
 # Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import base64
 import logging
 import re
 from datetime import timedelta
@@ -98,8 +97,14 @@ class DwoMailOrphan(models.Model):
 
     @api.model
     def _icp(self, key, default=None):
-        value = self.env["ir.config_parameter"].sudo().get_param(PARAM + key)
+        icp = self.env["ir.config_parameter"].sudo()
+        value = icp.get_str(PARAM + key) if hasattr(icp, "get_str") else icp.get_param(PARAM + key)
         return default if value is False or value is None else value
+
+    @api.model
+    def _icp_set(self, key, value):
+        icp = self.env["ir.config_parameter"].sudo()
+        return icp.set_str(PARAM + key, value) if hasattr(icp, "set_str") else icp.set_param(PARAM + key, value)
 
     @api.model
     def _capture_enabled(self):
@@ -188,7 +193,7 @@ class DwoMailOrphan(models.Model):
                 continue
             attachment = Attachment.create({
                 "name": fname or "attachment",
-                "datas": base64.b64encode(content),
+                "raw": content,
                 "res_model": self._name,
                 "res_id": self.id,
             })
@@ -348,7 +353,7 @@ class DwoMailOrphan(models.Model):
                 email_from=self.email_from,
                 author_id=self.author_id.id or False,
                 parent_id=parent.id or False,
-                attachments=[(a.name, base64.b64decode(a.datas or b"")) for a in self.attachment_ids.sudo()],
+                attachments=[(a.name, a.raw or b"") for a in self.attachment_ids.sudo()],
                 **kwargs)
         if follow and self.author_id and hasattr(record, "message_subscribe"):
             record.message_subscribe(partner_ids=self.author_id.ids)
@@ -453,7 +458,8 @@ class DwoMailOrphan(models.Model):
         if not since:
             since = fields.Datetime.to_string(fields.Datetime.now() - timedelta(days=1))
         now = fields.Datetime.now()
-        base = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "")
+        icp = self.env["ir.config_parameter"].sudo()
+        base = (icp.get_str("web.base.url") if hasattr(icp, "get_str") else icp.get_param("web.base.url")) or ""
         company = self.env.company
         for user in group.sudo().all_user_ids if "all_user_ids" in group._fields else group.sudo().users:
             if not user.email or not user.active:
@@ -484,7 +490,7 @@ class DwoMailOrphan(models.Model):
                 "email_from": company.email_formatted or user.email_formatted,
                 "auto_delete": True,
             })
-        self.env["ir.config_parameter"].sudo().set_param(PARAM + "last_digest", fields.Datetime.to_string(now))
+        self._icp_set("last_digest", fields.Datetime.to_string(now))
 
 
 class DwoMailOrphanSuggestion(models.Model):

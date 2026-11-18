@@ -64,7 +64,7 @@
                             <field name="reason"/>
                             <field name="score" widget="progressbar"/>
                             <button name="action_route" type="object" string="Route here" class="btn-primary"/>
-                            <button name="action_open_record" type="object" string="Open" icon="fa-external-link"/>
+                            <button name="action_open_record" type="object" string="Open"/>
                         </list>
                     </field>
                     <notebook>

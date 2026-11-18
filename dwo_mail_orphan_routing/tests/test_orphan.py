@@ -26,8 +26,8 @@ class TestOrphan(TransactionCase):
         cls.customer = cls.env["res.partner"].create({"name": "Lan Pham", "email": "lan@client.example"})
         cls.target = cls.env["res.partner"].create({"name": "Acme Project", "ref": "PRJ-4242"})
         cls.target2 = cls.env["res.partner"].create({"name": "Other Project", "ref": "PRJ-9999"})
-        cls.env["ir.config_parameter"].sudo().set_param("dwo_orphan.target_models", "res.partner")
-        cls.env["ir.config_parameter"].sudo().set_param("dwo_orphan.enabled", "1")
+        cls.env["dwo.mail.orphan"]._icp_set("target_models", "res.partner")
+        cls.env["dwo.mail.orphan"]._icp_set("enabled", "1")
         cls.n = 0
 
     def _mail(self, subject="Hello", frm="Lan Pham <lan@client.example>", to="nobody@unknown.example",
@@ -51,7 +51,7 @@ class TestOrphan(TransactionCase):
         self.assertFalse(self.env["mail.message"].search([("message_id", "=", orphan.message_id)]))
 
     def test_disabled_keeps_standard_behaviour(self):
-        self.env["ir.config_parameter"].sudo().set_param("dwo_orphan.enabled", "0")
+        self.env["dwo.mail.orphan"]._icp_set("enabled", "0")
         with self.assertRaises(ValueError):
             self._mail()
         self.assertFalse(self.Orphan.search([("subject", "=", "Hello")]))
@@ -251,11 +251,16 @@ class TestOrphan(TransactionCase):
         orphan = self._mail()
         user = self._user("limited")
         user.write({"group_ids": [(4, self.env.ref("base.group_partner_manager").id)]})
-        rule = self.env["ir.rule"].create({
-            "name": "no write on target", "model_id": self.env["ir.model"]._get("res.partner").id,
-            "domain_force": "[('id', '!=', %s)]" % self.target.id, "perm_read": False, "perm_write": True,
-            "perm_create": False, "perm_unlink": False, "global": True})
-        self.assertTrue(rule)
+        partner_model = self.env["ir.model"]._get("res.partner")
+        domain = "[('id', '!=', %s)]" % self.target.id
+        if "ir.rule" in self.env:
+            restriction = self.env["ir.rule"].create({
+                "name": "no write on target", "model_id": partner_model.id, "domain_force": domain,
+                "perm_read": False, "perm_write": True, "perm_create": False, "perm_unlink": False, "global": True})
+        else:  # Odoo 20: a restriction is an access without group
+            restriction = self.env["ir.access"].create({
+                "name": "no write on target", "model_id": partner_model.id, "operation": "u", "domain": domain})
+        self.assertTrue(restriction)
         with self.assertRaises(AccessError):
             orphan.with_user(user)._route_to("res.partner", self.target.id)
         orphan.with_user(user)._route_to("res.partner", self.target2.id)
@@ -267,8 +272,8 @@ class TestOrphan(TransactionCase):
         self.env["res.users"].browse(self.env.uid).sudo().email = "admin@dwo.example"
         mails_before = self.env["mail.mail"].search_count([])
         self._mail(subject="Digest me")
-        self.env["ir.config_parameter"].sudo().set_param("dwo_orphan.digest", "1")
-        self.env["ir.config_parameter"].sudo().set_param("dwo_orphan.last_digest", "2000-01-01 00:00:00")
+        self.env["dwo.mail.orphan"]._icp_set("digest", "1")
+        self.env["dwo.mail.orphan"]._icp_set("last_digest", "2000-01-01 00:00:00")
         self.Orphan._cron_digest()
         self.assertGreater(self.env["mail.mail"].search_count([]), mails_before)
         # purge: handled emails older than N days
@@ -277,7 +282,7 @@ class TestOrphan(TransactionCase):
         old.sudo().write({"date": "2020-01-01 00:00:00"})
         new_old = self._mail(subject="Old but new state")
         new_old.sudo().write({"date": "2020-01-01 00:00:00"})
-        self.env["ir.config_parameter"].sudo().set_param("dwo_orphan.keep_days", "30")
+        self.env["dwo.mail.orphan"]._icp_set("keep_days", "30")
         self.Orphan._cron_purge()
         self.assertFalse(old.exists())
         self.assertTrue(new_old.exists())
