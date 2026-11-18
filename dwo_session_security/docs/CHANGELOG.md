@@ -1,5 +1,11 @@
 # Changelog
 
+## 19.0.1.0.1 - 2026-11-18 (issue #92)
+
+- The PIN unlocks by itself: the lock page submits the form as soon as the typed digits reach the length of the user's own PIN (4 or 6; the page knows only that number). A wrong PIN is one attempt (a prefix is never sent), the error shows on the reloaded page with an empty field; the button, the Enter key and paste still work. Same for the repeated new PIN (when it equals the first one) and for the 6-digit email code. Numeric keypad (`inputmode=numeric`), `autocomplete=off`, autofocus.
+- The lock, waiting and PIN pages now look like the login page of Odoo: same structure (`card`, `form-control`, `btn btn-primary`, company logo) and the CSS of the bundle that page uses (`web.assets_frontend`, CSS only, through the template `page_css`; no script, no data). Bundle per version: `web.assets_frontend` in 17, 18, 19 and 20 (`web.login_layout` calls `web.frontend_layout`, which loads it). Colours and fonts therefore follow Odoo, Website or a theme that changes them; the module does not depend on any other module for them.
+- The gate lets through only: `/web/assets/*web.assets_frontend*.css` and `/web/binary/company_logo` (both public on the login page), besides the pages of the module and the sign out. JS bundles, the web client, RPC, files, images and the bus stay refused (tests `TestPageLooksLikeOdoo`).
+
 ## 19.0.1.0.0 - 2026-11-18 (issue #92)
 
 First version. One module, all features.
