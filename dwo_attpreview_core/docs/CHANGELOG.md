@@ -1,5 +1,9 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-18 - 17.0.1.3.1 - Ecosystem cards in the listing (#97)
+
+Listing only: a "More modules of the preview family" section with cards of the other modules (relative store links, icons in `static/description/img/`). Settings pictures retaken with all engines. No code change.
+
 ## 2026-11-17 - 17.0.1.3.0 - shared tree view, text engine tick and catalog (#83), 17.0 port of 18.0.1.3.0
 
 - Same as 19.0.1.3.0: `DwoTreeView` (`static/src/js/tree_view.js`, template, styles) and `static/lib/tree_libs` live in

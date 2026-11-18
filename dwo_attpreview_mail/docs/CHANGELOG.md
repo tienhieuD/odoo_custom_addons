@@ -1,5 +1,9 @@
 # CHANGELOG - dwo_attpreview_mail
 
+## 2026-11-18 - 17.0.2.2.1 - Ecosystem cards in the listing (#97)
+
+Listing only: a "More modules of the preview family" section with cards of the other modules (relative store links, icons in `static/description/img/`). No code change.
+
 ## 2026-11-17 - 17.0.2.2.0 - Errors for refused pictures, link confirmation (#87)
 
 **Added:** a picture that cannot be shown is replaced by a red message that says why (not a picture, plain http, private

@@ -2,7 +2,7 @@
 # Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 {
     "name": "Secure Email Preview: EML, MSG, ICS, VCF",
-    "version": "17.0.2.2.0",
+    "version": "17.0.2.2.1",
     "summary": "Open Outlook MSG and EML emails in Odoo with their attachments, level after level. Keywords: email preview, preview email, eml preview, preview eml, eml viewer, msg preview, preview msg, msg viewer, outlook msg, outlook email, open msg file, email attachment preview, ics preview, calendar invitation, vcf preview, vcard.",
     "description": "Engine for Secure Attachment Preview (dwo_attpreview_core). Preview .eml, .emlx, .msg and .oft "
                    "emails with headers, body and attachments (each attachment opens in its own preview), .ics "
