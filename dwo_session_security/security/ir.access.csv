@@ -1,0 +1,6 @@
+id,name,model_id,group_id/id,operation,domain
+access_dwo_session_own,dwo.session own sessions,dwo.session,base.group_user,r,"[('user_id', '=', user.id)]"
+access_dwo_session_admin,dwo.session administrators,dwo.session,base.group_system,rd,
+access_dwo_session_request_approver,dwo.session.request approvers,dwo.session.request,dwo_session_security.group_dwo_session_approver,ru,
+access_dwo_session_log_admin,dwo.session.log administrators,dwo.session.log,base.group_system,rd,
+access_dwo_pin_wizard,dwo.pin.wizard users,dwo.pin.wizard,base.group_user,crud,

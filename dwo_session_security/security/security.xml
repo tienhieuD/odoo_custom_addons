@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_dwo_session_exempt" model="res.groups">
+        <field name="name">Session security: exempt from time limits</field>
+        <field name="comment">Members are never locked or signed out because of idle time or maximum duration.</field>
+    </record>
+    <record id="group_dwo_session_approval" model="res.groups">
+        <field name="name">Session security: sign-in needs approval</field>
+        <field name="comment">Members wait for an approver after the sign-in (when Session approval is switched on). Administrators are exempt.</field>
+    </record>
+    <record id="group_dwo_session_approver" model="res.groups">
+        <field name="name">Session security: approver</field>
+        <field name="comment">Members decide the approval requests and the PIN reset requests. Administrators are approvers.</field>
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_dwo_session_approver'))]"/>
+    </record>
+
+</odoo>
