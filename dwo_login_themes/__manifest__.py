@@ -31,7 +31,7 @@
     },
     "uninstall_hook": "uninstall_hook",
     "images": ["static/description/banner.png"],
-    "price": 12,
+    "price": 22,
     "currency": "EUR",
     "application": False,
     "installable": True,
