@@ -6,7 +6,8 @@ Folder: `static/description/screenshots/`, used by `static/description/index.htm
 | --- | --- | --- |
 | `01-chatter-attachments.png` | Chatter of a partner with attachments of several types (xlsx, docx, pptx, pdf, picture, unknown file) | `listing_shots.mjs` 01 |
 | `06-toast-unsupported-file.png` | Notice for a file that cannot be previewed (file name, reason, Download), no dialog | `listing_shots.mjs` 06 |
-| `07-preview-engines.png` | Settings > Attachment Preview: max file size and engine tick boxes (office "Not installed", mail "Installed") | `listing_shots.mjs` 07 |
+| `07-preview-engines.png` | Settings > Attachment Preview: max file size and ALL engine tick boxes, all "Installed" (retaken 2026-11-18, #97; engine count and names in `docs/settings_screenshot.json`) | `_tools/shots_attpreview_settings.py` |
+| `07b-size-limits.png` | Same Settings page, the size-limit blocks of the installed engines (clip) | `shots_attpreview_settings.py` |
 | `08-engine-popup.png` | Popup of an engine that is not in the addons (office): file types, its Odoo Apps page (catalog copy), note, "Open on Odoo Apps" | `listing_shots.mjs` 08 |
 | `09-binary-field-preview.png` | Crop: "File Content" field of an attachment form with the Preview eye before Edit / Download / Clear | `field_shots.py` |
 | `10-binary-field-dialog.png` | The dialog opened from that field (docx drawn by the office engine) | `field_shots.py` |
@@ -24,3 +25,7 @@ Pictures 02-05 and 15-19 (office files in the dialog) belong to `dwo_attpreview_
 3. `node docs/tools/listing_shots.mjs PORT DB SAMPLES_DIR OUT_DIR 01,02,03,04,05,06`, then `python3 docs/tools/field_shots.py PORT OUT_DIR SAMPLES_ROOT` (SAMPLES_ROOT holds `jp_labor_2024/`), then `node ../dwo_attpreview_office/docs/tools/listing_extra_shots.mjs PORT DB SAMPLES_DIR OUT_DIR`.
 4. Only after the office `index.html` is final and `sync_attpreview_catalog.py` has run: mark office as not in the addons (`UPDATE ir_module_module SET state='uninstallable' WHERE name='dwo_attpreview_office'`, read on every load of Settings) and take 07 and 08 (`ENGINE_POPUP` chooses the engine).
 5. Look at every picture, copy the chosen ones to `static/description/screenshots/` of the right module, run the sync script again, drop the database.
+
+## Settings pictures (07, 07b)
+
+Retaken whenever an engine is added: `python3 odoo_appstore/_tools/shots_attpreview_settings.py` (clean database per version with core and all engines, English UI, database and filestore dropped afterwards). Step 4 of `listing_shots.mjs` above no longer applies to 07; 08 (engine popup) still needs an engine marked as not in the addons. See `ECOSYSTEM.md`.

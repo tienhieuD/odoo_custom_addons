@@ -1,5 +1,9 @@
 # CHANGELOG - dwo_attpreview_office
 
+## 2026-11-18 - 20.0.1.1.2 - Ecosystem cards in the listing (#97)
+
+Listing only: a "More modules of the preview family" section with cards of the other modules (relative store links, icons in `static/description/img/`). No code change.
+
 ## 2026-11-18 - 20.0.1.1.1 - silurus 0.90.1 (#94)
 
 **Library:** `@silurus/ooxml`, `@silurus/ooxml-legacy-office`, `@silurus/ooxml-opendocument` 0.90.0 -> **0.90.1** (compatible

@@ -1,5 +1,9 @@
 # CHANGELOG - dwo_attpreview_text
 
+## 2026-11-18 - 20.0.1.1.1 - Ecosystem cards in the listing (#97)
+
+Listing only: a "More modules of the preview family" section with cards of the other modules (relative store links, icons in `static/description/img/`). No code change.
+
 ## 2026-11-17 - 20.0.1.1.0 - Web pictures through the server, link confirmation (#87)
 
 **Added:** Markdown, HTML and notebook previews show the pictures they link from the internet: the Odoo server downloads

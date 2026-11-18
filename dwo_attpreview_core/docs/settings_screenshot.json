@@ -1,0 +1,16 @@
+{
+  "picture": "static/description/screenshots/07-preview-engines.png",
+  "engine_count": 8,
+  "engines": [
+    "dwo_attpreview_3d",
+    "dwo_attpreview_archive",
+    "dwo_attpreview_bim",
+    "dwo_attpreview_cad",
+    "dwo_attpreview_dwg",
+    "dwo_attpreview_mail",
+    "dwo_attpreview_office",
+    "dwo_attpreview_text"
+  ],
+  "odoo": "20.0",
+  "taken": "2026-11-18"
+}

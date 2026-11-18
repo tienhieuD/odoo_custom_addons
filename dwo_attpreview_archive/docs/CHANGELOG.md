@@ -1,5 +1,9 @@
 # CHANGELOG - dwo_attpreview_archive
 
+## 2026-11-18 - 20.0.1.0.1 - Ecosystem cards in the listing (#97)
+
+Listing only: a "More modules of the preview family" section with cards of the other modules (relative store links, icons in `static/description/img/`). No code change.
+
 ## 2026-11-17 - the tree view comes from the core (#83)
 
 - `DwoTreeView`, its template, styles and the libraries (`tree_libs.min.js`) moved to `dwo_attpreview_core` 20.0.1.3.0

@@ -1,5 +1,9 @@
 # CHANGELOG - dwo_attpreview_core
 
+## 2026-11-18 - 20.0.1.3.1 - Ecosystem cards in the listing (#97)
+
+Listing only: a "More modules of the preview family" section with cards of the other modules (relative store links, icons in `static/description/img/`). Settings pictures retaken with all engines. No code change.
+
 ## 2026-11-17 - 20.0.1.3.0 - shared tree view, text engine (#83)
 
 Port of 19.0.1.3.0 (Owl 3: `DwoTreeView` uses `useProps()`, `proxy`, `signal.ref()`; template with `this.`, `t-out`, `oi`
