@@ -158,11 +158,12 @@ class DwoLoginTheme(models.AbstractModel):
     def _build_context(self):
         notice = self.notice_active()
         theme_on = self.param("enabled")
+        hide_brand = bool(self.param("hide_brand"))
         if not theme_on and not notice:
-            return {}
+            return {"hide_brand": True} if hide_brand else {}
         # the login form page (web.login) draws the announcement itself; the layout draws it on the other pages
         form_page = bool(request) and request.httprequest.path.rstrip("/") == "/web/login"
-        ctx = {"notice": notice, "theme": bool(theme_on), "form_page": form_page}
+        ctx = {"notice": notice, "theme": bool(theme_on), "form_page": form_page, "hide_brand": hide_brand}
         if not theme_on:
             return ctx
         layout = self.param("layout")

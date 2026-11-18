@@ -115,6 +115,7 @@ class TestImages(HttpCase):
         values = self.env["res.config.settings"].get_values()
         self.assertEqual(values["dwo_login_layout"], "glass")
         self.assertIs(values["dwo_login_pwd_toggle"], False)  # a False boolean stays False (default is True)
+        self.assertIs(values["dwo_login_hide_brand"], False)  # off by default
         self.assertEqual(values["dwo_login_primary"], "#112233")
         self.assertEqual(values["dwo_login_overlay"], 40)
         self.assertNotIn("script", values["dwo_login_ann_html"])  # stored already clean
