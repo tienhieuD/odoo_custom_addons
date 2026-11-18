@@ -60,8 +60,8 @@
             <list editable="bottom" create="0" delete="0">
                 <field name="name" readonly="1"/>
                 <field name="login" readonly="1"/>
-                <field name="dwo_orphan_all_aliases"/>
-                <field name="dwo_orphan_alias_ids" widget="many2many_tags" invisible="dwo_orphan_all_aliases"/>
+                <field name="dwo_orphan_all_aliases" string="All aliases"/>
+                <field name="dwo_orphan_alias_ids" string="Only these aliases" widget="many2many_tags" invisible="dwo_orphan_all_aliases"/>
             </list>
         </field>
     </record>
