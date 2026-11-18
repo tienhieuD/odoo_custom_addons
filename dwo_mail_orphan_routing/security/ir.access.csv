@@ -1,0 +1,5 @@
+id,name,model_id,group_id/id,operation,domain
+access_dwo_mail_orphan_manager,dwo.mail.orphan managers,dwo.mail.orphan,group_dwo_orphan_manager,rud,"[(1, '=', 1)] if user.dwo_orphan_all_aliases else [('alias_id', 'in', user.dwo_orphan_alias_ids.ids)]"
+access_dwo_mail_orphan_suggestion_manager,dwo.mail.orphan.suggestion managers,dwo.mail.orphan.suggestion,group_dwo_orphan_manager,r,"[(1, '=', 1)] if user.dwo_orphan_all_aliases else [('orphan_id.alias_id', 'in', user.dwo_orphan_alias_ids.ids)]"
+access_dwo_mail_orphan_rule_manager,dwo.mail.orphan.rule managers,dwo.mail.orphan.rule,group_dwo_orphan_manager,crud,
+access_dwo_mail_orphan_route_wizard,dwo.mail.orphan.route.wizard managers,dwo.mail.orphan.route.wizard,group_dwo_orphan_manager,crud,

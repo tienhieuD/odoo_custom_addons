@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_dwo_orphan_manager" model="res.groups">
+        <field name="name">Orphan Mail Manager</field>
+        <field name="comment">Members see the orphan emails, route them to records they can edit and manage the rules.</field>
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_dwo_orphan_manager'))]"/>
+    </record>
+
+</odoo>
