@@ -3,7 +3,7 @@
 {
     "name": "Form Focus Mode",
     "version": "19.0.1.0.0",
-    "summary": "Three buttons next to the pager choose the form layout for all your forms: normal, chatter always hidden, or auto chatter (a bar on the right opens the chatter as a drawer you can resize). Remembered. Keywords: full screen form view, fullscreen form, wide form view, hide chatter, chatter toggle, form view width, auto chatter, chatter drawer, form view layout, maximize form.",
+    "summary": "Hide the chatter or open it as a drawer, from three buttons next to the pager. Keywords: hide chatter, hide chatter form, chatter hide, remove chatter, disable chatter, collapse chatter, chatter toggle, toggle chatter, show hide chatter, chatter drawer, chatter sidebar, chatter panel, auto chatter, resizable chatter, full screen form view, fullscreen form, full width form, wide form view, form view width, form view layout, maximize form, form focus, focus mode, form view chatter position, chatter right side, chatter width, widescreen form, more space form view.",
     "description": "Three buttons next to the pager of every form view choose the layout, for all your forms: normal "
                    "(the chatter beside the form, as Odoo does), always hidden (the form uses the full width) and auto "
                    "drawer (the chatter is hidden; a bar on the right with the words Auto chatter opens it as a drawer "
