@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_form_focus_mode.FormView" t-inherit="web.FormView" t-inherit-mode="extension">
+        <xpath expr="//div[@t-ref='root']" position="inside">
+            <!-- auto chatter: a bar on the right edge, always there; a click opens the drawer -->
+            <button t-if="dwoFfmEnabled() and dwoFfmMode() === 'auto' and !dwoFfm.drawer" type="button" class="o_dwo_ffm_edge"
+                    data-tooltip="Show the chatter" t-on-click.stop="dwoFfmToggleDrawer">
+                <i class="fa fa-chevron-left" role="img"/><span class="o_dwo_ffm_edge_label">Auto chatter</span>
+            </button>
+            <!-- the dimmed background behind the open drawer: a click on it closes the drawer -->
+            <div t-if="dwoFfmEnabled() and dwoFfmMode() === 'auto' and dwoFfm.drawer" class="o_dwo_ffm_backdrop" t-on-click.stop="dwoFfmToggleDrawer"/>
+            <div t-if="dwoFfmEnabled() and dwoFfmMode() === 'auto' and dwoFfm.drawer" class="o_dwo_ffm_resizer" data-tooltip="Drag to change the width"
+                 t-on-pointerdown.stop="dwoFfmStartResize"/>
+            <button t-if="dwoFfmEnabled() and dwoFfmMode() === 'auto' and dwoFfm.drawer" type="button" class="btn btn-secondary o_dwo_ffm_drawer_close"
+                    title="Close the chatter" t-on-click.stop="dwoFfmToggleDrawer">
+                <i class="fa fa-times" role="img"/>
+            </button>
+        </xpath>
+    </t>
+
+    <t t-name="dwo_form_focus_mode.Button" owl="1">
+        <nav t-if="ffm.dwoFfmEnabled()" class="o_dwo_ffm_switch d-print-none d-inline-flex btn-group">
+            <t t-foreach="['normal', 'hide', 'auto']" t-as="mode" t-key="mode">
+                <button type="button" class="btn btn-secondary o_dwo_ffm_toggle" t-att-class="{ active: ffm.dwoFfmMode() === mode }"
+                        t-att-data-mode="mode" t-att-data-tooltip="ffm.dwoFfmTitleOf(mode)" t-att-aria-label="ffm.dwoFfmTitleOf(mode)"
+                        t-on-click.stop="() => ffm.dwoFfmSet(mode)">
+                    <svg t-if="mode === 'normal'" class="o_dwo_ffm_icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><path d="M10.5 2.5v11"/></svg>
+                    <svg t-elif="mode === 'hide'" class="o_dwo_ffm_icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/></svg>
+                    <svg t-else="" class="o_dwo_ffm_icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2.5h5v11H3a1.5 1.5 0 0 1-1.5-1.5V4A1.5 1.5 0 0 1 3 2.5z" fill="currentColor" fill-opacity=".55" stroke="none"/><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><path d="M8 2.5v11"/></svg>
+                </button>
+            </t>
+        </nav>
+    </t>
+
+    <t t-name="dwo_form_focus_mode.ControlPanel" t-inherit="web.FormControlPanel" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_cp_pager')]" position="after">
+            <DwoFfmButton t-if="env.dwoFfm"/>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,137 @@
+// Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+// Layouts of a form view: the class is set by form_focus.js on the form (o_dwo_ffm_hide / o_dwo_ffm_auto).
+
+// the three buttons of the control panel (after the pager), like the view switcher; the layout in use is lit
+.o_dwo_ffm_switch .o_dwo_ffm_icon {
+    vertical-align: -3px;
+}
+
+.o_dwo_ffm_switch .o_dwo_ffm_toggle.active {
+    color: var(--primary, #714b67);
+    background-color: rgba($o-brand-primary, .16);
+    border-color: var(--primary, #714b67);
+}
+
+// hide and auto: no chatter in the page, the sheet takes the width
+.o_dwo_ffm_hide, .o_dwo_ffm_auto {
+    .o_FormRenderer_chatterContainer {
+        display: none;
+    }
+
+    // Odoo 16 gives the form a fixed width next to the side chatter (wide screens): it takes the whole width
+    .o_form_view_container {
+        width: auto;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .o_form_sheet_bg > .o_form_sheet {
+        max-width: none;
+    }
+}
+
+// auto chatter: the room of the bar on the right
+.o_dwo_ffm_auto .o_content {
+    padding-right: 30px;
+}
+
+// the chatter as a side drawer (auto chatter)
+.o_dwo_ffm_auto.o_dwo_ffm_drawer .o_FormRenderer_chatterContainer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: var(--dwo-ffm-top, 106px);
+    right: 0;
+    bottom: 0;
+    width: var(--dwo-ffm-drawer-width, 530px);
+    max-width: 92vw;
+    margin: 0;
+    padding: 2.75rem 0 0;
+    overflow-y: auto;
+    z-index: 1040;
+    border-left: 0;
+    background: var(--o-view-background-color, #fff);
+    box-shadow: -6px 0 24px rgba(0, 0, 0, .18);
+}
+
+// the dimmed background behind the open drawer: a click on it closes the drawer
+.o_dwo_ffm_backdrop {
+    position: fixed;
+    inset: var(--dwo-ffm-top, 106px) 0 0 0;
+    z-index: 1035;
+    background: rgba(0, 0, 0, .35);
+}
+
+// the handle on the left edge of the drawer
+.o_dwo_ffm_resizer {
+    position: fixed;
+    top: var(--dwo-ffm-top, 106px);
+    bottom: 0;
+    right: calc(var(--dwo-ffm-drawer-width, 530px) - 3px);
+    width: 7px;
+    z-index: 1045;
+    cursor: ew-resize;
+    touch-action: none;
+
+    &:hover, &:active {
+        background: var(--primary, #714b67);
+        opacity: .55;
+    }
+}
+
+.o_dwo_ffm_drawer_close {
+    position: fixed;
+    top: calc(var(--dwo-ffm-top, 106px) + .4rem);
+    right: 1rem;
+    z-index: 1050;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border-radius: 50%;
+}
+
+// the bar on the right edge of the screen: an arrow and the words "Auto chatter" written along it
+.o_dwo_ffm_edge {
+    position: fixed;
+    top: var(--dwo-ffm-top, 106px);
+    right: 0;
+    bottom: 0;
+    z-index: 1030;
+    width: 30px;
+    padding: 1rem 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .6rem;
+    color: var(--primary, #714b67);
+    background: var(--o-view-background-color, #fff);
+    border: 0;
+    border-left: 1px solid var(--border-color, #dee2e6);
+    cursor: pointer;
+
+    &:hover, &:focus-visible {
+        background: rgba($o-brand-primary, .1);
+    }
+
+    .o_dwo_ffm_edge_label {
+        writing-mode: vertical-rl;
+        font-size: .8rem;
+        font-weight: 600;
+        letter-spacing: .06em;
+        white-space: nowrap;
+    }
+
+    // the form has no chatter: no bar
+    .o_dwo_ffm_auto:not(:has(.o_FormRenderer_chatterContainer)) & {
+        display: none;
+    }
+}
+
+// the chatter of Odoo 16 keeps its own width and container limits: in the drawer it fills the drawer
+.o_dwo_ffm_auto.o_dwo_ffm_drawer .o_FormRenderer_chatterContainer {
+    .o_ChatterContainer, .o_Chatter {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+}
