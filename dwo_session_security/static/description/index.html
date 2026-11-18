@@ -15,15 +15,27 @@
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">A lock page without the application</h2>
-    <p class="mb-4" style="font-size: 16px;">When the screen locks, the browser leaves the web client for this page. It carries no menu, no record and no Odoo script, so the developer tools show nothing of the screen you left. Reload it, open the address in another tab or press Back: you get this page again until the PIN is entered.</p>
+    <p class="mb-4" style="font-size: 16px;">When the screen locks, the browser leaves the web client for this page, drawn like the Odoo login page (it loads only its CSS). Typing the last digit of the PIN unlocks it, no button needed. It carries no menu, no record and no Odoo script, so the developer tools show nothing of the screen you left. Reload it, open the address in another tab or press Back: you get this page again until the PIN is entered.</p>
     <div class="text-center mb-4">
-        <img src="screenshots/01-lock-page.png" alt="A dark page with a white card: a padlock, the words Screen locked, the name of the user, a PIN field, an Unlock button and a Forgot the PIN link" class="img-fluid rounded shadow"/>
+        <img src="screenshots/01-lock-page.png" alt="A page in the style of the Odoo login page: the company logo, a padlock, the words Screen locked, the name of the user, a PIN field, an Unlock button and Forgot the PIN" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Forgot the PIN? You choose the ways out</h2>
     <p class="mb-4" style="font-size: 16px;">Each way is a switch in Settings: the account password or a new sign in (SSO and two-factor users go through the normal login page), a request to an administrator, a 6-digit code by email, or a temporary PIN from an administrator. After every way the user chooses a new PIN.</p>
     <div class="text-center mb-4">
         <img src="screenshots/02-forgot-pin.png" alt="The lock page with the Forgot the PIN list open: enter the account password, sign in again, ask an administrator to reset the PIN, email me a code" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">A code by email, a new PIN</h2>
+    <p class="mb-4" style="font-size: 16px;">The code (6 digits, valid 10 minutes, 3 per hour) opens the form to choose a new PIN. The field sends the code by itself when the sixth digit is typed.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/10-email-code.png" alt="The lock page after Email me a code: a message that a code was sent and a field for the 6-digit code" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Choose a new PIN</h2>
+    <p class="mb-4" style="font-size: 16px;">After every way to recover a PIN, the user chooses a new one: 4 or 6 digits, not an easy one, not the previous one. The second field saves it by itself when it matches the first.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/11-new-pin.png" alt="The lock page asking for a new PIN twice, with a Save the PIN button" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">The session ended: a dialog, then back to the same screen</h2>

@@ -12,6 +12,16 @@ from .util import JSON, cfg_bool
 
 ALLOWED_PREFIX = "/dwo/session/"
 ALLOWED_PATHS = ("/web/session/logout",)
+PUBLIC_LOGO = "/web/binary/company_logo"
+
+
+def _is_public_css(path):
+    """The CSS bundle of Odoo's own login page (and the company logo): public, no data, no script."""
+    return path == PUBLIC_LOGO or (
+        path.startswith("/web/assets/") and path.endswith(".css") and "web.assets_frontend" in path
+    )
+
+
 NO_BROWSER_CHECK = ("/web/session/logout", "/dwo/session/relogin", "/dwo/session/bye")
 
 
@@ -52,7 +62,7 @@ class IrHttp(models.AbstractModel):
         if not row:
             return
         path = request.httprequest.path
-        allowed = path.startswith(ALLOWED_PREFIX) or path in ALLOWED_PATHS
+        allowed = path.startswith(ALLOWED_PREFIX) or path in ALLOWED_PATHS or _is_public_css(path)
         nav = cls._dwo_is_document() and path not in NO_BROWSER_CHECK
         state = row._dwo_apply_rules(nav=nav)
         if state == "active":
