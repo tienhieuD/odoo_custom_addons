@@ -5,8 +5,9 @@ import werkzeug.exceptions
 
 from odoo import models
 from odoo.exceptions import AccessDenied
-from odoo.http import SessionExpiredException, request, root
+from odoo.http import request
 
+from .compat import SessionExpiredException, get_store, session_logout
 from .util import JSON, cfg_bool
 
 ALLOWED_PREFIX = "/dwo/session/"
@@ -62,8 +63,8 @@ class IrHttp(models.AbstractModel):
             # an exception rolls the request back and skips the saving of the session: do both here
             sess = request.session
             if sess.get("uid"):
-                sess.logout(keep_db=True)
-            root.session_store.rotate(sess, env)     # saves the signed-out session, drops the old file
+                session_logout(sess)
+            get_store().rotate(sess, env)     # saves the signed-out session, drops the old file
             env.cr.commit()
             kind = (endpoint.routing.get("type") if endpoint is not None else "http") or "http"
             if kind in ("json", "jsonrpc"):

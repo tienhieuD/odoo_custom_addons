@@ -25,7 +25,8 @@ class TestPinRules(TransactionCase):
                 Pin.check_format(bad)
         Pin.check_format("4826")
         Pin.check_format("739105")
-        self.env["ir.config_parameter"].sudo().set_param("dwo_session.pin_digits", "6")
+        from odoo.addons.dwo_session_security.models import util
+        util.icp_set(self.env, "dwo_session.pin_digits", "6")
         with self.assertRaises(UserError):
             Pin.check_format("4826")
 

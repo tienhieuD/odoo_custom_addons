@@ -29,8 +29,7 @@ registry.category("web_tour.tours").add("dwo_session_expiry_tour", {
                 await service().beat();
             },
         },
-        { content: "The dialog says the session ended", trigger: ".modal-title:contains('Session ended')" },
-        { content: "The screen behind it is hidden", trigger: "body", run() {
+        { content: "The dialog says the session ended and the screen behind it is hidden", trigger: ".modal-title:contains('Session ended')", run() {
             if (document.querySelector(".o_list_renderer") && getComputedStyle(document.querySelector(".o_action_manager")).display !== "none") {
                 throw new Error("the web client is still visible behind the dialog");
             }

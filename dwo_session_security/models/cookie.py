@@ -7,6 +7,8 @@ import inspect
 
 from odoo import http
 
+from .compat import FutureResponse, Response
+
 _PATCHED = "_dwo_session_cookie"
 
 
@@ -15,9 +17,8 @@ def _enabled():
         request = http.request
         if not request or not request.db or "dwo.session" not in request.env:
             return False
-        value = request.env["ir.config_parameter"].sudo().get_param("dwo_session.close_browser", "")
-        enabled = request.env["ir.config_parameter"].sudo().get_param("dwo_session.enabled", "")
-        return str(value).lower() in ("1", "true") and str(enabled).lower() in ("1", "true")
+        from .util import cfg_bool
+        return cfg_bool(request.env, "close_browser") and cfg_bool(request.env, "enabled")
     except Exception:
         return False
 
@@ -39,6 +40,6 @@ def _wrap(orig):
     return set_cookie
 
 
-for _cls in (http.FutureResponse, http.Response):
+for _cls in (FutureResponse, Response):
     if not getattr(_cls.set_cookie, _PATCHED, False):
         _cls.set_cookie = _wrap(_cls.set_cookie)

@@ -27,5 +27,11 @@ class TestBus(SessionCase):
         self.assertTrue(session_is_active(session, self.env))
 
     def test_the_websocket_loop_uses_the_check(self):
-        from odoo.addons.bus import websocket
-        self.assertTrue(getattr(websocket.check_session, "_dwo_session", False))
+        from odoo import release
+        if release.version_info[0] >= 20:
+            from odoo.addons.bus import bus_dispatcher as module
+            function = module.check_sessions
+        else:
+            from odoo.addons.bus import websocket as module
+            function = module.check_session
+        self.assertTrue(getattr(function, "_dwo_session", False))

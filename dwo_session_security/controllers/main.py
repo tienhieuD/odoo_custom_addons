@@ -3,6 +3,7 @@ from odoo import http
 from odoo.exceptions import UserError
 from odoo.http import request
 
+from odoo.addons.dwo_session_security.models.compat import session_logout
 from odoo.addons.dwo_session_security.models.util import JSON, cfg_bool, safe_path, tr
 
 from . import pages
@@ -111,7 +112,7 @@ class DwoSessionController(http.Controller):
             return _go("/dwo/session/resume")
         if row.state == "locked":
             return _go("/dwo/session/locked")
-        return _html(pages.waiting_page(_env(), row))
+        return _html(pages.waiting_page(_env(), row, request.csrf_token()))
 
     @http.route("/dwo/session/resume", type="http", auth="public", methods=["GET"])
     def resume(self, **kw):
@@ -142,7 +143,7 @@ class DwoSessionController(http.Controller):
         elif row and row.state == "pending_approval":
             row._dwo_expire("relogin")
         elif request.session.get("uid"):
-            request.session.logout(keep_db=True)
+            session_logout(request.session)
         response = _login_redirect(url)
         response.headers["Cache-Control"] = "no-store"
         return response

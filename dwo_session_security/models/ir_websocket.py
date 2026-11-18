@@ -2,10 +2,18 @@
 """The bus must not deliver private messages to a session that is locked, waiting for approval or ended."""
 import functools
 
-from odoo import models
+from odoo import SUPERUSER_ID, api, models, release
 
+from .util import cfg_bool
+
+WEBSOCKET_HOOK = "none"
 try:
-    from odoo.addons.bus import websocket as _ws
+    if release.version_info[0] >= 20:
+        from odoo.addons.bus import bus_dispatcher as _ws
+        WEBSOCKET_HOOK = "check_sessions"
+    else:
+        from odoo.addons.bus import websocket as _ws
+        WEBSOCKET_HOOK = "check_session"
 except ImportError:   # pragma: no cover
     _ws = None
 
@@ -16,8 +24,7 @@ def session_is_active(session, env):
         key = session.get("dwo_key")
         if not key or "dwo.session" not in env:
             return True
-        enabled = env["ir.config_parameter"].sudo().get_param("dwo_session.enabled", "")
-        if str(enabled).lower() not in ("1", "true"):
+        if not cfg_bool(env, "enabled"):
             return True
         row = env["dwo.session"].sudo().search([("key", "=", key)], limit=1)
         return not row or row.state == "active"
@@ -25,7 +32,7 @@ def session_is_active(session, env):
         return False
 
 
-if _ws is not None and not getattr(_ws.check_session, "_dwo_session", False):
+if _ws is not None and WEBSOCKET_HOOK == "check_session" and not getattr(_ws.check_session, "_dwo_session", False):
     _orig_check = _ws.check_session
 
     @functools.wraps(_orig_check)
@@ -35,6 +42,21 @@ if _ws is not None and not getattr(_ws.check_session, "_dwo_session", False):
 
     _check_session._dwo_session = True
     _ws.check_session = _check_session
+
+if _ws is not None and WEBSOCKET_HOOK == "check_sessions" and not getattr(_ws.check_sessions, "_dwo_session", False):
+    _orig_check_all = _ws.check_sessions
+
+    @functools.wraps(_orig_check_all)
+    def _check_sessions(cr, sessions, *args, **kwargs):   # Odoo 20 checks all the sockets of a dispatch at once
+        resolved = _orig_check_all(cr, sessions, *args, **kwargs)
+        env = api.Environment(cr, SUPERUSER_ID, {})
+        for sid, session in list(resolved.items()):
+            if not session_is_active(session, env):
+                resolved.pop(sid)
+        return resolved
+
+    _check_sessions._dwo_session = True
+    _ws.check_sessions = _check_sessions
 
 
 class IrWebsocket(models.AbstractModel):

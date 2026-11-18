@@ -44,11 +44,25 @@ DEFAULTS = {
 }
 
 
+def icp_get(env, key, default=""):
+    """``ir.config_parameter`` read (Odoo 20 replaced get_param by typed getters)."""
+    icp = env["ir.config_parameter"].sudo()
+    if hasattr(icp, "get_param"):
+        return icp.get_param(key, default)
+    value = icp.get_str(key, None)
+    return default if value is None else value
+
+
+def icp_set(env, key, value):
+    icp = env["ir.config_parameter"].sudo()
+    return icp.set_param(key, value) if hasattr(icp, "set_param") else icp.set_str(key, value)
+
+
 def cfg(env, key):
     """Value of a setting (string)."""
     # a missing parameter means off / 0: Odoo removes the parameter when a setting is saved as unchecked or 0;
     # the defaults of DEFAULTS are written once, when the module is installed (see ``post_init``)
-    return env["ir.config_parameter"].sudo().get_param(PARAM + key, "") or ""
+    return icp_get(env, PARAM + key, "") or ""
 
 
 def cfg_bool(env, key):
@@ -107,7 +121,6 @@ def tr(env, message, *args):
 
 def post_init(env):
     """Write the default settings once (a setting that the administrator saves as off or 0 is removed by Odoo)."""
-    icp = env["ir.config_parameter"].sudo()
     for key, value in DEFAULTS.items():
-        if icp.get_param(PARAM + key, None) is None:
-            icp.set_param(PARAM + key, value)
+        if icp_get(env, PARAM + key, None) is None:
+            icp_set(env, PARAM + key, value)

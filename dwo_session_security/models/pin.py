@@ -3,7 +3,7 @@ import re
 import secrets
 from datetime import timedelta
 
-from odoo import api, fields, models
+from odoo import api, fields, models, release
 from odoo.exceptions import AccessDenied, UserError
 
 from .util import cfg, cfg_int, tr
@@ -54,7 +54,10 @@ class DwoUserPin(models.Model):
     otp_tries = fields.Integer()
     otp_sent = fields.Text(help="Timestamps of the codes sent in the last hour (anti-abuse).")
 
-    _user_uniq = models.Constraint("unique(user_id)", "One PIN record per user.")
+    if release.version_info[0] >= 19:
+        _user_uniq = models.Constraint("unique(user_id)", "One PIN record per user.")
+    else:
+        _sql_constraints = [("user_uniq", "unique(user_id)", "One PIN record per user.")]
 
     # -- helpers -------------------------------------------------------------------------------------------
     @api.model

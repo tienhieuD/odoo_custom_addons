@@ -6,7 +6,7 @@ from odoo import api, fields, models, release
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import html_escape
 
-from .util import APPROVER_GROUP, cfg_bool, cfg_int, describe_agent, tr
+from .util import APPROVER_GROUP, cfg_bool, cfg_int, describe_agent, icp_get, tr
 
 
 class DwoSessionRequest(models.Model):
@@ -84,7 +84,7 @@ class DwoSessionRequest(models.Model):
         return users.filtered(lambda u: u.has_group(APPROVER_GROUP) and u != self.user_id)
 
     def _record_url(self):
-        base = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "")
+        base = icp_get(self.env, "web.base.url", "")
         if release.version_info[0] >= 18:
             return "%s/odoo/dwo.session.request/%s" % (base, self.id)
         return "%s/web#id=%s&model=dwo.session.request&view_type=form" % (base, self.id)
@@ -96,7 +96,7 @@ class DwoSessionRequest(models.Model):
         text = "%s %s (%s, %s)" % (self.user_id.name, what, self.ip or "?", describe_agent(self.user_agent))
         if cfg_bool(self.env, "notify_toast"):
             for user in approvers:
-                self.env["bus.bus"]._sendone(user.partner_id, "dwo_session/request",
+                self.env["bus.bus"]._sendone(user if release.version_info[0] >= 20 else user.partner_id, "dwo_session/request",
                                              {"id": self.id, "kind": self.kind, "message": text})
         if cfg_bool(self.env, "notify_email"):
             for user in approvers.filtered("email"):

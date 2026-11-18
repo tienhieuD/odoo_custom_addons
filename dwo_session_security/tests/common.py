@@ -3,12 +3,13 @@ import json
 import re
 from datetime import timedelta
 
-from odoo import fields
+from odoo import fields, release
 from odoo.tests import HttpCase
 
 from odoo.addons.dwo_session_security.models import util
 
 PASSWORD = "Dwo-Test-Pass-1!"
+WEBCLIENT = "/odoo" if release.version_info[0] >= 18 else "/web"
 DOC = {"Sec-Fetch-Dest": "document", "Accept": "text/html"}
 
 
@@ -34,7 +35,7 @@ class SessionCase(HttpCase):
         })
 
     def set(self, key, value):
-        self.icp.set_param("dwo_session." + key, value)
+        util.icp_set(self.env, "dwo_session." + key, value)
 
     def sign_in(self, user=None):
         user = user or self.user

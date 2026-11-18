@@ -9,10 +9,11 @@ import secrets
 import time
 from datetime import timedelta
 
-from odoo import api, fields, models
+from odoo import api, fields, models, release
 from odoo.exceptions import AccessError
-from odoo.http import request, root
+from odoo.http import request
 
+from .compat import get_store, session_logout
 from .util import APPROVER_GROUP, EXEMPT_GROUP, NEEDS_APPROVAL_GROUP, cfg_bool, cfg_int, describe_agent, safe_path, tr
 
 TOUCH_STEP = 30          # seconds: the last activity is written at most this often
@@ -63,7 +64,10 @@ class DwoSession(models.Model):
     approval_id = fields.Many2one("dwo.session.request", readonly=True, ondelete="set null")
     is_current = fields.Boolean(compute="_compute_is_current")
 
-    _key_uniq = models.Constraint("unique(key)", "Session key must be unique.")
+    if release.version_info[0] >= 19:
+        _key_uniq = models.Constraint("unique(key)", "Session key must be unique.")
+    else:
+        _sql_constraints = [("key_uniq", "unique(key)", "Session key must be unique.")]
 
     # -- display -------------------------------------------------------------------------------------------
     @api.depends("user_agent")
@@ -229,12 +233,12 @@ class DwoSession(models.Model):
                                             note=dict(self._fields["end_reason"].selection).get(reason))
             if request and request.session.get("dwo_key") == rec.key:
                 request.dwo_ended = reason
-                request.session.logout(keep_db=True)
+                session_logout(request.session)
             elif rec.sid:
                 try:
-                    stored = root.session_store.get(rec.sid)
+                    stored = get_store().get(rec.sid)
                     if stored.get("dwo_key") == rec.key:
-                        root.session_store.delete(stored)
+                        get_store().delete(stored)
                 except Exception:   # the file is already gone or the store is not a file system
                     pass
 

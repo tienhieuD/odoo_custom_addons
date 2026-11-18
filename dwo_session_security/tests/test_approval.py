@@ -5,7 +5,7 @@ from odoo import fields
 from odoo.exceptions import AccessError, UserError
 from odoo.tests import tagged
 
-from .common import DOC, SessionCase
+from .common import WEBCLIENT, DOC, SessionCase
 
 
 @tagged("post_install", "-at_install")
@@ -29,7 +29,7 @@ class TestApproval(SessionCase):
         self.assertEqual(row.approval_id.kind, "login")
         res = self.rpc("/web/dataset/call_kw/res.users/read", model="res.users", method="read", args=[[self.user.id], ["name"]], kwargs={})
         self.assertIn("error", res)
-        self.assertEqual(self.go("/odoo").headers["Location"], "/dwo/session/waiting")
+        self.assertEqual(self.go(WEBCLIENT).headers["Location"], "/dwo/session/waiting")
         self.assertEqual(self.url_open("/web/image/res.users/%s/avatar_128" % self.user.id, allow_redirects=False).status_code, 403)
         page = self.go("/dwo/session/waiting")
         self.assertIn("Waiting for approval", page.text)
@@ -87,7 +87,7 @@ class TestApproval(SessionCase):
 
     def test_cancel_by_signing_out(self):
         self._wait()
-        out = self.url_open("/web/session/logout?redirect=/web/login", allow_redirects=False)
+        out = self.post("/web/session/logout?redirect=/web/login")
         self.assertEqual(out.status_code, 303)
 
     def test_administrators_and_other_users_are_not_asked(self):

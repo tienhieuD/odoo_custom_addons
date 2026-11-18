@@ -19,6 +19,8 @@ cursor:pointer;margin-top:10px;text-decoration:none}.btn.light,button.light{back
 .ok{background:#e6f6ec;color:#0e7c66;border-radius:8px;padding:8px 10px;font-size:13px;margin-top:10px}
 details{margin-top:16px;text-align:left}summary{cursor:pointer;color:#875a7b;font-size:14px;text-align:center}
 details form{margin-top:8px}.small{font-size:12px;color:#7b8794;margin-top:14px}
+button.link{background:none;border:0;color:#875a7b;width:auto;margin:0;padding:0;font-size:12px;text-decoration:underline;cursor:pointer}
+form.out{display:inline;margin:0}
 @keyframes spin{to{transform:rotate(360deg)}}.spin{width:34px;height:34px;border:4px solid #e4e7eb;border-top-color:#875a7b;
 border-radius:50%;animation:spin 1s linear infinite;margin:16px auto}
 """
@@ -57,6 +59,12 @@ def layout(env, title, body, want, reset="", canset=False):
 
 def _csrf(token):
     return '<input type="hidden" name="csrf_token" value="%s"/>' % escape(token)
+
+
+def signout(csrf, label):
+    """Odoo 20 only signs out with a POST: a small form works everywhere."""
+    return ('<form class="out" method="post" action="/web/session/logout?redirect=/web/login">%s'
+            '<button type="submit" class="link">%s</button></form>' % (_csrf(csrf), escape(label)))
 
 
 def message(kind, text):
@@ -121,16 +129,16 @@ def lock_page(env, row, csrf, error=None, notice=None, otp=False):
         if options:
             parts.append("<details%s><summary>%s</summary>%s</details>" % (
                 " open" if (otp or reset_state in ("pending", "rejected")) else "", escape(t("Forgot the PIN?")), "".join(options)))
-    parts.append('<p class="small"><a href="/web/session/logout?redirect=/web/login">%s</a></p>' % escape(t("Sign out")))
+    parts.append('<p class="small">%s</p>' % signout(csrf, t("Sign out")))
     parts.append("</div>")
     return layout(env, t("Screen locked"), "".join(parts), "locked", reset_state, row.can_set_pin)
 
 
-def waiting_page(env, row):
+def waiting_page(env, row, csrf):
     t = lambda m, *a: tr(env, m, *a)   # noqa: E731
     body = ('<div class="card"><div class="lock">&#9203;</div><h1>%s</h1><p>%s</p><div class="spin"></div>'
-            '<p class="small">%s</p><p class="small"><a href="/web/session/logout?redirect=/web/login">%s</a></p></div>'
+            '<p class="small">%s</p><p class="small">%s</p></div>'
             % (escape(t("Waiting for approval")),
                escape(t("An administrator has to approve this sign-in before you can enter. This page opens Odoo as soon as it is approved.")),
-               escape(row.user_id.name or ""), escape(t("Cancel and sign out"))))
+               escape(row.user_id.name or ""), signout(csrf, t("Cancel and sign out"))))
     return layout(env, t("Waiting for approval"), body, "waiting")

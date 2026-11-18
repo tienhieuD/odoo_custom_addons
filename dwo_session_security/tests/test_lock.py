@@ -3,7 +3,7 @@ import json
 
 from odoo.tests import tagged
 
-from .common import DOC, PASSWORD, SessionCase
+from .common import WEBCLIENT, DOC, PASSWORD, SessionCase
 
 
 @tagged("post_install", "-at_install")
@@ -33,7 +33,7 @@ class TestServerSideLock(SessionCase):
         for path in ("/web/image/res.users/%s/avatar_128" % self.user.id, "/web/content/ir.attachment/1/datas"):
             self.assertEqual(self.url_open(path, allow_redirects=False).status_code, 403, path)
         # the web client page itself goes to the lock page
-        for path in ("/odoo", "/web", "/odoo/action-1/5"):
+        for path in (WEBCLIENT, "/web"):
             res = self.go(path)
             self.assertEqual(res.status_code, 303, path)
             self.assertTrue(res.headers["Location"].endswith("/dwo/session/locked"), res.headers["Location"])
@@ -53,7 +53,7 @@ class TestServerSideLock(SessionCase):
         for forbidden in ("web.assets", "odoo.__session_info__", "/web/static", "res.partner"):
             self.assertNotIn(forbidden, page.text)
         self.assertEqual(self.beat(tab="t1")["state"], "locked")
-        out = self.url_open("/web/session/logout?redirect=/web/login", allow_redirects=False)
+        out = self.post("/web/session/logout?redirect=/web/login")
         self.assertEqual(out.status_code, 303)
 
     def test_unlock_with_pin_returns_to_the_same_screen(self):

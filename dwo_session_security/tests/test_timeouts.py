@@ -1,9 +1,11 @@
 # Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import time
 
+from odoo import release
+
 from odoo.tests import tagged
 
-from .common import DOC, PASSWORD, SessionCase
+from .common import WEBCLIENT, DOC, PASSWORD, SessionCase
 
 
 @tagged("post_install", "-at_install")
@@ -19,7 +21,7 @@ class TestTimeouts(SessionCase):
         self.assertEqual(self.beat(tab="t1")["state"], "locked")
         self.assertEqual(self.row().lock_reason, "idle")
         # the web client page is now the lock page
-        self.assertTrue(self.go("/odoo").headers["Location"].endswith("/dwo/session/locked"))
+        self.assertTrue(self.go(WEBCLIENT).headers["Location"].endswith("/dwo/session/locked"))
 
     def test_no_pin_no_idle_lock(self):
         row = self.sign_in()
@@ -36,9 +38,10 @@ class TestTimeouts(SessionCase):
         self.assertEqual(self.row().state, "expired")
         self.assertEqual(self.row().end_reason, "idle")
         # a page request goes to the login page, with the screen to come back to
-        page = self.go("/odoo/action-1/5")
+        page = self.go(WEBCLIENT)
         self.assertIn("/web/login", page.headers["Location"])
-        self.assertIn("redirect=", page.headers["Location"])
+        if release.version_info[0] >= 18:   # in 17 the web client page itself sends a signed-out user to the login page
+            self.assertIn("redirect=", page.headers["Location"])
         self.assertEqual(self.env["dwo.session.log"].search_count([("event", "=", "expired"), ("user_id", "=", self.user.id)]), 1)
 
     def test_absolute_limit(self):
@@ -147,7 +150,7 @@ class TestSessionCookie(SessionCase):
             self.assertNotIn("max-age", low)
             self.assertIn("httponly", low)
         # a plain RPC and an authenticated page keep it a browser-session cookie
-        for path in ("/odoo", "/web/login"):
+        for path in (WEBCLIENT, "/web/login"):
             res = self.url_open(path, allow_redirects=False)
             for cookie in [c for c in self._cookies(res) if c.startswith("session_id=")]:
                 self.assertNotIn("max-age", cookie.lower())
@@ -172,11 +175,11 @@ class TestCloseBrowser(SessionCase):
         self.sign_in()
         self.assertEqual(self.beat(tab="t1")["state"], "active")
         self.assertEqual(self.beat(tab="t2")["state"], "active")           # a new tab: another tab is alive
-        self.assertEqual(self.go("/odoo").status_code, 200)               # a page load: fine
+        self.assertEqual(self.go(WEBCLIENT).status_code, 200)               # a page load: fine
         # reload of the only tab: bye, then a page and a heartbeat within seconds
         self.rpc("/dwo/session/bye", tab="t1")
         self.rpc("/dwo/session/bye", tab="t2")
-        self.assertNotEqual(self.go("/odoo").status_code, 303)
+        self.assertNotEqual(self.go(WEBCLIENT).status_code, 303)
         self.assertEqual(self.beat(tab="t1")["state"], "active")
 
     def test_cookie_restored_after_the_browser_was_closed(self):
@@ -186,7 +189,7 @@ class TestCloseBrowser(SessionCase):
         tabs = row._tabs()
         old = time.time() - 120
         row.tabs = '{"t1": [%s, %s]}' % (old - 5, old)
-        res = self.go("/odoo/action-1/5")
+        res = self.go(WEBCLIENT)
         self.assertEqual(res.status_code, 303)
         self.assertIn("/web/login", res.headers["Location"])
         self.assertEqual(self.row().state, "expired")
@@ -210,4 +213,4 @@ class TestCloseBrowser(SessionCase):
         self.set("close_browser", "0")
         row.tabs = '{"t1": [%s, 0]}' % (time.time() - 4000)
         self.assertEqual(self.beat(tab="t1")["state"], "active")
-        self.assertNotEqual(self.go("/odoo").status_code, 303)
+        self.assertNotEqual(self.go(WEBCLIENT).status_code, 303)

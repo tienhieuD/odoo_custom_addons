@@ -16,11 +16,21 @@ class ResUsers(models.Model):
         for user in self:
             user.dwo_has_pin = pins.get(user.id, False)
 
-    def authenticate(self, *args, **kwargs):
+    @staticmethod
+    def _dwo_forget_old_row():
         # a new sign-in on a session that already had one: the row of the old sign-in must not be reused
         if request and getattr(request, "session", None) is not None and "dwo_key" in request.session:
             del request.session["dwo_key"]
-        return super().authenticate(*args, **kwargs)
+
+    if release.version_info[0] >= 19:      # an instance method from Odoo 19, a class method before
+        def authenticate(self, *args, **kwargs):
+            self._dwo_forget_old_row()
+            return super().authenticate(*args, **kwargs)
+    else:
+        @classmethod
+        def authenticate(cls, *args, **kwargs):
+            cls._dwo_forget_old_row()
+            return super().authenticate(*args, **kwargs)
 
     def write(self, vals):
         res = super().write(vals)
