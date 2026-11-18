@@ -89,10 +89,10 @@
         <field name="arch" type="xml">
             <list create="0" edit="0" decoration-warning="state == 'pending'" decoration-muted="state != 'pending'">
                 <field name="create_date"/>
-                <field name="kind"/>
-                <field name="user_id"/>
+                <field name="kind" width="150px"/>
+                <field name="user_id" width="150px"/>
                 <field name="ip"/>
-                <field name="browser"/>
+                <field name="browser" width="150px"/>
                 <field name="state" widget="badge" decoration-warning="state == 'pending'" decoration-success="state == 'approved'" decoration-danger="state in ('rejected', 'expired')"/>
                 <field name="decided_by"/>
                 <field name="decided_at"/>
@@ -204,9 +204,9 @@
                 </div>
                 <group>
                     <field name="user_id" invisible="mode == 'self'" options="{'no_create': True}"/>
-                    <field name="password" password="True" invisible="mode != 'self' or not has_password" required="mode == 'self' and has_password"/>
-                    <field name="pin" password="True" required="mode == 'self'" placeholder="4 or 6 digits"/>
-                    <field name="pin_confirm" password="True" required="mode == 'self'" placeholder="Repeat the PIN"/>
+                    <field name="password" string="Account password" password="True" invisible="mode != 'self' or not has_password" required="mode == 'self' and has_password"/>
+                    <field name="pin" string="PIN" password="True" required="mode == 'self'" placeholder="4 or 6 digits"/>
+                    <field name="pin_confirm" string="Repeat the PIN" password="True" required="mode == 'self'" placeholder="Same PIN again"/>
                 </group>
                 <footer>
                     <button name="action_confirm" type="object" string="Save" class="btn-primary" data-hotkey="q"/>

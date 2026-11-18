@@ -20,10 +20,10 @@
                             </div>
                         </setting>
                         <setting string="Sign out when idle (server side)" help="Minutes without activity before the session ends. 0 = never.">
-                            <field name="dwo_idle_logout_min" class="oe_inline"/> minutes
+                            <div class="mt-2"><field name="dwo_idle_logout_min" class="oe_inline"/> minutes</div>
                         </setting>
                         <setting string="Maximum session duration" help="Minutes after the sign-in when the session ends, whatever the activity. 0 = never.">
-                            <field name="dwo_absolute_min" class="oe_inline"/> minutes
+                            <div class="mt-2"><field name="dwo_absolute_min" class="oe_inline"/> minutes</div>
                         </setting>
                         <setting string="Warn before the session ends" help="A message with a countdown appears before the end of the session.">
                             <field name="dwo_warn_enabled"/>
@@ -53,8 +53,10 @@
                             <field name="dwo_pin_digits"/>
                         </setting>
                         <setting string="Wrong PIN limit" help="After 3 wrong PINs in a row the page pauses; after this many, the user is signed out.">
-                            <field name="dwo_pin_max_tries" class="oe_inline"/> tries, pause
-                            <field name="dwo_pin_lock_sec" class="oe_inline"/> seconds
+                            <div class="mt-2">
+                                <field name="dwo_pin_max_tries" class="oe_inline"/> tries, pause
+                                <field name="dwo_pin_lock_sec" class="oe_inline"/> seconds
+                            </div>
                         </setting>
                     </block>
                     <block title="Forgot the PIN" name="dwo_forgot" invisible="not dwo_enabled">
@@ -92,7 +94,7 @@
                     </block>
                     <block title="Log" name="dwo_log" invisible="not dwo_enabled">
                         <setting string="Keep the log" help="Days the log is kept. 0 = forever.">
-                            <field name="dwo_log_days" class="oe_inline"/> days
+                            <div class="mt-2"><field name="dwo_log_days" class="oe_inline"/> days</div>
                         </setting>
                     </block>
                 </app>

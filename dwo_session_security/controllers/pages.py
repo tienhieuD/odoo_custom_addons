@@ -13,7 +13,7 @@ background:#1f2933;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-seri
 font-size:26px;margin:0 auto 14px}h1{font-size:20px;margin:0 0 4px}p{margin:6px 0;color:#52606d;font-size:14px}
 input[type=password],input[type=text]{width:100%;font-size:22px;letter-spacing:.35em;text-align:center;padding:10px;border:1px solid #cbd2d9;
 border-radius:8px;margin:12px 0 4px}input.plain{letter-spacing:normal;font-size:16px}
-button,.btn{display:inline-block;width:100%;background:#875a7b;color:#fff;border:0;border-radius:8px;padding:11px;font-size:15px;
+button,.btn{display:inline-block;text-align:center;width:100%;background:#875a7b;color:#fff;border:0;border-radius:8px;padding:11px;font-size:15px;
 cursor:pointer;margin-top:10px;text-decoration:none}.btn.light,button.light{background:#e4e7eb;color:#1f2933}
 .err{background:#fde8e8;color:#b42318;border-radius:8px;padding:8px 10px;font-size:13px;margin-top:10px}
 .ok{background:#e6f6ec;color:#0e7c66;border-radius:8px;padding:8px 10px;font-size:13px;margin-top:10px}
