@@ -1,5 +1,19 @@
 # Changelog - dwo_login_themes
 
+## 2026-11-18 - 1.0.2 (Odoo 17, 18, 19, 20)
+
+Issue #96.
+
+- **Fix: the "Top bar" layout is now one clean horizontal row.** Logo, Email, Password, Log in and the other sign-in
+  buttons (OAuth providers, passkey) share the same height and the same bottom edge. Before, the Password field sat
+  about 4px higher than Email (Odoo's `mb-1` on the password group), the labels were at different heights, the button
+  and the "- or -" block floated at their own height. The groups of buttons now dissolve into the row
+  (`display: contents`), the labels get one height, and the signup / reset links follow the buttons. When the row is too
+  narrow it wraps by items; the footer links ("Manage Databases", "Powered by Odoo") are one centred row under the whole
+  bar; below 768px the existing card layout is used. Works with the markup of Odoo 17 to 20.
+- Tour: the top bar check that the fields and the Log in button end on the same line.
+- Listing image 06-topbar.png shot again.
+
 ## 2026-11-18 - 1.0.1 (Odoo 17, 18, 19, 20)
 
 Issue #96.
