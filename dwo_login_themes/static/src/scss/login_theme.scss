@@ -1,0 +1,192 @@
+// Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+// Login page themes. Every rule starts with a class that only this module puts on the page (.dwo_lc, .dwo_notice),
+// so the website and the portal that share this bundle are not touched. The look is driven by CSS variables set in
+// an inline <style> by the server (--dwo-primary, --dwo-button, --dwo-text, --dwo-card-bg, --dwo-overlay, ...).
+
+// ---------------------------------------------------------------------------------------------------------------
+// Announcement (it works with or without a layout)
+// ---------------------------------------------------------------------------------------------------------------
+.dwo_notice {
+    position: relative; display: flex; gap: .75rem; align-items: flex-start; box-sizing: border-box;
+    padding: .75rem 1rem; margin: 0 0 1rem; border: 1px solid; border-radius: .5rem;
+    font-size: .9rem; line-height: 1.4; text-align: left;
+    &.dwo_notice_info { background: #e7f1ff; border-color: #9ec5fe; color: #052c65; }
+    &.dwo_notice_success { background: #e6f6ec; border-color: #8fd3a8; color: #0b4a22; }
+    &.dwo_notice_warning { background: #fff4d6; border-color: #ffd666; color: #664500; }
+    &.dwo_notice_error { background: #fde8e8; border-color: #f1a3a3; color: #6b1212; }
+    .dwo_notice_body { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere;
+        > :first-child { margin-top: 0; } > :last-child { margin-bottom: 0; }
+        p, ul, ol { margin: 0 0 .5rem; } h1, h2, h3, h4 { font-size: 1.05rem; margin: 0 0 .35rem; }
+        a { color: inherit; text-decoration: underline; } }
+    .dwo_notice_close { flex: 0 0 auto; background: none; border: 0; padding: 0 .25rem; font-size: 1.4rem;
+        line-height: 1; color: inherit; opacity: .6; cursor: pointer; &:hover { opacity: 1; } }
+    &.dwo_notice_pos_below { margin: 1rem 0 0; }
+    &.dwo_notice_pos_top { position: fixed; top: 0; left: 0; right: 0; z-index: 20; margin: 0; border-width: 0 0 1px;
+        border-radius: 0; justify-content: center; .dwo_notice_body { flex: 0 1 900px; text-align: center; } }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Common base of every layout
+// ---------------------------------------------------------------------------------------------------------------
+body:has(.dwo_lc) { background: var(--dwo-page-bg, #e9ecef) !important; margin: 0; }
+
+.container.dwo_lc {
+    --dwo-radius: 16px; --dwo-field-bg: #fff; --dwo-field-border: rgba(0, 0, 0, .18);
+    position: relative; z-index: 1; width: 100%; max-width: none; min-height: 100vh; box-sizing: border-box;
+    padding: 24px !important; display: flex; align-items: center; justify-content: center; color: var(--dwo-text);
+
+    .dwo_bg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: -1; overflow: hidden; pointer-events: none;
+        background: var(--dwo-page-bg);
+        &::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0, 0, 0, var(--dwo-overlay)); } }
+    .dwo_bg_img { position: absolute; top: calc(var(--dwo-blur) * -2); right: calc(var(--dwo-blur) * -2);
+        bottom: calc(var(--dwo-blur) * -2); left: calc(var(--dwo-blur) * -2); background-size: cover; background-position: center;
+        filter: blur(var(--dwo-blur)); }
+    &.dwo_bgt_color .dwo_bg::after, &.dwo_bgt_gradient .dwo_bg::after { display: none; }
+    &.dwo_bgt_gradient .dwo_bg { background: linear-gradient(var(--dwo-grad-angle), var(--dwo-grad-from), var(--dwo-grad-to)); }
+    // slideshow: the server sends four images; each one shows for a quarter of the cycle
+    .dwo_bg_multi .dwo_bg_img { opacity: 0; animation: dwo_fade 28s infinite; animation-delay: calc(var(--dwo-i) * 7s); }
+
+    .o_database_list { position: relative; width: 100%; max-width: 420px !important; margin: 0 !important; color: var(--dwo-text);
+        background: var(--dwo-card-bg) !important; border-radius: var(--dwo-radius); box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+        .card-body { padding: 2rem; background: transparent !important; color: var(--dwo-text); } }
+    .o_database_list a { color: var(--dwo-primary); }
+    .list-group-item { background-color: var(--dwo-field-bg); border-color: var(--dwo-field-border); }
+    .btn:not(.btn-primary):not(.btn-link) { background-color: var(--dwo-field-bg); color: var(--dwo-text); border-color: var(--dwo-field-border); }
+    .form-label, label, .text-muted { color: var(--dwo-text); }
+    .form-control { background-color: var(--dwo-field-bg); color: var(--dwo-text); border-color: var(--dwo-field-border);
+        &:focus { border-color: var(--dwo-primary); box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--dwo-primary) 25%, transparent); }
+        &::placeholder { color: color-mix(in srgb, var(--dwo-text) 45%, transparent); } }
+    .btn-primary { background-color: var(--dwo-button) !important; border-color: var(--dwo-button) !important; color: #fff !important;
+        &:hover, &:focus { filter: brightness(.92); } }
+    .btn-link, .btn-outline-primary { color: var(--dwo-primary); background: transparent; }
+    .border-bottom, .border-top, .border-end, .border { border-color: color-mix(in srgb, var(--dwo-text) 16%, transparent) !important; }
+    img[alt="Logo"] { max-height: 80px !important; }
+    &.dwo_logo_small img[alt="Logo"] { max-height: 44px !important; }
+    &.dwo_logo_large img[alt="Logo"] { max-height: 130px !important; }
+
+    .dwo_welcome { text-align: center; margin: 0 0 1.25rem; }
+    .dwo_welcome_title { font-size: 1.4rem; font-weight: 600; margin: 0 0 .25rem; color: var(--dwo-text); }
+    .dwo_welcome_text { margin: 0; opacity: .7; }
+    .dwo_aside { display: none; }
+    .dwo_aside_title { font-size: 2.2rem; font-weight: 700; line-height: 1.15; margin: 0 0 1.25rem; color: inherit; }
+    .dwo_aside_list { list-style: none; margin: 0; padding: 0; font-size: 1.15rem;
+        li { position: relative; padding: .3rem 0 .3rem 1.9rem;
+            &::before { content: ""; position: absolute; left: 0; top: .55rem; width: 1.1rem; height: 1.1rem; border-radius: 50%;
+                background: rgba(255, 255, 255, .25); box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 2px #fff; } } }
+}
+.dwo_footer { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 5; max-width: 90vw;
+    padding: .25rem .9rem; border-radius: 99px; background: rgba(0, 0, 0, .4); color: #fff; font-size: .8rem;
+    text-align: center; backdrop-filter: blur(6px); }
+.dwo_pwd_btn { background: transparent; }
+
+@keyframes dwo_fade { 0% { opacity: 0; } 5% { opacity: 1; } 25% { opacity: 1; } 31% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes dwo_gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+@mixin dwo_layout($name) { .container.dwo_lc.dwo_l_#{$name} { @content; } }
+@mixin dwo_aside_on { .dwo_aside { display: flex; flex-direction: column; justify-content: center; position: fixed; top: 0; bottom: 0;
+    padding: 48px 64px; color: #fff; z-index: 0; text-shadow: 0 1px 12px rgba(0, 0, 0, .35); box-sizing: border-box; } }
+@mixin dwo_panel($width) { .o_database_list { width: $width; max-width: none !important; min-height: 100vh; border-radius: 0; box-shadow: none;
+    align-items: center; justify-content: center; .card-body { width: 100%; max-width: 400px; flex: none; } } }
+
+// 1. Centered card (the classic one): the base look is enough
+// 2-4. Splits: the form fills a flush panel, the image shows next to it
+@include dwo_layout(split_left) { justify-content: flex-end; padding: 0 !important; @include dwo_panel(50%); @include dwo_aside_on; .dwo_aside { left: 0; width: 50%; } }
+@include dwo_layout(split_right) { justify-content: flex-start; padding: 0 !important; @include dwo_panel(50%); @include dwo_aside_on; .dwo_aside { right: 0; width: 50%; } }
+@include dwo_layout(split_narrow) { justify-content: flex-start; padding: 0 !important; @include dwo_panel(30%);
+    .o_database_list { min-width: 380px; } @include dwo_aside_on; .dwo_aside { left: #{"max(30%, 380px)"}; right: 0; } }
+// 5-6. A tall floating column at the edge
+@mixin dwo_column($side) {
+    padding: 24px !important; justify-content: if($side == left, flex-start, flex-end);
+    .o_database_list { width: 440px; max-width: 100% !important; height: calc(100vh - 48px); min-height: 0; border-radius: 24px; align-items: center; justify-content: center;
+        .card-body { width: 100%; flex: none; } }
+    @include dwo_aside_on;
+    .dwo_aside { #{$side}: 520px; #{if($side == left, right, left)}: 0; }
+}
+@include dwo_layout(column_left) { @include dwo_column(left); }
+@include dwo_layout(column_right) { @include dwo_column(right); }
+// 7. Glass
+@include dwo_layout(glass) {
+    --dwo-text: #fff; --dwo-field-bg: rgba(255, 255, 255, .16); --dwo-field-border: rgba(255, 255, 255, .45);
+    .o_database_list { background: color-mix(in srgb, var(--dwo-card-bg) 14%, transparent) !important; border: 1px solid rgba(255, 255, 255, .4) !important;
+        backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); box-shadow: 0 25px 60px rgba(0, 0, 0, .3); }
+    .o_database_list a, .o_database_list .btn-link { color: #fff; text-decoration: underline; }
+    img[alt="Logo"] { background: rgba(255, 255, 255, .92); border-radius: 10px; padding: 6px 12px; }
+    .list-group-item, .list-group-item span { color: #fff; }
+    .form-control { color: #fff; } .form-control::placeholder { color: rgba(255, 255, 255, .7); }
+    .dwo_bg::after { background: #{"rgba(0, 0, 0, max(var(--dwo-overlay), .12))"}; }
+}
+// 8. Animated gradient (CSS only)
+@include dwo_layout(gradient) {
+    .dwo_bg { background: linear-gradient(var(--dwo-grad-angle), var(--dwo-grad-from), var(--dwo-grad-to), var(--dwo-primary), var(--dwo-grad-from));
+        background-size: 300% 300%; animation: dwo_gradient 18s ease infinite; }
+    .dwo_bg_img, .dwo_bg::after { display: none; }
+}
+// 9. Minimal
+@include dwo_layout(minimal) {
+    .dwo_bg_img, .dwo_bg::after { display: none; }
+    .o_database_list { max-width: 380px !important; border: 1px solid color-mix(in srgb, var(--dwo-text) 14%, transparent) !important; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, .08); }
+}
+// 10. Dark
+@include dwo_layout(dark) {
+    --dwo-card-bg: #161a26; --dwo-text: #e8eaf3; --dwo-field-bg: rgba(255, 255, 255, .07); --dwo-field-border: rgba(255, 255, 255, .2);
+    .dwo_bg { background: #0d1019; }
+    .dwo_bg::after { background: #{"rgba(8, 10, 20, max(var(--dwo-overlay), .5))"}; }
+    .o_database_list { border: 1px solid rgba(255, 255, 255, .08) !important; box-shadow: 0 25px 60px rgba(0, 0, 0, .55); }
+    .form-control { color: #e8eaf3; }
+    img[alt="Logo"] { background: rgba(255, 255, 255, .92); border-radius: 10px; padding: 6px 12px; }
+    .list-group-item, .list-group-item span { color: #e8eaf3; }
+    .o_database_list a { color: #c9c2ff; }
+    .o_database_list .text-muted, .o_database_list em, .o_database_list i:not(.fa) { color: #aeb4c8 !important; }
+}
+// 11. Top bar: the form in a horizontal bar, the image below. The form keeps its own display rules (d-none).
+@include dwo_layout(topbar) { align-items: flex-start; padding: 0 !important;
+    .o_database_list { max-width: none !important; border-radius: 0; box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+        .card-body { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; max-width: 1240px; margin: 0 auto; padding: 1rem 2rem; }
+        .card-body > div:first-child { flex: 0 0 auto; max-width: 220px; margin: 0 !important; padding: 0 !important; border: 0 !important;
+            img[alt="Logo"] { max-height: 44px !important; max-width: 220px; } }
+        .card-body > .dwo_welcome, .card-body > .dwo_notice { flex: 0 0 100%; margin: 0; }
+        .card-body > .oe_login_form:not(.d-none), .card-body > form:not(.d-none) { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .75rem 1rem; flex: 1 1 560px; margin: 0;
+            > .mb-3, > div { flex: 1 1 200px; margin: 0 !important; }
+            > .alert, > p { flex: 0 0 100%; margin: 0; }
+            > .oe_login_buttons { flex: 0 0 auto; padding: 0 !important; display: flex !important; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0 !important;
+                > .btn, > a, > div { width: auto; margin: 0; } }
+            > input[type="hidden"] { display: none; } }
+        .card-body > .text-center.small { flex: 0 0 100%; margin: 0 !important; padding: 0 !important; border: 0 !important; } }
+    @include dwo_aside_on; .dwo_aside { left: 0; right: 0; top: 160px; align-items: center; text-align: center; .dwo_aside_list { text-align: left; } } }
+// 12. Bottom-right corner (SaaS style)
+@include dwo_layout(corner) { justify-content: flex-end; align-items: flex-end; padding: 32px !important;
+    .o_database_list { max-width: 390px !important; }
+    @include dwo_aside_on; .dwo_aside { left: 0; right: 50%; top: 0; bottom: auto; padding: 64px; justify-content: flex-start; } }
+// 13. Intro panel beside the form
+@include dwo_layout(intro) { gap: 56px; flex-wrap: wrap;
+    .dwo_aside { display: block; position: static; flex: 1 1 360px; max-width: 520px; color: #fff; text-shadow: 0 1px 12px rgba(0, 0, 0, .35); }
+    .o_database_list { flex: 0 1 420px; width: 420px; } }
+// 14. Card in a card (Material): a big rounded card with the image on its left half and the form on its right half
+@include dwo_layout(material) {
+    .dwo_bg { top: 50%; left: 50%; right: auto; bottom: auto; width: #{"min(980px, 92vw)"}; height: #{"min(580px, 90vh)"};
+        transform: translate(-50%, -50%); border-radius: 28px; box-shadow: 0 30px 80px rgba(0, 0, 0, .3); }
+    .o_database_list { width: #{"min(490px, 46vw)"}; max-width: none !important; min-height: #{"min(580px, 90vh)"}; border-radius: 0 28px 28px 0; box-shadow: none;
+        transform: translateX(#{"calc(min(490px, 46vw) / 2)"}); align-items: center; justify-content: center; .card-body { width: 100%; flex: none; } }
+    @include dwo_aside_on;
+    .dwo_aside { top: 50%; bottom: auto; left: 50%; width: #{"min(490px, 46vw)"}; height: #{"min(580px, 90vh)"}; transform: translate(-100%, -50%); padding: 40px; }
+}
+body:has(.dwo_l_material) { background: color-mix(in srgb, var(--dwo-primary, #714b67) 16%, #f3f4f9) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    .container.dwo_lc .dwo_bg, .container.dwo_lc .dwo_bg_img { animation: none !important; }
+    .container.dwo_lc .dwo_bg_multi .dwo_bg_img:first-child { opacity: 1; }
+}
+
+// Narrow screens: every layout becomes a centered card on the background
+@media (max-width: 767.98px) {
+    .container.dwo_lc[class*="dwo_l_"] {
+        padding: 16px !important; justify-content: center; align-items: center; flex-direction: column; gap: 0;
+        .o_database_list { width: 100%; max-width: 440px !important; height: auto; min-height: 0; border-radius: var(--dwo-radius); transform: none; box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+            .card-body { padding: 1.5rem; max-width: none; display: block; } }
+        .dwo_aside { display: none !important; }
+        .dwo_bg { top: 0; left: 0; right: 0; bottom: 0; width: auto; height: auto; transform: none; border-radius: 0; box-shadow: none; }
+    }
+    .container.dwo_lc.dwo_l_topbar .o_database_list .card-body > .oe_login_form:not(.d-none) { display: block; > .mb-3, > div { margin-bottom: 1rem !important; } }
+    .container.dwo_lc.dwo_l_topbar .o_database_list { border-radius: var(--dwo-radius); }
+    body:has(.dwo_l_material) { background: var(--dwo-page-bg) !important; }
+}
