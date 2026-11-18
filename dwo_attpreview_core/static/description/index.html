@@ -171,7 +171,13 @@
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Settings</h2>
     <p class="mb-4" style="font-size: 16px;">Set the maximum file size and tick the preview engines you want. Each engine shows its file types and whether it is installed.</p>
     <div class="text-center mb-4">
-        <img src="screenshots/07-preview-engines.png" alt="Settings page Attachment Preview with the maximum file size and the list of preview engines with their file types and state" class="img-fluid rounded shadow"/>
+        <img src="screenshots/07-preview-engines.png" alt="Settings page Attachment Preview with the maximum file size and the list of all preview engines ticked, with their file types and state" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Size Limits per File Type</h2>
+    <p class="mb-4" style="font-size: 16px;">Each installed engine adds its own block with a size limit for each of its file types, so a very large file gets the notice with a Download button instead of a long wait.</p>
+    <div class="text-center mb-4">
+        <img src="screenshots/07b-size-limits.png" alt="Settings blocks with a size limit in MB for each file type of each installed engine, such as archives, emails, spreadsheets and documents" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">Engine Not Yet in Your Addons</h2>
@@ -209,6 +215,99 @@
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #1F5A96;">Requirements</h4>
             <p class="mb-2" style="font-size: 14px;">Odoo Community or Enterprise, on premise or on Odoo.sh. Depends only on the standard <code>base</code>, <code>web</code> and <code>mail</code> modules. No Python library to add.</p>
             <p class="mb-2" style="font-size: 14px;"><strong>Odoo Online is not supported</strong> (it cannot install third-party modules).</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #14304F;">More Modules of the Preview Family</h2>
+    <p class="mb-4" style="font-size: 16px;">Secure Attachment Preview works with separate preview engines. Each one adds the file types of its own family; they all follow the same access rules and keep your files on your Odoo server.</p>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_office.png" alt="Secure Office Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure Office Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Open Word, Excel and PowerPoint files without leaving Odoo.</p>
+                    <p class="mb-2"><span class="badge badge-secondary">EUR 80</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_office">View module</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_mail.png" alt="Secure Email Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure Email Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Read saved emails without leaving Odoo.</p>
+                    <p class="mb-2"><span class="badge badge-secondary">EUR 30</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_mail">View module</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_archive.png" alt="Secure Archive Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure Archive Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Browse archives in Odoo without extracting them.</p>
+                    <p class="mb-2"><span class="badge badge-secondary">EUR 25</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_archive">View module</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_text.png" alt="Secure Text &amp; Code Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure Text & Code Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Raw text, rendered preview and tree view for text files in Odoo.</p>
+                    <p class="mb-2"><span class="badge badge-secondary">EUR 15</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_text">View module</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_3d.png" alt="Secure 3D Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure 3D Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Open 3D models and CAD solids right inside Odoo.</p>
+                    <p class="mb-2"><span class="badge badge-secondary">EUR 30</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_3d">View module</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_cad.png" alt="Secure CAD Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure CAD Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Open DXF drawings right inside Odoo.</p>
+                    <p class="mb-2"><span class="badge badge-secondary">EUR 40</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_cad">View module</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_dwg.png" alt="Secure DWG Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure DWG Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Open AutoCAD DWG drawings right inside Odoo, free.</p>
+                    <p class="mb-2"><span class="badge badge-success">Free</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_dwg">View module</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #2E86AB;">
+                <div class="card-body text-center">
+                    <img src="img/eco_bim.png" alt="Secure BIM Preview" class="img-fluid mb-2" width="64"/>
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #14304F;">Secure BIM Preview</h4>
+                    <p class="mb-2" style="font-size: 14px;">Open IFC building models right inside Odoo.</p>
+                    <p class="mb-2"><span class="badge badge-secondary">EUR 50</span></p>
+                    <a class="btn btn-outline-primary btn-sm" href="/apps/modules/18.0/dwo_attpreview_bim">View module</a>
+                </div>
+            </div>
         </div>
     </div>
 
