@@ -3,7 +3,7 @@
 {
     "name": "Orphan Mail Router",
     "version": "18.0.1.0.0",
-    "summary": "Catch incoming emails that Odoo cannot attach to any record, suggest the right record and route them in one click. Keywords: lost messages, orphan emails, unrouted email, catchall, catch-all mailbox, email routing, route email manually, manual routing, incoming email, mail gateway, unmatched email, email inbox, reassign email, move message to record, chatter, bounce, alias, fetchmail, mail alias, email rules, daily digest.",
+    "summary": "Catch incoming emails that Odoo cannot attach to any record, suggest the right record and route them in one click. Keywords: lost messages, lost emails, orphan emails, orphan mail, unrouted email, unrouted emails, unmatched email, catchall, catch-all, catch-all mailbox, email routing, route email, route email manually, manual routing, manual email routing, incoming email, incoming emails, mail gateway, email inbox, reassign email, move email to record, move message to record, email to chatter, mail alias, alias bounce, bounce catchall, fetchmail, email rules, email digest, routing rules.",
     "description": "Orphan Mail Router keeps the incoming emails that no alias, reply or record can take. They land in an "
                    "inbox with filters, suggested target records (reply headers, codes in the subject, the sender), "
                    "one-click or bulk routing into the chatter of the record, automatic rules, a daily digest and a report.",
