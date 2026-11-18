@@ -50,7 +50,7 @@ class TestServerSideLock(SessionCase):
         self.assertIn("Screen locked", page.text)
         self.assertEqual(page.headers["Cache-Control"], "no-store")
         # no application data and no web client in the page
-        for forbidden in ("web.assets", "odoo.__session_info__", "/web/static", "res.partner"):
+        for forbidden in ("web.assets_web", "web.assets_backend", "<script src", "odoo.__session_info__", "res.partner"):
             self.assertNotIn(forbidden, page.text)
         self.assertEqual(self.beat(tab="t1")["state"], "locked")
         out = self.post("/web/session/logout?redirect=/web/login")
@@ -143,3 +143,43 @@ class TestServerSideLock(SessionCase):
         self.assertNotIn("locked", res.headers.get("Location", ""))
         res = self.rpc("/web/dataset/call_kw/res.users/read", model="res.users", method="read", args=[[self.user.id], ["name"]], kwargs={})
         self.assertIn("result", res)
+
+
+@tagged("post_install", "-at_install")
+class TestPageLooksLikeOdoo(SessionCase):
+    """The lock page uses the CSS of the login page of Odoo (only CSS): the gate lets that bundle through and nothing else."""
+
+    def test_css_bundle_reachable_while_locked_but_nothing_else(self):
+        import re
+        self.set_pin()
+        self.sign_in()
+        self.rpc("/dwo/session/lock", url="/web")
+        html = self.go("/dwo/session/locked").text
+        links = re.findall(r'<link[^>]+href="([^"]+)"', html)
+        css = [u for u in links if u.endswith(".css")]
+        self.assertTrue(css, "the page loads the CSS bundle of the login page")
+        for url in css:
+            res = self.url_open(url, allow_redirects=False)
+            self.assertEqual(res.status_code, 200, url)
+            self.assertIn("text/css", res.headers["Content-Type"])
+        # no script at all except the small inline one: no src, no web client bundle, no session info
+        self.assertFalse(re.findall(r"<script[^>]+src=", html))
+        for forbidden in ("web.assets_web", "web.assets_backend", "odoo.__session_info__", "res.partner"):
+            self.assertNotIn(forbidden, html)
+        self.assertIn("btn btn-primary", html)
+        self.assertIn('inputmode="numeric"', html)
+        # the web client, an RPC, a JS bundle of the web client and the bus stay refused
+        self.assertEqual(self.go(WEBCLIENT).status_code, 303)
+        res = self.rpc("/web/dataset/call_kw/res.partner/search_read", model="res.partner", method="search_read", args=[[]], kwargs={})
+        self.assertIn("error", res)
+        self.assertEqual(self.url_open(css[0].replace("assets_frontend", "assets_web").replace(".css", ".js"), allow_redirects=False).status_code, 403)
+        self.assertEqual(self.url_open(css[0].replace(".css", ".js"), allow_redirects=False).status_code, 403)
+        self.assertIn("error", self.rpc("/websocket/peek_notifications", channels=[], last=0, is_first_poll=True))
+
+    def test_auto_unlock_script_knows_only_the_pin_length(self):
+        self.set_pin(pin="739105")
+        self.sign_in()
+        self.rpc("/dwo/session/lock", url="/web")
+        html = self.go("/dwo/session/locked").text
+        self.assertIn('data-auto="6"', html)
+        self.assertNotIn("739105", html)

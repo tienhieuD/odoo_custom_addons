@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- CSS only, from the bundle of Odoo's own login page: no script, no data -->
+    <template id="page_css" name="Secure Session pages: CSS of the login page">
+        <t t-call-assets="web.assets_frontend" t-js="false"/>
+    </template>
+</odoo>
