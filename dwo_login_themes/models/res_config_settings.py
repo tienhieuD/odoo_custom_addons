@@ -46,6 +46,7 @@ class ResConfigSettings(models.TransientModel):
     dwo_login_intro_items = fields.Text(string="Intro panel points (one per line, up to 6)", default=D["intro_items"])
     dwo_login_footer_text = fields.Char(string="Footer text", default=D["footer_text"])
     dwo_login_pwd_toggle = fields.Boolean(string="Show / hide password button", default=D["pwd_toggle"])
+    dwo_login_hide_brand = fields.Boolean(string="Hide \"Powered by Odoo\"", default=D["hide_brand"])
     dwo_login_ann_enabled = fields.Boolean(string="Show the announcement", default=D["ann_enabled"])
     dwo_login_ann_html = fields.Text(string="Announcement (HTML)", default=D["ann_html"])
     dwo_login_ann_preview = fields.Html(string="Preview", compute="_compute_dwo_login_ann_preview", sanitize=False)
@@ -60,6 +61,7 @@ class ResConfigSettings(models.TransientModel):
         "enabled", "layout", "preset", "primary", "button", "text", "card_bg", "overlay", "blur", "bg_type",
         "bg_image", "bg_mode", "bg_pool", "bg_color", "bg_grad_from", "bg_grad_to", "bg_grad_angle", "logo_size",
         "page_title", "welcome_title", "welcome_text", "intro_title", "intro_items", "footer_text", "pwd_toggle",
+        "hide_brand",
         "ann_enabled", "ann_html", "ann_kind", "ann_pos", "ann_dismiss",
     ]
     _DWO_LOGIN_COLORS = {"primary": "primary", "button": "button", "text": "text", "card_bg": "card_bg",

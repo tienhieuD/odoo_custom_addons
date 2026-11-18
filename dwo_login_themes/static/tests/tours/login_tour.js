@@ -13,3 +13,18 @@ registry.category("web_tour.tours").add("dwo_login_themes_tour", {
         { content: "The web client is open", trigger: ".o_main_navbar" },
     ],
 });
+
+// "Powered by Odoo": hidden (class added by login_theme.js) when the option is on, still shown when it is off.
+registry.category("web_tour.tours").add("dwo_login_themes_brand_hidden_tour", {
+    steps: () => [
+        { content: "The form is visible", trigger: "form.oe_login_form input[name=login]" },
+        { content: "The brand link got the hiding class", trigger: "body:has(a[href*='odoo.com'].dwo_brand_off)" },
+    ],
+});
+registry.category("web_tour.tours").add("dwo_login_themes_brand_shown_tour", {
+    steps: () => [
+        { content: "The form is visible", trigger: "form.oe_login_form input[name=login]" },
+        { content: "The brand link is shown", trigger: "a[href*='odoo.com']:contains('Powered by')" },
+        { content: "Nothing was hidden", trigger: "body:not(:has(.dwo_brand_off))" },
+    ],
+});

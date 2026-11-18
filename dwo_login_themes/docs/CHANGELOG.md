@@ -1,5 +1,18 @@
 # Changelog - dwo_login_themes
 
+## 2026-11-18 - 1.0.1 (Odoo 17, 18, 19, 20)
+
+Issue #96.
+
+- **New option "Hide Powered by Odoo"** (Settings > Login Page Themes, `dwo_login.hide_brand`, off by default). The
+  layout puts `data-dwo-hidebrand="1"` on the login container; `static/src/js/login_theme.js` then adds the class
+  `dwo_brand_off` (CSS `display: none`) to `.o_brand_promotion` and to the odoo.com "Powered by" link, on DOM ready and
+  from a small MutationObserver. No template is replaced and no node is removed, so it does not conflict with other
+  debranding modules; if the link is already gone nothing happens. Works with the theme switched off too.
+- Tests: flag emitted or not (HttpCase) and two tours (the link gets the class when on, stays when off).
+- Listing: a before / after image (brand kit: photo, colours, logo, then the themed login page), text that says that the
+  layout, colours and background picture are the user's own choice, and the new option.
+
 ## 2026-11-18 - 1.0.0 (Odoo 17, 18, 19, 20)
 
 First release. Issue #96.
