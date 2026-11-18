@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dwo_session_user,dwo.session user,model_dwo_session,base.group_user,1,0,0,0
+access_dwo_session_admin,dwo.session admin,model_dwo_session,base.group_system,1,0,0,1
+access_dwo_session_request_approver,dwo.session.request approver,model_dwo_session_request,group_dwo_session_approver,1,1,0,0
+access_dwo_session_log_admin,dwo.session.log admin,model_dwo_session_log,base.group_system,1,0,0,1
+access_dwo_user_pin_none,dwo.user.pin nobody,model_dwo_user_pin,base.group_system,0,0,0,0
+access_dwo_pin_wizard,dwo.pin.wizard user,model_dwo_pin_wizard,base.group_user,1,1,1,1

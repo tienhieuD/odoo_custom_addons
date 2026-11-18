@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sessions -->
+    <record id="view_dwo_session_list" model="ir.ui.view">
+        <field name="name">dwo.session.list</field>
+        <field name="model">dwo.session</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" decoration-danger="state == 'expired'" decoration-warning="state in ('locked', 'pending_approval')" decoration-muted="state == 'expired'">
+                <header>
+                    <button name="action_force_logout" type="object" string="Force sign-out"/>
+                </header>
+                <field name="user_id"/>
+                <field name="ip"/>
+                <field name="browser"/>
+                <field name="login_time"/>
+                <field name="last_activity"/>
+                <field name="state" widget="badge" decoration-success="state == 'active'" decoration-warning="state in ('locked', 'pending_approval')" decoration-muted="state == 'expired'"/>
+                <field name="end_reason" optional="show"/>
+                <field name="is_current" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_dwo_session_form" model="ir.ui.view">
+        <field name="name">dwo.session.form</field>
+        <field name="model">dwo.session</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <button name="action_force_logout" type="object" string="Force sign-out" invisible="state == 'expired'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,locked,expired"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="ip"/>
+                            <field name="browser"/>
+                            <field name="user_agent"/>
+                        </group>
+                        <group>
+                            <field name="login_time"/>
+                            <field name="last_activity"/>
+                            <field name="locked_at"/>
+                            <field name="ended_at"/>
+                            <field name="end_reason"/>
+                            <field name="extensions"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_dwo_session_search" model="ir.ui.view">
+        <field name="name">dwo.session.search</field>
+        <field name="model">dwo.session</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <field name="ip"/>
+                <filter name="open" string="Open sessions" domain="[('state', '!=', 'expired')]"/>
+                <filter name="locked" string="Locked" domain="[('state', '=', 'locked')]"/>
+                <filter name="pending" string="Waiting for approval" domain="[('state', '=', 'pending_approval')]"/>
+                <separator/>
+                <group>
+                    <filter name="by_user" string="User" context="{'group_by': 'user_id'}"/>
+                    <filter name="by_state" string="State" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_dwo_session" model="ir.actions.act_window">
+        <field name="name">Sessions</field>
+        <field name="res_model">dwo.session</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+    <record id="action_dwo_my_sessions" model="ir.actions.act_window">
+        <field name="name">My sessions</field>
+        <field name="res_model">dwo.session</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+    <!-- Requests -->
+    <record id="view_dwo_request_list" model="ir.ui.view">
+        <field name="name">dwo.session.request.list</field>
+        <field name="model">dwo.session.request</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" decoration-warning="state == 'pending'" decoration-muted="state != 'pending'">
+                <field name="create_date"/>
+                <field name="kind"/>
+                <field name="user_id"/>
+                <field name="ip"/>
+                <field name="browser"/>
+                <field name="state" widget="badge" decoration-warning="state == 'pending'" decoration-success="state == 'approved'" decoration-danger="state in ('rejected', 'expired')"/>
+                <field name="decided_by"/>
+                <field name="decided_at"/>
+                <button name="action_approve" type="object" string="Approve" icon="fa-check" invisible="state != 'pending'"/>
+                <button name="action_reject" type="object" string="Reject" icon="fa-times" invisible="state != 'pending'"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_dwo_request_form" model="ir.ui.view">
+        <field name="name">dwo.session.request.form</field>
+        <field name="model">dwo.session.request</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="state != 'pending'"/>
+                    <button name="action_reject" type="object" string="Reject" invisible="state != 'pending'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kind"/>
+                            <field name="user_id"/>
+                            <field name="ip"/>
+                            <field name="browser"/>
+                        </group>
+                        <group>
+                            <field name="create_date"/>
+                            <field name="expires_at"/>
+                            <field name="decided_by"/>
+                            <field name="decided_at"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter"><field name="message_follower_ids"/><field name="activity_ids"/><field name="message_ids"/></div>
+            </form>
+        </field>
+    </record>
+    <record id="view_dwo_request_search" model="ir.ui.view">
+        <field name="name">dwo.session.request.search</field>
+        <field name="model">dwo.session.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <filter name="pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <filter name="login" string="Session approval" domain="[('kind', '=', 'login')]"/>
+                <filter name="pin_reset" string="PIN reset" domain="[('kind', '=', 'pin_reset')]"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_dwo_request" model="ir.actions.act_window">
+        <field name="name">Requests</field>
+        <field name="res_model">dwo.session.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_pending': 1}</field>
+    </record>
+
+    <!-- Log -->
+    <record id="view_dwo_log_list" model="ir.ui.view">
+        <field name="name">dwo.session.log.list</field>
+        <field name="model">dwo.session.log</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0">
+                <field name="create_date"/>
+                <field name="user_id"/>
+                <field name="event"/>
+                <field name="note"/>
+                <field name="ip"/>
+                <field name="user_agent" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_dwo_log_search" model="ir.ui.view">
+        <field name="name">dwo.session.log.search</field>
+        <field name="model">dwo.session.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <field name="event"/>
+                <field name="ip"/>
+                <group>
+                    <filter name="by_user" string="User" context="{'group_by': 'user_id'}"/>
+                    <filter name="by_event" string="Event" context="{'group_by': 'event'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_dwo_log" model="ir.actions.act_window">
+        <field name="name">Log</field>
+        <field name="res_model">dwo.session.log</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- PIN wizard -->
+    <record id="view_dwo_pin_wizard" model="ir.ui.view">
+        <field name="name">dwo.pin.wizard.form</field>
+        <field name="model">dwo.pin.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="mode" invisible="1"/>
+                <field name="has_password" invisible="1"/>
+                <field name="has_pin" invisible="1"/>
+                <div class="alert alert-info" role="alert" invisible="mode != 'self'">
+                    The PIN unlocks your session after it was locked. It never signs you in. Use 4 or 6 digits; 0000, 1234 and
+                    repeated digits are refused.
+                </div>
+                <div class="alert alert-info" role="alert" invisible="mode != 'temp'">
+                    Leave the PIN empty to get a random 6-digit temporary PIN. The user has to change it at the first unlock.
+                </div>
+                <group>
+                    <field name="user_id" invisible="mode == 'self'" options="{'no_create': True}"/>
+                    <field name="password" password="True" invisible="mode != 'self' or not has_password" required="mode == 'self' and has_password"/>
+                    <field name="pin" password="True" required="mode == 'self'" placeholder="4 or 6 digits"/>
+                    <field name="pin_confirm" password="True" required="mode == 'self'" placeholder="Repeat the PIN"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Save" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Preferences of the user (Security tab) -->
+    <record id="view_users_form_simple_modif_dwo" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.dwo.session</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='auth']" position="after">
+                <group name="dwo_session" string="Session lock">
+                    <div colspan="2">
+                        <button name="action_dwo_set_pin" type="object" string="Set or change the lock PIN" class="btn btn-secondary"/>
+                        <span class="text-muted ms-2">Unlocks the screen after it locked.</span>
+                    </div>
+                    <div colspan="2">
+                        <button name="action_dwo_my_sessions" type="object" string="Show my sessions" class="btn btn-secondary"/>
+                        <span class="text-muted ms-2">See where you are signed in and close a session.</span>
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- User form: temporary PIN (administrator) -->
+    <record id="view_users_form_dwo" model="ir.ui.view">
+        <field name="name">res.users.form.dwo.session</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_dwo_temp_pin" type="object" string="Temporary PIN" groups="base.group_system"
+                        invisible="id == uid"
+                        help="Give the user a temporary lock PIN (the user must change it at the first unlock)"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_dwo_root" name="Session Security" groups="group_dwo_session_approver" sequence="95"
+              web_icon="dwo_session_security,static/description/icon.png"/>
+    <menuitem id="menu_dwo_sessions" name="Sessions" parent="menu_dwo_root" action="action_dwo_session" groups="base.group_system" sequence="10"/>
+    <menuitem id="menu_dwo_requests" name="Requests" parent="menu_dwo_root" action="action_dwo_request" groups="group_dwo_session_approver" sequence="20"/>
+    <menuitem id="menu_dwo_log" name="Log" parent="menu_dwo_root" action="action_dwo_log" groups="base.group_system" sequence="30"/>
+</odoo>
