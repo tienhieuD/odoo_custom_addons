@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dwo_mail_orphan_manager,dwo.mail.orphan manager,model_dwo_mail_orphan,group_dwo_orphan_manager,1,1,0,1
+access_dwo_mail_orphan_suggestion_manager,dwo.mail.orphan.suggestion manager,model_dwo_mail_orphan_suggestion,group_dwo_orphan_manager,1,0,0,0
+access_dwo_mail_orphan_rule_manager,dwo.mail.orphan.rule manager,model_dwo_mail_orphan_rule,group_dwo_orphan_manager,1,1,1,1
+access_dwo_mail_orphan_route_wizard,dwo.mail.orphan.route.wizard manager,model_dwo_mail_orphan_route_wizard,group_dwo_orphan_manager,1,1,1,1
