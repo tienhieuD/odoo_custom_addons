@@ -43,6 +43,9 @@ class DwoApprovalFlow(models.Model):
     replace_statusbar = fields.Boolean(
         string="Replace the form's status bar",
         help="Hide the status bar the form already has and show the approval one instead.")
+    history_action = fields.Boolean(
+        string="Approval history action", default=True,
+        help="Adds \"Approval history\" to the Action menu of the form. It opens every vote and move of the document.")
     state_ids = fields.One2many("dwo.approval.state", "flow_id")
     transition_ids = fields.One2many("dwo.approval.transition", "flow_id")
     state_count = fields.Integer(compute="_compute_counts")
@@ -87,7 +90,7 @@ class DwoApprovalFlow(models.Model):
     def write(self, vals):
         result = super().write(vals)
         if {"active", "model_id", "state_mode", "state_field_id", "replace_statusbar",
-                "domain", "company_id"} & set(vals):
+                "domain", "company_id", "history_action"} & set(vals):
             self._after_change()
         return result
 
@@ -146,6 +149,19 @@ class DwoApprovalFlow(models.Model):
                 model=field.comodel_name, max=MAX_M2O_STATES))
         return [(str(rec.id), rec.display_name) for rec in records]
 
+    def _state_key(self, value, label):
+        self.ensure_one()
+        if self.state_field_id.ttype == "selection":
+            return value
+        return self.env["dwo.approval.state"].slugify(label) + "_" + value
+
+    @api.model
+    def field_states(self, model_id, state_field_id):
+        """States a model field would give (for the designer, before the flow is saved)."""
+        flow = self.new({"model_id": model_id, "state_mode": "field", "state_field_id": state_field_id})
+        return [{"key": flow._state_key(value, label), "name": label, "value": value}
+                for value, label in flow._field_values()]
+
     def _sync_field_states(self):
         """Mirror the values of the model field as state records (own-states flows are untouched)."""
         State = self.env["dwo.approval.state"]
@@ -159,7 +175,7 @@ class DwoApprovalFlow(models.Model):
                 if state:
                     state.write({"name": label, "missing": False})
                     continue
-                key = value if flow.state_field_id.ttype == "selection" else State.slugify(label) + "_" + value
+                key = flow._state_key(value, label)
                 while key in used:
                     key += "_"
                 used.add(key)
@@ -318,7 +334,7 @@ class DwoApprovalFlow(models.Model):
         logs = Log.search(domain, limit=limit + 1, offset=offset)
         return {
             "flow": {"id": flow.id, "name": flow.name},
-            "states": [{"id": s.id, "key": s.key, "name": s.name, "color": s.color}
+            "states": [{"id": s.id, "key": s.key, "name": s.name, "color": s.color, "visible": s.always_visible}
                        for s in flow.state_ids.sorted("sequence") if not s.missing],
             "current": current.id,
             "waiting": waiting,
@@ -347,6 +363,10 @@ class DwoApprovalFlow(models.Model):
                 data = json.loads(flow.graph)
             except ValueError as error:
                 raise ValidationError(self.env._("The flow is not valid JSON: %s", error)) from error
+            if flow.state_mode == "field" and flow.state_field_id:
+                flow._sync_field_states()  # the states of a new flow do not exist yet
+                if not data.get("states") and not data.get("transitions"):
+                    continue  # nothing drawn yet: the states just came from the field
             clean, errors = flow._normalize(data)
             if errors:
                 raise ValidationError("\n".join(errors))
@@ -357,7 +377,7 @@ class DwoApprovalFlow(models.Model):
         key_of = {s.id: s.key for s in self.state_ids}
         states = [{
             "id": s.id, "key": s.key, "name": s.name, "x": s.pos_x, "y": s.pos_y, "color": s.color,
-            "missing": s.missing} for s in self.state_ids.sorted("sequence")]
+            "visible": s.always_visible, "missing": s.missing} for s in self.state_ids.sorted("sequence")]
         transitions = []
         for tr in self.transition_ids.sorted("sequence"):
             who = None
@@ -438,9 +458,11 @@ class DwoApprovalFlow(models.Model):
                 errors.append("%s: color must be 0 to 11." % where)
             states.append({
                 "key": key, "name": name, "x": int(st.get("x", 10 + i * 220)), "y": int(st.get("y", 170)),
-                "color": color if isinstance(color, int) else 0})
+                "color": color if isinstance(color, int) else 0, "visible": bool(st.get("visible", True))})
         if self.state_mode == "field":
             known = set(self.state_ids.mapped("key"))
+            if self.state_field_id:
+                known |= {self._state_key(value, label) for value, label in self._field_values()}
             for st in states:
                 if st["key"] not in known:
                     errors.append('states: in "field" mode the states come from the field; "%s" is not one of them.'
@@ -559,7 +581,7 @@ class DwoApprovalFlow(models.Model):
         kept = self.env["dwo.approval.state"]
         for index, st in enumerate(clean["states"]):
             vals = {"name": st["name"], "sequence": index + 1, "pos_x": st["x"], "pos_y": st["y"],
-                    "color": st["color"]}
+                    "color": st["color"], "always_visible": st["visible"]}
             state = by_key.get(st["key"])
             if state:
                 if self.state_mode == "field":

@@ -62,7 +62,8 @@ export class ApprovalPanel extends Component {
         const data = this.state.data;
         const visible = this.props.statusbarVisible;
         // Odoo's own status bar lists the states in reverse (the bar is laid out right to left)
-        return data.states.filter((s) => !visible || visible.includes(s.key) || s.id === data.current).reverse();
+        const shown = (s) => (visible ? visible.includes(s.key) : s.visible !== false);
+        return data.states.filter((s) => shown(s) || s.id === data.current).reverse();
     }
 
     formatDate(value) {

@@ -60,6 +60,59 @@ class TestApprovalFlow(TransactionCase):
         self.assertEqual(self.partner.x_dwo_approval_state_id.key, "review")
         self.assertEqual(self._buttons(self.alice), [])
 
+    def test_history_action(self):
+        flow = self._flow([self._tr("Submit", "draft", "review"), self._tr("Done", "review", "done")])
+        action = self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id), ("dwo_label", "=", "__history__")])
+        self.assertEqual(len(action), 1)
+        self.assertEqual(action.binding_view_types, "form")
+        self.assertEqual(action.binding_model_id, flow.model_id)
+        self._press(flow, "Submit", self.alice)
+        result = action.with_user(self.bob).with_context(
+            active_model="res.partner", active_ids=self.partner.ids, active_id=self.partner.id).run()
+        history = self.env["dwo.approval.history"].browse(result["res_id"])
+        self.assertEqual(history.record_name, "ACME")
+        self.assertEqual(history.current_state, "Review")
+        self.assertEqual(history.line_ids.mapped("button"), ["Submit"])
+        self.assertEqual(history.line_ids.user_id, self.alice)
+        # the generic server action works from any model
+        generic = self.env.ref("dwo_approval_flow.server_action_dwo_approval_history")
+        result = generic.with_context(active_model="res.partner", active_ids=self.partner.ids).run()
+        self.assertEqual(self.env["dwo.approval.history"].browse(result["res_id"]).res_id, self.partner.id)
+        flow.history_action = False
+        self.assertFalse(self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id), ("dwo_label", "=", "__history__")]))
+
+    def test_status_bar_visibility(self):
+        flow = self._flow([self._tr("Submit", "draft", "review"), self._tr("Done", "review", "done")])
+        self.assertTrue(all(flow.state_ids.mapped("always_visible")))
+        graph = json.loads(flow.graph)
+        self.assertTrue(all(s["visible"] for s in graph["states"]))
+        for state in graph["states"]:
+            state["visible"] = state["key"] != "done"
+        flow.graph = json.dumps(graph)
+        self.assertEqual(flow.state_ids.filtered(lambda s: not s.always_visible).mapped("key"), ["done"])
+        data = self.env["dwo.approval.flow"].get_panel_data("res.partner", self.partner.id)
+        self.assertEqual({s["key"]: s["visible"] for s in data["states"]}, {"draft": True, "review": True, "done": False})
+        # an older JSON without the key keeps every state visible
+        for state in graph["states"]:
+            state.pop("visible")
+        flow.graph = json.dumps(graph)
+        self.assertTrue(all(flow.state_ids.mapped("always_visible")))
+
+    def test_field_states_load_before_save(self):
+        model = self.env["ir.model"]._get("res.partner")
+        field = self.env["ir.model.fields"]._get("res.partner", "type")
+        states = self.env["dwo.approval.flow"].field_states(model.id, field.id)
+        keys = [s["key"] for s in states]
+        self.assertIn("contact", keys)
+        self.assertIn("invoice", keys)
+        # a new flow saved with those states drawn: no "unknown state" error
+        graph = self._graph([{"key": k, "name": s["name"]} for k, s in zip(keys, states)],
+                            [self._tr("Go", keys[0], keys[1])])
+        flow = self.env["dwo.approval.flow"].create({
+            "name": "Field flow", "model_id": model.id, "state_mode": "field", "state_field_id": field.id, "graph": graph})
+        self.assertEqual(sorted(flow.state_ids.mapped("key")), sorted(keys))
+        self.assertEqual(flow.transition_count, 1)
+
     def test_who_group_user_field_expression(self):
         who = lambda *a, **k: {"approvers": list(a), "approvals": k.get("approvals", {"mode": "any"})}  # noqa: E731
         flow = self._flow([
@@ -314,7 +367,7 @@ class TestApprovalFlow(TransactionCase):
 
     def test_list_action(self):
         flow = self._flow([self._tr("Submit", "draft", "review", list_action=True)])
-        action = self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id)])
+        action = self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id), ("dwo_label", "!=", "__history__")])
         self.assertEqual(action.name, "Test flow: Submit")
         self.assertEqual(action.binding_model_id, self.model)
         other = self.env["res.partner"].create({"name": "Other"})
@@ -326,7 +379,7 @@ class TestApprovalFlow(TransactionCase):
         self.assertIn("1 done", result["params"]["message"])
         flow.transition_ids.list_action = False
         flow._sync_list_actions()
-        self.assertFalse(self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id)]))
+        self.assertFalse(self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id), ("dwo_label", "!=", "__history__")]))
 
     def test_test_wizard(self):
         flow = self._flow([self._tr("Submit", "draft", "review"), self._tr(

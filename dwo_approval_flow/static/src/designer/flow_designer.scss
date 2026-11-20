@@ -60,6 +60,8 @@
         &.o_selected .o_dwo_handle {
             opacity: 1;
         }
+        &.o_dim { opacity: 0.55; }
+
         &.o_selected rect.o_dwo_node_bg {
             filter: drop-shadow(0 0 4px $o-brand-primary);
         }

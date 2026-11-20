@@ -17,7 +17,7 @@
                 <div class="o_dwo_designer_canvas card">
                     <div class="d-flex gap-2 align-items-center p-2 border-bottom flex-wrap">
                         <button t-if="!readonly and !isFieldMode" type="button" class="btn btn-primary btn-sm" t-on-click="addState">+ State</button>
-                        <span t-if="isFieldMode" class="text-muted small">States come from the field. Save the flow to load them.</span>
+                        <span t-if="isFieldMode" class="text-muted small">States come from the field. Pick the field and they appear here.</span>
                         <span t-elif="!readonly" class="text-muted small">Drag the dot of a box onto another box to add an arrow.</span>
                         <span class="ms-auto"/>
                         <button type="button" class="btn btn-secondary btn-sm" t-on-click="copyJson">Copy JSON</button>
@@ -46,7 +46,7 @@
                                 </g>
                             </g>
                             <g t-foreach="graph.states" t-as="s" t-key="s.cid" class="o_dwo_node" t-att-data-skey="s.key"
-                               t-att-class="{ o_selected: state.selected and state.selected.cid === s.cid, o_missing: s.missing, o_drop: state.connecting and state.connecting.target === s.key }"
+                               t-att-class="{ o_selected: state.selected and state.selected.cid === s.cid, o_missing: s.missing, o_dim: s.visible === false, o_drop: state.connecting and state.connecting.target === s.key }"
                                t-att-transform="'translate(' + s.x + ' ' + s.y + ')'"
                                t-on-pointerdown="(ev) => this.startDrag(ev, s)">
                                 <rect class="o_dwo_node_bg" width="150" height="52" rx="10"/>
@@ -78,6 +78,13 @@
                         <label class="form-label mt-2">Color</label>
                         <ColorList colors="colorIds" selectedColor="s.color or 0" forceExpanded="true"
                                    onColorSelected="(color) => this.setColor(s, color)"/>
+                        <div class="form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="dwo_state_visible"
+                                   t-att-checked="s.visible !== false" t-att-disabled="readonly"
+                                   t-on-change="(ev) => this.setVisible(s, ev.target.checked)"/>
+                            <label class="form-check-label" for="dwo_state_visible">Always show on the status bar</label>
+                            <div class="text-muted small">Off: shown only while the document is in this state.</div>
+                        </div>
                         <div class="text-muted small mt-3">
                             Buttons leaving this state:
                             <t t-set="leaving" t-value="graph.transitions.filter((x) => x.from === s.key)"/>

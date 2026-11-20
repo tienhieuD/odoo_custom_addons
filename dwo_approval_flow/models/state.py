@@ -17,6 +17,9 @@ class DwoApprovalState(models.Model):
     pos_x = fields.Integer(default=10)
     pos_y = fields.Integer(default=170)
     color = fields.Integer(default=0)
+    always_visible = fields.Boolean(
+        string="Always shown on the status bar", default=True,
+        help="Off: the status bar shows this state only while the document is in it (like Odoo's statusbar_visible).")
     missing = fields.Boolean(help="The value no longer exists on the model's field.")
 
     _key_unique = models.Constraint("unique(flow_id, key)", "A state key must be unique inside a flow.")

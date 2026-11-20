@@ -8,6 +8,8 @@ from odoo.exceptions import UserError
 from . import guard
 from .flow import STATE_FIELD
 
+HISTORY_LABEL = "__history__"
+
 
 class DwoApprovalFlow(models.Model):
     _inherit = "dwo.approval.flow"
@@ -127,6 +129,18 @@ class DwoApprovalFlow(models.Model):
                         labels.append(tr.name)
             existing = Action.search([("dwo_approval_flow_id", "=", flow.id)])
             kept = Action
+            if flow.active and flow.history_action:
+                vals = {
+                    "name": self.env._("Approval history"), "model_id": flow.model_id.id, "state": "code",
+                    "code": "action = env['dwo.approval.flow'].action_history(%r, records.ids)" % flow.model_name,
+                    "binding_model_id": flow.model_id.id, "binding_type": "action",
+                    "binding_view_types": "form", "dwo_approval_flow_id": flow.id, "dwo_label": HISTORY_LABEL}
+                action = existing.filtered(lambda a: a.dwo_label == HISTORY_LABEL)[:1]
+                if action:
+                    action.write(vals)
+                else:
+                    action = Action.create(vals)
+                kept |= action
             for label in labels:
                 vals = {
                     "name": "%s: %s" % (flow.name, label), "model_id": flow.model_id.id, "state": "code",
@@ -141,6 +155,17 @@ class DwoApprovalFlow(models.Model):
                 kept |= action
             (existing - kept).unlink()
         self.env.registry.clear_cache()
+
+    @api.model
+    def action_history(self, model, ids):
+        """Open the approval history of one document (also usable as a server action or a button)."""
+        if not model or not ids:
+            raise UserError(self.env._("Select a document first."))
+        record = self.env[model].browse(ids[0]).exists()
+        if not record:
+            raise UserError(self.env._("The document no longer exists."))
+        record.check_access("read")
+        return self.env["dwo.approval.history"].open_for(record)
 
     @api.model
     def press_label(self, flow_id, label, ids):

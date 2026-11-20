@@ -14,6 +14,7 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "views/flow_views.xml",
+        "views/history_views.xml",
         "views/menu.xml",
     ],
     "assets": {

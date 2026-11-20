@@ -8,6 +8,9 @@ Issue #100.
 - **Own-state field** `x_dwo_approval_state_id` can no longer be written directly (except by system code and by the arrows).
 - **Several active flows per model**: the document is routed to the first flow (by sequence) whose "Applies to" domain matches. Native buttons are hidden only when the model has a single flow.
 - **List view**: arrow option "Also allow from the list view". It creates one `ir.actions.server` named `<flow>: <button>` bound to the model (list and form Action menu). It presses the arrow on every selected document where it is available and reports what was skipped. Arrows that ask for a reason are skipped.
+- **Approval history** (issue #104): every flow gets an `ir.actions.server` "Approval history" in the form Action menu (switch: "Approval history action" on the flow). It opens a read-only dialog (`dwo.approval.history`, a transient copy of the log, so it needs no access to the log model) with the document, the flow, the current step and every vote and move. A ready-made server action `dwo_approval_flow.server_action_dwo_approval_history` (uses `active_model`/`active_ids`) can be bound to any model or used as the action of a button or menu; the method is `dwo.approval.flow.action_history(model, ids)`.
+- **Status bar visibility** (issue #105): each state has "Always show on the status bar" (like Odoo's `statusbar_visible`, default on, checkbox in the designer panel, dimmed box when off). A state that is off is shown only while the document is in it, so e.g. Approved and Rejected never show together. Stored as `visible` in the JSON (older JSON keeps every state visible). The widget attribute `statusbar_visible` still wins when set.
+- **Designer, state field**: picking the "State field" (or switching to "A field of the model") loads its values into the diagram at once, before the flow is saved (`dwo.approval.flow.field_states`). Existing boxes with the same value keep their place, color and visibility; boxes that arrows still use but the field no longer has are kept and flagged. Saving a new flow drawn this way no longer fails with "at least one state is required".
 - **Test** button on the flow form: pick a document and a user and see which buttons show, with the reason for the hidden ones (same engine as the real buttons).
 - The flow form uses the whole width and the designer fills it (taller on big screens).
 - `name` of the flow and `message` of notify actions are translatable (state and button names already were). "Approvals needed" in the Who dialog is a radio list.
@@ -18,7 +21,7 @@ Issue #100.
 
 **Not done**: two flows approving the same document in parallel (a document has one flow at a time), the "same department" approver kind (needs `hr`), email templates, multi-company and `statusbar_visible` are untested, no automated JS tests.
 
-**Tests**: 22 Python tests. The UI was checked by hand in a real Odoo 19 with `purchase`: Action menu of the list, Test dialog, direct `button_confirm` and direct state write refused, then `button_confirm` going through the arrow.
+**Tests**: 25 Python tests. The UI was checked by hand in a real Odoo 19 with `purchase`: Action menu of the list, Test dialog, direct `button_confirm` and direct state write refused, then `button_confirm` going through the arrow.
 
 ## 19.0.1.0.0 (2026-11-20)
 

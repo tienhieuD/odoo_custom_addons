@@ -1,5 +1,6 @@
 import { Component, onWillUpdateProps, useRef, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
+import { useRecordObserver } from "@web/model/relational_model/utils";
 import { ColorList } from "@web/core/colorlist/colorlist";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
@@ -54,6 +55,16 @@ export class FlowDesigner extends Component {
             connecting: null,
         });
         this.lastSeen = this.props.record.data[this.props.name];
+        this.fieldKey = this.fieldKeyOf(this.props.record);
+        // the state field was picked or changed on this very record: load its values into the diagram
+        useRecordObserver((record) => {
+            const key = this.fieldKeyOf(record);
+            const [oldRes, oldRest] = [this.fieldKey.split("|")[0], this.fieldKey.slice(this.fieldKey.indexOf("|"))];
+            this.fieldKey = key;
+            if (key.split("|")[0] === oldRes && key.slice(key.indexOf("|")) !== oldRest && record.data.state_mode === "field") {
+                this.loadFieldStates(record);
+            }
+        });
         onWillUpdateProps((next) => {
             const text = next.record.data[next.name];
             if (text !== this.lastSeen) {
@@ -62,6 +73,49 @@ export class FlowDesigner extends Component {
                 this.state.selected = null;
             }
         });
+    }
+
+    fieldKeyOf(record) {
+        const d = record.data;
+        const model = d.model_id ? d.model_id.id : 0;
+        const field = d.state_field_id ? d.state_field_id.id : 0;
+        return `${record.resId || 0}|${d.state_mode}|${model}|${field}`;
+    }
+
+    async loadFieldStates(record) {
+        const d = record.data;
+        if (!d.model_id || !d.state_field_id) {
+            return;
+        }
+        let values;
+        try {
+            values = await this.orm.call("dwo.approval.flow", "field_states", [d.model_id.id, d.state_field_id.id]);
+        } catch (error) {
+            this.notification.add(error.data?.message || _t("Cannot read the values of this field."), { type: "danger" });
+            return;
+        }
+        const old = new Map(this.graph.states.map((s) => [s.key, s]));
+        const used = new Set(this.graph.transitions.flatMap((t) => [t.from, t.to]));
+        const states = values.map((v, i) => {
+            const known = old.get(v.key);
+            if (known) {
+                return Object.assign(known, { name: v.name, missing: false });
+            }
+            return {
+                cid: cid(), id: false, key: v.key, name: v.name, color: 0, visible: true, missing: false,
+                x: 10 + (i % 4) * 230, y: 20 + Math.floor(i / 4) * 110,
+            };
+        });
+        const keys = new Set(values.map((v) => v.key));
+        for (const s of this.graph.states) {
+            if (!keys.has(s.key) && used.has(s.key)) {
+                s.missing = true; // arrows still point to it: keep it, flagged
+                states.push(s);
+            }
+        }
+        this.state.graph.states = states;
+        this.state.selected = null;
+        this.commit();
     }
 
     // ------------------------------------------------------------------
@@ -229,7 +283,7 @@ export class FlowDesigner extends Component {
             n++;
         }
         const s = {
-            cid: cid(), id: false, key: `state_${n}`, name: _t("New state"), color: 0, missing: false,
+            cid: cid(), id: false, key: `state_${n}`, name: _t("New state"), color: 0, visible: true, missing: false,
             ...freeSpot(this.graph.states),
         };
         this.graph.states.push(s);
@@ -283,6 +337,11 @@ export class FlowDesigner extends Component {
             t.from = t.from === old ? key : t.from;
             t.to = t.to === old ? key : t.to;
         });
+        this.commit();
+    }
+
+    setVisible(state, value) {
+        state.visible = value;
         this.commit();
     }
 

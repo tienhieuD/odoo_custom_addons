@@ -47,6 +47,7 @@
                             <field name="domain" widget="domain" options="{'model': 'model_name'}"/>
                             <field name="model_name" invisible="1"/>
                             <field name="replace_statusbar"/>
+                            <field name="history_action"/>
                         </group>
                     </group>
                     <field name="graph" widget="dwo_flow_designer" nolabel="1" invisible="not model_id"
