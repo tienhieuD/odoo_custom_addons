@@ -16,7 +16,7 @@ class TestApprovalFlow(TransactionCase):
         super().setUpClass()
         Users = cls.env["res.users"].with_context(no_reset_password=True)
         cls.group = cls.env["res.groups"].create({"name": "Test Legal"})
-        base = {"group_ids": [(6, 0, [cls.env.ref("base.group_user").id])]}
+        base = {"group_ids": [(6, 0, [cls.env.ref("base.group_user").id, cls.env.ref("base.group_partner_manager").id])]}
         cls.alice = Users.create(dict(base, name="Alice", login="alice_t"))
         cls.bob = Users.create(dict(base, name="Bob", login="bob_t"))
         cls.carol = Users.create(dict(base, name="Carol", login="carol_t"))
@@ -243,10 +243,104 @@ class TestApprovalFlow(TransactionCase):
         view = self.env["res.partner"].get_view(view_type="form")
         self.assertNotIn("dwo_approval_buttons", view["arch"])
 
-    def test_one_active_flow_per_model(self):
-        self._flow([])
-        with self.assertRaises(ValidationError):
-            self._flow([])
+    def test_any_state_arrow_hidden_in_its_target(self):
+        flow = self._flow([self._tr("Hold", None, "review")])
+        self.assertEqual(self._buttons(self.alice), ["Hold"])
+        self._press(flow, "Hold", self.alice)
+        self.assertEqual(self._buttons(self.alice), [])
+
+    def test_several_flows_routed_by_domain(self):
+        first = self._flow([], name="For ACME", domain="[('name', '=', 'ACME')]", sequence=1)
+        second = self._flow([], name="For the rest", sequence=2)
+        other = self.env["res.partner"].create({"name": "Other"})
+        Flow = self.env["dwo.approval.flow"]
+        self.assertEqual(Flow._flow_of(self.partner), first)
+        self.assertEqual(Flow._flow_of(other), second)
+        first.active = False
+        self.assertEqual(Flow._flow_of(self.partner), second)
+
+    def _archive_flow(self, guard="all", **kw):
+        return self._flow([self._tr(
+            "Archive", "draft", "done", who={"approvers": [{"type": "users", "user_ids": [self.alice.id]}],
+                                             "approvals": {"mode": "any"}},
+            main_step={"mode": "call_method", "method": "action_archive", "run_as": "system", "guard": guard},
+            **kw)])
+
+    def test_guard_every_call(self):
+        self._archive_flow("all")
+        with self.assertRaises(UserError):
+            self.partner.with_user(self.bob).action_archive()
+        self.assertTrue(self.partner.active)
+        self.partner.with_user(self.alice).action_archive()  # goes through the arrow
+        self.assertFalse(self.partner.active)
+        self.assertEqual(self.partner.x_dwo_approval_state_id.key, "done")
+        self.assertEqual(self.env["dwo.approval.log"].search_count(
+            [("res_id", "=", self.partner.id), ("kind", "=", "move")]), 1)
+        other = self.env["res.partner"].create({"name": "Other"})
+        other.sudo().action_archive()  # system code is never blocked
+        self.assertFalse(other.active)
+
+    def test_guard_direct_only_from_rpc(self):
+        from odoo.service.model import call_kw
+        flow = self._archive_flow("direct")
+        partner = self.env["res.partner"].create({"name": "Gamma"})
+        model = self.env["res.partner"].with_user(self.bob)
+        with self.assertRaises(UserError):
+            call_kw(model, "action_archive", [partner.ids], {})
+        self.assertTrue(partner.active)
+        # a plain python call is not a button press: it is let through
+        partner.with_user(self.alice).action_archive()
+        self.assertFalse(partner.active)
+        # an arrow that is switched off stops guarding
+        flow.transition_ids.guard_scope = "none"
+        self.assertNotIn(("res.partner", "action_archive"), self.env["dwo.approval.flow"]._guard_pairs())
+
+    def test_guard_removed_with_flow(self):
+        flow = self._archive_flow("all")
+        self.assertTrue(getattr(vars(self.env.registry["res.partner"]).get("action_archive"), "_dwo_guard", False))
+        flow.unlink()
+        self.assertFalse(getattr(vars(self.env.registry["res.partner"]).get("action_archive"), "_dwo_guard", False))
+        self.partner.with_user(self.bob).action_archive()
+        self.assertFalse(self.partner.active)
+
+    def test_state_field_cannot_be_written_directly(self):
+        flow = self._flow([self._tr("Submit", "draft", "review")])
+        review = flow.state_ids.filtered(lambda s: s.key == "review")
+        with self.assertRaises(UserError):
+            self.partner.with_user(self.alice).write({"x_dwo_approval_state_id": review.id})
+        self._press(flow, "Submit", self.alice)
+        self.assertEqual(self.partner.x_dwo_approval_state_id, review)
+        self.partner.sudo().write({"x_dwo_approval_state_id": flow.state_ids[0].id})  # system code may
+
+    def test_list_action(self):
+        flow = self._flow([self._tr("Submit", "draft", "review", list_action=True)])
+        action = self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id)])
+        self.assertEqual(action.name, "Test flow: Submit")
+        self.assertEqual(action.binding_model_id, self.model)
+        other = self.env["res.partner"].create({"name": "Other"})
+        other.x_dwo_approval_state_id = flow.state_ids.filtered(lambda s: s.key == "done")
+        result = self.env["dwo.approval.flow"].with_user(self.alice).press_label(
+            flow.id, "Submit", (self.partner | other).ids)
+        self.assertEqual(self.partner.x_dwo_approval_state_id.key, "review")
+        self.assertEqual(other.x_dwo_approval_state_id.key, "done")  # not in "draft": skipped
+        self.assertIn("1 done", result["params"]["message"])
+        flow.transition_ids.list_action = False
+        flow._sync_list_actions()
+        self.assertFalse(self.env["ir.actions.server"].search([("dwo_approval_flow_id", "=", flow.id)]))
+
+    def test_test_wizard(self):
+        flow = self._flow([self._tr("Submit", "draft", "review"), self._tr(
+            "Approve", "review", "done", who={"approvers": [{"type": "users", "user_ids": [self.alice.id]}],
+                                             "approvals": {"mode": "any"}})])
+        wizard = self.env["dwo.approval.test"].create({
+            "flow_id": flow.id, "res_id": self.partner.id, "user_id": self.alice.id})
+        self.assertIn("Submit", wizard.result)
+        self.assertIn("Shown", wizard.result)
+        self._press(flow, "Submit", self.alice)
+        wizard.invalidate_recordset()
+        self.assertIn("Review", wizard.result)
+        wizard.user_id = self.bob
+        self.assertIn("not one of the approvers", wizard.result)
 
     def test_security(self):
         flow = self._flow([self._tr("Submit", "draft", "review")])

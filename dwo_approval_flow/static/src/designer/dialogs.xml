@@ -30,14 +30,23 @@
             <button type="button" class="btn btn-link ps-0" t-on-click="addRow">+ Add another approver</button>
             <hr/>
             <label class="form-label fw-bold">Approvals needed <span class="text-muted fw-normal">(for the whole button)</span></label>
-            <div class="d-flex gap-2">
-                <select class="form-select w-auto" t-on-change="(ev) => this.setMode(ev.target.value)">
-                    <option value="any" t-att-selected="state.mode === 'any'">1 approval is enough</option>
-                    <option value="all" t-att-selected="state.mode === 'all'" t-att-disabled="state.rows.length &lt; 2">Everyone listed (1 per approver line)</option>
-                    <option value="n" t-att-selected="state.mode === 'n'">At least N approvals</option>
-                </select>
-                <input t-if="state.mode === 'n'" type="number" min="2" class="form-control" style="width: 5rem"
-                       t-att-value="state.n" t-on-input="(ev) => this.setN(ev.target.value)"/>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="dwo_mode" id="dwo_mode_any" t-att-checked="state.mode === 'any'"
+                       t-on-change="() => this.setMode('any')"/>
+                <label class="form-check-label" for="dwo_mode_any">1 approval is enough</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="dwo_mode" id="dwo_mode_all" t-att-checked="state.mode === 'all'"
+                       t-att-disabled="state.rows.length &lt; 2" t-on-change="() => this.setMode('all')"/>
+                <label class="form-check-label" for="dwo_mode_all">Everyone listed (1 per approver line)</label>
+            </div>
+            <div class="form-check d-flex align-items-center gap-2">
+                <input class="form-check-input" type="radio" name="dwo_mode" id="dwo_mode_n" t-att-checked="state.mode === 'n'"
+                       t-on-change="() => this.setMode('n')"/>
+                <label class="form-check-label" for="dwo_mode_n">At least</label>
+                <input type="number" min="2" class="form-control form-control-sm" style="width: 4.5rem"
+                       t-att-disabled="state.mode !== 'n'" t-att-value="state.n" t-on-input="(ev) => this.setN(ev.target.value)"/>
+                <span>approvals</span>
             </div>
             <div t-if="state.error" class="text-danger mt-2" t-esc="state.error"/>
             <t t-set-slot="footer">
@@ -80,6 +89,12 @@
                     <input class="form-check-input" type="checkbox" id="dwo_step_verify" t-model="state.verify"/>
                     <label class="form-check-label" for="dwo_step_verify">Check that the document reached the target state, or undo everything</label>
                 </div>
+                <label class="form-label mt-2">Protect the method</label>
+                <select class="form-select" t-model="state.guard">
+                    <option value="direct">When the original button is pressed (recommended)</option>
+                    <option value="all">Every call, even from other code</option>
+                    <option value="none">Do not protect, only hide the original button</option>
+                </select>
                 <label class="form-label mt-2">Run as</label>
                 <select class="form-select" t-model="state.run_as">
                     <option value="user">The user who pressed</option>

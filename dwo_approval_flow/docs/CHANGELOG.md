@@ -1,5 +1,23 @@
 # Changelog
 
+## 19.0.1.1.0 (2026-11-20)
+
+Issue #100.
+
+- **Guard** (`models/guard.py`): the public methods that "call method" arrows use are patched on the final registry class (idempotent, rebuilt on registry load, removed when no flow needs them; other workers are told through the registry signal). Each arrow has "Protect the method": *direct* (default, only when the call comes from `call_kw`, i.e. a button or RPC), *every call* (except `sudo`) or *none*. A guarded call by a user is turned into pressing the arrow (votes included); if the arrow is not available a `UserError` explains why. The bypass flag is a server-side thread local, not a context key, so a client cannot forge it.
+- **Own-state field** `x_dwo_approval_state_id` can no longer be written directly (except by system code and by the arrows).
+- **Several active flows per model**: the document is routed to the first flow (by sequence) whose "Applies to" domain matches. Native buttons are hidden only when the model has a single flow.
+- **List view**: arrow option "Also allow from the list view". It creates one `ir.actions.server` named `<flow>: <button>` bound to the model (list and form Action menu). It presses the arrow on every selected document where it is available and reports what was skipped. Arrows that ask for a reason are skipped.
+- **Test** button on the flow form: pick a document and a user and see which buttons show, with the reason for the hidden ones (same engine as the real buttons).
+- The flow form uses the whole width and the designer fills it (taller on big screens).
+- `name` of the flow and `message` of notify actions are translatable (state and button names already were). "Approvals needed" in the Who dialog is a radio list.
+- Designer: arrows are curves (`static/src/designer/layout.js`, no library) that bend around boxes and spread when several arrows join the same two boxes; labels are moved along their curve so they do not overlap each other or a box; boxes cannot be dragged on top of each other and new boxes get a free spot. An any-state arrow no longer shows its button in its own target state.
+- JSON: `main_step.guard` and `list_action` added to schema `dwo_approval_flow/1` (old JSON still loads).
+
+**Not done**: two flows approving the same document in parallel (a document has one flow at a time), the "same department" approver kind (needs `hr`), email templates, multi-company and `statusbar_visible` are untested, no automated JS tests.
+
+**Tests**: 22 Python tests. The UI was checked by hand in a real Odoo 19 with `purchase`: Action menu of the list, Test dialog, direct `button_confirm` and direct state write refused, then `button_confirm` going through the arrow.
+
 ## 19.0.1.0.0 (2026-11-20)
 
 First version (issue #91). Odoo 19 only.

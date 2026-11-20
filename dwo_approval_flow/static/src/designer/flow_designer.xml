@@ -24,15 +24,16 @@
                         <button t-if="!readonly" type="button" class="btn btn-secondary btn-sm" t-on-click="loadJson">Load JSON</button>
                     </div>
                     <div class="o_dwo_canvas_scroll">
-                        <svg t-ref="svg" class="o_dwo_svg" t-att-width="canvasSize.width" t-att-height="canvasSize.height"
+                        <svg t-ref="svg" class="o_dwo_svg" style="min-width: 100%" t-att-width="canvasSize.width" t-att-height="canvasSize.height"
                              t-on-pointerdown="clearSelection">
                             <defs>
                                 <marker id="dwo_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
                                     <path d="M0 0L10 5L0 10z" fill="context-stroke"/>
                                 </marker>
                             </defs>
+                            <t t-set="lay" t-value="this.layout"/>
                             <g t-foreach="graph.transitions" t-as="t" t-key="t.cid">
-                                <t t-set="g" t-value="geometry(t)"/>
+                                <t t-set="g" t-value="lay[t.cid]"/>
                                 <g t-if="g" class="o_dwo_edge" t-att-class="{ o_selected: state.selected and state.selected.cid === t.cid }"
                                    t-on-pointerdown="(ev) => this.selectTransition(ev, t)">
                                     <circle t-if="g.any" t-att-cx="g.x1" t-att-cy="g.y1" r="4" class="o_dwo_any_dot"/>
@@ -158,6 +159,11 @@
                             <input class="form-check-input" type="checkbox" id="dwo_reason" t-att-checked="t.ask_reason"
                                    t-att-disabled="readonly" t-on-change="(ev) => this.toggleReason(t, ev)"/>
                             <label class="form-check-label" for="dwo_reason">Ask for a reason when pressed</label>
+                        </div>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="dwo_list" t-att-checked="t.list_action"
+                                   t-att-disabled="readonly" t-on-change="(ev) => this.toggleListAction(t, ev)"/>
+                            <label class="form-check-label" for="dwo_list">Also allow from the list view (Action menu)</label>
                         </div>
                         <div t-if="!readonly" class="mt-3 d-flex gap-2">
                             <button type="button" class="btn btn-sm btn-outline-danger" t-on-click="() => this.deleteTransition(t)">Delete arrow</button>

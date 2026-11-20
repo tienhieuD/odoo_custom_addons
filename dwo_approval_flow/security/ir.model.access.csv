@@ -7,3 +7,4 @@ access_approver_manager,dwo.approval.approver manager,model_dwo_approval_approve
 access_rule_manager,dwo.approval.rule manager,model_dwo_approval_rule,group_approval_manager,1,1,1,1
 access_action_manager,dwo.approval.action manager,model_dwo_approval_action,group_approval_manager,1,1,1,1
 access_log_manager,dwo.approval.log manager,model_dwo_approval_log,group_approval_manager,1,0,0,0
+access_test_manager,dwo.approval.test manager,model_dwo_approval_test,group_approval_manager,1,1,1,1

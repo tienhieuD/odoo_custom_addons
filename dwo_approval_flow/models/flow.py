@@ -25,7 +25,7 @@ class DwoApprovalFlow(models.Model):
     _description = "Approval Flow"
     _order = "sequence, id"
 
-    name = fields.Char(required=True)
+    name = fields.Char(required=True, translate=True)
     active = fields.Boolean(default=True)
     sequence = fields.Integer(default=10)
     company_id = fields.Many2one("res.company", help="Leave empty to apply to every company.")
@@ -74,19 +74,6 @@ class DwoApprovalFlow(models.Model):
                 raise ValidationError(self.env._("Invalid domain: %s", error)) from error
             if not isinstance(value, (list, tuple)):
                 raise ValidationError(self.env._("A domain must be a list."))
-
-    @api.constrains("active", "model_id", "company_id")
-    def _check_one_flow_per_model(self):
-        for flow in self.filtered("active"):
-            others = self.search([
-                ("id", "!=", flow.id), ("model_id", "=", flow.model_id.id), ("active", "=", True),
-                "|", ("company_id", "=", False), ("company_id", "=", flow.company_id.id or 0),
-            ] if flow.company_id else [
-                ("id", "!=", flow.id), ("model_id", "=", flow.model_id.id), ("active", "=", True)])
-            if others:
-                raise ValidationError(self.env._(
-                    "Only one active flow per model and company is supported. Archive “%s” first.",
-                    others[0].name))
 
     # ------------------------------------------------------------------
     # life cycle
@@ -218,7 +205,7 @@ class DwoApprovalFlow(models.Model):
         field = self.env[self.model_name]._fields[self._state_field_name()]
         value = state.id if self.state_mode == "custom" else (
             int(state.value) if field.type == "many2one" else state.value)
-        record.sudo().with_context(dwo_approval_move=True).write({field.name: value})
+        record.sudo().write({field.name: value})
 
     def _after_move(self, record, transition, user):
         """Hook for later versions (e.g. lock the document)."""
@@ -235,22 +222,25 @@ class DwoApprovalFlow(models.Model):
         if header is None:
             header = etree.Element("header")
             arch.insert(0, header)
+        replace = any(flow.replace_statusbar for flow in self)
+        has_bar = False
+        for node in header.findall("field"):
+            if node.get("widget") == "statusbar":
+                has_bar = True
+                if replace:
+                    node.set("invisible", "1")
         for flow in self:
             fname = flow._state_field_name()
-            has_bar = False
-            for node in header.findall("field"):
-                if node.get("widget") == "statusbar":
-                    has_bar = True
-                    if flow.replace_statusbar:
-                        node.set("invisible", "1")
             if not arch.xpath('.//field[@name="%s"]' % fname):
                 etree.SubElement(header, "field", name=fname, invisible="1")
-            flow._hide_native_buttons(header, fname)
-            index = max([i for i, n in enumerate(header) if n.tag != "field"] + [-1]) + 1
-            header.insert(index, etree.Element("widget", name="dwo_approval_buttons", state_field=fname))
-            if flow.replace_statusbar or not has_bar:
-                header.append(etree.Element(
-                    "widget", name="dwo_approval_panel", state_field=fname, show_waiting="0", show_history="0"))
+            if len(self) == 1:
+                flow._hide_native_buttons(header, fname)
+        fname = self[0]._state_field_name()
+        index = max([i for i, n in enumerate(header) if n.tag != "field"] + [-1]) + 1
+        header.insert(index, etree.Element("widget", name="dwo_approval_buttons", state_field=fname))
+        if replace or not has_bar:
+            header.append(etree.Element(
+                "widget", name="dwo_approval_panel", state_field=fname, show_waiting="0", show_history="0"))
 
     def _hide_native_buttons(self, header, fname):
         """Hide the form's own button when a flow calls that method from the same state."""
@@ -380,12 +370,12 @@ class DwoApprovalFlow(models.Model):
                     "approvals": {"mode": tr.vote_mode, "n": tr.vote_n}}
             transitions.append({
                 "id": tr.id, "name": tr.name, "from": key_of.get(tr.from_state_id.id),
-                "to": key_of.get(tr.to_state_id.id), "color": tr.color, "ask_reason": tr.ask_reason,
+                "to": key_of.get(tr.to_state_id.id), "color": tr.color, "ask_reason": tr.ask_reason, "list_action": tr.list_action,
                 "who": who, "rules": [r.domain for r in tr.rule_ids],
                 "main_step": {
                     "mode": tr.move_mode, "method": tr.method_name or "",
                     "server_action_id": tr.server_action_id.id or False, "verify": tr.verify,
-                    "run_as": tr.run_as},
+                    "run_as": tr.run_as, "guard": tr.guard_scope},
                 "actions": [{
                     "type": a.kind, "user_ids": a.recipient_user_ids.ids, "expr": a.recipient_expr or "",
                     "message": a.message or "", "field": a.field_name or "", "value": a.value or "",
@@ -471,7 +461,8 @@ class DwoApprovalFlow(models.Model):
             clean = {
                 "id": tr.get("id") if isinstance(tr.get("id"), int) else False, "name": tr.get("name") or "",
                 "from": tr.get("from"), "to": tr.get("to"), "color": color if isinstance(color, int) else 0,
-                "ask_reason": bool(tr.get("ask_reason")), "approvers": [], "mode": "any", "n": 2,
+                "ask_reason": bool(tr.get("ask_reason")), "list_action": bool(tr.get("list_action")),
+                "approvers": [], "mode": "any", "n": 2,
                 "rules": [], "actions": []}
             who = tr.get("who")
             if who:
@@ -524,7 +515,10 @@ class DwoApprovalFlow(models.Model):
                 "move_mode": step.get("mode", "set_state"), "method_name": step.get("method") or False,
                 "server_action_id": step.get("server_action_id") or self._resolve_ref(
                     "ir.actions.server", step.get("server_action"), errors, where + ".main_step"),
-                "verify": step.get("verify", True), "run_as": step.get("run_as", "user")}
+                "verify": step.get("verify", True), "run_as": step.get("run_as", "user"),
+                "guard_scope": step.get("guard", "direct")}
+            if clean["step"]["guard_scope"] not in ("direct", "all", "none"):
+                errors.append("%s.main_step.guard must be direct, all or none." % where)
             if clean["step"]["move_mode"] not in ("set_state", "call_method"):
                 errors.append("%s.main_step.mode must be set_state or call_method." % where)
             if clean["step"]["move_mode"] == "call_method":
@@ -581,6 +575,7 @@ class DwoApprovalFlow(models.Model):
             step = tr["step"]
             vals = {
                 "name": tr["name"], "sequence": index + 1, "color": tr["color"], "ask_reason": tr["ask_reason"],
+                "list_action": tr["list_action"],
                 "from_state_id": by_key[tr["from"]].id if tr["from"] else False,
                 "to_state_id": by_key[tr["to"]].id,
                 "vote_mode": tr["mode"], "vote_n": tr["n"], **step}
@@ -668,14 +663,15 @@ def _as_graph(clean, data):
     for tr in clean["transitions"]:
         out["transitions"].append({
             "id": False, "name": tr["name"], "from": tr["from"], "to": tr["to"], "color": tr["color"],
-            "ask_reason": tr["ask_reason"],
+            "ask_reason": tr["ask_reason"], "list_action": tr["list_action"],
             "who": {"approvers": [{"type": a["kind"], "user_ids": a["user_ids"], "group_id": a["group_id"],
                                    "value": a["value"], "label": ""} for a in tr["approvers"]],
                     "approvals": {"mode": tr["mode"], "n": tr["n"]}} if tr["approvers"] else None,
             "rules": tr["rules"],
             "main_step": {"mode": tr["step"]["move_mode"], "method": tr["step"]["method_name"] or "",
                           "server_action_id": tr["step"]["server_action_id"] or False,
-                          "verify": tr["step"]["verify"], "run_as": tr["step"]["run_as"]},
+                          "verify": tr["step"]["verify"], "run_as": tr["step"]["run_as"],
+                          "guard": tr["step"]["guard_scope"]},
             "actions": [{"type": a["kind"], "user_ids": a["recipient_user_ids"], "expr": a["recipient_expr"] or "",
                          "message": a["message"] or "", "field": a["field_name"] or "", "value": a["value"] or "",
                          "server_action_id": a["server_action_id"] or False,

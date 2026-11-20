@@ -24,7 +24,7 @@ class DwoApprovalAction(models.Model):
     ], required=True, default="notify")
     recipient_user_ids = fields.Many2many("res.users", string="To")
     recipient_expr = fields.Char(string="To (expression)")
-    message = fields.Text()
+    message = fields.Text(translate=True)
     template_id = fields.Many2one("mail.template", string="Email template")
     field_name = fields.Char(string="Field to update")
     value = fields.Char(string="New value", help="Text, number, id or true/false. {user} is the user who pressed.")

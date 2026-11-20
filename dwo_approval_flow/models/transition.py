@@ -7,6 +7,8 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import SQL
 
+from . import guard
+
 _logger = logging.getLogger(__name__)
 
 
@@ -38,9 +40,34 @@ class DwoApprovalTransition(models.Model):
         string="Check the state afterwards", default=True,
         help="After the method ran, the document must be in the target state or everything is rolled back.")
     run_as = fields.Selection([("user", "The user who pressed"), ("system", "System")], default="user", required=True)
+    guard_scope = fields.Selection(
+        [("direct", "When the original button is pressed"), ("all", "Every call"), ("none", "Do not protect")],
+        string="Protect the method", default="direct", required=True,
+        help="Direct: the method only runs through the approval when called from a button or RPC. "
+             "Every call: also when other code calls it (except as system). None: only the view is changed.")
+    list_action = fields.Boolean(
+        string="Also allow from the list view",
+        help="Adds an entry to the Action menu of the list and form views.")
     approver_ids = fields.One2many("dwo.approval.approver", "transition_id")
     rule_ids = fields.One2many("dwo.approval.rule", "transition_id")
     action_ids = fields.One2many("dwo.approval.action", "transition_id")
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        result = super().create(vals_list)
+        self.env["dwo.approval.flow"]._guard_sync()
+        return result
+
+    def write(self, vals):
+        result = super().write(vals)
+        if {"move_mode", "method_name", "guard_scope", "flow_id"} & set(vals):
+            self.env["dwo.approval.flow"]._guard_sync()
+        return result
+
+    def unlink(self):
+        result = super().unlink()
+        self.env["dwo.approval.flow"]._guard_sync()
+        return result
 
     @api.constrains("move_mode", "method_name", "server_action_id", "vote_mode", "vote_n")
     def _check_transition(self):
@@ -104,6 +131,8 @@ class DwoApprovalTransition(models.Model):
             return False, self.env._("The document is not in a state of this flow.")
         if self.from_state_id and self.from_state_id != current:
             return False, self.env._("The document is not in the state this button starts from.")
+        if not self.from_state_id and self.to_state_id == current:
+            return False, self.env._("The document is already in this state.")
         if not flow._applies(record):
             return False, self.env._("This flow does not apply to the document.")
         for rule in self.rule_ids:
@@ -180,12 +209,12 @@ class DwoApprovalTransition(models.Model):
             flow._write_state(record, self.to_state_id)
             return False
         target = record if self.run_as == "user" else record.sudo()
-        target = target.with_context(dwo_approval_run=True)
-        if self.server_action_id:
-            result = self.server_action_id.sudo().with_env(target.env).with_context(
-                active_model=record._name, active_id=record.id, active_ids=record.ids).run()
-        else:
-            result = getattr(target, self.method_name)()
+        with guard.bypass():
+            if self.server_action_id:
+                result = self.server_action_id.sudo().with_env(target.env).with_context(
+                    active_model=record._name, active_id=record.id, active_ids=record.ids).run()
+            else:
+                result = getattr(target, self.method_name)()
         if isinstance(result, dict) and result.get("type"):
             return result  # a wizard: the state changes later, nothing to check now
         if flow.state_mode == "custom":

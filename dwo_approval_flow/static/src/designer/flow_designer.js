@@ -7,9 +7,8 @@ import { browser } from "@web/core/browser/browser";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { ActionDialog, JsonDialog, RuleDialog, StepDialog, WhoDialog } from "./dialogs";
 import { COLORS } from "./palette";
+import { NH, NW, collides, computeLayout, freeSpot } from "./layout";
 
-const NW = 150;
-const NH = 52;
 let counter = 0;
 const cid = () => `c${++counter}`;
 
@@ -136,53 +135,8 @@ export class FlowDesigner extends Component {
         return c ? `stroke: ${c}; stroke-width: 1.8` : "";
     }
 
-    geometry(t) {
-        const b = this.stateByKey(t.to);
-        if (!b) {
-            return null;
-        }
-        const cb = { x: b.x + NW / 2, y: b.y + NH / 2 };
-        const a = t.from === null || t.from === undefined || t.from === false ? null : this.stateByKey(t.from);
-        let p1;
-        let p2;
-        if (!a) {
-            p1 = { x: b.x - 90, y: cb.y };
-            p2 = { x: b.x, y: cb.y };
-        } else {
-            const ca = { x: a.x + NW / 2, y: a.y + NH / 2 };
-            const reverse = this.graph.transitions.some((o) => o.from === t.to && o.to === t.from);
-            const dx = cb.x - ca.x;
-            const dy = cb.y - ca.y;
-            const len = Math.hypot(dx, dy) || 1;
-            const off = reverse ? 14 : 0;
-            const nx = (-dy / len) * off;
-            const ny = (dx / len) * off;
-            const q1 = this.clip(ca, { x: cb.x + nx, y: cb.y + ny });
-            const q2 = this.clip(cb, { x: ca.x + nx, y: ca.y + ny });
-            p1 = { x: q1.x + nx, y: q1.y + ny };
-            p2 = { x: q2.x + nx, y: q2.y + ny };
-        }
-        const label = t.name || "?";
-        const width = Math.max(40, label.length * 6.4 + 14);
-        return {
-            d: `M${p1.x} ${p1.y}L${p2.x} ${p2.y}`,
-            mx: (p1.x + p2.x) / 2,
-            my: (p1.y + p2.y) / 2,
-            width,
-            any: !a,
-            x1: p1.x,
-            y1: p1.y,
-        };
-    }
-
-    clip(c, to) {
-        const dx = to.x - c.x;
-        const dy = to.y - c.y;
-        if (!dx && !dy) {
-            return c;
-        }
-        const k = Math.min(dx ? NW / 2 / Math.abs(dx) : 1e9, dy ? NH / 2 / Math.abs(dy) : 1e9);
-        return { x: c.x + dx * k, y: c.y + dy * k };
+    get layout() {
+        return computeLayout(this.graph.states, this.graph.transitions);
     }
 
     pointer(ev) {
@@ -214,8 +168,18 @@ export class FlowDesigner extends Component {
         let moved = false;
         const move = (e) => {
             const p = this.pointer(e);
-            s.x = Math.max(4, Math.round(p.x - ox));
-            s.y = Math.max(4, Math.round(p.y - oy));
+            const x = Math.max(4, Math.round(p.x - ox));
+            const y = Math.max(4, Math.round(p.y - oy));
+            // boxes never overlap: slide along one axis when the other is blocked
+            const states = this.graph.states;
+            if (!collides(states, s, x, y)) {
+                s.x = x;
+                s.y = y;
+            } else if (!collides(states, s, x, s.y)) {
+                s.x = x;
+            } else if (!collides(states, s, s.x, y)) {
+                s.y = y;
+            }
             moved = true;
         };
         const up = () => {
@@ -266,7 +230,7 @@ export class FlowDesigner extends Component {
         }
         const s = {
             cid: cid(), id: false, key: `state_${n}`, name: _t("New state"), color: 0, missing: false,
-            x: 30 + (index % 4) * 220, y: 30 + Math.floor(index / 4) * 110,
+            ...freeSpot(this.graph.states),
         };
         this.graph.states.push(s);
         this.state.selected = { kind: "state", cid: s.cid };
@@ -280,8 +244,8 @@ export class FlowDesigner extends Component {
             return;
         }
         const t = {
-            cid: cid(), id: false, name: _t("New action"), from, to, color: 0, ask_reason: false,
-            who: null, rules: [], main_step: { mode: "set_state", method: "", server_action_id: false, verify: true, run_as: "user" },
+            cid: cid(), id: false, name: _t("New action"), from, to, color: 0, ask_reason: false, list_action: false,
+            who: null, rules: [], main_step: { mode: "set_state", method: "", server_action_id: false, verify: true, run_as: "user", guard: "direct" },
             actions: [],
         };
         this.graph.transitions.push(t);
@@ -453,7 +417,7 @@ export class FlowDesigner extends Component {
             model: this.modelName,
             step: {
                 mode: step.mode, method: step.method || "", server_action_id: step.server_action_id || false,
-                verify: step.verify !== false, run_as: step.run_as || "user",
+                verify: step.verify !== false, run_as: step.run_as || "user", guard: step.guard || "direct",
             },
             confirm: (value) => {
                 t.main_step = value;
@@ -487,6 +451,11 @@ export class FlowDesigner extends Component {
     }
 
     onNameChange() {
+        this.commit();
+    }
+
+    toggleListAction(t, ev) {
+        t.list_action = ev.target.checked;
         this.commit();
     }
 

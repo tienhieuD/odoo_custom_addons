@@ -25,6 +25,7 @@
                 <header>
                     <button name="action_refresh_states" type="object" string="Refresh states"
                             invisible="state_mode != 'field' or not id"/>
+                    <button name="action_test" type="object" string="Test" invisible="not id"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
@@ -51,6 +52,25 @@
                     <field name="graph" widget="dwo_flow_designer" nolabel="1" invisible="not model_id"
                            options="{'model_field': 'model_name'}"/>
                 </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_dwo_approval_test_form" model="ir.ui.view">
+        <field name="name">dwo.approval.test.form</field>
+        <field name="model">dwo.approval.test</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="flow_id" invisible="1"/>
+                    <field name="res_model" invisible="1"/>
+                    <field name="res_id" options="{'no_create': True}"/>
+                    <field name="user_id" options="{'no_create': True}"/>
+                </group>
+                <field name="result" nolabel="1"/>
+                <footer>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
             </form>
         </field>
     </record>

@@ -1,3 +1,12 @@
+// the flow form uses the whole width, the designer takes what is left
+.o_form_view .o_form_sheet_bg > .o_form_sheet:has(.o_dwo_designer) {
+    max-width: none;
+    > .o_field_dwo_flow_designer {
+        width: 100%;
+        margin-inline: 0;
+    }
+}
+
 .o_dwo_designer {
     .o_dwo_designer_grid {
         display: grid;
@@ -8,12 +17,12 @@
         }
     }
     .o_dwo_designer_panel {
-        max-height: 640px;
+        max-height: unquote("max(640px, calc(100vh - 300px))");
         overflow: auto;
     }
     .o_dwo_canvas_scroll {
         overflow: auto;
-        height: 460px;
+        height: unquote("max(460px, calc(100vh - 380px))");
         background: $o-view-background-color radial-gradient($border-color 1px, transparent 1px) 0 0 / 18px 18px;
     }
     .o_dwo_svg {
