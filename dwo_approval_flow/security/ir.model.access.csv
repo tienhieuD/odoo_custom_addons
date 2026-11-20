@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_flow_manager,dwo.approval.flow manager,model_dwo_approval_flow,group_approval_manager,1,1,1,1
+access_state_manager,dwo.approval.state manager,model_dwo_approval_state,group_approval_manager,1,1,1,1
+access_state_user,dwo.approval.state user,model_dwo_approval_state,base.group_user,1,0,0,0
+access_transition_manager,dwo.approval.transition manager,model_dwo_approval_transition,group_approval_manager,1,1,1,1
+access_approver_manager,dwo.approval.approver manager,model_dwo_approval_approver,group_approval_manager,1,1,1,1
+access_rule_manager,dwo.approval.rule manager,model_dwo_approval_rule,group_approval_manager,1,1,1,1
+access_action_manager,dwo.approval.action manager,model_dwo_approval_action,group_approval_manager,1,1,1,1
+access_log_manager,dwo.approval.log manager,model_dwo_approval_log,group_approval_manager,1,0,0,0

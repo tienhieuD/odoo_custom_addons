@@ -1,0 +1,541 @@
+import { Component, onWillUpdateProps, useRef, useState } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
+import { ColorList } from "@web/core/colorlist/colorlist";
+import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
+import { browser } from "@web/core/browser/browser";
+import { standardFieldProps } from "@web/views/fields/standard_field_props";
+import { ActionDialog, JsonDialog, RuleDialog, StepDialog, WhoDialog } from "./dialogs";
+import { COLORS } from "./palette";
+
+const NW = 150;
+const NH = 52;
+let counter = 0;
+const cid = () => `c${++counter}`;
+
+function parse(text) {
+    let graph;
+    try {
+        graph = JSON.parse(text || "{}");
+    } catch {
+        graph = {};
+    }
+    graph.schema = graph.schema || "dwo_approval_flow/1";
+    graph.states = graph.states || [];
+    graph.transitions = graph.transitions || [];
+    graph.states.forEach((s) => (s.cid = cid()));
+    graph.transitions.forEach((t) => {
+        t.cid = cid();
+        t.rules = t.rules || [];
+        t.actions = t.actions || [];
+        t.main_step = t.main_step || { mode: "set_state" };
+    });
+    return graph;
+}
+
+/** Field widget: the state diagram of an approval flow (boxes are states, arrows are buttons). */
+export class FlowDesigner extends Component {
+    static template = "dwo_approval_flow.Designer";
+    static components = { ColorList };
+    static props = {
+        ...standardFieldProps,
+        modelField: { type: String, optional: true },
+    };
+
+    setup() {
+        this.orm = useService("orm");
+        this.dialog = useService("dialog");
+        this.notification = useService("notification");
+        this.svgRef = useRef("svg");
+        this.colorIds = COLORS.map((_c, index) => index);
+        this.state = useState({
+            graph: parse(this.props.record.data[this.props.name]),
+            selected: null, // { kind: "state"|"transition", cid }
+            showChecks: false,
+            connecting: null,
+        });
+        this.lastSeen = this.props.record.data[this.props.name];
+        onWillUpdateProps((next) => {
+            const text = next.record.data[next.name];
+            if (text !== this.lastSeen) {
+                this.lastSeen = text;
+                this.state.graph = parse(text);
+                this.state.selected = null;
+            }
+        });
+    }
+
+    // ------------------------------------------------------------------
+    // data
+    // ------------------------------------------------------------------
+    get data() {
+        return this.props.record.data;
+    }
+
+    get modelName() {
+        return this.data[this.props.modelField || "model_name"] || "";
+    }
+
+    get isFieldMode() {
+        return this.data.state_mode === "field";
+    }
+
+    get readonly() {
+        return this.props.readonly;
+    }
+
+    get graph() {
+        return this.state.graph;
+    }
+
+    get selectedState() {
+        const sel = this.state.selected;
+        return sel && sel.kind === "state" ? this.graph.states.find((s) => s.cid === sel.cid) : null;
+    }
+
+    get selectedTransition() {
+        const sel = this.state.selected;
+        return sel && sel.kind === "transition" ? this.graph.transitions.find((t) => t.cid === sel.cid) : null;
+    }
+
+    stateByKey(key) {
+        return this.graph.states.find((s) => s.key === key);
+    }
+
+    commit() {
+        const text = JSON.stringify(this.graph, (key, value) => (key === "cid" ? undefined : value));
+        this.lastSeen = text;
+        this.props.record.update({ [this.props.name]: text });
+    }
+
+    // ------------------------------------------------------------------
+    // drawing
+    // ------------------------------------------------------------------
+    get canvasSize() {
+        const xs = this.graph.states.map((s) => s.x + NW + 60);
+        const ys = this.graph.states.map((s) => s.y + NH + 60);
+        return { width: Math.max(760, ...xs), height: Math.max(420, ...ys) };
+    }
+
+    stroke(color) {
+        return COLORS[color] || "";
+    }
+
+    nodeStyle(state) {
+        const c = this.stroke(state.color);
+        return c ? `stroke: ${c}; stroke-width: 2; fill: ${c}; fill-opacity: 0.16` : "";
+    }
+
+    edgeStyle(t) {
+        const c = this.stroke(t.color);
+        return c ? `stroke: ${c}` : "";
+    }
+
+    labelStyle(t) {
+        const c = this.stroke(t.color);
+        return c ? `stroke: ${c}; stroke-width: 1.8` : "";
+    }
+
+    geometry(t) {
+        const b = this.stateByKey(t.to);
+        if (!b) {
+            return null;
+        }
+        const cb = { x: b.x + NW / 2, y: b.y + NH / 2 };
+        const a = t.from === null || t.from === undefined || t.from === false ? null : this.stateByKey(t.from);
+        let p1;
+        let p2;
+        if (!a) {
+            p1 = { x: b.x - 90, y: cb.y };
+            p2 = { x: b.x, y: cb.y };
+        } else {
+            const ca = { x: a.x + NW / 2, y: a.y + NH / 2 };
+            const reverse = this.graph.transitions.some((o) => o.from === t.to && o.to === t.from);
+            const dx = cb.x - ca.x;
+            const dy = cb.y - ca.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const off = reverse ? 14 : 0;
+            const nx = (-dy / len) * off;
+            const ny = (dx / len) * off;
+            const q1 = this.clip(ca, { x: cb.x + nx, y: cb.y + ny });
+            const q2 = this.clip(cb, { x: ca.x + nx, y: ca.y + ny });
+            p1 = { x: q1.x + nx, y: q1.y + ny };
+            p2 = { x: q2.x + nx, y: q2.y + ny };
+        }
+        const label = t.name || "?";
+        const width = Math.max(40, label.length * 6.4 + 14);
+        return {
+            d: `M${p1.x} ${p1.y}L${p2.x} ${p2.y}`,
+            mx: (p1.x + p2.x) / 2,
+            my: (p1.y + p2.y) / 2,
+            width,
+            any: !a,
+            x1: p1.x,
+            y1: p1.y,
+        };
+    }
+
+    clip(c, to) {
+        const dx = to.x - c.x;
+        const dy = to.y - c.y;
+        if (!dx && !dy) {
+            return c;
+        }
+        const k = Math.min(dx ? NW / 2 / Math.abs(dx) : 1e9, dy ? NH / 2 / Math.abs(dy) : 1e9);
+        return { x: c.x + dx * k, y: c.y + dy * k };
+    }
+
+    pointer(ev) {
+        const rect = this.svgRef.el.getBoundingClientRect();
+        return { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+    }
+
+    // ------------------------------------------------------------------
+    // selecting, dragging, connecting
+    // ------------------------------------------------------------------
+    clearSelection() {
+        this.state.selected = null;
+    }
+
+    selectTransition(ev, t) {
+        ev.stopPropagation();
+        this.state.selected = { kind: "transition", cid: t.cid };
+    }
+
+    startDrag(ev, s) {
+        ev.stopPropagation();
+        this.state.selected = { kind: "state", cid: s.cid };
+        if (this.readonly) {
+            return;
+        }
+        const start = this.pointer(ev);
+        const ox = start.x - s.x;
+        const oy = start.y - s.y;
+        let moved = false;
+        const move = (e) => {
+            const p = this.pointer(e);
+            s.x = Math.max(4, Math.round(p.x - ox));
+            s.y = Math.max(4, Math.round(p.y - oy));
+            moved = true;
+        };
+        const up = () => {
+            browser.removeEventListener("pointermove", move);
+            browser.removeEventListener("pointerup", up);
+            if (moved) {
+                this.commit();
+            }
+        };
+        browser.addEventListener("pointermove", move);
+        browser.addEventListener("pointerup", up);
+    }
+
+    startConnect(ev, s) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        if (this.readonly) {
+            return;
+        }
+        this.state.connecting = { x1: s.x + NW, y1: s.y + NH / 2, x2: s.x + NW, y2: s.y + NH / 2, target: null };
+        const move = (e) => {
+            const p = this.pointer(e);
+            const el = document.elementFromPoint(e.clientX, e.clientY)?.closest("[data-skey]");
+            const target = el && el.dataset.skey !== s.key ? el.dataset.skey : null;
+            Object.assign(this.state.connecting, { x2: p.x, y2: p.y, target });
+        };
+        const up = () => {
+            browser.removeEventListener("pointermove", move);
+            browser.removeEventListener("pointerup", up);
+            const target = this.state.connecting.target;
+            this.state.connecting = null;
+            if (target) {
+                this.addTransition(s.key, target);
+            }
+        };
+        browser.addEventListener("pointermove", move);
+        browser.addEventListener("pointerup", up);
+    }
+
+    // ------------------------------------------------------------------
+    // editing the graph
+    // ------------------------------------------------------------------
+    addState() {
+        const index = this.graph.states.length;
+        let n = index + 1;
+        while (this.stateByKey(`state_${n}`)) {
+            n++;
+        }
+        const s = {
+            cid: cid(), id: false, key: `state_${n}`, name: _t("New state"), color: 0, missing: false,
+            x: 30 + (index % 4) * 220, y: 30 + Math.floor(index / 4) * 110,
+        };
+        this.graph.states.push(s);
+        this.state.selected = { kind: "state", cid: s.cid };
+        this.commit();
+    }
+
+    addTransition(from, to) {
+        const existing = this.graph.transitions.find((t) => t.from === from && t.to === to);
+        if (existing) {
+            this.state.selected = { kind: "transition", cid: existing.cid };
+            return;
+        }
+        const t = {
+            cid: cid(), id: false, name: _t("New action"), from, to, color: 0, ask_reason: false,
+            who: null, rules: [], main_step: { mode: "set_state", method: "", server_action_id: false, verify: true, run_as: "user" },
+            actions: [],
+        };
+        this.graph.transitions.push(t);
+        this.state.selected = { kind: "transition", cid: t.cid };
+        this.commit();
+    }
+
+    addWayBack(t) {
+        if (!t.from) {
+            return;
+        }
+        this.addTransition(t.to, t.from);
+        const back = this.graph.transitions[this.graph.transitions.length - 1];
+        back.name = _t("Send back");
+        this.commit();
+    }
+
+    deleteState(s) {
+        this.graph.states = this.graph.states.filter((x) => x !== s);
+        this.graph.transitions = this.graph.transitions.filter((t) => t.from !== s.key && t.to !== s.key);
+        this.state.selected = null;
+        this.commit();
+    }
+
+    deleteTransition(t) {
+        this.graph.transitions = this.graph.transitions.filter((x) => x !== t);
+        this.state.selected = null;
+        this.commit();
+    }
+
+    setStateKey(s, key) {
+        const old = s.key;
+        s.key = key;
+        this.graph.transitions.forEach((t) => {
+            t.from = t.from === old ? key : t.from;
+            t.to = t.to === old ? key : t.to;
+        });
+        this.commit();
+    }
+
+    setColor(item, color) {
+        item.color = color;
+        this.commit();
+    }
+
+    // ------------------------------------------------------------------
+    // texts shown in the panel
+    // ------------------------------------------------------------------
+    approverText(t) {
+        return (t.who ? t.who.approvers : []).map((a) => a.label || this.approverLabel(a)).join(_t(" or "));
+    }
+
+    approverLabel(a) {
+        return a.type === "dept" ? _t("Same department as the document") : a.value || "…";
+    }
+
+    approvalsText(t) {
+        const w = t.who;
+        if (w.approvals.mode === "all") {
+            return _t("Everyone listed approves");
+        }
+        if (w.approvals.mode === "n") {
+            return _t("At least %s approve", w.approvals.n);
+        }
+        return w.approvers.length > 1 ? _t("1 approval") : _t("Anyone from this list");
+    }
+
+    stepText(t) {
+        const step = t.main_step;
+        const to = (this.stateByKey(t.to) || {}).name;
+        if (step.mode === "call_method") {
+            return step.method
+                ? _t("Call %(method)s, then the state must be %(to)s", { method: step.method, to })
+                : _t("Run a server action, then the state must be %s", to);
+        }
+        return _t("Change state to %s", to);
+    }
+
+    actionText(a) {
+        const kinds = { notify: _t("Notify"), email: _t("Email"), update: _t("Update"), server: _t("Server action") };
+        return `${kinds[a.type]}: ${a.label || ""}${a.message ? ` — ${a.message}` : ""}`;
+    }
+
+    checkLines(t) {
+        const lines = [_t("The document is in “%s”", t.from || _t("any state"))];
+        if (t.who) {
+            lines.push(_t("The user is: %s", this.approverText(t)));
+        }
+        t.rules.forEach((rule) => lines.push(_t("The document matches %s", rule)));
+        return lines;
+    }
+
+    get problems() {
+        const out = [];
+        const first = this.graph.states[0];
+        this.graph.states.forEach((s) => {
+            const incoming = this.graph.transitions.some((t) => t.to === s.key);
+            if (s !== first && !incoming && !s.missing) {
+                out.push({ cid: s.cid, text: _t("“%s” cannot be reached: no arrow points to it.", s.name) });
+            }
+            if (s.missing) {
+                out.push({ cid: s.cid, text: _t("“%s” no longer exists on the model's field.", s.name) });
+            }
+        });
+        return out;
+    }
+
+    // ------------------------------------------------------------------
+    // dialogs
+    // ------------------------------------------------------------------
+    editWho(t) {
+        this.dialog.add(WhoDialog, {
+            model: this.modelName,
+            approvers: t.who ? t.who.approvers : [],
+            mode: t.who ? t.who.approvals.mode : "any",
+            n: t.who ? t.who.approvals.n : 2,
+            confirm: ({ approvers, mode, n }) => {
+                t.who = { approvers, approvals: { mode, n } };
+                this.commit();
+            },
+        });
+    }
+
+    removeWho(t) {
+        t.who = null;
+        this.commit();
+    }
+
+    editRule(t, index) {
+        this.dialog.add(RuleDialog, {
+            model: this.modelName,
+            domain: index >= 0 ? t.rules[index] : "[]",
+            confirm: (domain) => {
+                if (index >= 0) {
+                    t.rules[index] = domain;
+                } else {
+                    t.rules.push(domain);
+                }
+                this.commit();
+            },
+        });
+    }
+
+    removeRule(t, index) {
+        t.rules.splice(index, 1);
+        this.commit();
+    }
+
+    addCondition(t) {
+        if (t.who) {
+            this.editRule(t, -1);
+        } else {
+            this.dialog.add(WhoDialog, {
+                model: this.modelName,
+                approvers: [],
+                mode: "any",
+                n: 2,
+                confirm: ({ approvers, mode, n }) => {
+                    t.who = { approvers, approvals: { mode, n } };
+                    this.commit();
+                },
+            });
+        }
+    }
+
+    editStep(t) {
+        const step = t.main_step;
+        this.dialog.add(StepDialog, {
+            model: this.modelName,
+            step: {
+                mode: step.mode, method: step.method || "", server_action_id: step.server_action_id || false,
+                verify: step.verify !== false, run_as: step.run_as || "user",
+            },
+            confirm: (value) => {
+                t.main_step = value;
+                this.commit();
+            },
+        });
+    }
+
+    editAction(t, index) {
+        this.dialog.add(ActionDialog, {
+            model: this.modelName,
+            action: index >= 0 ? { ...t.actions[index] } : null,
+            confirm: (action) => {
+                if (index >= 0) {
+                    t.actions[index] = action;
+                } else {
+                    t.actions.push(action);
+                }
+                this.commit();
+            },
+        });
+    }
+
+    removeAction(t, index) {
+        t.actions.splice(index, 1);
+        this.commit();
+    }
+
+    onNameInput(item, ev) {
+        item.name = ev.target.value;
+    }
+
+    onNameChange() {
+        this.commit();
+    }
+
+    toggleReason(t, ev) {
+        t.ask_reason = ev.target.checked;
+        this.commit();
+    }
+
+    // ------------------------------------------------------------------
+    // JSON
+    // ------------------------------------------------------------------
+    async copyJson() {
+        const text = JSON.stringify(this.graph, (key, value) => (key === "cid" ? undefined : value));
+        const shared = await this.orm.call("dwo.approval.flow", "graph_to_share", [text]);
+        try {
+            await browser.navigator.clipboard.writeText(shared);
+            this.notification.add(_t("Flow copied as JSON."), { type: "success" });
+        } catch {
+            this.dialog.add(JsonDialog, { mode: "copy", text: shared, load: () => [], close: () => {} });
+        }
+    }
+
+    loadJson() {
+        const record = this.props.record;
+        this.dialog.add(JsonDialog, {
+            mode: "load",
+            load: async (text) => {
+                const result = await this.orm.call("dwo.approval.flow", "share_to_graph", [
+                    record.data.model_id.id,
+                    record.data.state_mode,
+                    record.data.state_field_id ? record.data.state_field_id.id : false,
+                    text,
+                    record.resId || false,
+                ]);
+                if (result.errors) {
+                    return result.errors;
+                }
+                this.state.graph = parse(result.graph);
+                this.state.selected = null;
+                this.commit();
+                return [];
+            },
+        });
+    }
+}
+
+registry.category("fields").add("dwo_flow_designer", {
+    component: FlowDesigner,
+    displayName: _t("Approval flow designer"),
+    supportedTypes: ["text"],
+    extractProps: ({ options }) => ({ modelField: options.model_field }),
+});

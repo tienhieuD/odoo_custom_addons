@@ -1,0 +1,26 @@
+.o_dwo_approval_panel {
+    .o_dwo_state_dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 4px;
+    }
+}
+
+.o_dwo_approval_statusbar {
+    display: flex;
+    flex-wrap: wrap;
+    .o_arrow_button {
+        opacity: 1;
+        &.o_arrow_button_current {
+            background-color: $o-brand-primary;
+            border-color: $o-brand-primary;
+            color: $white;
+            font-weight: bold;
+            &::after {
+                border-left-color: $o-brand-primary;
+            }
+        }
+    }
+}
