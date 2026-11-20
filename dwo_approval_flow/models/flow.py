@@ -652,10 +652,23 @@ class DwoApprovalFlow(models.Model):
         clean, errors = flow._normalize(data)
         if errors:
             return {"errors": errors}
-        return {"graph": json.dumps(_as_graph(clean, data), indent=1)}
+        return {"graph": json.dumps(_as_graph(clean, data, flow.env), indent=1)}
 
 
-def _as_graph(clean, data):
+def _approver_label(env, line):
+    """Text shown in the designer for an approver line that is not saved yet."""
+    if env is None:
+        return ""
+    if line["kind"] == "users":
+        return ", ".join(env["res.users"].browse(line["user_ids"]).mapped("name"))
+    if line["kind"] == "group":
+        return env["res.groups"].browse(line["group_id"]).display_name or ""
+    if line["kind"] == "dept":
+        return env._("Same department as the document")
+    return line["value"] or ""
+
+
+def _as_graph(clean, data, env=None):
     """Build the designer JSON from a validated graph (resolved ids, no db ids)."""
     out = {"schema": SCHEMA, "states": [], "transitions": []}
     for st in clean["states"]:
@@ -665,7 +678,7 @@ def _as_graph(clean, data):
             "id": False, "name": tr["name"], "from": tr["from"], "to": tr["to"], "color": tr["color"],
             "ask_reason": tr["ask_reason"], "list_action": tr["list_action"],
             "who": {"approvers": [{"type": a["kind"], "user_ids": a["user_ids"], "group_id": a["group_id"],
-                                   "value": a["value"], "label": ""} for a in tr["approvers"]],
+                                   "value": a["value"], "label": _approver_label(env, a)} for a in tr["approvers"]],
                     "approvals": {"mode": tr["mode"], "n": tr["n"]}} if tr["approvers"] else None,
             "rules": tr["rules"],
             "main_step": {"mode": tr["step"]["move_mode"], "method": tr["step"]["method_name"] or "",

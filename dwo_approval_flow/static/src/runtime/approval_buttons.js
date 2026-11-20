@@ -50,12 +50,12 @@ export class ApprovalButtons extends Component {
 
     btnClass(button) {
         if (button.color === 10) {
-            return "btn-primary";
+            return "btn-outline-primary";
         }
         if (button.color === 1 || button.color === 9) {
-            return "btn-danger";
+            return "btn-outline-danger";
         }
-        return "btn-secondary";
+        return "btn-outline-secondary";
     }
 
     label(button) {

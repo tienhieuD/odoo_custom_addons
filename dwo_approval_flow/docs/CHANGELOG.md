@@ -12,6 +12,8 @@ Issue #100.
 - The flow form uses the whole width and the designer fills it (taller on big screens).
 - `name` of the flow and `message` of notify actions are translatable (state and button names already were). "Approvals needed" in the Who dialog is a radio list.
 - Designer: arrows are curves (`static/src/designer/layout.js`, no library) that bend around boxes and spread when several arrows join the same two boxes; labels are moved along their curve so they do not overlap each other or a box; boxes cannot be dragged on top of each other and new boxes get a free spot. An any-state arrow no longer shows its button in its own target state.
+- Buttons created by a flow use the outline style.
+- The replaced status bar now uses the same markup and style as Odoo's own status bar (no colour dots).
 - JSON: `main_step.guard` and `list_action` added to schema `dwo_approval_flow/1` (old JSON still loads).
 
 **Not done**: two flows approving the same document in parallel (a document has one flow at a time), the "same department" approver kind (needs `hr`), email templates, multi-company and `statusbar_visible` are untested, no automated JS tests.

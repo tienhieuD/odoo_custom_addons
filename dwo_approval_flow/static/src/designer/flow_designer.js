@@ -454,6 +454,23 @@ export class FlowDesigner extends Component {
         this.commit();
     }
 
+    onStateNameChange(s) {
+        // a new box still has its automatic value (state_2): derive a readable one from the name
+        if (!s.id && /^state_\d+$/.test(s.key)) {
+            const base = (s.name || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+            let key = base || s.key;
+            for (let n = 2; this.graph.states.some((x) => x !== s && x.key === key); n++) {
+                key = `${base}_${n}`;
+            }
+            if (key !== s.key) {
+                this.setStateKey(s, key);
+                return;
+            }
+        }
+        this.commit();
+    }
+
     toggleListAction(t, ev) {
         t.list_action = ev.target.checked;
         this.commit();

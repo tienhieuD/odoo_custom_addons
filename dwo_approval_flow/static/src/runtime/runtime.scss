@@ -1,26 +1,24 @@
-.o_dwo_approval_panel {
-    .o_dwo_state_dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 4px;
+.o_dwo_approval_statusbar {
+    // keep the original look of Odoo's status bar, only make it readable although the buttons are inert
+    .o_statusbar_status > .o_arrow_button:disabled {
+        opacity: 1;
     }
 }
 
-.o_dwo_approval_statusbar {
+// In the form header Odoo pushes its status bar to the right. Our widget sits inside the buttons box, so that box
+// takes the free room and the widget goes to its right end.
+.o_statusbar_buttons:has(> .o_widget_dwo_approval_panel) {
+    flex: 1 1 auto;
+}
+.o_statusbar_buttons > .o_widget_dwo_approval_panel {
+    margin-left: auto;
+    align-self: stretch;
     display: flex;
-    flex-wrap: wrap;
-    .o_arrow_button {
-        opacity: 1;
-        &.o_arrow_button_current {
-            background-color: $o-brand-primary;
-            border-color: $o-brand-primary;
-            color: $white;
-            font-weight: bold;
-            &::after {
-                border-left-color: $o-brand-primary;
-            }
-        }
+    .o_dwo_approval_panel {
+        display: flex;
+    }
+    .o_dwo_approval_statusbar {
+        display: flex;
+        align-self: stretch;
     }
 }

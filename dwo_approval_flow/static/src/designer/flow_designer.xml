@@ -71,7 +71,7 @@
                         <h5>State</h5>
                         <label class="form-label">Name shown to users</label>
                         <input type="text" class="form-control" t-att-value="s.name" t-att-readonly="readonly or isFieldMode"
-                               t-on-input="(ev) => this.onNameInput(s, ev)" t-on-change="onNameChange"/>
+                               t-on-input="(ev) => this.onNameInput(s, ev)" t-on-change="() => this.onStateNameChange(s)"/>
                         <label class="form-label mt-2">Technical value</label>
                         <input type="text" class="form-control" t-att-value="s.key" t-att-readonly="readonly or isFieldMode"
                                t-on-change="(ev) => this.setStateKey(s, ev.target.value)"/>

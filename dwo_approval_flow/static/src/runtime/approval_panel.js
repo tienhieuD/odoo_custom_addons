@@ -4,7 +4,6 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { approvalBus } from "./approval_bus";
-import { COLORS } from "../designer/palette";
 
 /**
  * Status bar, "waiting for" and approval history of a document.
@@ -62,11 +61,8 @@ export class ApprovalPanel extends Component {
     get states() {
         const data = this.state.data;
         const visible = this.props.statusbarVisible;
-        return data.states.filter((s) => !visible || visible.includes(s.key) || s.id === data.current);
-    }
-
-    dot(state) {
-        return COLORS[state.color] || false;
+        // Odoo's own status bar lists the states in reverse (the bar is laid out right to left)
+        return data.states.filter((s) => !visible || visible.includes(s.key) || s.id === data.current).reverse();
     }
 
     formatDate(value) {

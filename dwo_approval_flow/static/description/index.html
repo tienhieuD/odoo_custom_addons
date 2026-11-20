@@ -2,13 +2,13 @@
 <div class="container">
 
     <div class="text-center pt-5 pb-3 border-bottom">
-        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Approval Flow for Odoo</h1>
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Dynamic Approval Workflow for Odoo</h1>
         <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Draw the approval of any document instead of coding it.</p>
         <p class="mb-4" style="font-size: 15px;">Boxes are the states of the document, arrows are the buttons that move it. Click an arrow to say <strong>who can press it</strong>, how many approvals it needs and what else happens.</p>
     </div>
 
     <div class="my-5">
-        <p class="mb-4" style="font-size: 17px;">Most approval needs are the same: a document goes from draft to review to approved, different people can press different buttons, and sometimes two people must agree. This module lets an administrator <strong>draw</strong> that process for any model, with no code, and shows the status and history on the form.</p>
+        <p class="mb-4" style="font-size: 17px;">Most approval needs are the same: a document goes from draft to review to approved, different people can press different buttons, and sometimes two people must agree. This module lets an administrator <strong>draw</strong> that process for any model, with no code, and shows the status and history on the form. It is an <strong>add-on to the flow you already have</strong>: it does not rewrite your model, so the original buttons, methods and states keep working. It can also be the approval flow of a model that has none.</p>
         <div class="text-center mb-4">
             <img src="flow.png" alt="Pick a model, draw the states and buttons, set who approves, documents move and every step is logged" class="img-fluid rounded shadow-sm"/>
         </div>
@@ -16,6 +16,22 @@
 
     <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
     <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Does not change your flow</h4>
+                    <p class="mb-0" style="font-size: 14px;">Combine it with the workflow a model already has: an arrow can call the original button, so Odoo still does the real work, after the approval. Other modules and customisations are not rewritten.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Or a brand-new flow</h4>
+                    <p class="mb-0" style="font-size: 14px;">Models without a status can have their own states, kept by the module, so you can build the whole approval process from scratch with no code.</p>
+                </div>
+            </div>
+        </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
@@ -36,15 +52,7 @@
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Several approvals</h4>
-                    <p class="mb-0" style="font-size: 14px;">One approval is enough, or one per approver line, or at least N. Waiting votes are shown on the form until the button goes through.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100" style="border-top: 4px solid #875A7B;">
-                <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Works on what you have</h4>
-                    <p class="mb-0" style="font-size: 14px;">Use the state field the model already has (for example purchase orders), or let the module keep its own state. A button can set the state, or call an existing method and check the result.</p>
+                    <p class="mb-0" style="font-size: 14px;">One approval is enough, or one per approver line, or at least N. Waiting votes are reported until the button goes through. Buttons can also appear in the list Action menu for many documents at once.</p>
                 </div>
             </div>
         </div>
@@ -67,16 +75,8 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Status and history widget</h4>
-                    <p class="mb-0" style="font-size: 14px;">The form shows the current state, the buttons the user may press and the history of every vote and move, in an Approval tab.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100" style="border-top: 4px solid #875A7B;">
-                <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">List view Action menu</h4>
-                    <p class="mb-0" style="font-size: 14px;">Mark an arrow to appear in the list Action menu and press it for many selected documents at once. Documents it cannot be pressed on are skipped and reported.</p>
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Status and history</h4>
+                    <p class="mb-0" style="font-size: 14px;">The form shows the flow's states and buttons, and every move is posted in the chatter. The Log menu lists every vote and move, and a history panel can be added to any form view.</p>
                 </div>
             </div>
         </div>
@@ -115,28 +115,58 @@
         </div>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Draw the flow</h2>
-    <p class="mb-4" style="font-size: 16px;">A purchase approval with branches: small orders go to the leader, big ones to the manager and the director. Reject returns to Draft.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 1. Start from the form you already have</h2>
+    <p class="mb-4" style="font-size: 16px;">This is a purchase order as Odoo ships it. We will add an approval step before the order can be confirmed, without touching how the order itself works.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_1.png" alt="Designer showing a purchase approval flow with eight states and curved arrows with button names" class="img-fluid rounded shadow"/>
+        <img src="screenshot_1.png" alt="Purchase order form with its own status bar RFQ, RFQ Sent, Purchase Order and the buttons Send RFQ, Confirm Order, Print and Cancel" class="img-fluid rounded shadow"/>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Waiting for the other approvals</h2>
-    <p class="mb-4" style="font-size: 16px;">One of two required approvals is recorded. The form shows who has voted and what is still missing.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 2. Create the flow</h2>
+    <p class="mb-4" style="font-size: 16px;">Open <strong>Approvals &gt; Flows &gt; New</strong>, give it a name, choose the model and tick <em>Replace the form's status bar</em> if you want the flow's states to be shown instead of the original ones. Leave it unticked to keep the original bar.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_2.png" alt="Purchase order form with the Approval tab showing the states, a message waiting for one more approval and the history" class="img-fluid rounded shadow"/>
+        <img src="screenshot_2.png" alt="New flow form with the name Purchase approval, the model Purchase Order, my own states, and the option Replace the form's status bar ticked" class="img-fluid rounded shadow"/>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Press a button for many documents</h2>
-    <p class="mb-4" style="font-size: 16px;">Arrows marked for the list view appear in the Action menu.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 3. Draw the states and buttons</h2>
+    <p class="mb-4" style="font-size: 16px;">Add boxes with <strong>+ State</strong> and drag the dot of a box onto another one to add a button. Here: Submit, then Approve or Reject, and Reopen to start again.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_3.png" alt="List of requests for quotation with two selected and the Action menu showing Purchase order approval: Submit and Approve" class="img-fluid rounded shadow"/>
+        <img src="screenshot_3.png" alt="Designer with the boxes Draft, Manager approval, Approved and Rejected joined by arrows named Submit, Approve, Reject and Reopen" class="img-fluid rounded shadow"/>
     </div>
 
-    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Choose who can press it</h2>
-    <p class="mb-4" style="font-size: 16px;">Approvers can be users, groups, a user on the document, an expression or a domain.</p>
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 4. Choose who can press it</h2>
+    <p class="mb-4" style="font-size: 16px;">Click the Approve arrow and choose the approvers: users, a group, a user on the document, an expression or a domain. Choose how many approvals are needed.</p>
     <div class="text-center mb-4">
-        <img src="screenshot_4.png" alt="Dialog Who can press it with an approver of type group and the Approvals needed selector" class="img-fluid rounded shadow"/>
+        <img src="screenshot_4.png" alt="Dialog Who can press it with the group Purchase Administrator and the number of approvals needed" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 5. Reuse the button you already have</h2>
+    <p class="mb-4" style="font-size: 16px;">Make the arrow call the method of the original button, here <code>button_confirm</code>. The order is confirmed by Odoo itself, only after the approval. If the result is not what the flow expects, everything is undone.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_5.png" alt="Dialog When the button is pressed with the method button_confirm and the option to check the document reached the target state" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 6. The form now shows the flow</h2>
+    <p class="mb-4" style="font-size: 16px;">The status bar shows the states of the flow. The buttons of the flow appear next to the original ones, which keep working.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_6.png" alt="Purchase order form whose status bar was replaced by Draft, Manager approval, Approved and Rejected, with a Submit button" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 7. Submit for approval</h2>
+    <p class="mb-4" style="font-size: 16px;">After Submit the document waits in Manager approval. People allowed to approve see Approve and Reject, the others see nothing. Every move is written in the chatter.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_7.png" alt="The same purchase order in Manager approval with the buttons Approve and Reject, and the move written in the chatter" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 8. Approved, and Odoo confirmed the order</h2>
+    <p class="mb-4" style="font-size: 16px;">Approve moved the document to Approved and called the original Confirm method: the order is now a purchase order. Reject asks for a reason and Reopen sends it back to Draft.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_8.png" alt="The purchase order now confirmed, with the status bar on Approved and the chatter listing Submit and Approve" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Bonus. Press a button for many documents</h2>
+    <p class="mb-4" style="font-size: 16px;">Tick <em>Also allow from the list view</em> on an arrow and it appears in the Action menu. Documents it cannot be pressed on are skipped and reported.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_9.png" alt="List of requests for quotation with two selected and the Action menu showing Purchase order approval: Submit and Approve" class="img-fluid rounded shadow"/>
     </div>
 
     <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
@@ -158,7 +188,7 @@
             <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
             <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_approval_flow</code> folder into an add-ons path of your Odoo server.</p>
             <p class="mb-2" style="font-size: 14px;">2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu.</p>
-            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Approval Flow</em> and click <strong>Install</strong>.</p>
+            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Dynamic Approval Workflow</em> and click <strong>Install</strong>.</p>
             <p class="text-muted mb-0" style="font-size: 14px;">Reload your browser page after installing so the new assets are loaded.</p>
         </div>
         <div class="tab-pane fade" id="apf_configure" role="tabpanel">
@@ -206,12 +236,16 @@
         <p class="mb-0" style="font-size: 14px;">Yes. A button can go to any box, so Reject can lead to Draft or to a Rejected state with a Reopen button.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
-        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it replace the buttons of my model?</h4>
-        <p class="mb-0" style="font-size: 14px;">If a model has one flow, the native state buttons are hidden and replaced by the flow's buttons. With the main step set to call a method, the original button logic still runs, only after the approval.</p>
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it break the flow my model already has?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It adds to it. The original buttons and methods keep working: an arrow can call the original method (for example Confirm), so Odoo still does the work, only after the approval. If a model has exactly one flow, the original button that the flow calls is hidden in the states where the flow handles it, so users are not shown two ways to do the same thing.</p>
     </div></div>
     <div class="card mb-3"><div class="card-body">
         <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it work with custom models?</h4>
         <p class="mb-0" style="font-size: 14px;">Yes, any model that has a form view. Models with a state selection field can reuse it.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I build a brand-new approval process?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. Choose a model, keep <em>My own states</em> and draw the states and buttons. The module keeps the state itself, so no change to the model is needed.</p>
     </div></div>
 
     <div class="mt-5">
