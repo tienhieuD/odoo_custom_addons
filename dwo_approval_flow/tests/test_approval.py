@@ -113,6 +113,57 @@ class TestApprovalFlow(TransactionCase):
         self.assertEqual(sorted(flow.state_ids.mapped("key")), sorted(keys))
         self.assertEqual(flow.transition_count, 1)
 
+    def test_flow_admin_without_settings(self):
+        """A plain employee who only has the Approval Flow Administrator group can configure flows."""
+        admin = self.env["res.users"].with_context(no_reset_password=True).create({
+            "name": "Flow Admin", "login": "flow_admin_t",
+            "group_ids": [(6, 0, [self.env.ref("base.group_user").id, self.env.ref("dwo_approval_flow.group_approval_manager").id])]})
+        Flow = self.env["dwo.approval.flow"].with_user(admin)
+        model = self.env["ir.model"].with_user(admin).search([("model", "=", "res.partner")])
+        self.assertTrue(model)
+        # the designer reads the fields of the model and the options of the pickers
+        self.assertTrue(self.env["ir.model.fields"].with_user(admin).search([("model_id", "=", model.id)], limit=1))
+        self.env["ir.actions.server"].with_user(admin).search([("model_id", "=", model.id)])
+        self.env["mail.template"].with_user(admin).search([("model_id", "=", model.id)])
+        self.env["res.groups"].with_user(admin).search([], limit=5).mapped("display_name")
+        self.env["res.users"].with_user(admin).search([], limit=5).mapped("name")
+        self.env["res.partner"].with_user(admin).fields_get()
+        # own states: creates the x_ field behind the scenes
+        flow = Flow.create({"name": "By admin", "model_id": model.id, "state_mode": "custom"})
+        flow.graph = self._graph(
+            [{"key": "draft", "name": "Draft"}, {"key": "review", "name": "Review"}, {"key": "done", "name": "Done"}],
+            [self._tr("Submit", "draft", "review", list_action=True, ask_reason=True),
+             self._tr("Approve", "review", "done",
+                      who={"approvers": [{"type": "group", "group_id": self.group.id},
+                                         {"type": "users", "user_ids": [self.alice.id]},
+                                         {"type": "field", "value": "user_id"},
+                                         {"type": "expr", "value": "record.user_id or user.id"}],
+                           "approvals": {"mode": "any"}},
+                      rules=["[('active', '=', True)]"],
+                      actions=[{"type": "notify", "user_ids": [self.bob.id], "message": "ok"},
+                               {"type": "update", "field": "comment", "value": "approved"}])])
+        self.assertEqual(flow.state_count, 3)
+        self.assertIn("x_dwo_approval_state_id", self.env["res.partner"]._fields)
+        flow.read(["graph", "state_count", "transition_count"])
+        flow.write({"name": "Renamed", "history_action": False})
+        flow.write({"history_action": True, "replace_statusbar": True})
+        # field mode on a selection
+        field = self.env["ir.model.fields"].with_user(admin).search([("model", "=", "res.partner"), ("name", "=", "type")])
+        Flow.field_states(model.id, field.id)
+        by_field = Flow.create({"name": "By field", "model_id": model.id, "state_mode": "field", "state_field_id": field.id})
+        self.assertTrue(by_field.state_ids)
+        # JSON import, export and the AI button
+        shared = Flow.graph_to_share(flow.graph)
+        self.assertNotIn("errors", Flow.share_to_graph(model.id, "custom", False, shared, flow.id))
+        self.assertNotIn("errors", Flow.ai_suggest(model.id, "custom", False, "any flow"))
+        self.assertNotIn("errors", Flow.ai_suggest(model.id, "custom", False, "change it", flow.graph, flow.id))
+        # a normal user can press the button the admin built
+        self.partner.invalidate_recordset()
+        self.assertIn("Submit", self._buttons(self.alice))
+        # and the admin can remove the flow
+        flow.unlink()
+        by_field.unlink()
+
     def test_ai_suggest_mock(self):
         Flow = self.env["dwo.approval.flow"]
         empty = Flow.ai_suggest(self.model.id, "custom", False, "  ")

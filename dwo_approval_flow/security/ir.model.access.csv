@@ -10,3 +10,6 @@ access_log_manager,dwo.approval.log manager,model_dwo_approval_log,group_approva
 access_test_manager,dwo.approval.test manager,model_dwo_approval_test,group_approval_manager,1,1,1,1
 access_history_user,dwo.approval.history user,model_dwo_approval_history,base.group_user,1,1,1,1
 access_history_line_user,dwo.approval.history.line user,model_dwo_approval_history_line,base.group_user,1,1,1,1
+access_ir_model_flow_manager,ir.model flow manager (read),base.model_ir_model,group_approval_manager,1,0,0,0
+access_ir_model_fields_flow_manager,ir.model.fields flow manager (read),base.model_ir_model_fields,group_approval_manager,1,0,0,0
+access_server_action_flow_manager,ir.actions.server flow manager (read),base.model_ir_actions_server,group_approval_manager,1,0,0,0

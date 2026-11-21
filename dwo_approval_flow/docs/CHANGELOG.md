@@ -1,5 +1,9 @@
 # Changelog
 
+## 19.0.1.3.1 (2026-11-21)
+
+- **Flow administrators without Settings**: the group "Approval Flow / Administrator" now has read-only access to `ir.model`, `ir.model.fields` and `ir.actions.server`, so a plain employee with that group can pick the model, the state field and server actions in the designer (before: "You are not allowed to access Models"). New test `test_flow_admin_without_settings`. Note: they can read the code of server actions and attach an existing one to a button.
+
 ## 19.0.1.3.0 (2026-11-21)
 
 - **AI button** (issue #107): next to "Load JSON" in the designer. It opens a dialog to describe the flow; OK calls `dwo.approval.flow.ai_suggest`, which builds the prompt (fixed text from `docs/AI_PROMPT.md` plus a CONTEXT block read from the database), calls `_ai_complete` and checks the answer with the same code as Import (up to 3 tries, sending the errors back). The button has a magic-wand icon and works both ways: on an empty diagram it builds a flow, on a diagram that already has states and arrows it edits it (the current flow goes into the prompt as `existing_flow`, and the dialog and tooltip say "Edit"). The person then presses "Apply to diagram". `_ai_complete` is a MOCK that returns a random flow; put the real API call there.
