@@ -7,4 +7,4 @@ from odoo.tests.common import TransactionCase
 class TestStickyDemo(TransactionCase):
     def test_demo_data(self):
         self.assertEqual(self.env["res.users"].search_count([("login", "in", ["demo_alice", "demo_bob", "demo_carol"])]), 3)
-        self.assertGreaterEqual(self.env["res.partner"].search_count([("comment", "like", "list view demo")]), 100)
+        self.assertGreaterEqual(self.env["res.partner"].search_count([("comment", "like", "list view demo")]), 400)
