@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Dynamic Approval Workflow - Demo Data",
+    "name": "Demo: Dynamic Approval Workflow",
     "version": "19.0.1.0.0",
     "summary": "Demo users, purchase orders and a ready-made approval flow for dwo_approval_flow.",
     "description": "Install only on demo servers. Creates three users (demo_alice, demo_bob, demo_carol, password demo), "

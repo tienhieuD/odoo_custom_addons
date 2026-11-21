@@ -253,7 +253,8 @@ class TestApprovalFlow(TransactionCase):
         with self.assertRaises(UserError):
             self._press(flow, "Reject", self.alice)
         self._press(flow, "Reject", self.alice, reason="Too expensive")
-        log = self.env["dwo.approval.log"].search([("kind", "=", "move")])
+        log = self.env["dwo.approval.log"].search([
+            ("kind", "=", "move"), ("res_model", "=", "res.partner"), ("res_id", "=", self.partner.id)])
         self.assertEqual(log.reason, "Too expensive")
 
     def test_any_state_arrow_and_two_way(self):

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "DWO SLA Core - Fake Demo Data (Lab)",
-    'summary': "Developer-only: generates realistic project.task SLA scenarios for screenshots/review.",
+    'name': "Demo: SLA & Escalation",
+    'summary': "Demo data: generates realistic project.task SLA scenarios for screenshots/review.",
     'description': """
-Lab module, NOT for publishing. Generates ~10 sla.definition records attached
+Demo module (lives in .demo, never published to the Apps store). Generates ~10 sla.definition records attached
 to project.task (plus one deliberately on an untracked model, to show the
 retroactive_pause config-time warning) and progresses a batch of fake
 project.task records through realistic timelines (start / pause / resume /
@@ -14,8 +14,8 @@ sla.task rows are produced by the real engine code path, not hand-crafted.
 Everything this module creates (projects, tasks, tags, sla.definition,
 res.partner.category demo row) is removed on uninstall.
     """,
-    'author': "DUO-TEK Software Vietnam",
-    'license': 'LGPL-3',
+    'author': "DuoTEK",
+    'license': 'OPL-1',
     'category': 'Hidden/Tools',
     'version': '19.0.1.0.0',
     'depends': ['dwo_sla_core', 'project'],

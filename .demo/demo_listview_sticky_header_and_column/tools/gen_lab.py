@@ -1,4 +1,4 @@
-"""Generate the listview_sticky_test_lab addon (models + views) so the field/column lists stay consistent."""
+"""Generate the demo_listview_sticky_header_and_column addon (models + views) so the field/column lists stay consistent."""
 import os, re, sys, textwrap
 
 OUT = sys.argv[1]

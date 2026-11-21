@@ -87,17 +87,17 @@ TOURS = [
     ("lshc_lab_wide_list", [
         (".o_list_view .o_data_row", NOOP),
         (".o_list_view thead th[data-name=category_id]:has(.js_pin_this_column)", WIDE),
-        ("body.lab_done", NOOP),
+        ("body.demo_done", NOOP),
     ]),
     ("lshc_lab_editable_list", [
         (".o_list_view .o_data_row", NOOP),
         (".o_list_view thead th[data-name=partner_id]:has(.js_pin_this_column)", EDITABLE),
-        ("body.lab_done", NOOP),
+        ("body.demo_done", NOOP),
     ]),
     ("lshc_lab_form_lists", [
         (".o_list_view .o_data_row td:nth-child(3)", '"click"'),
         (".o_form_view .o_notebook", NOOP),
         (".o_form_view .o_field_widget[name=line_medium_ids] thead th[data-name=product]:has(.js_pin_this_column)", FORM),
-        ("body.lab_done", NOOP),
+        ("body.demo_done", NOOP),
     ]),
 ]

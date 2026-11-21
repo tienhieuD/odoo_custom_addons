@@ -43,11 +43,11 @@ def post_init_hook(env):
         "state_field_id": field.id, "replace_statusbar": True})
     flow.graph = json.dumps(_flow_graph())
 
-    alice = env.ref("dwo_approval_flow_demo.user_alice")
-    vendor = env.ref("dwo_approval_flow_demo.vendor_gemini")
-    chair = env.ref("dwo_approval_flow_demo.product_chair")
-    desk = env.ref("dwo_approval_flow_demo.product_desk")
-    lamp = env.ref("dwo_approval_flow_demo.product_lamp")
+    alice = env.ref("demo_dwo_approval_flow.user_alice")
+    vendor = env.ref("demo_dwo_approval_flow.vendor_gemini")
+    chair = env.ref("demo_dwo_approval_flow.product_chair")
+    desk = env.ref("demo_dwo_approval_flow.product_desk")
+    lamp = env.ref("demo_dwo_approval_flow.product_lamp")
 
     def order(product, qty, price, user=alice):
         return env["purchase.order"].with_user(user).create({

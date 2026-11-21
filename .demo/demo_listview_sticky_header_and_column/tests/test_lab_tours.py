@@ -1,6 +1,6 @@
 from odoo.tests import HttpCase, tagged
 
-URL = '/odoo/action-listview_sticky_test_lab.action_lshc_test_'
+URL = '/odoo/action-demo_listview_sticky_header_and_column.action_lshc_test_'
 
 
 @tagged('post_install', '-at_install', 'lshc_lab')
