@@ -14,7 +14,7 @@
     # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Extra Tools',
-    'version': '14.0.0.7.0',
+    'version': '14.0.0.8.0',
     'live_test_url': 'https://demo-sticky.duotek.io.vn',
     # any module necessary for this one to work correctly
     'depends': ['base', 'web'],
