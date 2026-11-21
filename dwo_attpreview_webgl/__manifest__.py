@@ -3,6 +3,7 @@
 {
     "name": "Secure WebGL Preview Base",
     "version": "19.0.1.0.0",
+    "live_test_url": "https://demo-attpreview.duotek.io.vn",
     "summary": "Shared 3D viewer base (three.js) for Secure 3D, CAD and BIM Preview modules. Installed automatically; previews no file by itself.",
     "description": "Base of the Secure Attachment Preview design-file modules (3D models, CAD drawings, BIM). Bundles three.js (MIT) and a sandboxed viewer frame with orbit controls, fit-to-view, wireframe, grid and background switches. Everything is served by your own Odoo server: no CDN, no network access from the viewer. It previews no file by itself.",
     "author": "DuoTEK",
