@@ -726,3 +726,94 @@ tour.register("lshc_order_lines", { test: true }, expandAsync([
             },
         },
 ]));
+
+/** drag the resize handle of a column by dx pixels (what a user does with the mouse) */
+async function dragResize(root, name, dx) {
+    const handle = await waitFor(() => th(root, name)?.querySelector(".o_resize"), `resize handle of ${name}`);
+    const r = handle.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const opts = (cx) => ({ bubbles: true, cancelable: true, clientX: cx, clientY: y, button: 0 });
+    handle.dispatchEvent(new MouseEvent("mousedown", opts(x)));
+    window.dispatchEvent(new MouseEvent("mousemove", opts(x + dx / 2)));
+    window.dispatchEvent(new MouseEvent("mousemove", opts(x + dx)));
+    window.dispatchEvent(new MouseEvent("mouseup", opts(x + dx)));
+    await sleep(500);
+}
+const widthOf = (root, name) => Math.round(rect(th(root, name)).width);
+const widthsKey = () => lshcKeys().find((k) => k.endsWith("__widths"));
+
+tour.register("lshc_widths_remembered", { test: true }, expandAsync([
+        { trigger: `${LIST} .o_data_row`, run: () => {} },
+        {
+            content: "pin a column and drag another column wider",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                clearKeys();
+                const root = document.querySelector(LIST);
+                await pin(root, "translated_display_name");
+                const before = widthOf(root, "email");
+                await dragResize(root, "email", 120);
+                const after = widthOf(root, "email");
+                assert(after >= before + 80, `drag did not widen the column: ${before} -> ${after}`);
+                assert(widthsKey(), "widths were not stored while a column is pinned");
+                window.__lshcWidth = after;
+            },
+        },
+        {
+            content: "open a record",
+            trigger: `${LIST} .o_data_row:first-child .o_data_cell[name=translated_display_name]`,
+            run: "click",
+        },
+        { trigger: ".o_form_view", run: () => {} },
+        {
+            content: "back to the list",
+            trigger: ".o_control_panel .breadcrumb-item:not(.active), .o_control_panel .o_back_button",
+            run: "click",
+        },
+        { trigger: `${LIST} .o_data_row`, run: () => {} },
+        {
+            content: "the width is back after the list is opened again",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                const root = document.querySelector(LIST);
+                await sleep(800);
+                near(widthOf(root, "email"), window.__lshcWidth, 3, "remembered width");
+            },
+        },
+        {
+            content: "pinning another column keeps the widths",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                const root = document.querySelector(LIST);
+                await pin(root, "email");
+                near(widthOf(root, "email"), window.__lshcWidth, 3, "width after pinning another column");
+                assert(widthsKey(), "widths were dropped when the pin moved");
+            },
+        },
+        {
+            content: "unpinning forgets the widths and goes back to the Odoo widths",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                const root = document.querySelector(LIST);
+                await pin(root, "email"); // same column again = unpin
+                await sleep(500);
+                assert(!widthsKey(), "widths still stored after unpin");
+                assert(widthOf(root, "email") < window.__lshcWidth - 50, "width was not reset after unpin");
+                clearKeys();
+            },
+        },
+]));
+
+tour.register("lshc_widths_not_stored_without_pin", { test: true }, expandAsync([
+        { trigger: `${LIST} .o_data_row`, run: () => {} },
+        {
+            content: "resizing without a pinned column stores nothing",
+            trigger: `${LIST} .o_data_row`,
+            run: async () => {
+                clearKeys();
+                const root = document.querySelector(LIST);
+                await dragResize(root, "email", 100);
+                assert(!widthsKey(), "widths stored although nothing is pinned");
+            },
+        },
+]));

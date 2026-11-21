@@ -27,6 +27,12 @@ class TestStickyTour(HttpCase):
     def test_pin_persists_after_navigation(self):
         self.start_tour(PARTNER_LIST, 'lshc_pin_persist', login='admin')
 
+    def test_widths_remembered_while_pinned(self):
+        self.start_tour(PARTNER_LIST, 'lshc_widths_remembered', login='admin')
+
+    def test_widths_not_stored_without_pin(self):
+        self.start_tour(PARTNER_LIST, 'lshc_widths_not_stored_without_pin', login='admin')
+
     def test_checkbox_and_optional_columns(self):
         self.start_tour(PARTNER_LIST, 'lshc_checkbox_optional', login='admin')
 
