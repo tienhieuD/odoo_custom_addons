@@ -10,7 +10,7 @@
     'author': "DuoTEK",
     'license': 'OPL-1',
     'category': 'Extra Tools',
-    'version': '19.0.0.7.0',
+    'version': '19.0.0.8.0',
     'live_test_url': 'https://demo-sticky.duotek.io.vn',
     'depends': ['base', 'web'],
     'data': [],
