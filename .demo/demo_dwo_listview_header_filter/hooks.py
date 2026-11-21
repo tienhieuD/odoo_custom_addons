@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""300 contacts to filter from the list header, and a few with a busy chatter for the focus mode."""
+"""300 contacts to filter from the list header: countries, tags, companies and creation dates over two years."""
 import random
 from datetime import datetime, timedelta
 
@@ -42,8 +42,3 @@ def post_init_hook(env):
     for (pid,) in env.cr.fetchall():
         when = now - timedelta(days=rnd.randint(0, 730), hours=rnd.randint(0, 23))
         env.cr.execute("UPDATE res_partner SET create_date = %s WHERE id = %s", [when, pid])
-    # contacts with a busy chatter (focus mode hides it or opens it as a drawer)
-    for person in people[:6]:
-        for day, text in ((20, "Called to discuss the new offer."), (12, "Offer sent by email, waiting for feedback."),
-                          (5, "Customer asked for a discount on 100 units."), (1, "Discount approved, contract in preparation.")):
-            person.message_post(body=text, message_type="comment", subtype_xmlid="mail.mt_note")
