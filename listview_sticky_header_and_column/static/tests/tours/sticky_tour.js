@@ -19,7 +19,7 @@ const expandAsync = (steps) =>
                     window.__lshcAsyncError = null;
                     run.call(this, helper)
                         .catch((error) => {
-                            window.__lshcAsyncError = error;
+                            window.__lshcAsyncError = error; console.error("[lshc] ASYNC ERROR " + (error && error.message));
                         })
                         .then(() => document.body.classList.add(ASYNC_DONE));
                 },
@@ -730,6 +730,104 @@ tour.register("lshc_order_lines", { test: true }, expandAsync([
                 const idx = [...root.querySelectorAll("thead tr th")].indexOf(olHead(root, "Unit Price"));
                 assert(getComputedStyle(root.querySelector(`.o_data_row td:nth-child(${idx + 1})`)).position !== "sticky", "td still sticky");
                 clearKeys();
+            },
+        },
+]));
+
+/** the editable list of the Access Rights tab of a group form: its columns can be dragged (a plain list cannot, before Odoo 16) */
+const EDITABLE = ".o_field_widget[name=access_ids] .table-responsive, .o_field_widget[name=model_access] .table-responsive";
+const namedHeads = (root) => [...root.querySelectorAll("thead th[data-name]")];
+async function openAccessTab() {
+    await waitFor(() => [...document.querySelectorAll(".o_notebook .nav-link")].find((n) => /Access Rights/.test(n.textContent)), "Access Rights tab");
+    [...document.querySelectorAll(".o_notebook .nav-link")].find((n) => /Access Rights/.test(n.textContent)).click();
+    return waitFor(() => { const r = document.querySelector(EDITABLE); return r && r.querySelector(".o_data_row") && r; }, "access rights list");
+}
+/** drag the resize handle of a column by dx pixels (what a user does with the mouse) */
+async function dragResize(root, header, dx) {
+    const handle = await waitFor(() => header.querySelector(".o_resize"), "resize handle");
+    const r = handle.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const opts = (cx) => ({ bubbles: true, cancelable: true, clientX: cx, clientY: y, button: 0 });
+    handle.dispatchEvent(new MouseEvent("mousedown", opts(x)));
+    window.dispatchEvent(new MouseEvent("mousemove", opts(x + dx / 2)));
+    window.dispatchEvent(new MouseEvent("mousemove", opts(x + dx)));
+    window.dispatchEvent(new MouseEvent("mouseup", opts(x + dx)));
+    await sleep(500);
+}
+const widthEl = (el) => Math.round(rect(el).width);
+const widthsKey = () => lshcKeys().find((k) => k.endsWith("__widths"));
+// the page is reloaded in the middle of the tour: keep the numbers in sessionStorage
+const memo = {
+    get width() { return Number(sessionStorage.getItem("lshcWidth")); },
+    set width(v) { sessionStorage.setItem("lshcWidth", v); },
+    get name() { return sessionStorage.getItem("lshcName"); },
+    set name(v) { sessionStorage.setItem("lshcName", v); },
+};
+const groupForm = [{ trigger: ".o_form_view .o_notebook", run: () => {} }];
+
+tour.register("lshc_widths_remembered", { test: true }, expandAsync([
+        ...groupForm,
+        {
+            content: "pin the first column of the editable list and drag the second one wider",
+            trigger: ".o_form_view .o_notebook",
+            run: async () => {
+                clearKeys();
+                const root = await openAccessTab();
+                const [first, second] = namedHeads(root);
+                await pin(root, first.dataset.name);
+                const before = widthEl(second);
+                await dragResize(root, second, 120);
+                const after = widthEl(th(root, second.dataset.name));
+                assert(after >= before + 80, `drag did not widen the column: ${before} -> ${after}`);
+                assert(widthsKey(), "widths were not stored while a column is pinned");
+                memo.width = after;
+                memo.name = second.dataset.name;
+            },
+        },
+        {
+                content: "reload the page: the list is built again from scratch",
+                trigger: ".o_form_view .o_notebook",
+                run: () => { document.querySelector(".o_action_manager").innerHTML = ""; window.location.reload(); },
+            },
+            { trigger: ".o_form_view .o_notebook", run: () => {} },
+            {
+            content: "the width is back",
+            trigger: ".o_form_view .o_notebook",
+            run: async () => {
+                // the first group of the list may be another one: the key is per field, not per record
+                const root = await openAccessTab();
+                await sleep(900);
+                near(widthEl(th(root, memo.name)), memo.width, 3, "remembered width");
+            },
+        },
+        {
+            content: "pinning another column keeps the widths, unpinning forgets them",
+            trigger: ".o_form_view .o_notebook",
+            run: async () => {
+                const root = document.querySelector(EDITABLE);
+                const [first, second] = namedHeads(root);
+                await pin(root, second.dataset.name);
+                near(widthEl(th(root, memo.name)), memo.width, 3, "width after pinning another column");
+                assert(widthsKey(), "widths were dropped when the pin moved");
+                await pin(root, second.dataset.name); // same column again = unpin
+                await sleep(500);
+                assert(!widthsKey(), "widths still stored after unpin");
+                assert(widthEl(th(root, memo.name)) < memo.width - 50, "width was not reset after unpin");
+                clearKeys();
+            },
+        },
+]));
+
+tour.register("lshc_widths_not_stored_without_pin", { test: true }, expandAsync([
+        ...groupForm,
+        {
+            content: "resizing without a pinned column stores nothing",
+            trigger: ".o_form_view .o_notebook",
+            run: async () => {
+                clearKeys();
+                const root = await openAccessTab();
+                await dragResize(root, namedHeads(root)[1], 100);
+                assert(!widthsKey(), "widths stored although nothing is pinned");
             },
         },
 ]));

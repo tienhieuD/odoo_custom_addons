@@ -46,6 +46,8 @@ import localStorage from 'web.local_storage';
                     if (columnIndex !== null) {
                         self._lshcFreezeColumnListView(columnIndex);
                     }
+                    self._lshcListenResize();
+                    self._lshcApplyWidths();
                 }, 300);
                 return result;
             });
@@ -67,6 +69,129 @@ import localStorage from 'web.local_storage';
                 })
                 .appendTo($cell);
             return $cell;
+        },
+
+        /** Odoo computes the widths again whenever the list is updated or the window resized: put ours back afterwards. */
+        _freezeColumnWidths: function () {
+            var result = this._super.apply(this, arguments);
+            this._lshcApplyWidths();
+            return result;
+        },
+
+        // ------------------------------------------------------------------ remembered column widths
+        // Odoo 13-15 let the user drag the width of the columns of editable lists (handle `.o_resize`).
+        // While a column is pinned we remember those widths; unpinning forgets them (back to Odoo widths).
+        _lshcWidthsKey: function () {
+            return this._lshcGetKey() + '__widths';
+        },
+
+        /** Key of a header in the remembered widths: the field name, else its position. null for technical columns. */
+        _lshcWidthKey: function (th) {
+            var $th = $(th);
+            if ($th.is('.o_list_record_selector, .o_handle_cell, .o_list_button, .o_list_controller, .o_list_actions_header')) {
+                return null;
+            }
+            return th.dataset.name || ('#' + $th.index());
+        },
+
+        _lshcGetWidths: function () {
+            try {
+                var widths = JSON.parse(localStorage.getItem(this._lshcWidthsKey()) || '{}');
+                return widths && typeof widths === 'object' ? widths : {};
+            } catch (e) {
+                return {};
+            }
+        },
+
+        _lshcClearWidths: function () {
+            localStorage.removeItem(this._lshcWidthsKey());
+        },
+
+        /** Remember the widths of the columns, only while a column is pinned. */
+        _lshcSaveWidths: function () {
+            if (this._lshcGetColumnIndex() === null || !this.el) {
+                return;
+            }
+            var self = this;
+            var widths = {};
+            this.$('table thead tr').first().children('th').each(function () {
+                var key = self._lshcWidthKey(this);
+                if (key) {
+                    widths[key] = Math.round(this.getBoundingClientRect().width);
+                }
+            });
+            localStorage.setItem(this._lshcWidthsKey(), JSON.stringify(widths));
+        },
+
+        /** Save the widths when the user lets go of a column resize handle. */
+        _lshcListenResize: function () {
+            var self = this;
+            if (!this.el || this.el.dataset.lshcResize) {
+                return;
+            }
+            this.el.dataset.lshcResize = '1';
+            // capture: Odoo's own handle handler stops the event
+            this.el.addEventListener('mousedown', function (ev) {
+                if (!ev.target.closest || !ev.target.closest('.o_resize')) {
+                    return;
+                }
+                var onUp = function () {
+                    window.removeEventListener('mouseup', onUp, true);
+                    setTimeout(function () {
+                        if (!(self.isDestroyed && self.isDestroyed())) {
+                            self._lshcSaveWidths();
+                        }
+                    }, 0);
+                };
+                window.addEventListener('mouseup', onUp, true);
+            }, true);
+        },
+
+        /** Put the remembered widths on the headers (only while a column is pinned). */
+        _lshcApplyWidths: function () {
+            var self = this;
+            var table = this.el && this.el.querySelector('table');
+            if (!table || this._lshcGetColumnIndex() === null || this.isResizing) {
+                return;
+            }
+            var widths = this._lshcGetWidths();
+            if (!Object.keys(widths).length) {
+                return;
+            }
+            var applied = false;
+            var heads = Array.prototype.slice.call(table.querySelectorAll('thead tr:first-child th'));
+            heads.forEach(function (th) {
+                var width = widths[self._lshcWidthKey(th)];
+                if (isFinite(width) && width > 0) {
+                    th.style.width = width + 'px';
+                    th.style.maxWidth = width + 'px';
+                    applied = true;
+                }
+            });
+            if (applied) {
+                table.style.tableLayout = 'fixed';
+                table.style.width = Math.floor(heads.reduce(function (sum, th) {
+                    return sum + th.getBoundingClientRect().width;
+                }, 0)) + 'px';
+            }
+        },
+
+        /** Give the headers back to Odoo: forget the widths a user dragged (or that we applied). */
+        _lshcResetOdooWidths: function () {
+            var table = this.el && this.el.querySelector('table');
+            if (!table) {
+                return;
+            }
+            table.style.width = '';
+            this.el.style.width = '';
+            Array.prototype.forEach.call(table.querySelectorAll('thead tr th'), function (th) {
+                th.style.width = '';
+                th.style.maxWidth = '';
+            });
+            this.columnWidths = false;
+            if (typeof this._freezeColumnWidths === 'function') {
+                this._freezeColumnWidths();
+            }
         },
 
         // ------------------------------------------------------------------ helpers
@@ -130,6 +255,9 @@ import localStorage from 'web.local_storage';
                 // Unpin: null = nothing pinned, never store a sentinel like -1
                 this._lshcClearColumnIndex();
                 this._lshcRemoveOldStyle();
+                // sticky is off: forget the remembered widths, back to the Odoo widths
+                this._lshcClearWidths();
+                this._lshcResetOdooWidths();
             } else {
                 this._lshcSaveColumnIndex(columnIndex);
                 this._lshcFreezeColumnListView(columnIndex);
