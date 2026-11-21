@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="company_01" model="res.partner"><field name="name">Northwind Trading Ltd</field><field name="is_company" eval="True"/><field name="email">info@northwind-trading.example.com</field></record>
+    <record id="company_02" model="res.partner"><field name="name">Northwind Software Ltd</field><field name="is_company" eval="True"/><field name="email">info@northwind-software.example.com</field></record>
+    <record id="company_03" model="res.partner"><field name="name">Northwind Energy Ltd</field><field name="is_company" eval="True"/><field name="email">info@northwind-energy.example.com</field></record>
+    <record id="company_04" model="res.partner"><field name="name">Northwind Hardware Ltd</field><field name="is_company" eval="True"/><field name="email">info@northwind-hardware.example.com</field></record>
+    <record id="company_05" model="res.partner"><field name="name">Bluebird Foods Ltd</field><field name="is_company" eval="True"/><field name="email">info@bluebird-foods.example.com</field></record>
+    <record id="company_06" model="res.partner"><field name="name">Bluebird Consulting Ltd</field><field name="is_company" eval="True"/><field name="email">info@bluebird-consulting.example.com</field></record>
+    <record id="company_07" model="res.partner"><field name="name">Bluebird Media Ltd</field><field name="is_company" eval="True"/><field name="email">info@bluebird-media.example.com</field></record>
+    <record id="company_08" model="res.partner"><field name="name">Bluebird Logistics Ltd</field><field name="is_company" eval="True"/><field name="email">info@bluebird-logistics.example.com</field></record>
+    <record id="company_09" model="res.partner"><field name="name">Summit Hardware Ltd</field><field name="is_company" eval="True"/><field name="email">info@summit-hardware.example.com</field></record>
+    <record id="company_10" model="res.partner"><field name="name">Summit Trading Ltd</field><field name="is_company" eval="True"/><field name="email">info@summit-trading.example.com</field></record>
+    <record id="company_11" model="res.partner"><field name="name">Summit Software Ltd</field><field name="is_company" eval="True"/><field name="email">info@summit-software.example.com</field></record>
+    <record id="company_12" model="res.partner"><field name="name">Summit Energy Ltd</field><field name="is_company" eval="True"/><field name="email">info@summit-energy.example.com</field></record>
+    <record id="company_13" model="res.partner"><field name="name">Harbor Logistics Ltd</field><field name="is_company" eval="True"/><field name="email">info@harbor-logistics.example.com</field></record>
+    <record id="company_14" model="res.partner"><field name="name">Harbor Foods Ltd</field><field name="is_company" eval="True"/><field name="email">info@harbor-foods.example.com</field></record>
+    <record id="company_15" model="res.partner"><field name="name">Harbor Consulting Ltd</field><field name="is_company" eval="True"/><field name="email">info@harbor-consulting.example.com</field></record>
+    <record id="company_16" model="res.partner"><field name="name">Harbor Media Ltd</field><field name="is_company" eval="True"/><field name="email">info@harbor-media.example.com</field></record>
+    <record id="company_17" model="res.partner"><field name="name">Evergreen Energy Ltd</field><field name="is_company" eval="True"/><field name="email">info@evergreen-energy.example.com</field></record>
+    <record id="company_18" model="res.partner"><field name="name">Evergreen Hardware Ltd</field><field name="is_company" eval="True"/><field name="email">info@evergreen-hardware.example.com</field></record>
+    <record id="company_19" model="res.partner"><field name="name">Evergreen Trading Ltd</field><field name="is_company" eval="True"/><field name="email">info@evergreen-trading.example.com</field></record>
+    <record id="company_20" model="res.partner"><field name="name">Evergreen Software Ltd</field><field name="is_company" eval="True"/><field name="email">info@evergreen-software.example.com</field></record>
+    <record id="company_21" model="res.partner"><field name="name">Redwood Media Ltd</field><field name="is_company" eval="True"/><field name="email">info@redwood-media.example.com</field></record>
+    <record id="company_22" model="res.partner"><field name="name">Redwood Logistics Ltd</field><field name="is_company" eval="True"/><field name="email">info@redwood-logistics.example.com</field></record>
+    <record id="company_23" model="res.partner"><field name="name">Redwood Foods Ltd</field><field name="is_company" eval="True"/><field name="email">info@redwood-foods.example.com</field></record>
+    <record id="company_24" model="res.partner"><field name="name">Redwood Consulting Ltd</field><field name="is_company" eval="True"/><field name="email">info@redwood-consulting.example.com</field></record>
+    <record id="company_25" model="res.partner"><field name="name">Silverline Software Ltd</field><field name="is_company" eval="True"/><field name="email">info@silverline-software.example.com</field></record>
+    <record id="company_26" model="res.partner"><field name="name">Silverline Energy Ltd</field><field name="is_company" eval="True"/><field name="email">info@silverline-energy.example.com</field></record>
+    <record id="company_27" model="res.partner"><field name="name">Silverline Hardware Ltd</field><field name="is_company" eval="True"/><field name="email">info@silverline-hardware.example.com</field></record>
+    <record id="company_28" model="res.partner"><field name="name">Silverline Trading Ltd</field><field name="is_company" eval="True"/><field name="email">info@silverline-trading.example.com</field></record>
+    <record id="company_29" model="res.partner"><field name="name">Pioneer Consulting Ltd</field><field name="is_company" eval="True"/><field name="email">info@pioneer-consulting.example.com</field></record>
+    <record id="company_30" model="res.partner"><field name="name">Pioneer Media Ltd</field><field name="is_company" eval="True"/><field name="email">info@pioneer-media.example.com</field></record>
+    <record id="company_31" model="res.partner"><field name="name">Pioneer Logistics Ltd</field><field name="is_company" eval="True"/><field name="email">info@pioneer-logistics.example.com</field></record>
+    <record id="company_32" model="res.partner"><field name="name">Pioneer Foods Ltd</field><field name="is_company" eval="True"/><field name="email">info@pioneer-foods.example.com</field></record>
+    <record id="company_33" model="res.partner"><field name="name">Atlas Trading Ltd</field><field name="is_company" eval="True"/><field name="email">info@atlas-trading.example.com</field></record>
+    <record id="company_34" model="res.partner"><field name="name">Atlas Software Ltd</field><field name="is_company" eval="True"/><field name="email">info@atlas-software.example.com</field></record>
+    <record id="company_35" model="res.partner"><field name="name">Atlas Energy Ltd</field><field name="is_company" eval="True"/><field name="email">info@atlas-energy.example.com</field></record>
+    <record id="company_36" model="res.partner"><field name="name">Atlas Hardware Ltd</field><field name="is_company" eval="True"/><field name="email">info@atlas-hardware.example.com</field></record>
+    <record id="company_37" model="res.partner"><field name="name">Lakeside Foods Ltd</field><field name="is_company" eval="True"/><field name="email">info@lakeside-foods.example.com</field></record>
+    <record id="company_38" model="res.partner"><field name="name">Lakeside Consulting Ltd</field><field name="is_company" eval="True"/><field name="email">info@lakeside-consulting.example.com</field></record>
+    <record id="company_39" model="res.partner"><field name="name">Lakeside Media Ltd</field><field name="is_company" eval="True"/><field name="email">info@lakeside-media.example.com</field></record>
+    <record id="company_40" model="res.partner"><field name="name">Lakeside Logistics Ltd</field><field name="is_company" eval="True"/><field name="email">info@lakeside-logistics.example.com</field></record>
+</odoo>
