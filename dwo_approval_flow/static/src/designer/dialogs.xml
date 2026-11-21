@@ -168,4 +168,37 @@
             </t>
         </Dialog>
     </t>
+
+    <t t-name="dwo_approval_flow.AiDialog">
+        <Dialog t-props="{ title: props.editing ? 'Edit the flow with AI' : 'Build the flow with AI' }" size="'lg'">
+            <t t-if="!state.result">
+                <p class="text-muted" t-if="props.editing">The diagram already has states and arrows. Say what to change (for example "add a finance step after approval" or "only managers can reject"). The AI starts from the current flow. Nothing changes until you press Apply.</p>
+                <p class="text-muted" t-else="">Describe the approval process: the states, who approves, and any condition (for example by priority or amount). Nothing changes until you press Apply.</p>
+                <textarea class="form-control" rows="8" t-model="state.request" t-att-disabled="state.busy"
+                          t-att-placeholder="props.editing ? 'Example: add a finance check after the manager approval.' : 'Example: 5 states: draft, submitted, approved by leader, approved by manager, rejected. If priority is High or lower the leader approves; if Urgent the manager approves.'"/>
+            </t>
+            <t t-else="">
+                <p class="text-muted">Suggestion from the AI. Apply it to the diagram, or go back and change your request.</p>
+                <div t-if="state.result.notes.length" class="alert alert-info">
+                    <div t-foreach="state.result.notes" t-as="note" t-key="note_index" t-esc="note"/>
+                </div>
+                <textarea class="form-control font-monospace" rows="14" readonly="readonly" spellcheck="false" t-att-value="state.result.json"/>
+            </t>
+            <div t-if="state.errors.length" class="alert alert-danger mt-2 mb-0">
+                <div t-foreach="state.errors" t-as="error" t-key="error_index" t-esc="error"/>
+            </div>
+            <t t-set-slot="footer">
+                <t t-if="!state.result">
+                    <button class="btn btn-primary" t-on-click="onAsk" t-att-disabled="state.busy">
+                        <t t-if="state.busy">Thinking...</t><t t-else="">OK</t>
+                    </button>
+                </t>
+                <t t-else="">
+                    <button class="btn btn-primary" t-on-click="onApply">Apply to diagram</button>
+                    <button class="btn btn-secondary" t-on-click="onBack">Back</button>
+                </t>
+                <button class="btn btn-secondary" t-on-click="props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
 </templates>

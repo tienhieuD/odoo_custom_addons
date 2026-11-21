@@ -113,6 +113,35 @@ class TestApprovalFlow(TransactionCase):
         self.assertEqual(sorted(flow.state_ids.mapped("key")), sorted(keys))
         self.assertEqual(flow.transition_count, 1)
 
+    def test_ai_suggest_mock(self):
+        Flow = self.env["dwo.approval.flow"]
+        empty = Flow.ai_suggest(self.model.id, "custom", False, "  ")
+        self.assertIn("errors", empty)
+        for _i in range(5):
+            result = Flow.ai_suggest(self.model.id, "custom", False, "draft, review, approved")
+            self.assertNotIn("errors", result, result)
+            self.assertTrue(json.loads(result["graph"])["states"])
+            self.assertEqual(json.loads(result["json"])["schema"], SCHEMA)
+        field = self.env["ir.model.fields"]._get("res.partner", "type")
+        result = Flow.ai_suggest(self.model.id, "field", field.id, "invoice then delivery")
+        self.assertNotIn("errors", result, result)
+        keys = {s["key"] for s in json.loads(result["graph"])["states"]}
+        self.assertIn("invoice", keys)
+        self.assertIn("errors", Flow.ai_suggest(self.model.id, "field", False, "x"))
+        # edit mode: the current diagram goes in, the answer keeps its states and adds one
+        flow = self._flow([self._tr("Submit", "draft", "review"), self._tr("Approve", "review", "done")])
+        before = {s["key"] for s in json.loads(flow.graph)["states"]}
+        result = Flow.ai_suggest(self.model.id, "custom", False, "add a step", flow.graph, flow.id)
+        self.assertNotIn("errors", result, result)
+        after = {s["key"] for s in json.loads(result["graph"])["states"]}
+        self.assertTrue(before < after, (before, after))
+        # the prompt holds the fixed text and the live context
+        flow = Flow.new({"model_id": self.model.id, "state_mode": "custom"})
+        system = Flow._ai_system_prompt() + "\n\n" + flow._ai_context()
+        self.assertIn("dwo_approval_flow/1", system)
+        self.assertIn("model: res.partner", system)
+        self.assertIn("alice_t | Alice", system)
+
     def test_who_group_user_field_expression(self):
         who = lambda *a, **k: {"approvers": list(a), "approvals": k.get("approvals", {"mode": "any"})}  # noqa: E731
         flow = self._flow([

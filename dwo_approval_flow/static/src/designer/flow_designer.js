@@ -6,7 +6,7 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { browser } from "@web/core/browser/browser";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { ActionDialog, JsonDialog, RuleDialog, StepDialog, WhoDialog } from "./dialogs";
+import { ActionDialog, AiDialog, JsonDialog, RuleDialog, StepDialog, WhoDialog } from "./dialogs";
 import { COLORS } from "./palette";
 import { NH, NW, collides, computeLayout, freeSpot } from "./layout";
 
@@ -552,6 +552,34 @@ export class FlowDesigner extends Component {
         } catch {
             this.dialog.add(JsonDialog, { mode: "copy", text: shared, load: () => [], close: () => {} });
         }
+    }
+
+    get hasDiagram() {
+        return this.graph.states.length > 0 && this.graph.transitions.length > 0;
+    }
+
+    get aiTitle() {
+        return this.hasDiagram ? _t("Edit this flow with AI") : _t("Build a flow with AI");
+    }
+
+    aiFlow() {
+        const record = this.props.record;
+        this.dialog.add(AiDialog, {
+            editing: this.hasDiagram,
+            ask: (request) => this.orm.call("dwo.approval.flow", "ai_suggest", [
+                record.data.model_id.id,
+                record.data.state_mode,
+                record.data.state_field_id ? record.data.state_field_id.id : false,
+                request,
+                this.hasDiagram ? JSON.stringify(this.graph, (key, value) => (key === "cid" ? undefined : value)) : null,
+                record.resId || false,
+            ]),
+            apply: (graph) => {
+                this.state.graph = parse(graph);
+                this.state.selected = null;
+                this.commit();
+            },
+        });
     }
 
     loadJson() {

@@ -331,3 +331,42 @@ export class JsonDialog extends Component {
         this.props.close();
     }
 }
+
+/** Describe a flow in words; the AI suggests one; the person applies it to the diagram. */
+export class AiDialog extends Component {
+    static template = "dwo_approval_flow.AiDialog";
+    static components = { Dialog };
+    static props = { editing: Boolean, ask: Function, apply: Function, close: Function };
+
+    setup() {
+        this.state = useState({ request: "", busy: false, errors: [], result: null });
+    }
+
+    async onAsk() {
+        if (!this.state.request.trim()) {
+            this.state.errors = [_t("Describe the flow you want first.")];
+            return;
+        }
+        this.state.busy = true;
+        this.state.errors = [];
+        try {
+            const result = await this.props.ask(this.state.request);
+            if (result.errors) {
+                this.state.errors = result.errors;
+            } else {
+                this.state.result = result;
+            }
+        } finally {
+            this.state.busy = false;
+        }
+    }
+
+    onBack() {
+        this.state.result = null;
+    }
+
+    onApply() {
+        this.props.apply(this.state.result.graph);
+        this.props.close();
+    }
+}

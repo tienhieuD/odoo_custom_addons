@@ -22,6 +22,7 @@
                         <span class="ms-auto"/>
                         <button type="button" class="btn btn-secondary btn-sm" t-on-click="copyJson">Copy JSON</button>
                         <button t-if="!readonly" type="button" class="btn btn-secondary btn-sm" t-on-click="loadJson">Load JSON</button>
+                        <button t-if="!readonly" type="button" class="btn btn-primary btn-sm" t-on-click="aiFlow" t-att-title="aiTitle"><i class="fa fa-magic me-1"/>AI</button>
                     </div>
                     <div class="o_dwo_canvas_scroll">
                         <svg t-ref="svg" class="o_dwo_svg" style="min-width: 100%" t-att-width="canvasSize.width" t-att-height="canvasSize.height"
