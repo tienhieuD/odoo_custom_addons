@@ -3,6 +3,7 @@
 {
     "name": "Secure Session Login",
     "version": "20.0.1.0.1",
+    "live_test_url": "https://demo-session.duotek.io.vn",
     "summary": "Lock the screen with a PIN, end idle sessions, warn before logout and approve new sessions. Keywords: session timeout, idle logout, auto logout, inactivity timeout, idle timeout, inactive session, lock screen, screen lock, auto lock screen, pin lock, unlock with pin, session lock, lock odoo, session security, secure login, login security, session expiry, session expired, logout warning, session warning, session approval, login approval, approve login, approve session, session manager, session management, active sessions, user sessions, force logout, kill session, close browser logout, browser close logout, session cookie, maximum session duration, session duration, session limit, forgot pin, pin reset, auto lock, idle session, lock session, session timeout warning, logout after inactivity, logout inactive users.",
     "description": "Secure Session Login protects the Odoo session. After a time without activity the screen locks and a PIN "
                    "unlocks it. The lock is enforced by the server, and the locked page does not contain the application. "

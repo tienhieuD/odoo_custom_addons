@@ -11,6 +11,7 @@
     'license': 'OPL-1',
     'category': 'Extra Tools',
     'version': '20.0.0.7.0',
+    'live_test_url': 'https://demo-sticky.duotek.io.vn',
     'depends': ['base', 'web'],
     'data': [],
     "images": ['static/description/banner.png', 'static/description/theme_screenshot.png'],

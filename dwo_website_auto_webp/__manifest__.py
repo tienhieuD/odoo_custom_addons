@@ -1,6 +1,7 @@
 {
     'name': 'Website Auto WebP',
     'version': '20.0.1.0.2',
+    'live_test_url': 'https://demo-webp.duotek.io.vn',
     'category': 'Website',
     'summary': "Serve website images as WebP automatically for faster pages. Keywords: webp, webp images, convert to webp, image optimization, optimize images, image compression, website speed, page speed, pagespeed, seo images.",
     'description': """

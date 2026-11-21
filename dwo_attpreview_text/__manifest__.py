@@ -3,6 +3,7 @@
 {
     "name": "Secure Text & Code Preview: MD, HTML, XML, JSON, YAML, LOG",
     "version": "20.0.1.1.1",
+    "live_test_url": "https://demo-attpreview.duotek.io.vn",
     "summary": "Preview text and code files in Odoo: raw text with syntax colours, rendered Markdown and HTML, JSON, XML and YAML trees, logs and diffs. Keywords: text preview, text file viewer, code viewer, source code preview, syntax highlighting, markdown preview, preview markdown, markdown viewer, html preview, xml viewer, xml tree, json viewer, json tree, json preview, yaml viewer, log viewer, log file viewer, diff viewer, patch viewer, ipynb viewer, jupyter notebook viewer, po file viewer, srt viewer.",
     "description": "Engine for Secure Attachment Preview (dwo_attpreview_core). Opens text, code and data files in the "
                    "preview dialog: Raw (line numbers, syntax colours, wrap, find, go to line, copy), Preview "

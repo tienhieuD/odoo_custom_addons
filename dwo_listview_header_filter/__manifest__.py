@@ -3,6 +3,7 @@
 {
     "name": "List Header Filter: Quick Column Filter",
     "version": "20.0.1.0.0",
+    "live_test_url": "https://demo-headerfilter.duotek.io.vn",
     "summary": "Filter any list column from its header: checkboxes with search for many2one, many2many and selection, quick dates and fiscal year, Odoo's own operators. The filter joins the search bar as a facet. Keywords: list header filter, column filter, header filter, header search, list view filter, tree view filter, table filter, excel filter, filter by column, quick filter, list filter popover, fiscal year filter, date quick filter, multi select filter, search bar facet.",
     "description": "A filter icon in the header of each list column. Click it to choose what to show: checkboxes with search "
                    "for many2one, many2many and selection fields (the chosen values move to the top), quick dates "
