@@ -2,6 +2,7 @@
 {
     "name": "Record Concurrency Guard",
     "version": "17.0.1.1.0",
+    "live_test_url": "https://demo-concurrency.duotek.io.vn",
     "summary": "Stop users from overwriting each other's changes: conflict check at save. Keywords: concurrency, concurrent editing, concurrent edit, record lock, lock record, edit conflict, prevent overwrite, simultaneous editing, optimistic locking, multi user editing.",
     "description": "Soft concurrency control for form views. Choose the models and fields to watch; when another user changed a field you are saving, a dialog compares both values and lets you force save, discard or cancel. It never blocks a save. Requires the standard base, web and bus modules, no external library.",
     "author": "DuoTEK",

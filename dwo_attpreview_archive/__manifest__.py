@@ -3,6 +3,7 @@
 {
     "name": "Secure Archive Preview: ZIP, RAR, 7Z, TAR",
     "version": "17.0.1.0.1",
+    "live_test_url": "https://demo-attpreview.duotek.io.vn",
     "summary": "Browse ZIP, RAR, 7Z and TAR archives in Odoo as a folder tree and preview the files inside. Keywords: zip preview, preview zip, zip viewer, open zip, rar preview, preview rar, rar viewer, open rar, 7z preview, 7z viewer, tar preview, tar.gz viewer, archive preview, archive viewer, compressed file preview, zip file browser, file tree, folder tree.",
     "description": "Engine for Secure Attachment Preview (dwo_attpreview_core). Shows the content of zip, tar, tar.gz, "
                    "tar.bz2, tar.xz, gz, rar and 7z files as a folder tree (fast with tens of thousands of files) and "
