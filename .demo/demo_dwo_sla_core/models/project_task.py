@@ -3,13 +3,10 @@ from odoo import models
 
 
 class ProjectTask(models.Model):
-    """Demo-only: cho project.task kế thừa `sla.mixin` để chụp ảnh nút SLA.
+    """Demo-only: makes project.task inherit `sla.mixin` to show the SLA button.
 
-    Logic: module này KHÔNG phải một phần của dwo_sla_core bán ra (quyết
-    định của user: không ship bridge module, chỉ hướng dẫn trong docs,
-    xem 070_User-Guide.md "Smart Button on the Source Record"); đây chỉ là
-    bản demo nội bộ để lấy screenshot/kiểm tra thật, dùng đúng công thức
-    4 dòng mà user sẽ tự làm trên model của họ.
+    This is not part of the dwo_sla_core that is sold (there is no bridge module, only the user guide, see
+    "Smart Button on the Source Record"). It uses the same four lines a customer adds to their own model.
     """
     _name = 'project.task'
     _inherit = ['project.task', 'sla.mixin']

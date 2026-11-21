@@ -15,7 +15,7 @@ the server: the outgoing mail rows are marked as sent. Everything is removed on 
     "license": "OPL-1",
     "category": "Hidden/Tools",
     "version": "19.0.1.0.0",
-    "depends": ["dwo_mail_compose", "contacts"],
+    "depends": ["demo_users", "dwo_mail_compose", "contacts"],
     "post_init_hook": "post_init_hook",
     "uninstall_hook": "uninstall_hook",
     "installable": True,

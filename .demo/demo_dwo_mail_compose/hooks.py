@@ -8,8 +8,7 @@ from unittest.mock import patch
 from odoo import fields, tools
 
 TAG = "dwo_mail_compose_demo"
-ME_NAME, ME_EMAIL = "Hieu Nguyen", "hieu.nguyen@duotek.example"
-BOSS_EMAIL = "linh.tran@duotek.example"
+BOSS_EMAIL = "bob@example.com"   # demo_bob, the approver
 
 
 def _png(text, color_a=(135, 90, 123), color_b=(255, 200, 87), size=(520, 200)):
@@ -32,13 +31,10 @@ def _address(name, email):
 
 
 def post_init_hook(env):
-    admin = env.ref("base.user_admin")
-    if not admin.email:
-        admin.partner_id.write({"name": ME_NAME, "email": ME_EMAIL})
-        admin.write({"signature": "<p>Best regards,<br/>%s<br/>DUO-TEK Software Vietnam</p>" % ME_NAME})
+    admin = env.ref("demo_users.user_alice")      # the person who writes the emails in the scenarios
     me_email = admin.email
     me_name = admin.name
-    env.company.partner_id.email = env.company.partner_id.email or "sales@duotek.example"
+    env.company.sudo().partner_id.email = env.company.partner_id.email or "sales@duotek.example"
     env = env(user=admin)
     Partner, Message = env["res.partner"], env["mail.message"]
     composer = env["dwo.mail.composer"]
@@ -48,19 +44,14 @@ def post_init_hook(env):
     def partner(name, email, **vals):
         return Partner.create(dict(name=name, email=email, category_id=[(4, tag.id)], **vals))
 
-    managers = env["res.users"].with_context(no_reset_password=True).create([
-        {"name": "Linh Tran", "login": "linh.tran.demo", "password": "demo", "email": BOSS_EMAIL,
-         "group_ids": [(6, 0, [env.ref("base.group_user").id, env.ref("base.group_partner_manager").id])]},
-        {"name": "Minh Vu", "login": "minh.vu.demo", "password": "demo", "email": "minh.vu@duotek.example",
-         "group_ids": [(6, 0, [env.ref("base.group_user").id, env.ref("base.group_partner_manager").id])]},
-    ])
-    linh, minh = managers
-    # the approval flow is on: Linh and Minh are the approvers, the administrator can still send now
-    env.company.write({
+    managers = env.ref("demo_users.user_bob") | env.ref("demo_users.user_carol")
+    linh, minh = managers                          # Bob and Carol approve; Alice may also approve her own emails
+    # the approval flow is on
+    env.company.sudo().write({
         "dwo_mail_require_approval": True,
         "dwo_mail_allow_self_approval": True,
         "dwo_mail_approver_ids": [(6, 0, managers.ids)],
-        "dwo_mail_exempt_user_ids": [(6, 0, admin.ids)],
+        "dwo_mail_exempt_user_ids": [(6, 0, [])],
     })
 
     def incoming(record, days_ago, sender, to, cc, subject, body, attachments=()):
@@ -107,7 +98,7 @@ def post_init_hook(env):
         "The specification is attached.</p><p>Thanks,<br/>Lan</p>" % me_name, attachments=spec)
     reply = send(
         sakura, 8, [_address("Lan Pham", "lan.pham@sakura-trading.example")],
-        [_address("Thu Le", "thu.le@sakura-trading.example")], [_address("Linh Tran", BOSS_EMAIL)],
+        [_address("Thu Le", "thu.le@sakura-trading.example")], [_address("Bob Carter", BOSS_EMAIL)],
         "RE: Quotation for 200 warehouse scanners",
         "<p>Hello Lan,</p><p>Thank you for your request. Our quotation <b>Q-2026-0142</b> is ready: "
         "200 units, delivery in February, 12 months of warranty.</p>"
@@ -122,7 +113,7 @@ def post_init_hook(env):
     sakura.message_post(body="Customer wants a first delivery of 100 units on 15 February.",
                         message_type="comment", subtype_xmlid="mail.mt_note")
     sakura.with_context(mail_notify_force_send=False).message_post(
-        body="@Linh can you confirm the stock for 15 February?", message_type="comment", subtype_xmlid="mail.mt_comment")
+        body="@Bob can you confirm the stock for 15 February?", message_type="comment", subtype_xmlid="mail.mt_comment")
 
     # --- 2. an unsent draft with an inline image (pasted, so stored as an attachment link) and a second draft
     mekong = partner("Mekong Logistics", "contact@mekong-logistics.example", is_company=True, city="Can Tho")
@@ -178,7 +169,7 @@ def post_init_hook(env):
 
     # --- 6. a clean thread, and a template with a Bcc, to start an email from nothing
     partner("Blue Ocean Studio", "hello@blue-ocean.example", is_company=True, city="Da Lat")
-    env["mail.template"].create({
+    env["mail.template"].sudo().create({
         "name": "Quotation follow-up (demo)", "model_id": env["ir.model"]._get("res.partner").id,
         "subject": "Following up on your request, {{ object.name }}",
         "email_to": "{{ object.email }}", "email_bcc": BOSS_EMAIL,
@@ -196,6 +187,4 @@ def uninstall_hook(env):
     env["mail.message"].sudo().search([("model", "=", "res.partner"), ("res_id", "in", partners.ids)]).unlink()
     partners.unlink()
     env["mail.template"].search([("name", "=", "Quotation follow-up (demo)")]).unlink()
-    env["res.users"].with_context(active_test=False).search(
-        [("login", "in", ("linh.tran.demo", "minh.vu.demo"))]).unlink()
     tag.unlink()

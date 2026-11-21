@@ -18,8 +18,9 @@ res.partner.category demo row) is removed on uninstall.
     'license': 'OPL-1',
     'category': 'Hidden/Tools',
     'version': '19.0.1.0.0',
-    'depends': ['dwo_sla_core', 'project'],
+    'depends': ['demo_users', 'dwo_sla_core', 'project'],
     'data': [
+        'data/users.xml',
         'views/project_task_views.xml',
     ],
     'post_init_hook': 'post_init_hook',

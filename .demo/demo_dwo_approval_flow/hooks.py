@@ -43,7 +43,7 @@ def post_init_hook(env):
         "state_field_id": field.id, "replace_statusbar": True})
     flow.graph = json.dumps(_flow_graph())
 
-    alice = env.ref("demo_dwo_approval_flow.user_alice")
+    alice = env.ref("demo_users.user_alice")
     vendor = env.ref("demo_dwo_approval_flow.vendor_gemini")
     chair = env.ref("demo_dwo_approval_flow.product_chair")
     desk = env.ref("demo_dwo_approval_flow.product_desk")

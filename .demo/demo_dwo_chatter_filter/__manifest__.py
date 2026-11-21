@@ -11,7 +11,7 @@ over several days. Nothing leaves the server. Everything is removed on uninstall
     "license": "OPL-1",
     "category": "Hidden/Tools",
     "version": "19.0.1.0.0",
-    "depends": ["dwo_chatter_filter", "contacts"],
+    "depends": ["demo_users", "dwo_chatter_filter", "contacts"],
     "post_init_hook": "post_init_hook",
     "uninstall_hook": "uninstall_hook",
     "installable": True,

@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
-    <record id="user_alice" model="res.users" context="{'no_reset_password': True}">
-        <field name="name">Alice Martin</field>
-        <field name="login">demo_alice</field>
-        <field name="password">demo</field>
-        <field name="email">alice@example.com</field>
-        <field name="group_ids" eval="[(6, 0, [ref('base.group_user'), ref('purchase.group_purchase_user')])]"/>
+    <!-- the users come from demo_users; here they get the purchase rights the demo needs -->
+    <record id="demo_users.user_alice" model="res.users">
+        <field name="group_ids" eval="[(4, ref('purchase.group_purchase_user'))]"/>
     </record>
-    <record id="user_bob" model="res.users" context="{'no_reset_password': True}">
-        <field name="name">Bob Carter</field>
-        <field name="login">demo_bob</field>
-        <field name="password">demo</field>
-        <field name="email">bob@example.com</field>
-        <field name="group_ids" eval="[(6, 0, [ref('base.group_user'), ref('purchase.group_purchase_manager')])]"/>
+    <record id="demo_users.user_bob" model="res.users">
+        <field name="group_ids" eval="[(4, ref('purchase.group_purchase_manager'))]"/>
     </record>
-    <record id="user_carol" model="res.users" context="{'no_reset_password': True}">
-        <field name="name">Carol Evans</field>
-        <field name="login">demo_carol</field>
-        <field name="password">demo</field>
-        <field name="email">carol@example.com</field>
-        <field name="group_ids" eval="[(6, 0, [ref('base.group_user'), ref('purchase.group_purchase_manager')])]"/>
+    <record id="demo_users.user_carol" model="res.users">
+        <field name="group_ids" eval="[(4, ref('purchase.group_purchase_manager'))]"/>
     </record>
 
     <record id="vendor_gemini" model="res.partner">

@@ -37,8 +37,8 @@ def post_init_hook(env):
     user_ids_field = env['ir.model.fields']._get('project.task', 'user_ids')
     email_from_field = env['ir.model.fields']._get('project.task', 'email_from')
 
-    # Server Action dùng cho mốc escalation kiểu "Run Server Action" (demo
-    # case cho action_type=server_action, scope-add "escalation list UX").
+    # Server action used by an escalation of the type "Run Server Action"
+    # (demo case for action_type=server_action).
     demo_server_action = ServerAction.create({
         'name': "Log SLA Escalation (Demo)",
         'model_id': task_model.id,
@@ -215,10 +215,9 @@ def post_init_hook(env):
     # ------------------------------------------------------------------
     # 4. Fake tasks, progressed through realistic timelines
     # ------------------------------------------------------------------
-    # T0 tính theo thời điểm cài module (KHÔNG hardcode ngày), để mọi kịch
-    # bản "đang chạy, còn thời gian"/"vừa mới tạo" luôn đúng bất kể cài lúc
-    # nào -- trước đây T0 cố định 2026-10-26 nên sau vài ngày mọi task
-    # "trong hạn" sẽ hiện SAI thành đã trễ hạn rất xa so với thời gian thực.
+    # T0 is the time of the installation (never a fixed date), so the scenarios
+    # "running, plenty of time left" and "just created" are right whenever the
+    # demo is built.
     T0 = fields.Datetime.now()
 
     def mk(project, name, priority, **extra):
