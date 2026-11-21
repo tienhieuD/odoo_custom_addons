@@ -208,9 +208,12 @@ body:has(.dwo_l_material) { background: color-mix(in srgb, var(--dwo-primary, #7
 @media (max-width: 767.98px) {
     .container.dwo_lc[class*="dwo_l_"] {
         padding: 16px !important; justify-content: center; align-items: center; flex-direction: column; gap: 0;
-        .o_database_list { width: 100%; max-width: 440px !important; height: auto; min-height: 0; border-radius: var(--dwo-radius); transform: none; box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+        // flex: 0 0 auto: the card is as tall as its content (the "intro" layout gives it a 420px flex-basis, which is a HEIGHT in a column)
+        .o_database_list { flex: 0 0 auto; width: 100%; max-width: 440px !important; height: auto; min-height: 0; border-radius: var(--dwo-radius); transform: none; box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
             .card-body { padding: 1.5rem; max-width: none; display: block; } }
         .dwo_aside { display: none !important; }
+        // the footer text follows the card instead of floating over its links
+        .dwo_footer { position: static; transform: none; margin: 16px auto 0; max-width: 100%; }
         .dwo_bg { top: 0; left: 0; right: 0; bottom: 0; width: auto; height: auto; transform: none; border-radius: 0; box-shadow: none; }
     }
     .container.dwo_lc.dwo_l_topbar .o_database_list .card-body > .oe_login_form:not(.d-none) { display: block; > .mb-3, > div { margin-bottom: 1rem !important; } }

@@ -1,5 +1,14 @@
 # Changelog - dwo_login_themes
 
+## 2026-11-21 - 1.0.3 (Odoo 19; the same CSS fix applies to 17, 18 and 20)
+
+- **Fix: the "With an intro panel" layout on a phone.** The login card was cut off after the Password field: the Log in
+  button, the "- or -" block, the passkey button and the footer links hung outside the white card. On narrow screens
+  every layout stacks the card in a column, and this layout gave the card a 420px flex-basis, which in a column is a
+  *height*. The card is now as tall as its content (`flex: 0 0 auto`). All 14 layouts were checked at 390x844.
+- **Fix: the footer text no longer floats over the links on a phone.** On narrow screens it follows the card instead of
+  being fixed at the bottom of the screen.
+
 ## 2026-11-18 - 1.0.2 (Odoo 17, 18, 19, 20)
 
 Issue #96.
