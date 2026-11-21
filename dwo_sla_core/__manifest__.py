@@ -24,6 +24,7 @@ Requires only the standard base, resource, web and mail modules.
 
     'category': 'Services',
     'version': '14.0.1.2.6',
+    'live_test_url': 'https://demo-sla.duotek.io.vn',
     'installable': True,
     'application': False,
     'license': 'OPL-1',

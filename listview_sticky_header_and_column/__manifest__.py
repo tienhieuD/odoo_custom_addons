@@ -15,6 +15,7 @@
     # for the full list
     'category': 'Extra Tools',
     'version': '14.0.0.7.0',
+    'live_test_url': 'https://demo-sticky.duotek.io.vn',
     # any module necessary for this one to work correctly
     'depends': ['base', 'web'],
     # always loaded
