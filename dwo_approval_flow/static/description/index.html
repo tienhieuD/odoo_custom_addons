@@ -27,6 +27,14 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100" style="border-top: 4px solid #875A7B;">
                 <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Hard to skip</h4>
+                    <p class="mb-0" style="font-size: 14px;">When a user presses the original button of the form that an arrow calls (for example <em>Confirm</em>), the press goes through the approval: who may press it, votes, reason. The user who cannot, gets a clear message. It is on by default.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Or a brand-new flow</h4>
                     <p class="mb-0" style="font-size: 14px;">Models without a status can have their own states, kept by the module, so you can build the whole approval process from scratch with no code, such as an eight-step business trip.</p>
                 </div>
@@ -77,14 +85,6 @@
                 <div class="card-body">
                     <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Status and history</h4>
                     <p class="mb-0" style="font-size: 14px;">The form shows the flow's states and buttons, every move is posted in the chatter, and <em>Approval history</em> lists every vote and move. The Log and Notifications menus show who did and who was told what.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100" style="border-top: 4px solid #875A7B;">
-                <div class="card-body">
-                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Test before you trust</h4>
-                    <p class="mb-0" style="font-size: 14px;">The Test button shows, for a document and a user, which buttons would appear and why the others are hidden. A flow can be exported and imported as JSON.</p>
                 </div>
             </div>
         </div>
@@ -239,7 +239,7 @@
             <p class="mb-2" style="font-size: 14px;">A document follows <strong>one flow at a time</strong>. With several flows on a model, the first one whose <em>Applies to</em> filter matches is used. Two flows cannot approve the same document in parallel.</p>
             <p class="mb-2" style="font-size: 14px;">A button does not run by itself when a state is entered, and an arrow cannot loop back to its own box.</p>
             <p class="mb-2" style="font-size: 14px;">Nothing is sent for the first state of a new document, or when the document is moved by code that does not use an arrow. A button that anybody can press has no list of approvers, so it tells nobody. The text of a notification is in the language of the person who pressed the button.</p>
-            <p class="mb-2" style="font-size: 14px;">The buttons of the form are the buttons of the flow: the module hides the original button where the flow calls its method, but code and RPC that call the method directly are not blocked.</p>
+            <p class="mb-2" style="font-size: 14px;">The protection covers the buttons of the screen only. Code, scheduled actions and external RPC calls that run the method directly are not blocked, and a model's own state field can be changed by code as before. The first state of a new document sends nothing.</p>
         </div>
     </div>
 
