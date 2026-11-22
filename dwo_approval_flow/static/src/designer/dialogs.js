@@ -1,7 +1,6 @@
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { Dialog } from "@web/core/dialog/dialog";
-import { DomainSelectorDialog } from "@web/core/domain_selector_dialog/domain_selector_dialog";
 import { browser } from "@web/core/browser/browser";
 import { MultiRecordSelector } from "@web/core/record_selectors/multi_record_selector";
 import { RecordSelector } from "@web/core/record_selectors/record_selector";
@@ -28,10 +27,20 @@ export function checkExpression(text) {
 export const APPROVER_TYPES = [
     ["users", _t("A specific user")],
     ["group", _t("A group")],
-    ["dept", _t("Same department as the document")],
     ["field", _t("User named on the document")],
     ["expr", _t("An expression (record / user)")],
 ];
+
+const NO_CHANNELS = { bus: false, activity: false, email: false };
+/** The rows of the table of notifications: key, name, what it does. */
+const CHANNELS = [
+    ["bus", _t("System notification"), _t("A pop-up in Odoo")],
+    ["activity", _t("Activity"), _t("A \"To approve\" to-do")],
+    ["email", _t("Email (inbox)"), _t("An email, or Discuss, as each person prefers")],
+];
+
+// Only shown for an arrow saved before this option was removed, so that it can still be opened.
+const LEGACY_DEPT = ["dept", _t("Same department as the document")];
 
 export const ACTION_TYPES = [
     ["notify", _t("Notify in chatter")],
@@ -64,22 +73,46 @@ export class WhoDialog extends Component {
         approvers: Array,
         mode: String,
         n: Number,
+        followers: Object,
         confirm: Function,
         close: Function,
     };
 
     setup() {
-        this.types = APPROVER_TYPES;
         this.nameService = useService("name");
         this.fieldsState = useModelFields(() => this.props.model);
         this.state = useState({
             rows: this.props.approvers.length
-                ? this.props.approvers.map((a) => ({ ...a, user_ids: [...(a.user_ids || [])] }))
-                : [{ type: "users", user_ids: [], group_id: false, value: "" }],
+                ? this.props.approvers.map((a) => ({
+                      ...a,
+                      user_ids: [...(a.user_ids || [])],
+                      notify: { ...NO_CHANNELS, ...a.notify },
+                  }))
+                : [this.newRow()],
             mode: this.props.mode,
             n: this.props.n || 2,
+            followers: { ...NO_CHANNELS, ...this.props.followers },
             error: "",
         });
+        this.channels = CHANNELS;
+    }
+
+    newRow() {
+        return { type: "users", user_ids: [], group_id: false, value: "", notify: { ...NO_CHANNELS } };
+    }
+
+    /** Header of the column of an approver line in the table of notifications. */
+    columnLabel(row) {
+        const type = (this.types.find((t) => t[0] === row.type) || [])[1] || "";
+        return row.label || row.value || type;
+    }
+
+    async refreshLabel(row) {
+        row.label = await this.label(row);
+    }
+
+    setNotify(target, channel, checked) {
+        target[channel] = checked;
     }
 
     get userFields() {
@@ -91,18 +124,22 @@ export class WhoDialog extends Component {
         row.value = type === "field" ? (this.userFields[0] || {}).name || "" : "";
         row.user_ids = [];
         row.group_id = false;
+        row.label = "";
     }
 
     setValue(row, value) {
         row.value = value;
+        this.refreshLabel(row);
     }
 
     setIds(row, ids) {
         row.user_ids = ids;
+        this.refreshLabel(row);
     }
 
     setGroup(row, id) {
         row.group_id = id;
+        this.refreshLabel(row);
     }
 
     setMode(mode) {
@@ -114,7 +151,11 @@ export class WhoDialog extends Component {
     }
 
     addRow() {
-        this.state.rows.push({ type: "users", user_ids: [], group_id: false, value: "" });
+        this.state.rows.push(this.newRow());
+    }
+
+    get types() {
+        return this.state.rows.some((row) => row.type === "dept") ? [...APPROVER_TYPES, LEGACY_DEPT] : APPROVER_TYPES;
     }
 
     removeRow(index) {
@@ -155,40 +196,7 @@ export class WhoDialog extends Component {
             row.label = await this.label(row);
         }
         const mode = this.state.rows.length < 2 && this.state.mode === "all" ? "any" : this.state.mode;
-        await this.props.confirm({ approvers: this.state.rows, mode, n: this.state.n });
-        this.props.close();
-    }
-}
-
-/** A rule on the document: an Odoo domain that may use `user`. */
-export class RuleDialog extends Component {
-    static template = "dwo_approval_flow.RuleDialog";
-    static components = { Dialog };
-    static props = { model: String, domain: String, confirm: Function, close: Function };
-
-    setup() {
-        this.dialog = useService("dialog");
-        this.state = useState({ domain: this.props.domain || "[]", error: "" });
-    }
-
-    openEditor() {
-        this.dialog.add(DomainSelectorDialog, {
-            resModel: this.props.model,
-            domain: this.state.domain,
-            isDebugMode: Boolean(this.env.debug),
-            onConfirm: (domain) => {
-                this.state.domain = domain;
-            },
-        });
-    }
-
-    async onSave() {
-        const text = this.state.domain.trim();
-        if (!text.startsWith("[")) {
-            this.state.error = _t("A domain is a list, such as [(\"amount_total\", \">\", 50000)].");
-            return;
-        }
-        await this.props.confirm(text);
+        await this.props.confirm({ approvers: this.state.rows, mode, n: this.state.n, followers: { ...this.state.followers } });
         this.props.close();
     }
 }
@@ -200,11 +208,51 @@ export class StepDialog extends Component {
     static props = { model: String, step: Object, confirm: Function, close: Function };
 
     setup() {
-        this.state = useState({ ...this.props.step });
+        this.orm = useService("orm");
+        const step = this.props.step;
+        // three choices on screen, two modes in the data: a server action is a "call" without a method
+        const kind = step.mode !== "call_method" ? "state" : step.server_action_id && !step.method ? "server" : "method";
+        this.state = useState({ ...step, kind, error: "", methods: [], listOpen: false });
+        onWillStart(async () => {
+            try {
+                this.state.methods = await this.orm.call("dwo.approval.flow", "model_methods", [this.props.model]);
+            } catch {
+                this.state.methods = []; // no list: the name can still be typed
+            }
+        });
     }
 
     get serverActionDomain() {
         return [["model_id.model", "=", this.props.model]];
+    }
+
+    get matches() {
+        const text = (this.state.method || "").trim().toLowerCase();
+        return this.state.methods.filter((m) => !text || m.name.toLowerCase().includes(text)).slice(0, 8);
+    }
+
+    get picked() {
+        return this.state.methods.find((m) => m.name === (this.state.method || "").trim());
+    }
+
+    /** First line of a docstring. */
+    shortDoc(doc) {
+        const line = (doc || "").split("\n").find((l) => l.trim()) || "";
+        return line.trim();
+    }
+
+    onMethodInput(ev) {
+        this.state.method = ev.target.value;
+        this.state.listOpen = true;
+    }
+
+    pickMethod(name) {
+        this.state.method = name;
+        this.state.listOpen = false;
+    }
+
+    closeListLater() {
+        setTimeout(() => (this.state.listOpen = false), 150);
     }
 
     setField(name, value) {
@@ -212,11 +260,27 @@ export class StepDialog extends Component {
     }
 
     async onSave() {
-        if (this.state.mode === "call_method" && !this.state.method.trim() && !this.state.server_action_id) {
-            this.state.error = _t("Type a method name or pick a server action.");
+        const { kind, error, methods, listOpen, ...step } = this.state;
+        step.method = (step.method || "").trim();
+        if (kind === "method" && !step.method) {
+            this.state.error = _t("Type the name of a method.");
             return;
         }
-        const { error, ...step } = this.state;
+        if (kind === "method" && methods.length && !methods.some((m) => m.name === step.method)) {
+            this.state.error = _t("This is not a public method of the model.");
+            return;
+        }
+        if (kind === "server" && !step.server_action_id) {
+            this.state.error = _t("Pick a server action.");
+            return;
+        }
+        if (kind === "state") {
+            Object.assign(step, { mode: "set_state", method: "", server_action_id: false });
+        } else if (kind === "server") {
+            Object.assign(step, { mode: "call_method", method: "" });
+        } else {
+            Object.assign(step, { mode: "call_method", server_action_id: false });
+        }
         await this.props.confirm(step);
         this.props.close();
     }

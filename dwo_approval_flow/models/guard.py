@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Protect the methods an approval arrow calls, and the own-states field, against direct use.
+"""Protect the own-states field (``x_dwo_approval_state_id``) against direct writes.
 
-The patch is put on the final class of the registry (outside every ``_inherit``) for the few
-``(model, method)`` pairs the active flows use. It is idempotent and rebuilt when the registry loads.
+The patch is put on the final class of the registry (outside every ``_inherit``) for the models
+that have a flow with own states. It is idempotent and rebuilt when the registry loads.
 The bypass flag lives in the server process (a thread local), never in the context, so a client
 cannot forge it.
 """
 import functools
 import logging
-import sys
 import threading
 
 _logger = logging.getLogger(__name__)
@@ -29,29 +28,12 @@ def is_bypassed():
     return getattr(_local, "depth", 0) > 0
 
 
-def called_from_rpc(name):
-    """True when the nearest ``call_kw`` frame (button click or RPC) asked for method ``name``."""
-    frame = sys._getframe(1)
-    while frame:
-        if frame.f_code.co_name == "call_kw" and frame.f_globals.get("__name__") == "odoo.service.model":
-            return frame.f_locals.get("name") == name
-        frame = frame.f_back
-    return False
-
-
 def make_wrapper(name, original):
-    if name == "write":
-        @functools.wraps(original)
-        def wrapper(self, vals, *args, **kwargs):
-            if not is_bypassed() and not self.env.su and "x_dwo_approval_state_id" in vals:
-                self.env["dwo.approval.flow"]._guard_write_refused()
-            return original(self, vals, *args, **kwargs)
-    else:
-        @functools.wraps(original)
-        def wrapper(self, *args, **kwargs):
-            if is_bypassed() or self.env.su or not self:
-                return original(self, *args, **kwargs)
-            return self.env["dwo.approval.flow"]._guard_call(self, name, original, args, kwargs)
+    @functools.wraps(original)
+    def wrapper(self, vals, *args, **kwargs):
+        if not is_bypassed() and not self.env.su and "x_dwo_approval_state_id" in vals:
+            self.env["dwo.approval.flow"]._guard_write_refused()
+        return original(self, vals, *args, **kwargs)
     wrapper._dwo_guard = True
     wrapper._dwo_orig = original
     return wrapper

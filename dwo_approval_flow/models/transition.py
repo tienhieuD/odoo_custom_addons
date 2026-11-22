@@ -40,11 +40,6 @@ class DwoApprovalTransition(models.Model):
         string="Check the state afterwards", default=True,
         help="After the method ran, the document must be in the target state or everything is rolled back.")
     run_as = fields.Selection([("user", "The user who pressed"), ("system", "System")], default="user", required=True)
-    guard_scope = fields.Selection(
-        [("direct", "When the original button is pressed"), ("all", "Every call"), ("none", "Do not protect")],
-        string="Protect the method", default="direct", required=True,
-        help="Direct: the method only runs through the approval when called from a button or RPC. "
-             "Every call: also when other code calls it (except as system). None: only the view is changed.")
     list_action = fields.Boolean(
         string="Also allow from the list view",
         help="Adds an entry to the Action menu of the list and form views.")
@@ -60,7 +55,7 @@ class DwoApprovalTransition(models.Model):
 
     def write(self, vals):
         result = super().write(vals)
-        if {"move_mode", "method_name", "guard_scope", "flow_id"} & set(vals):
+        if "flow_id" in vals:
             self.env["dwo.approval.flow"]._guard_sync()
         return result
 

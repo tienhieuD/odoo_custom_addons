@@ -393,50 +393,6 @@ class TestApprovalFlow(TransactionCase):
         first.active = False
         self.assertEqual(Flow._flow_of(self.partner), second)
 
-    def _archive_flow(self, guard="all", **kw):
-        return self._flow([self._tr(
-            "Archive", "draft", "done", who={"approvers": [{"type": "users", "user_ids": [self.alice.id]}],
-                                             "approvals": {"mode": "any"}},
-            main_step={"mode": "call_method", "method": "action_archive", "run_as": "system", "guard": guard},
-            **kw)])
-
-    def test_guard_every_call(self):
-        self._archive_flow("all")
-        with self.assertRaises(UserError):
-            self.partner.with_user(self.bob).action_archive()
-        self.assertTrue(self.partner.active)
-        self.partner.with_user(self.alice).action_archive()  # goes through the arrow
-        self.assertFalse(self.partner.active)
-        self.assertEqual(self.partner.x_dwo_approval_state_id.key, "done")
-        self.assertEqual(self.env["dwo.approval.log"].search_count(
-            [("res_id", "=", self.partner.id), ("kind", "=", "move")]), 1)
-        other = self.env["res.partner"].create({"name": "Other"})
-        other.sudo().action_archive()  # system code is never blocked
-        self.assertFalse(other.active)
-
-    def test_guard_direct_only_from_rpc(self):
-        from odoo.service.model import call_kw
-        flow = self._archive_flow("direct")
-        partner = self.env["res.partner"].create({"name": "Gamma"})
-        model = self.env["res.partner"].with_user(self.bob)
-        with self.assertRaises(UserError):
-            call_kw(model, "action_archive", [partner.ids], {})
-        self.assertTrue(partner.active)
-        # a plain python call is not a button press: it is let through
-        partner.with_user(self.alice).action_archive()
-        self.assertFalse(partner.active)
-        # an arrow that is switched off stops guarding
-        flow.transition_ids.guard_scope = "none"
-        self.assertNotIn(("res.partner", "action_archive"), self.env["dwo.approval.flow"]._guard_pairs())
-
-    def test_guard_removed_with_flow(self):
-        flow = self._archive_flow("all")
-        self.assertTrue(getattr(vars(self.env.registry["res.partner"]).get("action_archive"), "_dwo_guard", False))
-        flow.unlink()
-        self.assertFalse(getattr(vars(self.env.registry["res.partner"]).get("action_archive"), "_dwo_guard", False))
-        self.partner.with_user(self.bob).action_archive()
-        self.assertFalse(self.partner.active)
-
     def test_state_field_cannot_be_written_directly(self):
         flow = self._flow([self._tr("Submit", "draft", "review")])
         review = flow.state_ids.filtered(lambda s: s.key == "review")

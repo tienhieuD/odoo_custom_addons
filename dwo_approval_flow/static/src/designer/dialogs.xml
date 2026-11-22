@@ -15,7 +15,7 @@
                                          update="(ids) => this.setIds(row, ids)"/>
                     <RecordSelector t-elif="row.type === 'group'" resModel="'res.groups'" resId="row.group_id"
                                     update="(id) => this.setGroup(row, id)"/>
-                    <span t-elif="row.type === 'dept'" class="text-muted">The user's department equals the document's department.</span>
+                    <span t-elif="row.type === 'dept'" class="text-muted">The user's department equals the document's department (an old option: pick another type to replace it).</span>
                     <select t-elif="row.type === 'field'" class="form-select" t-on-change="(ev) => this.setValue(row, ev.target.value)">
                         <option t-foreach="userFields" t-as="f" t-key="f.name" t-att-value="f.name" t-att-selected="f.name === row.value">
                             <t t-esc="f.string"/> (<t t-esc="f.name"/>)
@@ -28,6 +28,7 @@
                         t-on-click="() => this.removeRow(row_index)"><i class="fa fa-times"/></button>
             </div>
             <button type="button" class="btn btn-link ps-0" t-on-click="addRow">+ Add another approver</button>
+
             <hr/>
             <label class="form-label fw-bold">Approvals needed <span class="text-muted fw-normal">(for the whole button)</span></label>
             <div class="form-check">
@@ -48,20 +49,37 @@
                        t-att-disabled="state.mode !== 'n'" t-att-value="state.n" t-on-input="(ev) => this.setN(ev.target.value)"/>
                 <span>approvals</span>
             </div>
+            <hr/>
+            <label class="form-label fw-bold" title="Tick who is told, and how, when the document reaches the step this button starts from. Only the people who really can press the button are told.">Notifications</label>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle text-center mb-1">
+                    <thead>
+                        <tr>
+                            <th/>
+                            <th t-foreach="channels" t-as="ch" t-key="ch[0]" class="fw-normal" t-att-title="ch[2]" t-esc="ch[1]"/>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="state.rows" t-as="row" t-key="row_index">
+                            <td class="text-start" t-esc="columnLabel(row)"
+                                title="The people of this approver line. Those told are listed in &quot;Waiting for my approval&quot;."/>
+                            <td t-foreach="channels" t-as="ch" t-key="ch[0]">
+                                <input type="checkbox" class="form-check-input" t-att-checked="row.notify[ch[0]]"
+                                       t-on-change="(ev) => this.setNotify(row.notify, ch[0], ev.target.checked)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-start"
+                                title="The followers who kept the subtype “Approval”. System notification and Activity go to each of them; Email posts one note they get as they prefer.">Document followers</td>
+                            <td t-foreach="channels" t-as="ch" t-key="ch[0]">
+                                <input type="checkbox" class="form-check-input" t-att-checked="state.followers[ch[0]]"
+                                       t-on-change="(ev) => this.setNotify(state.followers, ch[0], ev.target.checked)"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div t-if="state.error" class="text-danger mt-2" t-esc="state.error"/>
-            <t t-set-slot="footer">
-                <button class="btn btn-primary" t-on-click="onSave">Save</button>
-                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
-            </t>
-        </Dialog>
-    </t>
-
-    <t t-name="dwo_approval_flow.RuleDialog">
-        <Dialog title="'A rule on the document'" size="'md'">
-            <label class="form-label">Odoo domain <span class="text-muted">(you can use <code>user</code>)</span></label>
-            <textarea class="form-control font-monospace" rows="4" t-model="state.domain"/>
-            <button type="button" class="btn btn-link ps-0" t-on-click="openEditor">Use the domain editor</button>
-            <div t-if="state.error" class="text-danger" t-esc="state.error"/>
             <t t-set-slot="footer">
                 <button class="btn btn-primary" t-on-click="onSave">Save</button>
                 <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
@@ -72,35 +90,47 @@
     <t t-name="dwo_approval_flow.StepDialog">
         <Dialog title="'When the button is pressed'" size="'md'">
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="dwo_step_set" value="set_state" t-model="state.mode"/>
-                <label class="form-check-label" for="dwo_step_set">Change the state of the document</label>
+                <input class="form-check-input" type="radio" id="dwo_step_state" value="state" t-model="state.kind"/>
+                <label class="form-check-label" for="dwo_step_state" title="The document moves to the target state. Nothing else runs.">Change the state</label>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="dwo_step_call" value="call_method" t-model="state.mode"/>
-                <label class="form-check-label" for="dwo_step_call">Call a method or a server action of the model</label>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="radio" id="dwo_step_server" value="server" t-model="state.kind"/>
+                <label class="form-check-label" for="dwo_step_server" title="Run an Odoo server action of the model. It must leave the document in the target state, or everything is cancelled and an error is shown.">Run a server action</label>
             </div>
-            <div t-if="state.mode === 'call_method'" class="mt-3">
-                <label class="form-label">Method (for example <code>action_confirm</code>)</label>
-                <input type="text" class="form-control" t-model="state.method"/>
-                <label class="form-label mt-2">or a server action</label>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="radio" id="dwo_step_method" value="method" t-model="state.kind"/>
+                <label class="form-check-label" for="dwo_step_method" title="Call a public method of the model, such as the one behind an existing button. It must leave the document in the target state, or everything is cancelled and an error is shown.">Call a method <span class="badge text-bg-secondary">advanced</span></label>
+            </div>
+
+            <div t-if="state.kind === 'server'" class="mt-3">
+                <label class="form-label">Server action</label>
                 <RecordSelector resModel="'ir.actions.server'" resId="state.server_action_id" domain="serverActionDomain"
                                 update="(id) => this.setField('server_action_id', id)"/>
-                <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" id="dwo_step_verify" t-model="state.verify"/>
-                    <label class="form-check-label" for="dwo_step_verify">Check that the document reached the target state, or undo everything</label>
+            </div>
+            <div t-if="state.kind === 'method'" class="mt-3">
+                <label class="form-label">Method</label>
+                <input type="text" class="form-control font-monospace" placeholder="Start typing, for example action_confirm"
+                       autocomplete="off" t-att-value="state.method" t-on-input="onMethodInput"
+                       t-on-focus="() => { state.listOpen = true }" t-on-blur="closeListLater"/>
+                <div t-if="state.listOpen and matches.length" class="list-group mt-1" style="max-height: 14rem; overflow-y: auto">
+                    <button t-foreach="matches" t-as="m" t-key="m.name" type="button"
+                            class="list-group-item list-group-item-action py-1" t-att-title="m.doc"
+                            t-on-mousedown.prevent="() => this.pickMethod(m.name)">
+                        <div class="font-monospace" t-esc="m.name"/>
+                        <div t-if="m.doc" class="text-muted small text-truncate" t-esc="shortDoc(m.doc)"/>
+                    </button>
                 </div>
-                <label class="form-label mt-2">Protect the method</label>
-                <select class="form-select" t-model="state.guard">
-                    <option value="direct">When the original button is pressed (recommended)</option>
-                    <option value="all">Every call, even from other code</option>
-                    <option value="none">Do not protect, only hide the original button</option>
-                </select>
-                <label class="form-label mt-2">Run as</label>
+                <div t-if="picked" class="text-muted small mt-1 text-truncate" t-att-title="picked.doc or ''"
+                     t-esc="shortDoc(picked.doc) or 'No description.'"/>
+                <div t-elif="state.method and state.methods.length and !state.listOpen" class="text-warning small mt-1">Not a public method of this model.</div>
+            </div>
+            <t t-if="state.kind !== 'state'">
+                <label class="form-label mt-3" title="Choose System when the approver may approve but has no right to do what the action does (for example confirm a purchase order).">Run as</label>
                 <select class="form-select" t-model="state.run_as">
-                    <option value="user">The user who pressed</option>
+                    <option value="user">The user who pressed (their access rights apply)</option>
                     <option value="system">System (ignores the user's access rights)</option>
                 </select>
-            </div>
+            </t>
             <div t-if="state.error" class="text-danger mt-2" t-esc="state.error"/>
             <t t-set-slot="footer">
                 <button class="btn btn-primary" t-on-click="onSave">Save</button>

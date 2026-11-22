@@ -18,6 +18,7 @@ STATE_FIELD = "x_dwo_approval_state_id"
 APPROVER_TYPES = ("users", "group", "dept", "field", "expr")
 ACTION_TYPES = ("notify", "email", "update", "server")
 MAX_M2O_STATES = 50
+CHANNELS = ("bus", "activity", "email")
 
 
 class DwoApprovalFlow(models.Model):
@@ -385,17 +386,19 @@ class DwoApprovalFlow(models.Model):
                 who = {
                     "approvers": [{
                         "type": a.kind, "user_ids": a.user_ids.ids, "group_id": a.group_id.id or False,
-                        "value": a.value or "",
+                        "value": a.value or "", "notify": {c: bool(a["notify_" + c]) for c in CHANNELS},
                         "label": a._label()} for a in tr.approver_ids],
                     "approvals": {"mode": tr.vote_mode, "n": tr.vote_n}}
             transitions.append({
                 "id": tr.id, "name": tr.name, "from": key_of.get(tr.from_state_id.id),
                 "to": key_of.get(tr.to_state_id.id), "color": tr.color, "ask_reason": tr.ask_reason, "list_action": tr.list_action,
+                "notify": {"followers": {c: bool(tr["notify_followers_" + c]) for c in CHANNELS},
+                           "creator": tr.notify_creator},
                 "who": who, "rules": [r.domain for r in tr.rule_ids],
                 "main_step": {
                     "mode": tr.move_mode, "method": tr.method_name or "",
                     "server_action_id": tr.server_action_id.id or False, "verify": tr.verify,
-                    "run_as": tr.run_as, "guard": tr.guard_scope},
+                    "run_as": tr.run_as},
                 "actions": [{
                     "type": a.kind, "user_ids": a.recipient_user_ids.ids, "expr": a.recipient_expr or "",
                     "message": a.message or "", "field": a.field_name or "", "value": a.value or "",
@@ -484,6 +487,9 @@ class DwoApprovalFlow(models.Model):
                 "id": tr.get("id") if isinstance(tr.get("id"), int) else False, "name": tr.get("name") or "",
                 "from": tr.get("from"), "to": tr.get("to"), "color": color if isinstance(color, int) else 0,
                 "ask_reason": bool(tr.get("ask_reason")), "list_action": bool(tr.get("list_action")),
+                "notify": {
+                    "followers": {c: bool(((tr.get("notify") or {}).get("followers") or {}).get(c)) for c in CHANNELS},
+                    "creator": bool((tr.get("notify") or {}).get("creator"))},
                 "approvers": [], "mode": "any", "n": 2,
                 "rules": [], "actions": []}
             who = tr.get("who")
@@ -501,7 +507,8 @@ class DwoApprovalFlow(models.Model):
                     if kind not in APPROVER_TYPES:
                         errors.append("%s: type must be one of %s." % (w, ", ".join(APPROVER_TYPES)))
                         continue
-                    line = {"kind": kind, "user_ids": [], "group_id": False, "value": ""}
+                    line = {"kind": kind, "user_ids": [], "group_id": False, "value": "",
+                            "notify": {c: bool((ap.get("notify") or {}).get(c)) for c in CHANNELS}}
                     if kind == "users":
                         line["user_ids"] = ap.get("user_ids") or self._resolve_users(ap.get("value"), errors, w)
                         if not line["user_ids"]:
@@ -537,10 +544,7 @@ class DwoApprovalFlow(models.Model):
                 "move_mode": step.get("mode", "set_state"), "method_name": step.get("method") or False,
                 "server_action_id": step.get("server_action_id") or self._resolve_ref(
                     "ir.actions.server", step.get("server_action"), errors, where + ".main_step"),
-                "verify": step.get("verify", True), "run_as": step.get("run_as", "user"),
-                "guard_scope": step.get("guard", "direct")}
-            if clean["step"]["guard_scope"] not in ("direct", "all", "none"):
-                errors.append("%s.main_step.guard must be direct, all or none." % where)
+                "verify": step.get("verify", True), "run_as": step.get("run_as", "user")}
             if clean["step"]["move_mode"] not in ("set_state", "call_method"):
                 errors.append("%s.main_step.mode must be set_state or call_method." % where)
             if clean["step"]["move_mode"] == "call_method":
@@ -597,7 +601,8 @@ class DwoApprovalFlow(models.Model):
             step = tr["step"]
             vals = {
                 "name": tr["name"], "sequence": index + 1, "color": tr["color"], "ask_reason": tr["ask_reason"],
-                "list_action": tr["list_action"],
+                "list_action": tr["list_action"], "notify_creator": tr["notify"]["creator"],
+                **{"notify_followers_" + c: tr["notify"]["followers"][c] for c in CHANNELS},
                 "from_state_id": by_key[tr["from"]].id if tr["from"] else False,
                 "to_state_id": by_key[tr["to"]].id,
                 "vote_mode": tr["mode"], "vote_n": tr["n"], **step}
@@ -614,7 +619,7 @@ class DwoApprovalFlow(models.Model):
                 self.env["dwo.approval.approver"].create({
                     "transition_id": record.id, "sequence": seq + 1, "kind": ap["kind"],
                     "user_ids": [(6, 0, ap["user_ids"])], "group_id": ap["group_id"] or False,
-                    "value": ap["value"] or False})
+                    "value": ap["value"] or False, **{"notify_" + c: ap["notify"][c] for c in CHANNELS}})
             for seq, text in enumerate(tr["rules"]):
                 self.env["dwo.approval.rule"].create({"transition_id": record.id, "sequence": seq + 1, "domain": text})
             for seq, act in enumerate(tr["actions"]):
@@ -699,14 +704,15 @@ def _as_graph(clean, data, env=None):
         out["transitions"].append({
             "id": False, "name": tr["name"], "from": tr["from"], "to": tr["to"], "color": tr["color"],
             "ask_reason": tr["ask_reason"], "list_action": tr["list_action"],
+            "notify": {"followers": dict(tr["notify"]["followers"]), "creator": tr["notify"]["creator"]},
             "who": {"approvers": [{"type": a["kind"], "user_ids": a["user_ids"], "group_id": a["group_id"],
-                                   "value": a["value"], "label": _approver_label(env, a)} for a in tr["approvers"]],
+                                   "value": a["value"], "notify": dict(a["notify"]),
+                                   "label": _approver_label(env, a)} for a in tr["approvers"]],
                     "approvals": {"mode": tr["mode"], "n": tr["n"]}} if tr["approvers"] else None,
             "rules": tr["rules"],
             "main_step": {"mode": tr["step"]["move_mode"], "method": tr["step"]["method_name"] or "",
                           "server_action_id": tr["step"]["server_action_id"] or False,
-                          "verify": tr["step"]["verify"], "run_as": tr["step"]["run_as"],
-                          "guard": tr["step"]["guard_scope"]},
+                          "verify": tr["step"]["verify"], "run_as": tr["step"]["run_as"]},
             "actions": [{"type": a["kind"], "user_ids": a["recipient_user_ids"], "expr": a["recipient_expr"] or "",
                          "message": a["message"] or "", "field": a["field_name"] or "", "value": a["value"] or "",
                          "server_action_id": a["server_action_id"] or False,

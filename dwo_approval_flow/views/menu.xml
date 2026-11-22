@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_dwo_approval_root" name="Approvals" web_icon="dwo_approval_flow,static/description/icon.png"
-              groups="group_approval_manager" sequence="95"/>
+              groups="base.group_user" sequence="95"/>
+    <menuitem id="menu_dwo_approval_pending" name="Waiting for my approval" parent="menu_dwo_approval_root"
+              action="action_dwo_approval_pending" sequence="5"/>
     <menuitem id="menu_dwo_approval_flows" name="Flows" parent="menu_dwo_approval_root"
-              action="action_dwo_approval_flow" sequence="10"/>
+              action="action_dwo_approval_flow" sequence="10" groups="group_approval_manager"/>
     <menuitem id="menu_dwo_approval_log" name="Log" parent="menu_dwo_approval_root"
-              action="action_dwo_approval_log" sequence="20"/>
+              action="action_dwo_approval_log" sequence="20" groups="group_approval_manager"/>
+    <menuitem id="menu_dwo_approval_notify_log" name="Notifications" parent="menu_dwo_approval_root"
+              action="action_dwo_approval_notify_log" sequence="30" groups="group_approval_manager"/>
 </odoo>

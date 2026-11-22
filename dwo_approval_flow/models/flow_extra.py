@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-"""v1.1 of the flow model: guards, entries in the Action menu, several flows per model."""
+"""v1.1 of the flow model: the own-state guard, entries in the Action menu, several flows per model."""
+import inspect
+
 from markupsafe import Markup
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 
 from . import guard
-from .flow import STATE_FIELD
 
 HISTORY_LABEL = "__history__"
 
@@ -43,7 +44,7 @@ class DwoApprovalFlow(models.Model):
             return super()._write_state(record, state)
 
     # ------------------------------------------------------------------
-    # guards
+    # the own-state field cannot be written directly
     # ------------------------------------------------------------------
     @api.model
     def _register_hook(self):
@@ -62,9 +63,6 @@ class DwoApprovalFlow(models.Model):
                 continue
             if flow.state_mode == "custom":
                 pairs.add((flow.model_name, "write"))
-            for tr in flow.transition_ids:
-                if tr.move_mode == "call_method" and tr.method_name and tr.guard_scope != "none":
-                    pairs.add((flow.model_name, tr.method_name))
         return pairs
 
     @api.model
@@ -80,41 +78,25 @@ class DwoApprovalFlow(models.Model):
         raise UserError(self.env._("The approval state can only be changed with the approval buttons."))
 
     @api.model
-    def _guard_call(self, records, name, original, args, kwargs):
-        """A guarded method was called: send governed documents through their arrow instead."""
-        direct = guard.called_from_rpc(name)
-        free, held = records.browse(), []
-        for record in records:
-            flow = self._flow_of(record)
-            arrows = flow.transition_ids.filtered(
-                lambda t: t.move_mode == "call_method" and t.method_name == name
-                and (t.guard_scope == "all" or (t.guard_scope == "direct" and direct))
-            ).sorted("sequence") if flow else self.env["dwo.approval.transition"]
-            if arrows:
-                held.append((record, arrows))
-            else:
-                free |= record
-        result = original(free, *args, **kwargs) if free else True
-        user = self.env.user
-        for record, arrows in held:
-            arrow = next((t for t in arrows if t._check_available(record, user)[0]), None)
-            if not arrow:
-                why = arrows[0]._check_available(record, user)[1]
-                raise UserError(self.env._(
-                    "“%(doc)s” goes through an approval and you cannot do this now. %(why)s",
-                    doc=record.display_name, why=why))
-            if arrow.ask_reason:
-                raise UserError(self.env._("Use the approval button of the document: a reason is required."))
-            outcome = arrow._press(record, user)
-            if outcome.get("action"):
-                result = outcome["action"]
-            elif outcome["status"] == "waiting" and len(records) == 1:
-                result = {"type": "ir.actions.client", "tag": "display_notification", "params": {
-                    "title": self.env._("Approval"), "type": "info", "sticky": False,
-                    "message": self.env._("Approved. %(count)s of %(needed)s approvals.",
-                                          count=outcome["count"], needed=outcome["needed"]),
-                    "next": {"type": "ir.actions.client", "tag": "reload"}}}
-        return result
+    def model_methods(self, model_name):
+        """Public methods of a model with their docstring, for the autocomplete of the designer."""
+        if not self.env.user.has_group("dwo_approval_flow.group_approval_manager"):
+            raise AccessError(self.env._("Only flow administrators can list the methods of a model."))
+        if model_name not in self.env:
+            return []
+        orm = set(dir(models.Model)) | set(dir(models.BaseModel))
+        cls = type(self.env[model_name])
+        found = []
+        for name in dir(cls):
+            if name.startswith("_") or name in orm:
+                continue
+            func = getattr(cls, name, None)
+            if not callable(func) or isinstance(func, type):
+                continue
+            found.append({"name": name, "doc": inspect.getdoc(func) or ""})
+        # the methods behind buttons first
+        found.sort(key=lambda m: (not m["name"].startswith(("action_", "button_")), m["name"]))
+        return found
 
     # ------------------------------------------------------------------
     # Action menu of the list view

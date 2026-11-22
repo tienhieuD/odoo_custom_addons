@@ -6,9 +6,14 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { browser } from "@web/core/browser/browser";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { ActionDialog, AiDialog, JsonDialog, RuleDialog, StepDialog, WhoDialog } from "./dialogs";
+import { DomainSelector } from "@web/core/domain_selector/domain_selector";
+import { DomainSelectorDialog } from "@web/core/domain_selector_dialog/domain_selector_dialog";
+import { ActionDialog, AiDialog, JsonDialog, StepDialog, WhoDialog } from "./dialogs";
 import { COLORS } from "./palette";
 import { NH, NW, collides, computeLayout, freeSpot } from "./layout";
+
+// The AI button works end to end (dialog, prompt, checks) but the model call is still a mock: switch to true when the real one is in.
+const AI_READY = false;
 
 let counter = 0;
 const cid = () => `c${++counter}`;
@@ -36,7 +41,7 @@ function parse(text) {
 /** Field widget: the state diagram of an approval flow (boxes are states, arrows are buttons). */
 export class FlowDesigner extends Component {
     static template = "dwo_approval_flow.Designer";
-    static components = { ColorList };
+    static components = { ColorList, DomainSelector };
     static props = {
         ...standardFieldProps,
         modelField: { type: String, optional: true },
@@ -298,8 +303,8 @@ export class FlowDesigner extends Component {
             return;
         }
         const t = {
-            cid: cid(), id: false, name: _t("New action"), from, to, color: 0, ask_reason: false, list_action: false,
-            who: null, rules: [], main_step: { mode: "set_state", method: "", server_action_id: false, verify: true, run_as: "user", guard: "direct" },
+            cid: cid(), id: false, name: _t("New action"), from, to, color: 0, ask_reason: false, list_action: false, notify: { followers: {}, creator: false },
+            who: null, rules: [], main_step: { mode: "set_state", method: "", server_action_id: false, verify: true, run_as: "user" },
             actions: [],
         };
         this.graph.transitions.push(t);
@@ -377,8 +382,8 @@ export class FlowDesigner extends Component {
         const to = (this.stateByKey(t.to) || {}).name;
         if (step.mode === "call_method") {
             return step.method
-                ? _t("Call %(method)s, then the state must be %(to)s", { method: step.method, to })
-                : _t("Run a server action, then the state must be %s", to);
+                ? _t("Call the method %(method)s (the state must become %(to)s)", { method: step.method, to })
+                : _t("Run a server action (the state must become %s)", to);
         }
         return _t("Change state to %s", to);
     }
@@ -421,23 +426,44 @@ export class FlowDesigner extends Component {
             approvers: t.who ? t.who.approvers : [],
             mode: t.who ? t.who.approvals.mode : "any",
             n: t.who ? t.who.approvals.n : 2,
-            confirm: ({ approvers, mode, n }) => {
+            followers: (t.notify && t.notify.followers) || {},
+            confirm: ({ approvers, mode, n, followers }) => {
                 t.who = { approvers, approvals: { mode, n } };
+                t.notify = Object.assign({}, t.notify, { followers });
                 this.commit();
             },
         });
     }
 
+    notifyText(t) {
+        const names = { bus: _t("system"), activity: _t("activity"), email: _t("email") };
+        const list = (flags) => Object.keys(names).filter((c) => flags && flags[c]).map((c) => names[c]).join(", ");
+        const parts = [];
+        const approvers = new Set();
+        ((t.who && t.who.approvers) || []).forEach((a) => Object.keys(names).forEach((c) => a.notify && a.notify[c] && approvers.add(c)));
+        if (approvers.size) {
+            parts.push(_t("approvers: %s", list(Object.fromEntries([...approvers].map((c) => [c, true])))));
+        }
+        const followers = list(t.notify && t.notify.followers);
+        if (followers) {
+            parts.push(_t("followers: %s", followers));
+        }
+        return parts.length ? _t("Told on arrival: %s", parts.join("; ")) : "";
+    }
+
     removeWho(t) {
         t.who = null;
+        t.notify = Object.assign({}, t.notify, { followers: { bus: false, activity: false, email: false } });
         this.commit();
     }
 
     editRule(t, index) {
-        this.dialog.add(RuleDialog, {
-            model: this.modelName,
+        // the Odoo domain editor, straight away: no domain text to type
+        this.dialog.add(DomainSelectorDialog, {
+            resModel: this.modelName,
             domain: index >= 0 ? t.rules[index] : "[]",
-            confirm: (domain) => {
+            isDebugMode: Boolean(this.env.debug),
+            onConfirm: (domain) => {
                 if (index >= 0) {
                     t.rules[index] = domain;
                 } else {
@@ -454,20 +480,7 @@ export class FlowDesigner extends Component {
     }
 
     addCondition(t) {
-        if (t.who) {
-            this.editRule(t, -1);
-        } else {
-            this.dialog.add(WhoDialog, {
-                model: this.modelName,
-                approvers: [],
-                mode: "any",
-                n: 2,
-                confirm: ({ approvers, mode, n }) => {
-                    t.who = { approvers, approvals: { mode, n } };
-                    this.commit();
-                },
-            });
-        }
+        this.editRule(t, -1);
     }
 
     editStep(t) {
@@ -476,7 +489,7 @@ export class FlowDesigner extends Component {
             model: this.modelName,
             step: {
                 mode: step.mode, method: step.method || "", server_action_id: step.server_action_id || false,
-                verify: step.verify !== false, run_as: step.run_as || "user", guard: step.guard || "direct",
+                verify: step.verify !== false, run_as: step.run_as || "user",
             },
             confirm: (value) => {
                 t.main_step = value;
@@ -530,6 +543,11 @@ export class FlowDesigner extends Component {
         this.commit();
     }
 
+    toggleNotify(t, key, ev) {
+        t.notify = Object.assign({}, t.notify, { [key]: ev.target.checked });
+        this.commit();
+    }
+
     toggleListAction(t, ev) {
         t.list_action = ev.target.checked;
         this.commit();
@@ -559,10 +577,17 @@ export class FlowDesigner extends Component {
     }
 
     get aiTitle() {
+        if (!AI_READY) {
+            return _t("Build a flow with AI: coming soon");
+        }
         return this.hasDiagram ? _t("Edit this flow with AI") : _t("Build a flow with AI");
     }
 
     aiFlow() {
+        if (!AI_READY) {
+            this.notification.add(_t("The AI flow builder is coming soon."), { type: "info" });
+            return;
+        }
         const record = this.props.record;
         this.dialog.add(AiDialog, {
             editing: this.hasDiagram,

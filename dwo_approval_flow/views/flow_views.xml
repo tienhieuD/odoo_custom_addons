@@ -50,6 +50,15 @@
                             <field name="history_action"/>
                         </group>
                     </group>
+                    <group string="Notifications" name="notify">
+                        <group>
+                            <field name="notify_template_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="remind_after"/>
+                            <field name="remind_max" invisible="not remind_after"/>
+                        </group>
+                    </group>
                     <field name="graph" widget="dwo_flow_designer" nolabel="1" invisible="not model_id"
                            options="{'model_field': 'model_name'}"/>
                 </sheet>

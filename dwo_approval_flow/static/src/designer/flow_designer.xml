@@ -83,8 +83,7 @@
                             <input type="checkbox" class="form-check-input" id="dwo_state_visible"
                                    t-att-checked="s.visible !== false" t-att-disabled="readonly"
                                    t-on-change="(ev) => this.setVisible(s, ev.target.checked)"/>
-                            <label class="form-check-label" for="dwo_state_visible">Always show on the status bar</label>
-                            <div class="text-muted small">Off: shown only while the document is in this state.</div>
+                            <label class="form-check-label" for="dwo_state_visible" title="Off: the status bar shows this state only while the document is in it.">Always show on the status bar</label>
                         </div>
                         <div class="text-muted small mt-3">
                             Buttons leaving this state:
@@ -118,6 +117,7 @@
                                 <span class="flex-grow-1">
                                     <t t-esc="approverText(t)"/>
                                     <div class="text-muted small" t-esc="approvalsText(t)"/>
+                                    <div t-if="notifyText(t)" class="text-muted small"><i class="fa fa-bell-o"/> <t t-esc="notifyText(t)"/></div>
                                 </span>
                                 <t t-if="!readonly">
                                     <button type="button" class="btn btn-link p-0" title="Edit" t-on-click="() => this.editWho(t)"><i class="fa fa-pencil"/></button>
@@ -126,7 +126,9 @@
                             </div>
                             <div t-foreach="t.rules" t-as="rule" t-key="rule_index" class="list-group-item d-flex gap-2 align-items-center">
                                 <span class="badge text-bg-warning flex-shrink-0">Rule</span>
-                                <code class="flex-grow-1 text-break" t-esc="rule"/>
+                                <span class="flex-grow-1 text-break">
+                                    <DomainSelector resModel="modelName" domain="rule" readonly="true"/>
+                                </span>
                                 <t t-if="!readonly">
                                     <button type="button" class="btn btn-link p-0" title="Edit" t-on-click="() => this.editRule(t, rule_index)"><i class="fa fa-pencil"/></button>
                                     <button type="button" class="btn btn-link p-0 text-danger" title="Remove" t-on-click="() => this.removeRule(t, rule_index)"><i class="fa fa-times"/></button>
@@ -138,6 +140,7 @@
                                 <span t-if="line_index" class="text-primary">AND </span><t t-esc="line"/>
                             </div>
                         </div>
+                        <button t-if="!readonly and !t.who" type="button" class="btn btn-link ps-0" t-on-click="() => this.editWho(t)">+ Set who can press it</button>
                         <button t-if="!readonly" type="button" class="btn btn-link ps-0" t-on-click="() => this.addCondition(t)">+ Add a condition</button>
 
                         <div class="mt-3 mb-1 fw-bold">When pressed</div>
@@ -172,6 +175,11 @@
                             <input class="form-check-input" type="checkbox" id="dwo_list" t-att-checked="t.list_action"
                                    t-att-disabled="readonly" t-on-change="(ev) => this.toggleListAction(t, ev)"/>
                             <label class="form-check-label" for="dwo_list">Also allow from the list view (Action menu)</label>
+                        </div>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="dwo_notify_creator" t-att-checked="t.notify and t.notify.creator"
+                                   t-att-disabled="readonly" t-on-change="(ev) => this.toggleNotify(t, 'creator', ev)"/>
+                            <label class="form-check-label" for="dwo_notify_creator">Notify the creator of the document when this is pressed or voted</label>
                         </div>
                         <div t-if="!readonly" class="mt-3 d-flex gap-2">
                             <button type="button" class="btn btn-sm btn-outline-danger" t-on-click="() => this.deleteTransition(t)">Delete arrow</button>

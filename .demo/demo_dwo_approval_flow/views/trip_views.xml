@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_business_trip_list" model="ir.ui.view">
+        <field name="name">awesome.business.trip.list</field>
+        <field name="model">awesome.business.trip</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="traveler_id"/>
+                <field name="destination"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_cost" sum="Total"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_business_trip_form" model="ir.ui.view">
+        <field name="name">awesome.business.trip.form</field>
+        <field name="model">awesome.business.trip</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Sales summit in Berlin"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="traveler_id"/>
+                            <field name="manager_id"/>
+                            <field name="destination"/>
+                            <field name="transport"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="total_cost"/>
+                        </group>
+                    </group>
+                    <field name="purpose" placeholder="Why this trip?"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_business_trip_search" model="ir.ui.view">
+        <field name="name">awesome.business.trip.search</field>
+        <field name="model">awesome.business.trip</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="traveler_id"/>
+                <field name="destination"/>
+                <filter name="mine" string="My trips" domain="[('traveler_id', '=', uid)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_business_trip" model="ir.actions.act_window">
+        <field name="name">Business Trips</field>
+        <field name="res_model">awesome.business.trip</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_business_trip_root" name="Business Trips" action="action_business_trip" sequence="96"
+              groups="base.group_user" web_icon="dwo_approval_flow,static/description/icon.png"/>
+</odoo>

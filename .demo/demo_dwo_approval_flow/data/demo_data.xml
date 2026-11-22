@@ -2,12 +2,15 @@
 <odoo noupdate="1">
     <!-- the users come from demo_users; here they get the purchase rights the demo needs -->
     <record id="demo_users.user_alice" model="res.users">
+        <field name="notification_type">inbox</field>
         <field name="group_ids" eval="[(4, ref('purchase.group_purchase_user'))]"/>
     </record>
     <record id="demo_users.user_bob" model="res.users">
+        <field name="notification_type">inbox</field>
         <field name="group_ids" eval="[(4, ref('purchase.group_purchase_manager'))]"/>
     </record>
     <record id="demo_users.user_carol" model="res.users">
+        <field name="notification_type">inbox</field>
         <field name="group_ids" eval="[(4, ref('purchase.group_purchase_manager'))]"/>
     </record>
 
@@ -17,8 +20,33 @@
         <field name="login">demo_admin</field>
         <field name="password">demo</field>
         <field name="email">dana@example.com</field>
+        <field name="notification_type">inbox</field>
         <field name="group_ids" eval="[(6, 0, [ref('base.group_user'), ref('base.group_partner_manager'),
             ref('purchase.group_purchase_manager'), ref('dwo_approval_flow.group_approval_manager')])]"/>
+    </record>
+
+    <!-- business trips: two roles that are groups, and the people who hold them -->
+    <record id="group_finance" model="res.groups">
+        <field name="name">Demo: Finance</field>
+    </record>
+    <record id="group_travel_desk" model="res.groups">
+        <field name="name">Demo: Travel desk</field>
+    </record>
+    <record id="user_finance" model="res.users" context="{'no_reset_password': True}">
+        <field name="name">Fiona Park</field>
+        <field name="login">demo_finance</field>
+        <field name="password">demo</field>
+        <field name="email">fiona@example.com</field>
+        <field name="notification_type">inbox</field>
+        <field name="group_ids" eval="[(6, 0, [ref('base.group_user'), ref('group_finance')])]"/>
+    </record>
+    <record id="user_travel" model="res.users" context="{'no_reset_password': True}">
+        <field name="name">Tom Ellis</field>
+        <field name="login">demo_travel</field>
+        <field name="password">demo</field>
+        <field name="email">tom@example.com</field>
+        <field name="notification_type">inbox</field>
+        <field name="group_ids" eval="[(6, 0, [ref('base.group_user'), ref('group_travel_desk')])]"/>
     </record>
 
     <record id="vendor_gemini" model="res.partner">

@@ -67,6 +67,7 @@ You convert a plain-language description of an approval process into ONE JSON do
   "color": 10,
   "ask_reason": false,
   "list_action": false,
+  "notify": { "followers": { "bus": false, "activity": false, "email": false }, "creator": false },
   "who": { ... } or null,
   "rules": [ "<odoo domain as a string>" ],
   "main_step": { ... },
@@ -80,6 +81,10 @@ You convert a plain-language description of an approval process into ONE JSON do
 - `color`: 0 to 11 (section 3.5). Convention: neutral 0, positive/approve 10, negative/reject 1, warning 2.
 - `ask_reason`: true makes the user type a reason before the move. Use it for rejections and cancellations; not for normal approvals.
 - `list_action`: true also adds the button to the Action menu of the list view (mass approve). Default false. Set true only if the description asks for mass or list actions.
+- `notify`: extra people told about this arrow. Optional, every flag defaults to false; set one only when the description asks to notify or alert somebody.
+  - `followers`: `{"bus": true, "activity": false, "email": true}`: tells the followers of the document who subscribed to the subtype "Approval" when a document arrives in the `from` state of this arrow (`bus` = a pop-up in Odoo, `activity` = a to-do, `email` = a note they get as an email or an inbox message).
+  - `creator`: true tells the person who created the document when this arrow is pressed (or voted, "1/2").
+  - The approvers themselves are told through their own line in `who.approvers`: add `"notify": {"bus": true, "activity": true, "email": false}` to a line to tell the people of that line (a to-do, a pop-up in Odoo, an email or inbox message) when a document arrives in the `from` state; they are also listed in "Waiting for my approval". Omit it (or use false) for no message. An arrow with `who: null` has no approvers to tell.
 - `who`: who may press the button.
   - `null` = anybody who can open the record.
   - otherwise an object, see 3.3.
@@ -99,7 +104,6 @@ You convert a plain-language description of an approval process into ONE JSON do
   "approvers": [
     { "type": "group", "value": "base.group_system" },
     { "type": "users", "value": "demo_alice,demo_bob" },
-    { "type": "dept" },
     { "type": "field", "value": "user_id" },
     { "type": "expr",  "value": "record.employee_id.parent_id.user_id or record.user_id" }
   ],
@@ -113,7 +117,6 @@ You convert a plain-language description of an approval process into ONE JSON do
 |---|---|---|
 | `users` | logins separated by commas, from CONTEXT users | those exact people |
 | `group` | xml id (e.g. `purchase.group_purchase_manager`) of a group from CONTEXT | every member of the group |
-| `dept` | not used | users who belong to the same department as the record (record needs `department_id`, the user needs an employee). Use only if CONTEXT says the model has `department_id` |
 | `field` | name of a many2one field to `res.users` on the record (from CONTEXT), e.g. `user_id` | the user named on the record |
 | `expr` | a path expression | users reached by following fields from the record or from the user |
 
@@ -129,7 +132,7 @@ Keep `n` only meaningful with `"mode": "n"`; for the other modes write `"n": 1`.
 
 ```
 "main_step": { "mode": "set_state" }
-"main_step": { "mode": "call_method", "method": "button_confirm", "verify": true, "run_as": "user", "guard": "direct" }
+"main_step": { "mode": "call_method", "method": "button_confirm", "verify": true, "run_as": "user" }
 "main_step": { "mode": "call_method", "server_action": "module.action_xml_id" }
 ```
 
@@ -137,7 +140,6 @@ Keep `n` only meaningful with `"mode": "n"`; for the other modes write `"n": 1`.
 - `call_method`: the module calls an existing public method of the model (for example the standard "Confirm" button method) and the method is responsible for moving the record. Use only when the description says that a standard button/method must run, AND the method name or server action appears in CONTEXT. Never guess a method name.
 - `verify` (default true): after the call the record must be in the target state, otherwise everything is rolled back.
 - `run_as`: `"user"` (default) the person who pressed, or `"system"` to run with full rights.
-- `guard`: `"direct"` (default) the original button/RPC cannot be used to bypass approval; `"all"` also protects calls from other code; `"none"` leaves the method unprotected.
 - If you set `mode` to `call_method` you must give either `method` or `server_action`.
 
 ### 3.5 Colors (0 to 11)
@@ -168,7 +170,7 @@ Add actions only when the description asks for notification, e-mail or a field c
 5. Who approves: translate each role to a group or users listed in CONTEXT. If the description names a role that has no match in CONTEXT, use `"who": null` for that transition and add a note, never invent a group.
 6. If a state can be left only by some people (for example only the manager may reject urgent requests), give the reject button the same `rules` and `who` as the approve button of that branch, so people see consistent buttons.
 7. If a failed/rejected state exists, add a way out (for example "Reopen" to the draft state) unless the description says the rejection is final.
-8. Do not add anything the description did not ask for (no emails, no field updates, no `main_step`, no `list_action`).
+8. Do not add anything the description did not ask for (no emails, no field updates, no `main_step`, no `list_action`, no `notify`).
 
 ## 5. Layout of the diagram
 
@@ -323,7 +325,7 @@ CONTEXT says `state_mode: field`, `state_field: state`, `field_states: draft, se
   "transitions": [
     {"name": "Confirm", "from": "sent", "to": "purchase", "color": 10,
      "who": {"approvers": [{"type": "group", "value": "purchase.group_purchase_manager"}], "approvals": {"mode": "any", "n": 1}},
-     "rules": [], "main_step": {"mode": "call_method", "method": "button_confirm", "verify": true, "run_as": "user", "guard": "direct"},
+     "rules": [], "main_step": {"mode": "call_method", "method": "button_confirm", "verify": true, "run_as": "user"},
      "actions": []}
   ]
 }

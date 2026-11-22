@@ -12,3 +12,4 @@ from . import flow_extra
 from . import server_action
 from . import history
 from . import flow_ai
+from . import notify
