@@ -111,3 +111,9 @@
         stroke-dasharray: 5 4;
     }
 }
+
+// the rules are shown read only: no "Include archived" switch
+.o_dwo_designer .o_tree_editor_row .form-switch,
+.o_dwo_designer .o_domain_selector_row .form-switch {
+    display: none;
+}
