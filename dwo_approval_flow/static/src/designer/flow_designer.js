@@ -319,7 +319,7 @@ export class FlowDesigner extends AbstractField {
         }
         const t = {
             cid: cid(), id: false, name: _t("New action"), from, to, color: 0, ask_reason: false, list_action: false, notify: { followers: {}, creator: false },
-            who: null, rules: [], main_step: { mode: "set_state", method: "", server_action_id: false, verify: true, run_as: "user" },
+            who: null, rules: [], main_step: { mode: "set_state", method: "", server_action_id: false, verify: true, run_as: "user", guard: "direct" },
             actions: [],
         };
         this.graph.transitions.push(t);
@@ -517,7 +517,7 @@ export class FlowDesigner extends AbstractField {
             model: this.modelName,
             step: {
                 mode: step.mode, method: step.method || "", server_action_id: step.server_action_id || false,
-                verify: step.verify !== false, run_as: step.run_as || "user",
+                verify: step.verify !== false, run_as: step.run_as || "user", guard: step.guard || "direct",
             },
             confirm: (value) => {
                 t.main_step = value;

@@ -398,7 +398,7 @@ class DwoApprovalFlow(models.Model):
                 "main_step": {
                     "mode": tr.move_mode, "method": tr.method_name or "",
                     "server_action_id": tr.server_action_id.id or False, "verify": tr.verify,
-                    "run_as": tr.run_as},
+                    "run_as": tr.run_as, "guard": tr.guard_scope},
                 "actions": [{
                     "type": a.kind, "user_ids": a.recipient_user_ids.ids, "expr": a.recipient_expr or "",
                     "message": a.message or "", "field": a.field_name or "", "value": a.value or "",
@@ -544,7 +544,8 @@ class DwoApprovalFlow(models.Model):
                 "move_mode": step.get("mode", "set_state"), "method_name": step.get("method") or False,
                 "server_action_id": step.get("server_action_id") or self._resolve_ref(
                     "ir.actions.server", step.get("server_action"), errors, where + ".main_step"),
-                "verify": step.get("verify", True), "run_as": step.get("run_as", "user")}
+                "verify": step.get("verify", True), "run_as": step.get("run_as", "user"),
+                "guard_scope": "none" if step.get("guard") == "none" else "direct"}
             if clean["step"]["move_mode"] not in ("set_state", "call_method"):
                 errors.append("%s.main_step.mode must be set_state or call_method." % where)
             if clean["step"]["move_mode"] == "call_method":
@@ -712,7 +713,8 @@ def _as_graph(clean, data, env=None):
             "rules": tr["rules"],
             "main_step": {"mode": tr["step"]["move_mode"], "method": tr["step"]["method_name"] or "",
                           "server_action_id": tr["step"]["server_action_id"] or False,
-                          "verify": tr["step"]["verify"], "run_as": tr["step"]["run_as"]},
+                          "verify": tr["step"]["verify"], "run_as": tr["step"]["run_as"],
+                          "guard": tr["step"]["guard_scope"]},
             "actions": [{"type": a["kind"], "user_ids": a["recipient_user_ids"], "expr": a["recipient_expr"] or "",
                          "message": a["message"] or "", "field": a["field_name"] or "", "value": a["value"] or "",
                          "server_action_id": a["server_action_id"] or False,

@@ -400,6 +400,42 @@ class TestApprovalFlow(TransactionCase):
         self.assertTrue(texts[1].endswith("greater than 1000"))
         self.assertEqual(texts[2], "all records")
 
+    def _archive_flow(self, guard=None, **kw):
+        step = {"mode": "call_method", "method": "action_archive", "run_as": "system"}
+        if guard:
+            step["guard"] = guard
+        return self._flow([self._tr(
+            "Archive", "draft", "done", who={"approvers": [{"type": "users", "user_ids": [self.alice.id]}],
+                                             "approvals": {"mode": "any"}}, main_step=step, **kw)])
+
+    def test_guard_goes_through_the_arrow(self):
+        flow = self._archive_flow()  # protected by default
+        self.assertIn(("res.partner", "action_archive"), self.env["dwo.approval.flow"]._guard_methods())
+        partner = self.env["res.partner"].create({"name": "Gamma"})
+        Flow = self.env["dwo.approval.flow"].with_user(self.bob)
+        with self.assertRaises(UserError):
+            Flow._guard_rpc("res.partner", "action_archive", partner.ids)
+        self.assertTrue(partner.active)
+        free, result = self.env["dwo.approval.flow"].with_user(self.alice)._guard_rpc(
+            "res.partner", "action_archive", partner.ids)
+        self.assertEqual(free, [])  # the arrow took the press: the original method does not run again
+        self.assertFalse(partner.active)  # the arrow called it as system
+        self.assertEqual(partner.x_dwo_approval_state_id.key, "done")
+        # a document the flow does not govern keeps the original behaviour
+        flow.domain = "[('name', '=', 'Gamma')]"
+        other = self.env["res.partner"].create({"name": "Other"})
+        self.assertEqual(Flow._guard_rpc("res.partner", "action_archive", other.ids), (other.ids, None))
+
+    def test_guard_can_be_switched_off(self):
+        flow = self._archive_flow(guard="none")
+        self.assertNotIn(("res.partner", "action_archive"), self.env["dwo.approval.flow"]._guard_methods())
+        flow.transition_ids.guard_scope = "direct"
+        self.assertIn(("res.partner", "action_archive"), self.env["dwo.approval.flow"]._guard_methods())
+        data = json.loads(flow.graph)
+        self.assertEqual(data["transitions"][0]["main_step"]["guard"], "direct")
+        flow.graph = json.dumps(data)  # the designer saves it back unchanged
+        self.assertEqual(flow.transition_ids.guard_scope, "direct")
+
     def test_state_field_cannot_be_written_directly(self):
         flow = self._flow([self._tr("Submit", "draft", "review")])
         review = flow.state_ids.filtered(lambda s: s.key == "review")
