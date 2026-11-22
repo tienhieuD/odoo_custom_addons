@@ -24,7 +24,7 @@
             'listview_sticky_header_and_column/static/tests/tours/**/*',
         ]
     },
-    'price': 35.00,
+    'price': 25.00,
     'currency': 'EUR',
     'external_dependencies': {}
 }
