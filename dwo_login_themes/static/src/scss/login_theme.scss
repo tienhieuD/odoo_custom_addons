@@ -52,10 +52,10 @@ body:has(.dwo_lc) { background: var(--dwo-page-bg, #e9ecef) !important; margin: 
     .o_database_list a { color: var(--dwo-primary); }
     .list-group-item { background-color: var(--dwo-field-bg); border-color: var(--dwo-field-border); }
     .btn:not(.btn-primary):not(.btn-link) { background-color: var(--dwo-field-bg); color: var(--dwo-text); border-color: var(--dwo-field-border); }
-    .form-label, label, .text-muted { color: var(--dwo-text); }
+    .form-label, label, .text-muted, em { color: var(--dwo-text); }
     .form-control { background-color: var(--dwo-field-bg); color: var(--dwo-text); border-color: var(--dwo-field-border);
         &:focus { border-color: var(--dwo-primary); box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--dwo-primary) 25%, transparent); }
-        &::placeholder { color: color-mix(in srgb, var(--dwo-text) 45%, transparent); } }
+        &::placeholder { color: color-mix(in srgb, var(--dwo-text) 70%, transparent); } }
     .btn-primary { background-color: var(--dwo-button) !important; border-color: var(--dwo-button) !important; color: #fff !important;
         &:hover, &:focus { filter: brightness(.92); } }
     .btn-link, .btn-outline-primary { color: var(--dwo-primary); background: transparent; }
@@ -74,6 +74,12 @@ body:has(.dwo_lc) { background: var(--dwo-page-bg, #e9ecef) !important; margin: 
             &::before { content: ""; position: absolute; left: 0; top: .55rem; width: 1.1rem; height: 1.1rem; border-radius: 50%;
                 background: rgba(255, 255, 255, .25); box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 2px #fff; } } }
 }
+// a dark card colour (for instance the Midnight preset): the fields and the buttons follow it, light text on a dark field
+.container.dwo_lc.dwo_card_dark { --dwo-field-bg: rgba(255, 255, 255, .08); --dwo-field-border: rgba(255, 255, 255, .24);
+    .form-control { color: var(--dwo-text); }
+    img[alt="Logo"] { background: rgba(255, 255, 255, .92); border-radius: 10px; padding: 6px 12px; }
+    .dwo_pwd_btn, .btn:not(.btn-primary):not(.btn-link) { color: var(--dwo-text); }
+    .o_database_list .text-muted, .o_database_list em { color: color-mix(in srgb, var(--dwo-text) 75%, transparent) !important; } }
 .dwo_footer { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 5; max-width: 90vw;
     padding: .25rem .9rem; border-radius: 99px; background: rgba(0, 0, 0, .4); color: #fff; font-size: .8rem;
     text-align: center; backdrop-filter: blur(6px); }

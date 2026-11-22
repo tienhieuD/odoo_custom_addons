@@ -15,3 +15,8 @@ def post_init_hook(env):
     icp = env["ir.config_parameter"].sudo()
     for key, value in SETTINGS.items():
         icp.set_param("dwo_login." + key, value)
+    # the demo users are administrators here, so that anybody can open Settings and change the login page
+    # (demo_guard stops them from creating users, changing a password or installing an app)
+    admin = env.ref("base.group_system")
+    for xmlid in ("user_alice", "user_bob", "user_carol"):
+        env.ref("demo_users." + xmlid).write({"group_ids": [(4, admin.id)]})
