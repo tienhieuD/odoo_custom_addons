@@ -1,8 +1,8 @@
 // Copyright 2026 DuoTEK. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3).
 // Shared code of the sandboxed 3D viewer pages (iframe sandbox="allow-scripts", opaque origin, CSP without network).
 // The parent window sends the file bytes with postMessage; nothing is fetched from anywhere else.
-import * as THREE from "../lib/three/build/three.module.js";
-import { OrbitControls } from "../lib/three/examples/jsm/controls/OrbitControls.js";
+import * as THREE from "../lib/dGhyZWU/build/three.module.js";
+import { OrbitControls } from "../lib/dGhyZWU/examples/jsm/controls/OrbitControls.js";
 
 export { THREE };
 
