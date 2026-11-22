@@ -126,7 +126,7 @@
                             </div>
                             <div t-foreach="t.rules" t-as="rule" t-key="rule_index" class="list-group-item d-flex gap-2 align-items-center">
                                 <span class="badge text-bg-warning flex-shrink-0">Rule</span>
-                                <span class="flex-grow-1 text-break">
+                                <span class="flex-grow-1 small" style="min-width: 0">
                                     <DomainSelector resModel="modelName" domain="rule" readonly="true"/>
                                 </span>
                                 <t t-if="!readonly">

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Demo: Dynamic Approval Workflow",
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.1.0",
     "summary": "Demo users and two ready-made approval flows for dwo_approval_flow: purchase orders and business trips.",
     "description": "Install only on demo servers. Gives the demo users (demo_users) purchase rights, adds demo_admin (can configure the flows) and creates "
                    "some vendors, products and purchase orders, and a purchase approval flow that replaces the status bar.",

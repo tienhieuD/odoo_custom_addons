@@ -27,10 +27,10 @@
 
     <!-- business trips: two roles that are groups, and the people who hold them -->
     <record id="group_finance" model="res.groups">
-        <field name="name">Demo: Finance</field>
+        <field name="name">Finance</field>
     </record>
     <record id="group_travel_desk" model="res.groups">
-        <field name="name">Demo: Travel desk</field>
+        <field name="name">Travel desk</field>
     </record>
     <record id="user_finance" model="res.users" context="{'no_reset_password': True}">
         <field name="name">Fiona Park</field>

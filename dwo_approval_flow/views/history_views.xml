@@ -19,8 +19,8 @@
                         <field name="date"/>
                         <field name="user_id"/>
                         <field name="button"/>
-                        <field name="from_name"/>
-                        <field name="to_name"/>
+                        <field name="from_name" string="From"/>
+                        <field name="to_name" string="To"/>
                         <field name="votes"/>
                         <field name="reason"/>
                         <field name="kind" column_invisible="1"/>
