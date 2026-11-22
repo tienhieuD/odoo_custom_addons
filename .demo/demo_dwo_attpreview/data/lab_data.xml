@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- the biggest request the server accepts (Odoo checks it, the web client shows it): 100 MB -->
+    <record id="param_max_upload" model="ir.config_parameter">
+        <field name="key">web.max_file_upload_size</field>
+        <field name="value">104857600</field>
+    </record>
+
+    <record id="cron_lab_sweep" model="ir.cron">
+        <field name="name">Preview Lab: delete the files above the limits</field>
+        <field name="model_id" ref="model_awesome_preview"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_lab_sweep()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+    </record>
+
+    <!-- every demo user lands in the lab -->
+    <record id="demo_users.user_alice" model="res.users"><field name="action_id" ref="action_awesome_preview"/></record>
+    <record id="demo_users.user_bob" model="res.users"><field name="action_id" ref="action_awesome_preview"/></record>
+    <record id="demo_users.user_carol" model="res.users"><field name="action_id" ref="action_awesome_preview"/></record>
+</odoo>

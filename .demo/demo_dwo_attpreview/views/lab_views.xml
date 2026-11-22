@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_awesome_preview_list" model="ir.ui.view">
+        <field name="name">awesome.preview.list</field>
+        <field name="model">awesome.preview</field>
+        <field name="arch" type="xml">
+            <list string="Preview Lab">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="module_name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_awesome_preview_form" model="ir.ui.view">
+        <field name="name">awesome.preview.form</field>
+        <field name="model">awesome.preview</field>
+        <field name="arch" type="xml">
+            <form string="Preview Lab">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Click a file, or the eye button next to it, to preview it. You can add your own files in every
+                        field below and in the chatter: up to <strong>10 files</strong> per record, each up to
+                        <strong>100 MB</strong>. The files you add beyond that are deleted automatically, and the whole
+                        demo is reset after 15 minutes without use.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="module_name"/>
+                            <field name="description"/>
+                        </group>
+                        <group string="Single file fields">
+                            <field name="file_binary" filename="file_binary_name"/>
+                            <field name="file_binary_name" invisible="1"/>
+                            <field name="file_m2o"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Many2many (attachments)" name="m2m">
+                            <field name="file_m2m" widget="many2many_binary"/>
+                        </page>
+                        <page string="One2many (lines with a file)" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="file" filename="file_name"/>
+                                    <field name="file_name" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="One2many (attachments of the record)" name="attachments">
+                            <field name="attachment_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="mimetype"/>
+                                    <field name="file_size"/>
+                                    <field name="create_date"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_awesome_preview" model="ir.actions.act_window">
+        <field name="name">Preview Lab</field>
+        <field name="res_model">awesome.preview</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_awesome_preview_root" name="Preview Lab" sequence="5" web_icon="mail,static/description/icon.png"
+              action="action_awesome_preview" groups="base.group_user"/>
+</odoo>

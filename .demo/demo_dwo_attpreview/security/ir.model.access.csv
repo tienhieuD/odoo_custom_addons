@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_awesome_preview_user,awesome.preview user,model_awesome_preview,base.group_user,1,1,0,0
+access_awesome_preview_admin,awesome.preview admin,model_awesome_preview,base.group_system,1,1,1,1
+access_awesome_preview_file_user,awesome.preview.file user,model_awesome_preview_file,base.group_user,1,1,1,1
