@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Catalogue service configuration -->
+<config version="2.4">
+  <server host="0.0.0.0" port="8080" workers="4">
+    <tls enabled="true" cert="/etc/ssl/catalogue.pem"/>
+  </server>
+  <database url="postgresql://catalogue@db/catalogue" pool="10"/>
+  <cache ttl="60" backend="redis"><node host="cache1"/><node host="cache2"/></cache>
+  <modules>
+    <module name="base"/>
+    <module name="mail"/>
+    <module name="sale" optional="true"/>
+  </modules>
+  <catalogue>
+      <product sku='NW-0001' price='33.63' stock='141'>Garden chair</product>
+      <product sku='NW-0002' price='276.15' stock='224'>Garden table</product>
+      <product sku='NW-0003' price='38.77' stock='211'>Watering can</product>
+      <product sku='NW-0004' price='166.06' stock='368'>Pruning shears</product>
+      <product sku='NW-0005' price='79.46' stock='430'>Plant pot set</product>
+      <product sku='NW-0006' price='236.77' stock='75'>Solar lantern</product>
+  </catalogue>
+</config>

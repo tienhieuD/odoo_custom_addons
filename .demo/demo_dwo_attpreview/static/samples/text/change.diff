@@ -1,0 +1,48 @@
+diff --git a/catalogue/server.py b/catalogue/server.py
+index 3f2a1c4..9be07d2 100644
+--- a/catalogue/server.py
++++ b/catalogue/server.py
+@@ -12,9 +12,12 @@ from .cache import Cache
+ 
+ 
+ def list_products(page=1, size=50):
+-    rows = db.query("SELECT * FROM product")
+-    return [dict(r) for r in rows]
++    offset = (page - 1) * size
++    rows = db.query("SELECT * FROM product WHERE active ORDER BY name LIMIT %s OFFSET %s", (size, offset))
++    return {"page": page, "size": size, "items": [dict(r) for r in rows]}
+ 
+ 
+ def get_product(product_id):
+@@ -40,7 +43,8 @@ def create_order(payload):
+     if not payload.get("lines"):
+         raise ValueError("an order needs at least one line")
+-    order = Order(**payload)
++    order = Order(**payload, currency="EUR")
++    order.validate_stock()
+     db.save(order)
+     return order.id
+ 
+diff --git a/settings.yaml b/settings.yaml
+index 71d0aa1..a8c33e9 100644
+--- a/settings.yaml
++++ b/settings.yaml
+@@ -1,6 +1,6 @@
+ server:
+   host: 0.0.0.0
+-  port: 8000
++  port: 8080
+   workers: 4
+ cache:
+-  ttl: 30
++  ttl: 60
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index e69de29..4c1d9ab 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -0,0 +1,5 @@
++## 2.4.0
++
++- Paged product list
++- Orders check the stock before they are saved
++- Default port is now 8080

@@ -1,0 +1,595 @@
+{
+  "generated": "2026-11-21T08:00:00Z",
+  "currency": "EUR",
+  "count": 36,
+  "products": [
+    {
+      "id": 1001,
+      "sku": "NW-0001",
+      "name": "Garden chair",
+      "category": "Furniture",
+      "price": 120,
+      "stock": 590,
+      "tags": [
+        "outdoor",
+        "wood"
+      ],
+      "dimensions": {
+        "w": 84,
+        "h": 119
+      },
+      "active": true
+    },
+    {
+      "id": 1002,
+      "sku": "NW-0002",
+      "name": "Garden table",
+      "category": "Furniture",
+      "price": 450,
+      "stock": 785,
+      "tags": [
+        "outdoor"
+      ],
+      "dimensions": {
+        "w": 38,
+        "h": 56
+      },
+      "active": true
+    },
+    {
+      "id": 1003,
+      "sku": "NW-0003",
+      "name": "Watering can",
+      "category": "Tools",
+      "price": 15.5,
+      "stock": 577,
+      "tags": [
+        "metal"
+      ],
+      "dimensions": {
+        "w": 84,
+        "h": 56
+      },
+      "active": true
+    },
+    {
+      "id": 1004,
+      "sku": "NW-0004",
+      "name": "Pruning shears",
+      "category": "Tools",
+      "price": 24,
+      "stock": 781,
+      "tags": [
+        "steel",
+        "grip"
+      ],
+      "dimensions": {
+        "w": 84,
+        "h": 46
+      },
+      "active": true
+    },
+    {
+      "id": 1005,
+      "sku": "NW-0005",
+      "name": "Plant pot set",
+      "category": "Decor",
+      "price": 32,
+      "stock": 714,
+      "tags": [
+        "clay"
+      ],
+      "dimensions": {
+        "w": 68,
+        "h": 45
+      },
+      "active": true
+    },
+    {
+      "id": 1006,
+      "sku": "NW-0006",
+      "name": "Solar lantern",
+      "category": "Decor",
+      "price": 18.9,
+      "stock": 63,
+      "tags": [
+        "solar",
+        "led"
+      ],
+      "dimensions": {
+        "w": 74,
+        "h": 48
+      },
+      "active": true
+    },
+    {
+      "id": 1007,
+      "sku": "NW-0007",
+      "name": "Hose 25 m",
+      "category": "Tools",
+      "price": 39,
+      "stock": 134,
+      "tags": [],
+      "dimensions": {
+        "w": 66,
+        "h": 119
+      },
+      "active": false
+    },
+    {
+      "id": 1008,
+      "sku": "NW-0008",
+      "name": "Raised bed",
+      "category": "Furniture",
+      "price": 89,
+      "stock": 581,
+      "tags": [
+        "wood",
+        "diy"
+      ],
+      "dimensions": {
+        "w": 48,
+        "h": 23
+      },
+      "active": true
+    },
+    {
+      "id": 1009,
+      "sku": "NW-0009",
+      "name": "Compost bin",
+      "category": "Tools",
+      "price": 54,
+      "stock": 143,
+      "tags": [
+        "eco"
+      ],
+      "dimensions": {
+        "w": 69,
+        "h": 11
+      },
+      "active": true
+    },
+    {
+      "id": 1010,
+      "sku": "NW-0010",
+      "name": "Bird feeder",
+      "category": "Decor",
+      "price": 14.2,
+      "stock": 357,
+      "tags": [
+        "wood",
+        "birds"
+      ],
+      "dimensions": {
+        "w": 27,
+        "h": 15
+      },
+      "active": true
+    },
+    {
+      "id": 1011,
+      "sku": "NW-0011",
+      "name": "Wheelbarrow",
+      "category": "Tools",
+      "price": 79,
+      "stock": 878,
+      "tags": [
+        "steel"
+      ],
+      "dimensions": {
+        "w": 87,
+        "h": 68
+      },
+      "active": true
+    },
+    {
+      "id": 1012,
+      "sku": "NW-0012",
+      "name": "Hammock",
+      "category": "Furniture",
+      "price": 65,
+      "stock": 462,
+      "tags": [
+        "outdoor",
+        "cotton"
+      ],
+      "dimensions": {
+        "w": 24,
+        "h": 116
+      },
+      "active": true
+    },
+    {
+      "id": 1013,
+      "sku": "NW-0013",
+      "name": "Garden chair",
+      "category": "Furniture",
+      "price": 120,
+      "stock": 197,
+      "tags": [
+        "outdoor",
+        "wood"
+      ],
+      "dimensions": {
+        "w": 51,
+        "h": 76
+      },
+      "active": true
+    },
+    {
+      "id": 1014,
+      "sku": "NW-0014",
+      "name": "Garden table",
+      "category": "Furniture",
+      "price": 450,
+      "stock": 262,
+      "tags": [
+        "outdoor"
+      ],
+      "dimensions": {
+        "w": 30,
+        "h": 57
+      },
+      "active": false
+    },
+    {
+      "id": 1015,
+      "sku": "NW-0015",
+      "name": "Watering can",
+      "category": "Tools",
+      "price": 15.5,
+      "stock": 606,
+      "tags": [
+        "metal"
+      ],
+      "dimensions": {
+        "w": 60,
+        "h": 78
+      },
+      "active": true
+    },
+    {
+      "id": 1016,
+      "sku": "NW-0016",
+      "name": "Pruning shears",
+      "category": "Tools",
+      "price": 24,
+      "stock": 505,
+      "tags": [
+        "steel",
+        "grip"
+      ],
+      "dimensions": {
+        "w": 15,
+        "h": 30
+      },
+      "active": true
+    },
+    {
+      "id": 1017,
+      "sku": "NW-0017",
+      "name": "Plant pot set",
+      "category": "Decor",
+      "price": 32,
+      "stock": 577,
+      "tags": [
+        "clay"
+      ],
+      "dimensions": {
+        "w": 54,
+        "h": 88
+      },
+      "active": true
+    },
+    {
+      "id": 1018,
+      "sku": "NW-0018",
+      "name": "Solar lantern",
+      "category": "Decor",
+      "price": 18.9,
+      "stock": 391,
+      "tags": [
+        "solar",
+        "led"
+      ],
+      "dimensions": {
+        "w": 88,
+        "h": 90
+      },
+      "active": true
+    },
+    {
+      "id": 1019,
+      "sku": "NW-0019",
+      "name": "Hose 25 m",
+      "category": "Tools",
+      "price": 39,
+      "stock": 76,
+      "tags": [],
+      "dimensions": {
+        "w": 21,
+        "h": 71
+      },
+      "active": true
+    },
+    {
+      "id": 1020,
+      "sku": "NW-0020",
+      "name": "Raised bed",
+      "category": "Furniture",
+      "price": 89,
+      "stock": 124,
+      "tags": [
+        "wood",
+        "diy"
+      ],
+      "dimensions": {
+        "w": 48,
+        "h": 61
+      },
+      "active": true
+    },
+    {
+      "id": 1021,
+      "sku": "NW-0021",
+      "name": "Compost bin",
+      "category": "Tools",
+      "price": 54,
+      "stock": 624,
+      "tags": [
+        "eco"
+      ],
+      "dimensions": {
+        "w": 64,
+        "h": 120
+      },
+      "active": false
+    },
+    {
+      "id": 1022,
+      "sku": "NW-0022",
+      "name": "Bird feeder",
+      "category": "Decor",
+      "price": 14.2,
+      "stock": 615,
+      "tags": [
+        "wood",
+        "birds"
+      ],
+      "dimensions": {
+        "w": 81,
+        "h": 42
+      },
+      "active": true
+    },
+    {
+      "id": 1023,
+      "sku": "NW-0023",
+      "name": "Wheelbarrow",
+      "category": "Tools",
+      "price": 79,
+      "stock": 658,
+      "tags": [
+        "steel"
+      ],
+      "dimensions": {
+        "w": 57,
+        "h": 88
+      },
+      "active": true
+    },
+    {
+      "id": 1024,
+      "sku": "NW-0024",
+      "name": "Hammock",
+      "category": "Furniture",
+      "price": 65,
+      "stock": 729,
+      "tags": [
+        "outdoor",
+        "cotton"
+      ],
+      "dimensions": {
+        "w": 28,
+        "h": 26
+      },
+      "active": true
+    },
+    {
+      "id": 1025,
+      "sku": "NW-0025",
+      "name": "Garden chair",
+      "category": "Furniture",
+      "price": 120,
+      "stock": 40,
+      "tags": [
+        "outdoor",
+        "wood"
+      ],
+      "dimensions": {
+        "w": 17,
+        "h": 47
+      },
+      "active": true
+    },
+    {
+      "id": 1026,
+      "sku": "NW-0026",
+      "name": "Garden table",
+      "category": "Furniture",
+      "price": 450,
+      "stock": 3,
+      "tags": [
+        "outdoor"
+      ],
+      "dimensions": {
+        "w": 36,
+        "h": 104
+      },
+      "active": true
+    },
+    {
+      "id": 1027,
+      "sku": "NW-0027",
+      "name": "Watering can",
+      "category": "Tools",
+      "price": 15.5,
+      "stock": 596,
+      "tags": [
+        "metal"
+      ],
+      "dimensions": {
+        "w": 58,
+        "h": 59
+      },
+      "active": true
+    },
+    {
+      "id": 1028,
+      "sku": "NW-0028",
+      "name": "Pruning shears",
+      "category": "Tools",
+      "price": 24,
+      "stock": 64,
+      "tags": [
+        "steel",
+        "grip"
+      ],
+      "dimensions": {
+        "w": 10,
+        "h": 61
+      },
+      "active": false
+    },
+    {
+      "id": 1029,
+      "sku": "NW-0029",
+      "name": "Plant pot set",
+      "category": "Decor",
+      "price": 32,
+      "stock": 867,
+      "tags": [
+        "clay"
+      ],
+      "dimensions": {
+        "w": 42,
+        "h": 60
+      },
+      "active": true
+    },
+    {
+      "id": 1030,
+      "sku": "NW-0030",
+      "name": "Solar lantern",
+      "category": "Decor",
+      "price": 18.9,
+      "stock": 776,
+      "tags": [
+        "solar",
+        "led"
+      ],
+      "dimensions": {
+        "w": 71,
+        "h": 73
+      },
+      "active": true
+    },
+    {
+      "id": 1031,
+      "sku": "NW-0031",
+      "name": "Hose 25 m",
+      "category": "Tools",
+      "price": 39,
+      "stock": 478,
+      "tags": [],
+      "dimensions": {
+        "w": 47,
+        "h": 75
+      },
+      "active": true
+    },
+    {
+      "id": 1032,
+      "sku": "NW-0032",
+      "name": "Raised bed",
+      "category": "Furniture",
+      "price": 89,
+      "stock": 768,
+      "tags": [
+        "wood",
+        "diy"
+      ],
+      "dimensions": {
+        "w": 30,
+        "h": 41
+      },
+      "active": true
+    },
+    {
+      "id": 1033,
+      "sku": "NW-0033",
+      "name": "Compost bin",
+      "category": "Tools",
+      "price": 54,
+      "stock": 590,
+      "tags": [
+        "eco"
+      ],
+      "dimensions": {
+        "w": 55,
+        "h": 42
+      },
+      "active": true
+    },
+    {
+      "id": 1034,
+      "sku": "NW-0034",
+      "name": "Bird feeder",
+      "category": "Decor",
+      "price": 14.2,
+      "stock": 630,
+      "tags": [
+        "wood",
+        "birds"
+      ],
+      "dimensions": {
+        "w": 89,
+        "h": 33
+      },
+      "active": true
+    },
+    {
+      "id": 1035,
+      "sku": "NW-0035",
+      "name": "Wheelbarrow",
+      "category": "Tools",
+      "price": 79,
+      "stock": 656,
+      "tags": [
+        "steel"
+      ],
+      "dimensions": {
+        "w": 74,
+        "h": 95
+      },
+      "active": false
+    },
+    {
+      "id": 1036,
+      "sku": "NW-0036",
+      "name": "Hammock",
+      "category": "Furniture",
+      "price": 65,
+      "stock": 805,
+      "tags": [
+        "outdoor",
+        "cotton"
+      ],
+      "dimensions": {
+        "w": 15,
+        "h": 29
+      },
+      "active": true
+    }
+  ]
+}

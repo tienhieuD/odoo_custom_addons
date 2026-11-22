@@ -4,17 +4,14 @@ kind of file field (binary, many2one, many2many, one2many lines) and in the chat
 
 Every sample is English (see tools/make_samples.py for how the files were built)."""
 import base64
-import json
-import struct
-import zlib
 
 from odoo.tools import file_open
 
 # (record name, module, what to try, [file in static/samples], None = the text files made below)
 LAB = [
     ("Core: PDF, images, video, audio", "dwo_attpreview_core",
-     "PDF and images open in a large dialog. Add a video or an audio file of your own to try them too.",
-     ["sample.pdf", "sample.png"]),
+     "A 3-page PDF report, a photo, a video and an audio file open in a large dialog.",
+     ["sample.pdf", "sample.png", "sample.mp4", "sample.mp3"]),
     ("Text and code", "dwo_attpreview_text",
      "Raw text with colours, Markdown, JSON, XML and YAML trees, logs and diffs.", None),
     ("Office documents", "dwo_attpreview_office",
@@ -43,64 +40,16 @@ def _read(name):
 
 
 def _text_files():
-    data = {"name": "Demo", "items": [{"id": 1, "tags": ["a", "b"]}, {"id": 2, "tags": []}], "ok": True}
-    return [
-        ("README.md", b"# Project notes\n\nThis is **Markdown**, rendered by the text preview.\n\n"
-                      b"- First item\n- Second item\n\n```python\nprint('hello')\n```\n"),
-        ("data.json", json.dumps(data, indent=2).encode()),
-        ("config.xml", b"<?xml version='1.0'?>\n<config>\n  <server host='localhost' port='8069'/>\n"
-                       b"  <modules><module name='base'/><module name='mail'/></modules>\n</config>\n"),
-        ("settings.yaml", b"server:\n  host: localhost\n  port: 8069\nmodules:\n  - base\n  - mail\n"),
-        ("script.py", b"def total(lines):\n    \"\"\"Sum the amounts.\"\"\"\n    return sum(l['amount'] for l in lines)\n"),
-        ("page.html", b"<h1>Hello</h1><p>A <b>simple</b> page.</p>"),
-        ("server.log", b"2026-11-21 08:00:01 INFO  started\n2026-11-21 08:00:05 WARN  slow query (1.2 s)\n"
-                       b"2026-11-21 08:00:09 ERROR connection reset by peer\n"),
-        ("change.diff", b"--- a/app.py\n+++ b/app.py\n@@ -1,3 +1,3 @@\n def run():\n-    return 1\n+    return 2\n"),
-    ]
-
-
-def _png():
-    """A small PNG made on the fly (a gradient), so no binary image is stored in the repository."""
-    width, height = 320, 200
-    rows = b"".join(b"\x00" + b"".join(bytes((x * 255 // width, y * 255 // height, 160)) for x in range(width))
-                    for y in range(height))
-
-    def chunk(kind, data):
-        body = kind + data
-        return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body))
-
-    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
-            + chunk(b"IDAT", zlib.compress(rows)) + chunk(b"IEND", b""))
-
-
-def _pdf():
-    """A one-page PDF with a line of text."""
-    stream = b"BT /F1 18 Tf 20 70 Td (Sample PDF for the preview) Tj ET"
-    objs = [
-        b"<< /Type /Catalog /Pages 2 0 R >>",
-        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 144] /Contents 4 0 R "
-        b"/Resources << /Font << /F1 5 0 R >> >> >>",
-        b"<< /Length %d >>\nstream\n%s\nendstream" % (len(stream), stream),
-        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-    ]
-    out, offsets = b"%PDF-1.4\n", []
-    for number, body in enumerate(objs, 1):
-        offsets.append(len(out))
-        out += b"%d 0 obj\n%s\nendobj\n" % (number, body)
-    xref = len(out)
-    out += b"xref\n0 %d\n0000000000 65535 f \n" % (len(objs) + 1)
-    out += b"".join(b"%010d 00000 n \n" % off for off in offsets)
-    return out + b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (len(objs) + 1, xref)
+    """Longer, realistic text, code, log and diff files (tools/make_rich_samples.py)."""
+    names = ["README.md", "data.json", "config.xml", "settings.yaml", "script.py", "page.html", "server.log", "change.diff"]
+    return [(n, _read("text/" + n)) for n in names]
 
 
 def post_init_hook(env):
     Lab, Attachment = env["awesome.preview"], env["ir.attachment"]
-    generated = {"sample.png": _png, "sample.pdf": _pdf}
-
     for sequence, (name, module, note, names) in enumerate(LAB, 1):
         files = _text_files() if names is None else [
-            (f, generated[f]() if f in generated else _read(f)) for f in names]
+            (f, _read(f)) for f in names]
         rec = Lab.create({"name": name, "sequence": sequence * 10, "module_name": module, "description": note})
         atts = Attachment.browse()
         for filename, raw in files:

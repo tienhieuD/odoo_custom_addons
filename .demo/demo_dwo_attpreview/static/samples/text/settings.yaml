@@ -1,0 +1,30 @@
+# Catalogue service settings
+server:
+  host: 0.0.0.0
+  port: 8080
+  workers: 4
+  tls:
+    enabled: true
+    cert: /etc/ssl/catalogue.pem
+database:
+  url: postgresql://catalogue@db/catalogue
+  pool: 10
+cache:
+  ttl: 60
+  nodes:
+    - host: cache1
+      port: 6379
+    - host: cache2
+      port: 6379
+logging:
+  level: INFO
+  handlers: [console, file]
+  file: /var/log/catalogue/server.log
+modules:
+  - base
+  - mail
+  - sale
+features:
+  search: true
+  recommendations: false
+  tax_included: true

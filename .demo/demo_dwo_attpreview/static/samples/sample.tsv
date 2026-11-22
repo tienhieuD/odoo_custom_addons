@@ -1,6 +1,241 @@
-Order	Customer	Product	Quantity	Amount
-SO-1001	Northwind Traders	Garden chair	4	480
-SO-1002	Contoso Ltd	Watering can	20	300
-SO-1003	Globex Corporation	Solar lantern	12	216
-SO-1004	Initech	Plant pot set	6	192
-SO-1005	Umbrella Supplies	Pruning shears	9	216
+Order	Date	Customer	Product	Quantity	Amount	Status
+SO-1001	2026-09-15	Wayne Outdoor	Raised bed	27	2403.00	Open
+SO-1002	2026-02-13	Stark Garden	Solar lantern	13	245.70	Paid
+SO-1003	2026-10-13	Contoso Ltd	Compost bin	1	54.00	Late
+SO-1004	2026-01-25	Contoso Ltd	Compost bin	24	1296.00	Late
+SO-1005	2026-06-11	Northwind Traders	Raised bed	14	1246.00	Open
+SO-1006	2026-03-21	Globex Corporation	Pruning shears	26	624.00	Late
+SO-1007	2026-01-02	Globex Corporation	Compost bin	30	1620.00	Paid
+SO-1008	2026-01-15	Contoso Ltd	Hose 25 m	30	1170.00	Late
+SO-1009	2026-10-18	Hooli	Garden chair	4	480.00	Open
+SO-1010	2026-07-03	Umbrella Supplies	Compost bin	1	54.00	Paid
+SO-1011	2026-09-05	Umbrella Supplies	Watering can	7	108.50	Paid
+SO-1012	2026-05-11	Hooli	Raised bed	11	979.00	Paid
+SO-1013	2026-06-12	Contoso Ltd	Hose 25 m	11	429.00	Open
+SO-1014	2026-09-11	Stark Garden	Pruning shears	30	720.00	Late
+SO-1015	2026-06-20	Stark Garden	Watering can	28	434.00	Open
+SO-1016	2026-11-07	Hooli	Solar lantern	22	415.80	Paid
+SO-1017	2026-09-21	Initech	Pruning shears	16	384.00	Open
+SO-1018	2026-03-28	Umbrella Supplies	Hose 25 m	12	468.00	Late
+SO-1019	2026-03-21	Wayne Outdoor	Plant pot set	20	640.00	Open
+SO-1020	2026-06-05	Stark Garden	Watering can	7	108.50	Paid
+SO-1021	2026-08-18	Hooli	Garden chair	15	1800.00	Paid
+SO-1022	2026-10-03	Globex Corporation	Compost bin	1	54.00	Open
+SO-1023	2026-08-01	Stark Garden	Compost bin	27	1458.00	Open
+SO-1024	2026-05-14	Northwind Traders	Plant pot set	15	480.00	Paid
+SO-1025	2026-10-24	Globex Corporation	Plant pot set	30	960.00	Open
+SO-1026	2026-04-11	Globex Corporation	Raised bed	28	2492.00	Paid
+SO-1027	2026-05-14	Wayne Outdoor	Raised bed	16	1424.00	Paid
+SO-1028	2026-11-16	Globex Corporation	Watering can	18	279.00	Late
+SO-1029	2026-03-09	Northwind Traders	Pruning shears	4	96.00	Open
+SO-1030	2026-06-16	Contoso Ltd	Watering can	7	108.50	Paid
+SO-1031	2026-10-20	Hooli	Watering can	17	263.50	Paid
+SO-1032	2026-09-12	Hooli	Pruning shears	16	384.00	Paid
+SO-1033	2026-01-25	Globex Corporation	Solar lantern	2	37.80	Paid
+SO-1034	2026-04-02	Initech	Garden chair	30	3600.00	Open
+SO-1035	2026-03-04	Contoso Ltd	Hose 25 m	2	78.00	Paid
+SO-1036	2026-07-05	Northwind Traders	Solar lantern	16	302.40	Paid
+SO-1037	2026-07-10	Stark Garden	Watering can	24	372.00	Paid
+SO-1038	2026-04-17	Stark Garden	Hose 25 m	28	1092.00	Late
+SO-1039	2026-08-11	Wayne Outdoor	Compost bin	15	810.00	Paid
+SO-1040	2026-06-02	Stark Garden	Watering can	21	325.50	Paid
+SO-1041	2026-10-02	Umbrella Supplies	Pruning shears	29	696.00	Late
+SO-1042	2026-03-05	Contoso Ltd	Garden chair	15	1800.00	Open
+SO-1043	2026-07-14	Contoso Ltd	Plant pot set	12	384.00	Late
+SO-1044	2026-07-20	Initech	Pruning shears	6	144.00	Paid
+SO-1045	2026-02-27	Hooli	Watering can	10	155.00	Open
+SO-1046	2026-03-05	Wayne Outdoor	Raised bed	27	2403.00	Late
+SO-1047	2026-10-25	Hooli	Plant pot set	20	640.00	Paid
+SO-1048	2026-11-16	Umbrella Supplies	Garden chair	8	960.00	Open
+SO-1049	2026-09-17	Umbrella Supplies	Hose 25 m	20	780.00	Open
+SO-1050	2026-03-13	Initech	Pruning shears	11	264.00	Late
+SO-1051	2026-03-08	Umbrella Supplies	Watering can	8	124.00	Open
+SO-1052	2026-08-13	Stark Garden	Garden chair	8	960.00	Paid
+SO-1053	2026-04-09	Initech	Solar lantern	9	170.10	Open
+SO-1054	2026-05-06	Contoso Ltd	Pruning shears	3	72.00	Paid
+SO-1055	2026-10-24	Umbrella Supplies	Compost bin	15	810.00	Paid
+SO-1056	2026-04-05	Wayne Outdoor	Hose 25 m	6	234.00	Late
+SO-1057	2026-11-26	Contoso Ltd	Watering can	12	186.00	Paid
+SO-1058	2026-11-04	Globex Corporation	Pruning shears	3	72.00	Paid
+SO-1059	2026-01-08	Umbrella Supplies	Compost bin	15	810.00	Late
+SO-1060	2026-09-17	Stark Garden	Garden chair	7	840.00	Paid
+SO-1061	2026-05-13	Wayne Outdoor	Hose 25 m	7	273.00	Open
+SO-1062	2026-02-13	Stark Garden	Hose 25 m	8	312.00	Late
+SO-1063	2026-02-25	Globex Corporation	Garden chair	27	3240.00	Open
+SO-1064	2026-03-21	Hooli	Watering can	13	201.50	Late
+SO-1065	2026-03-18	Umbrella Supplies	Watering can	28	434.00	Paid
+SO-1066	2026-01-10	Globex Corporation	Plant pot set	21	672.00	Paid
+SO-1067	2026-09-07	Umbrella Supplies	Hose 25 m	14	546.00	Late
+SO-1068	2026-01-08	Wayne Outdoor	Plant pot set	19	608.00	Paid
+SO-1069	2026-02-13	Initech	Watering can	4	62.00	Late
+SO-1070	2026-06-07	Northwind Traders	Compost bin	30	1620.00	Paid
+SO-1071	2026-10-25	Umbrella Supplies	Garden chair	6	720.00	Paid
+SO-1072	2026-05-01	Contoso Ltd	Pruning shears	9	216.00	Open
+SO-1073	2026-01-08	Initech	Hose 25 m	6	234.00	Open
+SO-1074	2026-11-17	Stark Garden	Plant pot set	8	256.00	Open
+SO-1075	2026-08-26	Contoso Ltd	Pruning shears	10	240.00	Paid
+SO-1076	2026-06-19	Contoso Ltd	Compost bin	25	1350.00	Paid
+SO-1077	2026-05-26	Contoso Ltd	Raised bed	27	2403.00	Paid
+SO-1078	2026-10-16	Wayne Outdoor	Pruning shears	9	216.00	Late
+SO-1079	2026-11-12	Umbrella Supplies	Pruning shears	3	72.00	Late
+SO-1080	2026-11-03	Wayne Outdoor	Compost bin	18	972.00	Open
+SO-1081	2026-03-15	Contoso Ltd	Solar lantern	10	189.00	Late
+SO-1082	2026-07-01	Wayne Outdoor	Garden chair	12	1440.00	Paid
+SO-1083	2026-02-16	Initech	Compost bin	21	1134.00	Paid
+SO-1084	2026-11-08	Umbrella Supplies	Hose 25 m	12	468.00	Open
+SO-1085	2026-04-20	Globex Corporation	Raised bed	27	2403.00	Paid
+SO-1086	2026-10-16	Wayne Outdoor	Plant pot set	17	544.00	Open
+SO-1087	2026-09-15	Northwind Traders	Pruning shears	11	264.00	Open
+SO-1088	2026-07-18	Northwind Traders	Pruning shears	8	192.00	Late
+SO-1089	2026-02-15	Initech	Garden chair	21	2520.00	Open
+SO-1090	2026-07-23	Globex Corporation	Compost bin	5	270.00	Paid
+SO-1091	2026-11-03	Northwind Traders	Hose 25 m	4	156.00	Late
+SO-1092	2026-10-12	Initech	Hose 25 m	22	858.00	Late
+SO-1093	2026-01-03	Contoso Ltd	Watering can	30	465.00	Paid
+SO-1094	2026-11-20	Initech	Raised bed	2	178.00	Paid
+SO-1095	2026-05-04	Globex Corporation	Pruning shears	15	360.00	Open
+SO-1096	2026-10-14	Wayne Outdoor	Compost bin	26	1404.00	Late
+SO-1097	2026-01-10	Umbrella Supplies	Raised bed	17	1513.00	Late
+SO-1098	2026-04-11	Stark Garden	Raised bed	19	1691.00	Open
+SO-1099	2026-09-18	Wayne Outdoor	Plant pot set	28	896.00	Late
+SO-1100	2026-01-25	Initech	Watering can	2	31.00	Open
+SO-1101	2026-09-04	Initech	Plant pot set	7	224.00	Paid
+SO-1102	2026-01-28	Contoso Ltd	Raised bed	30	2670.00	Late
+SO-1103	2026-11-02	Contoso Ltd	Garden chair	5	600.00	Paid
+SO-1104	2026-08-24	Wayne Outdoor	Compost bin	1	54.00	Paid
+SO-1105	2026-03-04	Globex Corporation	Hose 25 m	1	39.00	Open
+SO-1106	2026-04-01	Wayne Outdoor	Compost bin	11	594.00	Open
+SO-1107	2026-03-07	Stark Garden	Watering can	21	325.50	Paid
+SO-1108	2026-10-04	Stark Garden	Raised bed	3	267.00	Late
+SO-1109	2026-04-19	Umbrella Supplies	Compost bin	15	810.00	Late
+SO-1110	2026-05-03	Umbrella Supplies	Hose 25 m	8	312.00	Late
+SO-1111	2026-10-12	Stark Garden	Pruning shears	1	24.00	Late
+SO-1112	2026-04-01	Initech	Solar lantern	11	207.90	Open
+SO-1113	2026-02-10	Initech	Pruning shears	30	720.00	Late
+SO-1114	2026-04-11	Wayne Outdoor	Watering can	4	62.00	Paid
+SO-1115	2026-10-05	Wayne Outdoor	Plant pot set	9	288.00	Open
+SO-1116	2026-04-27	Initech	Plant pot set	2	64.00	Paid
+SO-1117	2026-06-05	Initech	Watering can	27	418.50	Paid
+SO-1118	2026-01-18	Northwind Traders	Raised bed	2	178.00	Open
+SO-1119	2026-05-22	Northwind Traders	Solar lantern	15	283.50	Paid
+SO-1120	2026-11-21	Northwind Traders	Hose 25 m	16	624.00	Late
+SO-1121	2026-01-14	Northwind Traders	Plant pot set	13	416.00	Paid
+SO-1122	2026-09-12	Contoso Ltd	Compost bin	13	702.00	Open
+SO-1123	2026-09-01	Initech	Plant pot set	22	704.00	Paid
+SO-1124	2026-10-12	Contoso Ltd	Raised bed	8	712.00	Late
+SO-1125	2026-01-12	Contoso Ltd	Plant pot set	15	480.00	Paid
+SO-1126	2026-09-01	Wayne Outdoor	Pruning shears	14	336.00	Paid
+SO-1127	2026-09-09	Contoso Ltd	Compost bin	20	1080.00	Late
+SO-1128	2026-06-24	Contoso Ltd	Watering can	1	15.50	Paid
+SO-1129	2026-10-17	Northwind Traders	Solar lantern	3	56.70	Open
+SO-1130	2026-05-24	Northwind Traders	Watering can	14	217.00	Open
+SO-1131	2026-09-13	Hooli	Garden chair	1	120.00	Open
+SO-1132	2026-02-18	Wayne Outdoor	Solar lantern	16	302.40	Late
+SO-1133	2026-03-06	Globex Corporation	Compost bin	6	324.00	Late
+SO-1134	2026-07-06	Stark Garden	Watering can	16	248.00	Late
+SO-1135	2026-10-21	Stark Garden	Hose 25 m	1	39.00	Late
+SO-1136	2026-02-20	Globex Corporation	Compost bin	3	162.00	Paid
+SO-1137	2026-08-04	Globex Corporation	Raised bed	21	1869.00	Paid
+SO-1138	2026-02-02	Globex Corporation	Watering can	8	124.00	Paid
+SO-1139	2026-07-07	Northwind Traders	Solar lantern	7	132.30	Paid
+SO-1140	2026-09-18	Umbrella Supplies	Pruning shears	25	600.00	Open
+SO-1141	2026-07-19	Initech	Plant pot set	10	320.00	Open
+SO-1142	2026-04-12	Globex Corporation	Compost bin	21	1134.00	Paid
+SO-1143	2026-01-17	Umbrella Supplies	Raised bed	29	2581.00	Paid
+SO-1144	2026-02-07	Umbrella Supplies	Garden chair	5	600.00	Late
+SO-1145	2026-05-27	Hooli	Garden chair	19	2280.00	Paid
+SO-1146	2026-11-12	Wayne Outdoor	Garden chair	4	480.00	Paid
+SO-1147	2026-05-15	Wayne Outdoor	Watering can	27	418.50	Paid
+SO-1148	2026-09-08	Globex Corporation	Hose 25 m	2	78.00	Open
+SO-1149	2026-01-04	Contoso Ltd	Solar lantern	23	434.70	Open
+SO-1150	2026-10-07	Umbrella Supplies	Watering can	23	356.50	Late
+SO-1151	2026-05-04	Initech	Compost bin	15	810.00	Paid
+SO-1152	2026-10-05	Contoso Ltd	Hose 25 m	4	156.00	Paid
+SO-1153	2026-09-18	Initech	Hose 25 m	16	624.00	Late
+SO-1154	2026-06-06	Globex Corporation	Solar lantern	16	302.40	Late
+SO-1155	2026-02-08	Umbrella Supplies	Plant pot set	8	256.00	Open
+SO-1156	2026-08-13	Umbrella Supplies	Solar lantern	15	283.50	Late
+SO-1157	2026-05-05	Northwind Traders	Compost bin	24	1296.00	Paid
+SO-1158	2026-05-07	Stark Garden	Solar lantern	13	245.70	Paid
+SO-1159	2026-11-21	Wayne Outdoor	Solar lantern	24	453.60	Paid
+SO-1160	2026-05-02	Hooli	Raised bed	15	1335.00	Paid
+SO-1161	2026-09-01	Wayne Outdoor	Compost bin	16	864.00	Late
+SO-1162	2026-10-25	Globex Corporation	Compost bin	14	756.00	Paid
+SO-1163	2026-02-04	Hooli	Solar lantern	4	75.60	Open
+SO-1164	2026-05-18	Hooli	Solar lantern	12	226.80	Late
+SO-1165	2026-07-04	Hooli	Compost bin	1	54.00	Paid
+SO-1166	2026-11-11	Stark Garden	Solar lantern	19	359.10	Late
+SO-1167	2026-05-22	Hooli	Compost bin	2	108.00	Paid
+SO-1168	2026-09-16	Northwind Traders	Watering can	26	403.00	Open
+SO-1169	2026-08-22	Hooli	Plant pot set	17	544.00	Paid
+SO-1170	2026-10-26	Stark Garden	Pruning shears	6	144.00	Open
+SO-1171	2026-03-27	Globex Corporation	Solar lantern	15	283.50	Open
+SO-1172	2026-06-19	Contoso Ltd	Pruning shears	8	192.00	Open
+SO-1173	2026-11-02	Umbrella Supplies	Hose 25 m	13	507.00	Open
+SO-1174	2026-06-05	Stark Garden	Solar lantern	17	321.30	Open
+SO-1175	2026-08-11	Globex Corporation	Hose 25 m	10	390.00	Paid
+SO-1176	2026-11-20	Northwind Traders	Plant pot set	5	160.00	Paid
+SO-1177	2026-04-19	Stark Garden	Watering can	21	325.50	Paid
+SO-1178	2026-03-25	Globex Corporation	Hose 25 m	8	312.00	Paid
+SO-1179	2026-11-04	Hooli	Compost bin	28	1512.00	Paid
+SO-1180	2026-04-18	Wayne Outdoor	Garden chair	10	1200.00	Paid
+SO-1181	2026-06-12	Umbrella Supplies	Compost bin	9	486.00	Open
+SO-1182	2026-03-22	Umbrella Supplies	Pruning shears	6	144.00	Paid
+SO-1183	2026-07-18	Initech	Compost bin	4	216.00	Paid
+SO-1184	2026-11-08	Stark Garden	Solar lantern	1	18.90	Open
+SO-1185	2026-10-10	Wayne Outdoor	Pruning shears	23	552.00	Late
+SO-1186	2026-03-12	Initech	Compost bin	3	162.00	Late
+SO-1187	2026-02-11	Hooli	Pruning shears	26	624.00	Paid
+SO-1188	2026-04-27	Stark Garden	Compost bin	3	162.00	Late
+SO-1189	2026-04-24	Wayne Outdoor	Solar lantern	29	548.10	Paid
+SO-1190	2026-01-04	Northwind Traders	Plant pot set	20	640.00	Paid
+SO-1191	2026-10-07	Globex Corporation	Raised bed	9	801.00	Paid
+SO-1192	2026-03-20	Initech	Plant pot set	19	608.00	Paid
+SO-1193	2026-01-18	Contoso Ltd	Garden chair	18	2160.00	Paid
+SO-1194	2026-08-01	Hooli	Plant pot set	20	640.00	Paid
+SO-1195	2026-09-04	Umbrella Supplies	Compost bin	2	108.00	Open
+SO-1196	2026-01-05	Initech	Hose 25 m	13	507.00	Paid
+SO-1197	2026-05-24	Wayne Outdoor	Raised bed	20	1780.00	Paid
+SO-1198	2026-02-08	Initech	Plant pot set	1	32.00	Paid
+SO-1199	2026-02-22	Northwind Traders	Plant pot set	6	192.00	Open
+SO-1200	2026-11-08	Globex Corporation	Garden chair	8	960.00	Paid
+SO-1201	2026-02-15	Hooli	Plant pot set	10	320.00	Paid
+SO-1202	2026-03-22	Northwind Traders	Compost bin	4	216.00	Paid
+SO-1203	2026-02-27	Contoso Ltd	Watering can	23	356.50	Open
+SO-1204	2026-07-26	Northwind Traders	Watering can	24	372.00	Paid
+SO-1205	2026-08-21	Initech	Hose 25 m	22	858.00	Open
+SO-1206	2026-10-20	Stark Garden	Watering can	19	294.50	Paid
+SO-1207	2026-03-17	Contoso Ltd	Watering can	12	186.00	Open
+SO-1208	2026-09-11	Initech	Hose 25 m	29	1131.00	Paid
+SO-1209	2026-05-07	Umbrella Supplies	Hose 25 m	12	468.00	Paid
+SO-1210	2026-09-10	Northwind Traders	Raised bed	2	178.00	Late
+SO-1211	2026-02-09	Umbrella Supplies	Plant pot set	3	96.00	Paid
+SO-1212	2026-01-08	Contoso Ltd	Compost bin	2	108.00	Open
+SO-1213	2026-06-23	Contoso Ltd	Garden chair	24	2880.00	Paid
+SO-1214	2026-08-27	Northwind Traders	Solar lantern	4	75.60	Late
+SO-1215	2026-09-17	Initech	Raised bed	23	2047.00	Paid
+SO-1216	2026-01-20	Umbrella Supplies	Compost bin	18	972.00	Open
+SO-1217	2026-10-15	Globex Corporation	Garden chair	24	2880.00	Paid
+SO-1218	2026-08-07	Initech	Hose 25 m	25	975.00	Paid
+SO-1219	2026-07-15	Hooli	Solar lantern	20	378.00	Late
+SO-1220	2026-09-13	Umbrella Supplies	Solar lantern	8	151.20	Paid
+SO-1221	2026-04-18	Umbrella Supplies	Raised bed	26	2314.00	Paid
+SO-1222	2026-09-04	Umbrella Supplies	Compost bin	30	1620.00	Open
+SO-1223	2026-11-25	Stark Garden	Plant pot set	26	832.00	Late
+SO-1224	2026-08-07	Wayne Outdoor	Solar lantern	25	472.50	Paid
+SO-1225	2026-03-03	Contoso Ltd	Hose 25 m	2	78.00	Late
+SO-1226	2026-02-23	Umbrella Supplies	Raised bed	24	2136.00	Open
+SO-1227	2026-01-07	Contoso Ltd	Pruning shears	28	672.00	Paid
+SO-1228	2026-01-26	Initech	Plant pot set	3	96.00	Paid
+SO-1229	2026-08-27	Globex Corporation	Compost bin	16	864.00	Paid
+SO-1230	2026-02-05	Contoso Ltd	Hose 25 m	28	1092.00	Paid
+SO-1231	2026-10-15	Wayne Outdoor	Plant pot set	30	960.00	Open
+SO-1232	2026-09-02	Stark Garden	Watering can	28	434.00	Paid
+SO-1233	2026-01-26	Initech	Raised bed	20	1780.00	Paid
+SO-1234	2026-10-02	Initech	Raised bed	26	2314.00	Late
+SO-1235	2026-09-05	Initech	Plant pot set	30	960.00	Open
+SO-1236	2026-02-16	Contoso Ltd	Watering can	24	372.00	Paid
+SO-1237	2026-10-07	Hooli	Solar lantern	22	415.80	Paid
+SO-1238	2026-03-27	Initech	Raised bed	23	2047.00	Late
+SO-1239	2026-03-17	Initech	Garden chair	26	3120.00	Paid
+SO-1240	2026-11-27	Globex Corporation	Watering can	24	372.00	Paid
