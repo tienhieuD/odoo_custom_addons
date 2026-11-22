@@ -193,3 +193,15 @@ class TestLoginPage(HttpCase):
         self.assertGreaterEqual(len(data.LAYOUTS), 12)
         for key, _label in data.LAYOUTS:
             self.assertIn('data-value="%s"' % key, scss)
+
+    def test_13_dark_card_class(self):
+        """A dark card colour (the Midnight preset) puts a class on the page so the fields and buttons turn dark too."""
+        self.assertTrue(tools.is_dark_color("#1B1E2B"))
+        self.assertTrue(tools.is_dark_color("#000"))
+        self.assertFalse(tools.is_dark_color("#FFFFFF"))
+        self.assertFalse(tools.is_dark_color("#E9ECEF"))
+        self.assertFalse(tools.is_dark_color("red"))  # not a hex colour: never dark
+        self.set(enabled="1", layout="card", card_bg="#1B1E2B")
+        self.assertIn("dwo_card_dark", self.page())
+        self.set(card_bg="#FFFFFF")
+        self.assertNotIn("dwo_card_dark", self.page())

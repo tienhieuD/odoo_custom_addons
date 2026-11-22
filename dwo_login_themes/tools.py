@@ -162,6 +162,21 @@ def safe_color(value, default):
     return value if HEX_COLOR.match(value) else default
 
 
+def is_dark_color(value):
+    """True when a ``#rgb`` / ``#rrggbb`` colour is dark (relative luminance under 0.4); False for anything else."""
+    value = (value or "").strip()
+    if not HEX_COLOR.match(value):
+        return False
+    hexa = value[1:]
+    if len(hexa) == 3:
+        hexa = "".join(ch * 2 for ch in hexa)
+    channels = []
+    for i in (0, 2, 4):
+        c = int(hexa[i:i + 2], 16) / 255.0
+        channels.append(c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2] < 0.4
+
+
 def clamp_int(value, low, high, default):
     try:
         number = int(value)
