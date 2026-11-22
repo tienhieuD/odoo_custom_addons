@@ -63,10 +63,10 @@
 //   background-color: #ccc !important;
 // }
 
-// A list (x2many without a label) in a half-width group of a form: the grid cell takes the width of the whole table,
-// the page grows sideways and the half list is cut. The cell may shrink and spans the group, so the list keeps its
+// A list (x2many) without a label in a half-width group of a form: the grid track took the width of the whole table,
+// the group grew sideways and the half list was cut. The cell may shrink and spans the group, so the list keeps its
 // own horizontal scrollbar (overflow auto of its renderer) inside the group.
-.o_inner_group > .o_cell:has(> :is(.o_field_one2many, .o_field_many2many)):not(.o_wrap_label + .o_cell) {
+.o_inner_group .o_cell:has(> :is(.o_field_one2many, .o_field_many2many)):not(.o_wrap_label + .o_cell, .o_wrap_label + .o_wrap_field > .o_cell) {
   min-width: 0;
   grid-column: 1 / -1;
 }
