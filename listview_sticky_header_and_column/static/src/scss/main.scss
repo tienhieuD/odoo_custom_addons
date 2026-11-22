@@ -45,3 +45,16 @@
     z-index: 2;
   }
 }
+
+// A list (x2many) in a half-width group of a form: the table cell took the width of the whole list and pushed it out
+// of the sheet. A fixed layout lets the group keep its width, and the list scrolls inside it.
+.o_form_view .o_inner_group.o_group_col_6:has(.o_field_x2many_list) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.o_form_view .o_inner_group.o_group_col_6 .o_field_x2many_list {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
