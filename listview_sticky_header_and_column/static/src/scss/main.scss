@@ -62,3 +62,9 @@
 // .o_content .table-responsive tr.o_data_row:focus-within td {
 //   background-color: #ccc !important;
 // }
+
+// A list (x2many) in a half-width group of a form: its table is wider than the group and made the whole page scroll
+// sideways. The group clips what goes beyond it (only sideways), the list keeps its own scrollbar.
+.o_inner_group:has(.o_field_one2many, .o_field_many2many) {
+  overflow-x: clip;
+}
