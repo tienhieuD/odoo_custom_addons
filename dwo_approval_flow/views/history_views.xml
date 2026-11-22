@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_dwo_approval_history_form" model="ir.ui.view">
+        <field name="name">dwo.approval.history.form</field>
+        <field name="model">dwo.approval.history</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <group>
+                    <group>
+                        <field name="record_name" string="Document"/>
+                        <field name="flow_name" string="Approval flow"/>
+                    </group>
+                    <group>
+                        <field name="current_state" string="Current step"/>
+                    </group>
+                </group>
+                <field name="line_ids" nolabel="1">
+                    <tree>
+                        <field name="date"/>
+                        <field name="user_id"/>
+                        <field name="button"/>
+                        <field name="from_name" string="From"/>
+                        <field name="to_name" string="To"/>
+                        <field name="votes"/>
+                        <field name="reason"/>
+                        <field name="kind" invisible="1"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- A ready-made server action: bind it to a model, or use it as the action of a button or a menu. -->
+    <record id="server_action_dwo_approval_history" model="ir.actions.server">
+        <field name="name">Approval history</field>
+        <field name="model_id" ref="model_dwo_approval_flow"/>
+        <field name="state">code</field>
+        <field name="code">action = env['dwo.approval.flow'].action_history(env.context.get('active_model'), env.context.get('active_ids') or ([env.context.get('active_id')] if env.context.get('active_id') else []))</field>
+    </record>
+</odoo>
