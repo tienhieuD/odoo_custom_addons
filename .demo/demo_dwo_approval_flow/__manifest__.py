@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Demo: Dynamic Approval Workflow",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.2.0",
     "summary": "Demo users, purchase orders and a ready-made approval flow for dwo_approval_flow.",
-    "description": "Install only on demo servers. Gives the demo users (demo_users) purchase rights and creates "
+    "description": "Install only on demo servers. Gives the demo users (demo_users) purchase rights, adds demo_admin (can configure the flows) and creates "
                    "some vendors, products and purchase orders, and a purchase approval flow that replaces the status bar.",
     "author": "DuoTEK",
     "website": "https://duotek.io.vn",
