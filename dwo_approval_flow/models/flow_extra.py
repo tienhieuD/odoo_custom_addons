@@ -60,9 +60,59 @@ class DwoApprovalFlow(models.Model):
         return set()  # nothing is patched on the registry classes: the own-state guard lives in base.write
 
     @api.model
+    def _guard_methods(self):
+        """``{(model, method)}`` of the protected arrows that call a method (cached on the registry)."""
+        registry = self.env.registry
+        methods = getattr(registry, "_dwo_guard_methods", None)
+        if methods is None:
+            methods = {
+                (tr.flow_id.model_name, tr.method_name)
+                for tr in self.env["dwo.approval.transition"].sudo().search([
+                    ("flow_id.active", "=", True), ("move_mode", "=", "call_method"),
+                    ("method_name", "!=", False), ("guard_scope", "!=", "none")])}
+            registry._dwo_guard_methods = methods
+        return methods
+
+    @api.model
+    def _guard_rpc(self, model, name, ids):
+        """The web client calls ``model.name`` on ``ids``: documents that go through an approval are sent to their arrow.
+
+        Returns ``(ids the method may still run on, result of the arrow or None)``; raises when a document cannot move.
+        """
+        free, result = [], None
+        user = self.env.user
+        records = self.env[model].browse(ids).exists()
+        for record in records:
+            flow = self._flow_of(record)
+            arrows = flow.transition_ids.filtered(
+                lambda t: t.move_mode == "call_method" and t.method_name == name and t.guard_scope != "none"
+            ).sorted("sequence") if flow else self.env["dwo.approval.transition"]
+            if not arrows:
+                free.append(record.id)
+                continue
+            arrow = next((t for t in arrows if t._check_available(record, user)[0]), None)
+            if not arrow:
+                raise UserError(self.env._(
+                    "“%(doc)s” goes through an approval and you cannot do this now. %(why)s",
+                    doc=record.display_name, why=arrows[0]._check_available(record, user)[1]))
+            if arrow.ask_reason:
+                raise UserError(self.env._("Use the approval button of the document: a reason is required."))
+            outcome = arrow._press(record, user)
+            if outcome.get("action"):
+                result = outcome["action"]
+            elif outcome["status"] == "waiting" and len(records) == 1:
+                result = {"type": "ir.actions.client", "tag": "display_notification", "params": {
+                    "title": self.env._("Approval"), "type": "info", "sticky": False,
+                    "message": self.env._("Approved. %(count)s of %(needed)s approvals.",
+                                 count=outcome["count"], needed=outcome["needed"]),
+                    "next": {"type": "ir.actions.client", "tag": "reload"}}}
+        return free, result
+
+    @api.model
     def _guard_sync(self):
         """Patch exactly the pairs the active flows need; tell the other workers to do the same."""
         registry = self.env.registry
+        registry._dwo_guard_methods = None
         guard.sync(registry, self._guard_pairs())
         if self.pool.ready:
             registry.registry_invalidated = True
