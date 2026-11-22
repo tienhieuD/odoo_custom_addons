@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="mail_activity_type_to_approve" model="mail.activity.type">
+        <field name="name">To approve</field>
+        <field name="icon">fa-check</field>
+        <field name="delay_count">0</field>
+        <field name="res_model" eval="False"/>
+    </record>
+
+    <!-- followers who keep this subtype are told when a document reaches a step that asks to notify the followers -->
+    <record id="mt_approval" model="mail.message.subtype">
+        <field name="name">Approval</field>
+        <field name="default" eval="True"/>
+        <field name="internal" eval="False"/>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="ir_cron_dwo_approval_remind" model="ir.cron">
+        <field name="name">Approval flow: remind approvers</field>
+        <field name="model_id" ref="model_dwo_approval_flow"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_remind()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+    </record>
+</odoo>

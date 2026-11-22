@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="dwo_approval_flow.WhoDialog">
+        <Dialog title="'Who can press it'" size="'lg'">
+            <label class="form-label fw-bold">Approvers (any of them)</label>
+            <div t-foreach="state.rows" t-as="row" t-key="row_index" class="d-flex gap-2 align-items-start mb-2">
+                <select class="form-select w-auto" style="min-width: 15rem" t-on-change="(ev) => this.setType(row, ev.target.value)">
+                    <option t-foreach="types" t-as="type" t-key="type[0]" t-att-value="type[0]" t-att-selected="type[0] === row.type">
+                        <t t-esc="type[1]"/>
+                    </option>
+                </select>
+                <div class="flex-grow-1">
+                    <MultiRecordSelector t-if="row.type === 'users'" resModel="'res.users'" resIds="row.user_ids"
+                                         update="(ids) => this.setIds(row, ids)"/>
+                    <RecordSelector t-elif="row.type === 'group'" resModel="'res.groups'" resId="row.group_id"
+                                    update="(id) => this.setGroup(row, id)"/>
+                    <span t-elif="row.type === 'dept'" class="text-muted">The user's department equals the document's department (an old option: pick another type to replace it).</span>
+                    <select t-elif="row.type === 'field'" class="form-select" t-on-change="(ev) => this.setValue(row, ev.target.value)">
+                        <option t-foreach="userFields" t-as="f" t-key="f.name" t-att-value="f.name" t-att-selected="f.name === row.value">
+                            <t t-esc="f.string"/> (<t t-esc="f.name"/>)
+                        </option>
+                    </select>
+                    <input t-else="" type="text" class="form-control" placeholder="record.manager_id.user_id"
+                           t-att-value="row.value" t-on-input="(ev) => this.setValue(row, ev.target.value)"/>
+                </div>
+                <button t-if="state.rows.length > 1" type="button" class="btn btn-link text-danger" title="Remove"
+                        t-on-click="() => this.removeRow(row_index)"><i class="fa fa-times"/></button>
+            </div>
+            <button type="button" class="btn btn-link ps-0" t-on-click="addRow">+ Add another approver</button>
+
+            <hr/>
+            <label class="form-label fw-bold">Approvals needed <span class="text-muted fw-normal">(for the whole button)</span></label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="dwo_mode" id="dwo_mode_any" t-att-checked="state.mode === 'any'"
+                       t-on-change="() => this.setMode('any')"/>
+                <label class="form-check-label" for="dwo_mode_any">1 approval is enough</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="dwo_mode" id="dwo_mode_all" t-att-checked="state.mode === 'all'"
+                       t-att-disabled="state.rows.length &lt; 2" t-on-change="() => this.setMode('all')"/>
+                <label class="form-check-label" for="dwo_mode_all">Everyone listed (1 per approver line)</label>
+            </div>
+            <div class="form-check d-flex align-items-center gap-2">
+                <input class="form-check-input" type="radio" name="dwo_mode" id="dwo_mode_n" t-att-checked="state.mode === 'n'"
+                       t-on-change="() => this.setMode('n')"/>
+                <label class="form-check-label" for="dwo_mode_n">At least</label>
+                <input type="number" min="2" class="form-control form-control-sm" style="width: 4.5rem"
+                       t-att-disabled="state.mode !== 'n'" t-att-value="state.n" t-on-input="(ev) => this.setN(ev.target.value)"/>
+                <span>approvals</span>
+            </div>
+            <hr/>
+            <label class="form-label fw-bold" title="Tick who is told, and how, when the document reaches the step this button starts from. Only the people who really can press the button are told.">Notifications</label>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle text-center mb-1">
+                    <thead>
+                        <tr>
+                            <th/>
+                            <th t-foreach="channels" t-as="ch" t-key="ch[0]" class="fw-normal" t-att-title="ch[2]" t-esc="ch[1]"/>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="state.rows" t-as="row" t-key="row_index">
+                            <td class="text-start" t-esc="columnLabel(row)"
+                                title="The people of this approver line. Those told are listed in &quot;Waiting for my approval&quot;."/>
+                            <td t-foreach="channels" t-as="ch" t-key="ch[0]">
+                                <input type="checkbox" class="form-check-input" t-att-checked="row.notify[ch[0]]"
+                                       t-on-change="(ev) => this.setNotify(row.notify, ch[0], ev.target.checked)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-start"
+                                title="The followers who kept the subtype “Approval”. System notification and Activity go to each of them; Email posts one note they get as they prefer.">Document followers</td>
+                            <td t-foreach="channels" t-as="ch" t-key="ch[0]">
+                                <input type="checkbox" class="form-check-input" t-att-checked="state.followers[ch[0]]"
+                                       t-on-change="(ev) => this.setNotify(state.followers, ch[0], ev.target.checked)"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div t-if="state.error" class="text-danger mt-2" t-esc="state.error"/>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="onSave">Save</button>
+                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="dwo_approval_flow.StepDialog">
+        <Dialog title="'When the button is pressed'" size="'md'">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" id="dwo_step_state" value="state" t-model="state.kind"/>
+                <label class="form-check-label" for="dwo_step_state" title="The document moves to the target state. Nothing else runs.">Change the state</label>
+            </div>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="radio" id="dwo_step_server" value="server" t-model="state.kind"/>
+                <label class="form-check-label" for="dwo_step_server" title="Run an Odoo server action of the model. It must leave the document in the target state, or everything is cancelled and an error is shown.">Run a server action</label>
+            </div>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="radio" id="dwo_step_method" value="method" t-model="state.kind"/>
+                <label class="form-check-label" for="dwo_step_method" title="Call a public method of the model, such as the one behind an existing button. It must leave the document in the target state, or everything is cancelled and an error is shown.">Call a method <span class="badge text-bg-secondary">advanced</span></label>
+            </div>
+
+            <div t-if="state.kind === 'server'" class="mt-3">
+                <label class="form-label">Server action</label>
+                <RecordSelector resModel="'ir.actions.server'" resId="state.server_action_id" domain="serverActionDomain"
+                                update="(id) => this.setField('server_action_id', id)"/>
+            </div>
+            <div t-if="state.kind === 'method'" class="mt-3">
+                <label class="form-label">Method</label>
+                <input type="text" class="form-control font-monospace" placeholder="Start typing, for example action_confirm"
+                       autocomplete="off" t-att-value="state.method" t-on-input="onMethodInput"
+                       t-on-focus="() => { state.listOpen = true }" t-on-blur="closeListLater"/>
+                <div t-if="state.listOpen and matches.length" class="list-group mt-1" style="max-height: 14rem; overflow-y: auto">
+                    <button t-foreach="matches" t-as="m" t-key="m.name" type="button"
+                            class="list-group-item list-group-item-action py-1" t-att-title="m.doc"
+                            t-on-mousedown.prevent="() => this.pickMethod(m.name)">
+                        <div class="font-monospace" t-esc="m.name"/>
+                        <div t-if="m.doc" class="text-muted small text-truncate" t-esc="shortDoc(m.doc)"/>
+                    </button>
+                </div>
+                <div t-if="picked" class="text-muted small mt-1 text-truncate" t-att-title="picked.doc or ''"
+                     t-esc="shortDoc(picked.doc) or 'No description.'"/>
+                <div t-elif="state.method and state.methods.length and !state.listOpen" class="text-warning small mt-1">Not a public method of this model.</div>
+            </div>
+            <t t-if="state.kind !== 'state'">
+                <label class="form-label mt-3" title="Choose System when the approver may approve but has no right to do what the action does (for example confirm a purchase order).">Run as</label>
+                <select class="form-select" t-model="state.run_as">
+                    <option value="user">The user who pressed (their access rights apply)</option>
+                    <option value="system">System (ignores the user's access rights)</option>
+                </select>
+            </t>
+            <div t-if="state.error" class="text-danger mt-2" t-esc="state.error"/>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="onSave">Save</button>
+                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="dwo_approval_flow.ActionDialog">
+        <Dialog title="'An action after the state changed'" size="'md'">
+            <label class="form-label">Type</label>
+            <select class="form-select" t-model="state.type">
+                <option t-foreach="types" t-as="type" t-key="type[0]" t-att-value="type[0]"><t t-esc="type[1]"/></option>
+            </select>
+            <t t-if="state.type === 'notify' or state.type === 'email'">
+                <label class="form-label mt-2">To (leave empty for the requester)</label>
+                <MultiRecordSelector resModel="'res.users'" resIds="state.user_ids" update="(ids) => this.setField('user_ids', ids)"/>
+                <input type="text" class="form-control mt-1" placeholder="or an expression: record.user_id" t-model="state.expr"/>
+                <t t-if="state.type === 'email'">
+                    <label class="form-label mt-2">Email template (optional)</label>
+                    <RecordSelector resModel="'mail.template'" resId="state.template_id" domain="templateDomain"
+                                    update="(id) => this.setField('template_id', id)"/>
+                </t>
+                <label class="form-label mt-2">Message</label>
+                <textarea class="form-control" rows="3" t-model="state.message"/>
+            </t>
+            <t t-if="state.type === 'update'">
+                <label class="form-label mt-2">Field</label>
+                <select class="form-select" t-model="state.field">
+                    <option value=""/>
+                    <option t-foreach="writableFields" t-as="f" t-key="f.name" t-att-value="f.name">
+                        <t t-esc="f.string"/> (<t t-esc="f.name"/>)
+                    </option>
+                </select>
+                <label class="form-label mt-2">New value <span class="text-muted">({user} is the person who pressed)</span></label>
+                <input type="text" class="form-control" t-model="state.value"/>
+            </t>
+            <t t-if="state.type === 'server'">
+                <label class="form-label mt-2">Server action</label>
+                <RecordSelector resModel="'ir.actions.server'" resId="state.server_action_id" domain="serverActionDomain"
+                                update="(id) => this.setField('server_action_id', id)"/>
+            </t>
+            <div t-if="state.error" class="text-danger mt-2" t-esc="state.error"/>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="onSave">Save</button>
+                <button class="btn btn-secondary" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="dwo_approval_flow.JsonDialog">
+        <Dialog t-props="{ title: props.mode === 'copy' ? 'Flow as JSON' : 'Load a flow from JSON' }" size="'lg'">
+            <p class="text-muted" t-if="props.mode === 'copy'">Share this text or keep it as a backup.</p>
+            <p class="text-muted" t-else="">Paste the JSON. It replaces the flow you see now (nothing is saved until you save the form).</p>
+            <textarea class="form-control font-monospace" rows="16" spellcheck="false" t-model="state.text"/>
+            <div t-if="state.errors.length" class="alert alert-danger mt-2 mb-0">
+                <div t-foreach="state.errors" t-as="error" t-key="error_index" t-esc="error"/>
+            </div>
+            <t t-set-slot="footer">
+                <button t-if="props.mode === 'copy'" class="btn btn-primary" t-on-click="copy">
+                    <t t-if="state.copied">Copied</t><t t-else="">Copy</t>
+                </button>
+                <button t-else="" class="btn btn-primary" t-on-click="onLoad">Load</button>
+                <button class="btn btn-secondary" t-on-click="props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="dwo_approval_flow.AiDialog">
+        <Dialog t-props="{ title: props.editing ? 'Edit the flow with AI' : 'Build the flow with AI' }" size="'lg'">
+            <t t-if="!state.result">
+                <p class="text-muted" t-if="props.editing">The diagram already has states and arrows. Say what to change (for example "add a finance step after approval" or "only managers can reject"). The AI starts from the current flow. Nothing changes until you press Apply.</p>
+                <p class="text-muted" t-else="">Describe the approval process: the states, who approves, and any condition (for example by priority or amount). Nothing changes until you press Apply.</p>
+                <textarea class="form-control" rows="8" t-model="state.request" t-att-disabled="state.busy"
+                          t-att-placeholder="props.editing ? 'Example: add a finance check after the manager approval.' : 'Example: 5 states: draft, submitted, approved by leader, approved by manager, rejected. If priority is High or lower the leader approves; if Urgent the manager approves.'"/>
+            </t>
+            <t t-else="">
+                <p class="text-muted">Suggestion from the AI. Apply it to the diagram, or go back and change your request.</p>
+                <div t-if="state.result.notes.length" class="alert alert-info">
+                    <div t-foreach="state.result.notes" t-as="note" t-key="note_index" t-esc="note"/>
+                </div>
+                <textarea class="form-control font-monospace" rows="14" readonly="readonly" spellcheck="false" t-att-value="state.result.json"/>
+            </t>
+            <div t-if="state.errors.length" class="alert alert-danger mt-2 mb-0">
+                <div t-foreach="state.errors" t-as="error" t-key="error_index" t-esc="error"/>
+            </div>
+            <t t-set-slot="footer">
+                <t t-if="!state.result">
+                    <button class="btn btn-primary" t-on-click="onAsk" t-att-disabled="state.busy">
+                        <t t-if="state.busy">Thinking...</t><t t-else="">OK</t>
+                    </button>
+                </t>
+                <t t-else="">
+                    <button class="btn btn-primary" t-on-click="onApply">Apply to diagram</button>
+                    <button class="btn btn-secondary" t-on-click="onBack">Back</button>
+                </t>
+                <button class="btn btn-secondary" t-on-click="props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>
