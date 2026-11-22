@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_approval_flow.Buttons" owl="1">
+        <div class="o_dwo_approval_buttons d-flex flex-wrap">
+            <t t-foreach="state.buttons" t-as="button" t-key="button.id">
+                <button type="button" class="btn mr-1" t-att-class="btnClass(button)"
+                        t-att-disabled="state.busy" t-on-click="() => this.press(button)">
+                    <t t-esc="label(button)"/>
+                </button>
+            </t>
+            <div t-if="state.asking" class="o_dwo_reason">
+                <div class="modal-backdrop show"/>
+                <div class="modal d-block" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" t-esc="state.asking.name"/>
+                                <button type="button" class="close" t-on-click="cancelReason">&#215;</button>
+                            </div>
+                            <div class="modal-body">
+                                <label>Reason (required)</label>
+                                <textarea class="form-control" rows="4" t-model="state.reason"/>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" t-att-disabled="!state.reason.trim() or state.busy" t-on-click="confirmReason">Confirm</button>
+                                <button class="btn btn-secondary" t-on-click="cancelReason">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

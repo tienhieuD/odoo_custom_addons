@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_approval_flow.Modal" owl="1">
+        <div class="o_dwo_modal">
+            <div class="modal-backdrop show"/>
+            <div class="modal d-block" tabindex="-1" role="dialog" t-on-mousedown.self="props.close">
+                <div t-att-class="dialogClass" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" t-esc="props.title"/>
+                            <button type="button" class="close" t-on-click="props.close">&#215;</button>
+                        </div>
+                        <div class="modal-body"><t t-slot="default"/></div>
+                        <div class="modal-footer"><t t-slot="footer"/></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

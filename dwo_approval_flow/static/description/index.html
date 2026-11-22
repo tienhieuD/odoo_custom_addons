@@ -1,0 +1,321 @@
+<section class="oe_container">
+<div class="container">
+
+    <div class="text-center pt-5 pb-3 border-bottom">
+        <h1 class="font-weight-bold mt-0 mb-2" style="font-size: 30px; color: #4A2F45;">Dynamic Approval Workflow for Odoo</h1>
+        <p class="font-weight-bold mb-2" style="font-size: 18px; color: #4A2F45;">Draw the approval of any document instead of coding it.</p>
+        <p class="mb-4" style="font-size: 15px;">Boxes are the states of the document, arrows are the buttons that move it. Click an arrow to say <strong>who can press it</strong>, how many approvals it needs, <strong>who is told</strong> and what else happens.</p>
+    </div>
+
+    <div class="my-5">
+        <p class="mb-4" style="font-size: 17px;">Most approval needs are the same: a document goes from draft to review to approved, different people can press different buttons, sometimes two people must agree, and <strong>the next approver has to hear about it</strong>. This module lets an administrator <strong>draw</strong> that process for any model, with no code, tells the right people at the right step (a pop-up, a to-do or an email), and shows the status and history on the form. It is an <strong>add-on to the flow you already have</strong>: it does not rewrite your model, so the original buttons, methods and states keep working. It can also be the approval flow of a model that has none.</p>
+        <div class="text-center mb-4">
+            <img src="flow.png" alt="Pick a model, draw the states and buttons, set who approves, documents move and every step is logged" class="img-fluid rounded shadow-sm"/>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-4" style="font-size: 30px; color: #4A2F45;">What you get</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Does not change your flow</h4>
+                    <p class="mb-0" style="font-size: 14px;">Combine it with the workflow a model already has: an arrow can call the original button, so Odoo still does the real work, after the approval. Other modules and customisations are not rewritten.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Or a brand-new flow</h4>
+                    <p class="mb-0" style="font-size: 14px;">Models without a status can have their own states, kept by the module, so you can build the whole approval process from scratch with no code, such as an eight-step business trip.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">A diagram, not a form</h4>
+                    <p class="mb-0" style="font-size: 14px;">Drag boxes, drag a dot from one box to another to add an arrow. Curved arrows bend around boxes, labels stay readable and boxes cannot overlap.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Who can press a button</h4>
+                    <p class="mb-0" style="font-size: 14px;">Users, groups, a user taken from the document, or an expression. Add rules such as <em>cost above 3000</em> to send a document to a different step.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Several approvals</h4>
+                    <p class="mb-0" style="font-size: 14px;">One approval is enough, or one per approver line, or at least N. Waiting votes are reported (<em>1/2</em>) until the button goes through. Buttons can also be used from the list Action menu.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Tells the right people</h4>
+                    <p class="mb-0" style="font-size: 14px;">Per arrow, tick who is told and how: a pop-up in Odoo, a <em>To approve</em> activity, or an email or inbox message. Approvers, the followers of the document and its creator can each be told.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">A queue and reminders</h4>
+                    <p class="mb-0" style="font-size: 14px;">Every employee gets <em>Waiting for my approval</em>, a list of the documents that wait for them. People who did not answer are reminded after the delay you choose, up to a limit.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Status and history</h4>
+                    <p class="mb-0" style="font-size: 14px;">The form shows the flow's states and buttons, every move is posted in the chatter, and <em>Approval history</em> lists every vote and move. The Log and Notifications menus show who did and who was told what.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100" style="border-top: 4px solid #875A7B;">
+                <div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #4A2F45;">Test before you trust</h4>
+                    <p class="mb-0" style="font-size: 14px;">The Test button shows, for a document and a user, which buttons would appear and why the others are hidden. A flow can be exported and imported as JSON.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded p-4 my-5" style="border: 2px solid #875A7B;">
+        <h2 class="font-weight-bold text-center mt-0 mb-2" style="font-size: 26px; color: #4A2F45;">How it works</h2>
+        <p class="text-center mb-4" style="font-size: 16px;">Set up a flow once, then it works on the documents.</p>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">1. Create a flow</h4>
+                    <p class="mb-0" style="font-size: 13px;">Open <strong>Approvals &gt; Flows</strong>, choose a model and where the states come from. Add boxes and arrows in the designer.</p>
+                </div></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">2. Set the arrows</h4>
+                    <p class="mb-0" style="font-size: 13px;">Click an arrow: choose the approvers, the number of approvals, rules, what happens when it is pressed, and who is told and how.</p>
+                </div></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100"><div class="card-body">
+                    <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #875A7B;">3. Use it</h4>
+                    <p class="mb-0" style="font-size: 13px;">Users press the buttons on the form or from the list, and the next approver is told. Every vote and state change is recorded.</p>
+                </div></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 1. Open your flows</h2>
+    <p class="mb-4" style="font-size: 16px;"><strong>Approvals &gt; Flows</strong> lists the flows of your database. This demo has two: one on the purchase orders Odoo already has, and one for a business trip document that has no states of its own.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_1.png" alt="Approval Flows list with two flows, Purchase approval on Purchase Order and Business trip approval on Business Trip" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 2. The flow is a diagram</h2>
+    <p class="mb-4" style="font-size: 16px;">Eight steps and a Rejected state, drawn in a few minutes. Boxes are the states of the document, arrows are the buttons. The business trip has no state in Odoo, so the module keeps it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_2.png" alt="Designer showing the business trip flow: Draft, Manager review, Finance check, Director approval, Travel booking, Booked, Expense report, Settled and Rejected, joined by arrows" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 3. Click an arrow</h2>
+    <p class="mb-4" style="font-size: 16px;">Each arrow says who can press it, which rules must be true (here: a cost above 3000 goes to the director, a smaller one goes straight to booking), what happens when it is pressed and who is told.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_3.png" alt="Designer with the arrow To director selected, showing who can press it, the rule estimated cost greater than 3000, what happens when pressed and the options" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 4. Choose who can press it, and who is told</h2>
+    <p class="mb-4" style="font-size: 16px;">Pick the approvers (users, a group, a user on the document, an expression) and how many approvals are needed. The table at the bottom says who is told and how: tick a cell to tell that person, or the followers of the document, in that way.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_4.png" alt="Dialog Who can press it with the group Finance, the number of approvals and a table of notifications with System notification, Activity and Email for the approvers and for the document followers" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 5. Or reuse a button you already have</h2>
+    <p class="mb-4" style="font-size: 16px;">Make the arrow call the method of the original button. Type a few letters and the module suggests the public methods of the model, with the first line of their description. Odoo does the real work, only after the approval.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_5.png" alt="Dialog When the button is pressed with the option Call a method and a list of methods of the model with a short description under each name" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 6. A user starts a document</h2>
+    <p class="mb-4" style="font-size: 16px;">Alice, a traveler, creates a business trip. The status bar shows the steps of the flow and the only button she can press is <em>Submit</em>.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_6.png" alt="Business trip form in Draft with a Submit button and the status bar showing the eight steps" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 7. Submit for approval</h2>
+    <p class="mb-4" style="font-size: 16px;">After Submit the trip waits in Manager review. A <em>To approve</em> activity is scheduled for her manager and the move is written in the chatter.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_7.png" alt="The business trip in Manager review, with a To approve activity for Bob and a note in the chatter" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 8. The approver gets a pop-up</h2>
+    <p class="mb-4" style="font-size: 16px;">If the approver is online, a pop-up tells them at once that a document needs them, without waiting for an email.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_8.png" alt="The Waiting for my approval list of Bob with a pop-up saying To approve: Conference in Vienna" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 9. A queue of what is waiting</h2>
+    <p class="mb-4" style="font-size: 16px;"><em>Waiting for my approval</em> lists, for each person, the documents that wait for them, with the flow, the step and the time. People see only their own.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_9.png" alt="The list Waiting for my approval with the business trip Client visit in Hamburg and two purchase orders" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 10. Approve or reject</h2>
+    <p class="mb-4" style="font-size: 16px;">The manager opens the trip and sees <em>Approve</em> and <em>Reject</em>. Reject asks for a reason, and the people who cannot press these buttons see nothing.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_10.png" alt="Business trip in Manager review seen by the manager, with the buttons Approve and Reject and the activity To approve" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 11. Each step shows only what the person can do</h2>
+    <p class="mb-4" style="font-size: 16px;">The trip costs more than 3000, so finance sees <em>To director</em> and not the direct approval. Rules on the arrows choose the route.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_11.png" alt="Business trip in Finance check seen by finance, with only the buttons To director and Reject" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 12. The creator is told too</h2>
+    <p class="mb-4" style="font-size: 16px;">Every time somebody presses a button or votes, the person who created the document is told, with the reason if there is one.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_12.png" alt="The messaging menu of the traveler with notifications such as Fiona Park pressed To director on Client visit in Hamburg" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 13. The whole history</h2>
+    <p class="mb-4" style="font-size: 16px;"><em>Approval history</em>, in the Action menu of the form, lists every vote and move: who, which button, from which step to which. Anybody who can read the document can open it.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_13.png" alt="Dialog Approval history with every move of the business trip: who pressed which button, from which step to which" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Step 14. See who was told</h2>
+    <p class="mb-4" style="font-size: 16px;">Administrators can see who was told, in which way, and whether it was sent. A failing email never blocks an approval, it only shows up here.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_14.png" alt="The Notifications list with the person told, the kind, the channel and whether it was sent" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Bonus. Several approvals for the same button</h2>
+    <p class="mb-4" style="font-size: 16px;">A large purchase order needs two approvals. After the first one the button shows <em>(1/2)</em> to the other approver, and the order moves only when the second one is given.</p>
+    <div class="text-center mb-4">
+        <img src="screenshot_15.png" alt="Purchase order in To Approve with the button Approve (large order) (1/2) and the chatter saying one approval was given" class="img-fluid rounded shadow"/>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Requirements &amp; Installation</h2>
+    <p class="mb-3" style="font-size: 16px;">The module depends on the standard <code>base</code>, <code>web</code> and <code>mail</code> modules and needs no external Python library.</p>
+    <p class="mb-3 p-3 border rounded" style="font-size: 15px; border-left: 4px solid #875A7B;">The email and inbox notifications need a working outgoing mail server for real emails (an inbox message needs none). The activities and pop-ups need nothing more than the <code>mail</code> module.</p>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#apf_install" role="tab" aria-controls="apf_install" aria-selected="true">Install</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#apf_configure" role="tab" aria-controls="apf_configure" aria-selected="false">Configure</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#apf_limits" role="tab" aria-controls="apf_limits" aria-selected="false">Good to know</a>
+        </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-4 mb-5">
+        <div class="tab-pane fade show active" id="apf_install" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Install the module</h4>
+            <p class="mb-2" style="font-size: 14px;">1. Copy the <code>dwo_approval_flow</code> folder into an add-ons path of your Odoo server.</p>
+            <p class="mb-2" style="font-size: 14px;">2. Restart Odoo, activate developer mode and click <strong>Update Apps List</strong> in the Apps menu.</p>
+            <p class="mb-2" style="font-size: 14px;">3. Search for <em>Dynamic Approval Workflow</em> and click <strong>Install</strong>.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Reload your browser page after installing so the new assets are loaded.</p>
+        </div>
+        <div class="tab-pane fade" id="apf_configure" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">Create your first flow</h4>
+            <p class="mb-2" style="font-size: 14px;">Open the <strong>Approvals</strong> menu, then <strong>Flows</strong>, and click <strong>New</strong>. Choose the model and whether the states are the module's own or come from a field of the model.</p>
+            <p class="mb-2" style="font-size: 14px;">Add states with <strong>+ State</strong>, drag the dot of a box onto another box to add a button, then click the arrow to set approvers and actions.</p>
+            <p class="text-muted mb-0" style="font-size: 14px;">Only users in the group Approval Flow / Administrator can edit flows. A flow can be exported and imported as JSON.</p>
+            <p class="mb-2" style="font-size: 14px;">Click the <strong>Who can press it</strong> section of an arrow to choose who is told and how, and use <em>Remind after (hours)</em> on the flow to remind the people who did not answer.</p>
+        </div>
+        <div class="tab-pane fade" id="apf_limits" role="tabpanel">
+            <h4 class="font-weight-bold mt-0 mb-3" style="font-size: 18px; color: #875A7B;">What it does not do</h4>
+            <p class="mb-2" style="font-size: 14px;">A document follows <strong>one flow at a time</strong>. With several flows on a model, the first one whose <em>Applies to</em> filter matches is used. Two flows cannot approve the same document in parallel.</p>
+            <p class="mb-2" style="font-size: 14px;">A button does not run by itself when a state is entered, and an arrow cannot loop back to its own box.</p>
+            <p class="mb-2" style="font-size: 14px;">Nothing is sent for the first state of a new document, or when the document is moved by code that does not use an arrow. A button that anybody can press has no list of approvers, so it tells nobody. The text of a notification is in the language of the person who pressed the button.</p>
+            <p class="mb-2" style="font-size: 14px;">The buttons of the form are the buttons of the flow: the module hides the original button where the flow calls its method, but code and RPC that call the method directly are not blocked.</p>
+        </div>
+    </div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Changelog</h2>
+    <p class="mb-3" style="font-size: 16px;">Module releases, newest first.</p>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">2.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-22</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Notifications set on each arrow (approvers, followers and the creator, by pop-up, activity or email), the Waiting for my approval queue, reminders, a notifications log, simpler designer dialogs (domain editor, three kinds of step, method autocomplete), two ready-made demo flows.</p></div>
+        </div>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.1</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-20</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">Protect the methods that arrows call, several flows per model, list view Action menu, Test button, full-width designer with curved arrows, translatable names and messages.</p></div>
+        </div>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <h4 class="font-weight-bold mt-0 mb-1" style="font-size: 18px; color: #875A7B;">1.0</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">2026-11-20</p>
+            </div>
+            <div class="col-md-9"><p class="mb-0" style="font-size: 14px;">First release: designer, approvers, rules, votes, extra actions, status and history widget, JSON import and export.</p></div>
+        </div>
+    </div></div>
+
+    <h2 class="font-weight-bold mt-5 mb-3" style="font-size: 30px; color: #4A2F45;">Frequently Asked Questions</h2>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can small orders go to one step and big ones to another?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. Draw two arrows from the same box and give each a rule, for example amount below 5000 on one and amount of 5000 or more on the other. Only the arrow whose rule matches is shown.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can a rejected document go back to draft?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. A button can go to any box, so Reject can lead to Draft or to a Rejected state with a Reopen button.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it break the flow my model already has?</h4>
+        <p class="mb-0" style="font-size: 14px;">No. It adds to it. The original buttons and methods keep working: an arrow can call the original method (for example Confirm), so Odoo still does the work, only after the approval. If a model has exactly one flow, the original button that the flow calls is hidden in the states where the flow handles it, so users are not shown two ways to do the same thing.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Does it work with custom models?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes, any model that has a form view. Models with a state selection field can reuse it.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Can I build a brand-new approval process?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes. Choose a model, keep <em>My own states</em> and draw the states and buttons. The module keeps the state itself, so no change to the model is needed.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Who gets a notification, and can I choose how?</h4>
+        <p class="mb-0" style="font-size: 14px;">You choose per arrow. In the <em>Who can press it</em> dialog a table has one row per approver line and one for the followers of the document, and three columns: a pop-up in Odoo, a <em>To approve</em> activity and an email (or an inbox message, as each person prefers). The creator of the document can be told too. Nothing is sent until you tick a box.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">What if an email cannot be sent?</h4>
+        <p class="mb-0" style="font-size: 14px;">The approval goes through anyway. Each try is written in the Notifications log with the error, and the activity and the pop-up still reach the person.</p>
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+        <h4 class="font-weight-bold mt-0 mb-2" style="font-size: 16px; color: #4A2F45;">Do approvers who did not answer get a reminder?</h4>
+        <p class="mb-0" style="font-size: 14px;">Yes, if you set <em>Remind after (hours)</em> on the flow. They are reminded after that delay, up to the limit you set, and not any more once the document has moved on.</p>
+    </div></div>
+
+    <div class="mt-5">
+        <p class="text-muted mb-0" style="font-size: 13px;"><strong>Keywords:</strong> approval, approval workflow, approval flow, multi level approval, approval matrix, state diagram, dynamic approval, purchase approval, sale approval, expense approval, approval notification, approval reminder, business trip approval, waiting for approval</p>
+    </div>
+    <div class="text-center rounded p-4 mt-5 mb-3" style="border: 2px solid #875A7B;">
+        <p class="font-weight-bold mt-0 mb-2" style="font-size: 24px; color: #875A7B;">Make every approval visible.</p>
+        <p class="mb-2" style="font-size: 15px;">Install it, draw your first flow and let your team follow it.</p>
+        <p class="text-muted mb-0" style="font-size: 13px;">Developed by DuoTEK</p>
+        <p class="text-muted mt-1 mb-0" style="font-size: 13px;">Questions or support: <a href="mailto:hello@duotek.io.vn">hello@duotek.io.vn</a></p>
+    </div>
+
+</div>
+</section>

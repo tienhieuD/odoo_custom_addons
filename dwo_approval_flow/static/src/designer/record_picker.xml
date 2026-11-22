@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_approval_flow.RecordPicker" owl="1">
+        <div class="o_dwo_picker">
+            <div class="d-flex flex-wrap mb-1">
+                <span t-foreach="selected" t-as="item" t-key="item.id" class="badge bg-secondary d-inline-flex align-items-center">
+                    <t t-esc="item.name"/>
+                    <a href="#" class="ml-1 text-white" t-on-click.prevent="() => this.remove(item.id)">&#215;</a>
+                </span>
+            </div>
+            <input t-if="props.multi or !props.resId" type="text" class="form-control" placeholder="Search..."
+                   autocomplete="off" t-att-value="state.text" t-on-input="search"
+                   t-on-focus="search" t-on-blur="closeLater"/>
+            <div t-if="state.open and state.options.length" class="list-group mt-1" style="max-height: 12rem; overflow-y: auto">
+                <button t-foreach="state.options" t-as="option" t-key="option[0]" type="button"
+                        class="list-group-item list-group-item-action py-1"
+                        t-on-mousedown.prevent="() => this.pick(option[0], option[1])">
+                    <t t-esc="option[1]"/>
+                </button>
+            </div>
+        </div>
+    </t>
+</templates>
