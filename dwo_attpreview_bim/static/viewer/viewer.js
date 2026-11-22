@@ -2,7 +2,7 @@
 // Sandboxed BIM viewer page: the parent sends the bytes of the IFC file (postMessage); web-ifc (WebAssembly) reads
 // them here and three.js draws the geometry. Properties come from the same reader. Nothing leaves this page.
 import { THREE, bridge, createStage, formatStats } from "/dwo_attpreview_webgl/asset/viewer/common.js";
-import * as WebIFC from "/dwo_attpreview_bim/asset/lib/web-ifc/web-ifc-api.js";
+import * as WebIFC from "/dwo_attpreview_bim/asset/lib/d2ViLWlmYw/web-ifc-api.js";
 
 const SPATIAL = new Set(["IFCPROJECT", "IFCSITE", "IFCBUILDING", "IFCBUILDINGSTOREY"]);
 const treeEl = document.getElementById("tree");
@@ -304,7 +304,7 @@ function mainBox() {
 bridge("dwo_attpreview_bim", async (kind, buffer) => {
     getStage();
     api = new WebIFC.IfcAPI();
-    api.SetWasmPath("/dwo_attpreview_bim/asset/lib/web-ifc/", true);
+    api.SetWasmPath("/dwo_attpreview_bim/asset/lib/d2ViLWlmYw/", true);
     await api.Init();
     modelID = api.OpenModel(new Uint8Array(buffer), { COORDINATE_TO_ORIGIN: true });
     if (modelID < 0) {

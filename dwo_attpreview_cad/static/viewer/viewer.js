@@ -1,10 +1,10 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 // Sandboxed DXF viewer page: the parent sends the bytes of the file (postMessage), dxf-viewer draws them here.
 import { THREE, bridge, requireWebGL } from "/dwo_attpreview_webgl/asset/viewer/common.js";
-import { DxfViewer } from "/dwo_attpreview_cad/asset/lib/dxf-viewer/dxf-viewer.bundle.js";
+import { DxfViewer } from "/dwo_attpreview_cad/asset/lib/ZHhmLXZpZXdlcg/dxf-viewer.bundle.js";
 
 const FONTS = ["noto-sans-latin-400-normal.woff", "noto-sans-latin-ext-400-normal.woff", "noto-sans-vietnamese-400-normal.woff"]
-    .map((name) => "/dwo_attpreview_cad/asset/lib/dxf-viewer/fonts/" + name);
+    .map((name) => "/dwo_attpreview_cad/asset/lib/ZHhmLXZpZXdlcg/fonts/" + name);
 const stageEl = document.getElementById("stage");
 const layersEl = document.getElementById("layers");
 const info = document.getElementById("info");
