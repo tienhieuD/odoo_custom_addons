@@ -20,7 +20,7 @@ LAST = ['Nguyen', 'Tran', 'Smith', 'Garcia', 'Tanaka', 'Martin', 'Silva', 'Kim',
 THING = ['Order', 'Contract', 'Project', 'Ticket', 'Shipment', 'Invoice', 'Quote', 'Campaign']
 CITY = ['Hanoi', 'Saigon', 'Da Nang', 'Paris', 'Berlin', 'Tokyo', 'Austin', 'Lisbon', 'Oslo', 'Cairo']
 NOTE = ['Call back next week', 'Waiting for approval', 'Needs a second review', 'Delivered on time', 'Customer asked for a discount', 'Check the packaging']
-NREC = 240
+NREC = 10   # records of the lab (their lines: 34 each); the owner wants few, editable records
 RM = R + [('write_date', 'fields.Datetime()', 'Last update', {})]   # needed by the image widget (cache key)
 
 RS = {
