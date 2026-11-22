@@ -1,11 +1,35 @@
 # -*- coding: utf-8 -*-
 # Copyright 2026 DuoTEK. Licensed under the GNU Lesser General Public License v3.0 (LGPL-3).
 """Serving the files of a sandboxed viewer page. Shared by the viewer modules (3D, CAD, BIM, DWG)."""
+import base64
 import os
 
 from odoo.http import Stream, request
 
 ASSET_EXT = (".html", ".css", ".js", ".mjs", ".wasm", ".json", ".woff", ".ttf")
+
+
+def lib_alias(name):
+    """The public name of a library folder under ``lib/``: its name in base64url, without padding (``silurus`` is
+    ``c2lsdXJ1cw``). The viewer pages and the libraries use it in every URL, so the network tab does not tell
+    which library is behind a file. The folder on the disk keeps its real name. Other modules of the family
+    must write ``lib/<lib_alias(name)>/`` in the URLs they build."""
+    return base64.urlsafe_b64encode(name.encode()).decode().rstrip("=")
+
+
+def _lib_real_path(rel):
+    """``lib/<alias>/x`` -> ``lib/<real name>/x``; the same ``rel`` when it is not under ``lib/``; ``None`` when
+    the alias is not valid (a real folder name is not accepted in a URL)."""
+    if not rel.startswith("lib/"):
+        return rel
+    head, _, tail = rel[4:].partition("/")
+    try:
+        real = base64.urlsafe_b64decode(head + "=" * (-len(head) % 4)).decode()
+    except (ValueError, UnicodeDecodeError):
+        return None
+    if not real or lib_alias(real) != head or "/" in real or real.startswith("."):
+        return None
+    return "lib/%s/%s" % (real, tail)
 
 
 def viewer_csp(origin, extra_script=""):
@@ -25,7 +49,10 @@ def serve_asset(module, path, allowed_dirs, script_extra=""):
     ``script_extra``: more ``script-src`` sources for the page, only for a viewer that needs them (the DWG viewer:
     the WebAssembly glue of LibreDWG builds functions with ``new Function``)."""
     rel = os.path.normpath(path).replace(os.sep, "/")
-    if rel.startswith("..") or not rel.startswith(tuple(allowed_dirs)) or not rel.lower().endswith(ASSET_EXT):
+    if rel.startswith(".."):
+        return request.not_found()
+    rel = _lib_real_path(rel)
+    if rel is None or not rel.startswith(tuple(allowed_dirs)) or not rel.lower().endswith(ASSET_EXT):
         return request.not_found()
     try:
         stream = Stream.from_path("%s/static/%s" % (module, rel), public=True)

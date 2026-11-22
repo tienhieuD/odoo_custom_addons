@@ -3,13 +3,13 @@
 // STEP, IGES and 3DM (WebAssembly readers) are in solid.html: only that page may use unsafe-eval.
 import { THREE, bridge } from "/dwo_attpreview_webgl/asset/viewer/common.js";
 import { getStage, meshOf, show } from "./model.js";
-import { STLLoader } from "/dwo_attpreview_webgl/asset/lib/three/examples/jsm/loaders/STLLoader.js";
-import { OBJLoader } from "/dwo_attpreview_webgl/asset/lib/three/examples/jsm/loaders/OBJLoader.js";
-import { PLYLoader } from "/dwo_attpreview_webgl/asset/lib/three/examples/jsm/loaders/PLYLoader.js";
-import { GLTFLoader } from "/dwo_attpreview_webgl/asset/lib/three/examples/jsm/loaders/GLTFLoader.js";
-import { ThreeMFLoader } from "/dwo_attpreview_webgl/asset/lib/three/examples/jsm/loaders/3MFLoader.js";
-import { FBXLoader } from "/dwo_attpreview_webgl/asset/lib/three/examples/jsm/loaders/FBXLoader.js";
-import { ColladaLoader } from "/dwo_attpreview_webgl/asset/lib/three/examples/jsm/loaders/ColladaLoader.js";
+import { STLLoader } from "/dwo_attpreview_webgl/asset/lib/dGhyZWU/examples/jsm/loaders/STLLoader.js";
+import { OBJLoader } from "/dwo_attpreview_webgl/asset/lib/dGhyZWU/examples/jsm/loaders/OBJLoader.js";
+import { PLYLoader } from "/dwo_attpreview_webgl/asset/lib/dGhyZWU/examples/jsm/loaders/PLYLoader.js";
+import { GLTFLoader } from "/dwo_attpreview_webgl/asset/lib/dGhyZWU/examples/jsm/loaders/GLTFLoader.js";
+import { ThreeMFLoader } from "/dwo_attpreview_webgl/asset/lib/dGhyZWU/examples/jsm/loaders/3MFLoader.js";
+import { FBXLoader } from "/dwo_attpreview_webgl/asset/lib/dGhyZWU/examples/jsm/loaders/FBXLoader.js";
+import { ColladaLoader } from "/dwo_attpreview_webgl/asset/lib/dGhyZWU/examples/jsm/loaders/ColladaLoader.js";
 
 const text = (buffer) => new TextDecoder("utf-8").decode(buffer);
 

@@ -46,19 +46,19 @@ class TestCadEngine(TransactionCase):
 class TestCadRoutes(_AssetRoutesWithoutTestCookie, HttpCase):
 
     def test_01_asset_route_serves_only_the_viewer_and_its_library(self):
-        for path, ok in (("viewer/viewer.html", True), ("viewer/viewer.js", True), ("lib/dxf-viewer/dxf-viewer.bundle.js", True),
-                         ("lib/dxf-viewer/fonts/noto-sans-latin-400-normal.woff", True),
-                         ("lib/dxf-viewer/LICENSE-dxf-viewer-MPL-2.0.txt", False), ("../__manifest__.py", False),
-                         ("models/engine.py", False), ("lib/dxf-viewer/../../__manifest__.py", False)):
+        for path, ok in (("viewer/viewer.html", True), ("viewer/viewer.js", True), ("lib/ZHhmLXZpZXdlcg/dxf-viewer.bundle.js", True),
+                         ("lib/ZHhmLXZpZXdlcg/fonts/noto-sans-latin-400-normal.woff", True),
+                         ("lib/ZHhmLXZpZXdlcg/LICENSE-dxf-viewer-MPL-2.0.txt", False), ("../__manifest__.py", False),
+                         ("models/engine.py", False), ("lib/ZHhmLXZpZXdlcg/../../__manifest__.py", False)):
             self.assertEqual(self.url_open("/dwo_attpreview_cad/asset/" + path).status_code == 200, ok, path)
         res = self.url_open("/dwo_attpreview_cad/asset/viewer/viewer.html")
         self.assertIn("default-src 'none'", res.headers["Content-Security-Policy"])
         self.assertEqual(res.headers["Access-Control-Allow-Origin"], "*")
 
     def test_02_bundle_imports_three_from_the_webgl_module_only(self):
-        res = self.url_open("/dwo_attpreview_cad/asset/lib/dxf-viewer/dxf-viewer.bundle.js")
+        res = self.url_open("/dwo_attpreview_cad/asset/lib/ZHhmLXZpZXdlcg/dxf-viewer.bundle.js")
         text = res.text
-        self.assertIn('from"/dwo_attpreview_webgl/asset/lib/three/build/three.module.js"', text)
+        self.assertIn('from"/dwo_attpreview_webgl/asset/lib/dGhyZWU/build/three.module.js"', text)
         self.assertNotIn('from"three"', text)
         self.assertNotRegex(text, r'(?:from|import\()\s*"https?:')
 

@@ -8,8 +8,8 @@ const FALLBACK = 0x9aa7b8;
 
 /** STEP / IGES: Open CASCADE gives meshes (positions, normals, index, colour); each one becomes a THREE mesh. */
 async function loadCad(kind, buffer) {
-    const { occtimportjs } = await import("/dwo_attpreview_3d/asset/lib/occt/occt-import-js.bundle.js");
-    const occt = await occtimportjs({ locateFile: (name) => "/dwo_attpreview_3d/asset/lib/occt/" + name });
+    const { occtimportjs } = await import("/dwo_attpreview_3d/asset/lib/b2NjdA/occt-import-js.bundle.js");
+    const occt = await occtimportjs({ locateFile: (name) => "/dwo_attpreview_3d/asset/lib/b2NjdA/" + name });
     const bytes = new Uint8Array(buffer);
     const result = kind === "iges" || kind === "igs" ? occt.ReadIgesFile(bytes, null) : occt.ReadStepFile(bytes, null);
     if (!result || !result.success || !result.meshes.length) {
@@ -68,8 +68,8 @@ function toThree(rh, geometry) {
 }
 
 async function loadRhino(buffer) {
-    const { default: rhino3dm } = await import("/dwo_attpreview_3d/asset/lib/rhino3dm/rhino3dm.module.min.js");
-    const rh = await rhino3dm({ locateFile: (name) => "/dwo_attpreview_3d/asset/lib/rhino3dm/" + name });
+    const { default: rhino3dm } = await import("/dwo_attpreview_3d/asset/lib/cmhpbm8zZG0/rhino3dm.module.min.js");
+    const rh = await rhino3dm({ locateFile: (name) => "/dwo_attpreview_3d/asset/lib/cmhpbm8zZG0/" + name });
     const doc = rh.File3dm.fromByteArray(new Uint8Array(buffer));
     if (!doc) {
         throw new Error("This 3DM file could not be read (it may be damaged or saved by a newer version of Rhino).");

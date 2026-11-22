@@ -44,10 +44,10 @@ class TestDwgRoutes(_AssetRoutesWithoutTestCookie, HttpCase):
 
     def test_01_asset_route_serves_only_the_viewer_and_the_libraries(self):
         for path, ok in (("viewer/viewer.html", True), ("viewer/viewer.js", True),
-                         ("lib/libredwg/dist/libredwg-web.js", True), ("lib/libredwg/wasm/libredwg-web.js", True),
-                         ("lib/libredwg/wasm/libredwg-web.wasm", True), ("lib/dxf-viewer/dxf-viewer.bundle.js", True),
-                         ("lib/libredwg/LICENSE-GPL-3.0.txt", False), ("../__manifest__.py", False),
-                         ("models/engine.py", False), ("lib/libredwg/../../__manifest__.py", False)):
+                         ("lib/bGlicmVkd2c/dist/libredwg-web.js", True), ("lib/bGlicmVkd2c/wasm/libredwg-web.js", True),
+                         ("lib/bGlicmVkd2c/wasm/libredwg-web.wasm", True), ("lib/ZHhmLXZpZXdlcg/dxf-viewer.bundle.js", True),
+                         ("lib/bGlicmVkd2c/LICENSE-GPL-3.0.txt", False), ("../__manifest__.py", False),
+                         ("models/engine.py", False), ("lib/bGlicmVkd2c/../../__manifest__.py", False)):
             self.assertEqual(self.url_open("/dwo_attpreview_dwg/asset/" + path).status_code == 200, ok, path)
         res = self.url_open("/dwo_attpreview_dwg/asset/viewer/viewer.html")
         csp = res.headers["Content-Security-Policy"]
@@ -56,7 +56,7 @@ class TestDwgRoutes(_AssetRoutesWithoutTestCookie, HttpCase):
         self.assertIn(" 'unsafe-eval'", csp)  # the LibreDWG glue needs it; the page has no network and is sandboxed
         self.assertIn("connect-src %s" % self.base_url(), csp)
         self.assertNotIn("http:", csp.replace(self.base_url(), ""))
-        wasm = self.url_open("/dwo_attpreview_dwg/asset/lib/libredwg/wasm/libredwg-web.wasm")
+        wasm = self.url_open("/dwo_attpreview_dwg/asset/lib/bGlicmVkd2c/wasm/libredwg-web.wasm")
         self.assertEqual(wasm.headers["Content-Type"], "application/wasm")
 
     def test_02_file_route_checks_access_and_engine(self):

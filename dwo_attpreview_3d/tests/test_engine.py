@@ -112,15 +112,16 @@ class Test3DRoutes(_AssetRoutesWithoutTestCookie, HttpCase):
             csp = self.url_open("/dwo_attpreview_3d/asset/viewer/" + page).headers["Content-Security-Policy"]
             self.assertEqual(" 'unsafe-eval'" in csp, eval_ok, page)
             self.assertIn("default-src 'none'", csp)
-        for path in ("lib/occt/occt-import-js.bundle.js", "lib/occt/occt-import-js.wasm", "lib/rhino3dm/rhino3dm.module.min.js",
-                     "lib/rhino3dm/rhino3dm.wasm"):
+        for path in ("lib/b2NjdA/occt-import-js.bundle.js", "lib/b2NjdA/occt-import-js.wasm", "lib/cmhpbm8zZG0/rhino3dm.module.min.js",
+                     "lib/cmhpbm8zZG0/rhino3dm.wasm"):
             self.assertEqual(self.url_open("/dwo_attpreview_3d/asset/" + path).status_code, 200, path)
-        self.assertEqual(self.url_open("/dwo_attpreview_3d/asset/lib/occt/LICENSE-LGPL-2.1.txt").status_code, 404)
+        self.assertEqual(self.url_open("/dwo_attpreview_3d/asset/lib/b2NjdA/LICENSE-LGPL-2.1.txt").status_code, 404)
+        self.assertEqual(self.url_open("/dwo_attpreview_3d/asset/lib/occt/occt-import-js.bundle.js").status_code, 404)  # real name refused
 
     def test_02_webgl_asset_route_serves_three_and_nothing_else(self):
-        for path, ok in (("lib/three/build/three.module.js", True), ("viewer/common.js", True),
-                         ("lib/three/examples/jsm/loaders/STLLoader.js", True), ("controllers/main.py", False),
-                         ("lib/three/../../__manifest__.py", False), ("lib/three/LICENSE", False)):
+        for path, ok in (("lib/dGhyZWU/build/three.module.js", True), ("viewer/common.js", True),
+                         ("lib/dGhyZWU/examples/jsm/loaders/STLLoader.js", True), ("controllers/main.py", False),
+                         ("lib/dGhyZWU/../../__manifest__.py", False), ("lib/dGhyZWU/LICENSE", False)):
             self.assertEqual(self.url_open("/dwo_attpreview_webgl/asset/" + path).status_code == 200, ok, path)
 
     def test_03_file_route_checks_access_and_engine(self):

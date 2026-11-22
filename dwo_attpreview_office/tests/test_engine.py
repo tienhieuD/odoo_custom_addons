@@ -499,12 +499,12 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
 
     def test_03_asset_route_mime_cors_and_whitelist(self):
         base = "/dwo_attpreview_office/asset/"
-        wasm = self.url_open(base + "lib/silurus/xlsx_parser_bg.wasm")
+        wasm = self.url_open(base + "lib/c2lsdXJ1cw/xlsx_parser_bg.wasm")
         self.assertEqual(wasm.status_code, 200)
         self.assertEqual(wasm.headers["Content-Type"], "application/wasm")
         self.assertEqual(wasm.headers["Access-Control-Allow-Origin"], "*")
         self.assertEqual(wasm.content[:4], b"\0asm")
-        mjs = self.url_open(base + "lib/silurus/docx.mjs")
+        mjs = self.url_open(base + "lib/c2lsdXJ1cw/docx.mjs")
         self.assertEqual(mjs.status_code, 200)
         self.assertIn("javascript", mjs.headers["Content-Type"])
         # the legacy add-on: modules, wasm, shared chunk and the companion runtime next to them
@@ -513,17 +513,18 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
                      "legacy-doc-source-module.mjs", "legacy-xls-source-module.mjs", "legacy-ppt-source-module.mjs",
                      "odt.mjs", "ods.mjs", "odp.mjs", "odf-source-Cee46vyi.js", "odt-source-module.mjs",
                      "ods-source-module.mjs", "odp-source-module.mjs"):
-            res = self.url_open(base + "lib/silurus/" + name)
+            res = self.url_open(base + "lib/c2lsdXJ1cw/" + name)
             self.assertEqual(res.status_code, 200, name)
             self.assertNotIn("@silurus/", res.text.replace("@silurus/ooxml ", ""), name)  # no bare import
         for name in ("legacy_doc_direct_bg.wasm", "legacy_xls_direct_bg.wasm", "legacy_ppt_direct_bg.wasm",
                      "opendocument_odt_bg.wasm", "opendocument_ods_bg.wasm", "opendocument_odp_bg.wasm"):
-            res = self.url_open(base + "lib/silurus/" + name)
+            res = self.url_open(base + "lib/c2lsdXJ1cw/" + name)
             self.assertEqual(res.headers["Content-Type"], "application/wasm", name)
             self.assertEqual(res.content[:4], b"\0asm")
         # not served: licence and notices of the add-on
-        self.assertEqual(self.url_open(base + "lib/silurus/LICENSE.ooxml-legacy-office").status_code, 404)
-        self.assertEqual(self.url_open(base + "lib/silurus/LICENSE.ooxml-opendocument").status_code, 404)
+        self.assertEqual(self.url_open(base + "lib/c2lsdXJ1cw/LICENSE.ooxml-legacy-office").status_code, 404)
+        self.assertEqual(self.url_open(base + "lib/silurus/docx.mjs").status_code, 404)  # the real name is not a URL
+        self.assertEqual(self.url_open(base + "lib/c2lsdXJ1cw/LICENSE.ooxml-opendocument").status_code, 404)
         html = self.url_open(base + "viewer/viewer.html")
         self.assertEqual(html.status_code, 200)
         csp = html.headers["Content-Security-Policy"]
@@ -531,7 +532,7 @@ class TestOfficeRoutes(_AssetRouteWithoutTestCookie, HttpCase):
         self.assertIn("default-src 'none'", csp)
         self.assertNotIn("http://", csp.replace("http://127.0.0.1", "").replace("http://localhost", ""))
         for bad in ("../__manifest__.py", "viewer/../../__manifest__.py", "models/engine.py",
-                    "lib/silurus/../../../__manifest__.py", "lib/silurus/nothing.js", "viewer/x.py", "tests/files/sample.xlsx"):
+                    "lib/c2lsdXJ1cw/../../../__manifest__.py", "lib/c2lsdXJ1cw/nothing.js", "viewer/x.py", "tests/files/sample.xlsx"):
             self.assertEqual(self.url_open(base + bad).status_code, 404, bad)
 
     def test_03b_viewer_uses_scroll_viewer_for_docx_and_slides_for_pptx(self):
