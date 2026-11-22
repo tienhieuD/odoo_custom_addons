@@ -1,0 +1,24 @@
+.o_dwo_approval_statusbar {
+    // keep the original look of Odoo's status bar, only make it readable although the buttons are inert
+    .o_statusbar_status > .o_arrow_button:disabled {
+        opacity: 1;
+    }
+}
+
+// In the form header Odoo pushes its status bar to the right. Our widget sits inside the buttons box, so that box
+// takes the free room and the widget goes to its right end.
+.o_statusbar_buttons:has(> .o_widget_dwo_approval_panel) {
+    flex: 1 1 auto;
+}
+.o_statusbar_buttons > .o_widget_dwo_approval_panel {
+    margin-left: auto;
+    align-self: stretch;
+    display: flex;
+    .o_dwo_approval_panel {
+        display: flex;
+    }
+    .o_dwo_approval_statusbar {
+        display: flex;
+        align-self: stretch;
+    }
+}

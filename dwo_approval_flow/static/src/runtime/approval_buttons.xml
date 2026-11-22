@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_approval_flow.Buttons">
+        <div class="o_dwo_approval_buttons d-flex flex-wrap gap-1">
+            <t t-foreach="state.buttons" t-as="button" t-key="button.id">
+                <button type="button" class="btn" t-att-class="btnClass(button)"
+                        t-att-disabled="state.busy" t-on-click="() => this.press(button)">
+                    <t t-esc="label(button)"/>
+                </button>
+            </t>
+        </div>
+    </t>
+</templates>
