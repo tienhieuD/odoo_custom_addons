@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- each demo user lands where the demo starts for them -->
+    <record id="user_flow_admin" model="res.users">
+        <field name="action_id" ref="dwo_approval_flow.action_dwo_approval_flow"/>
+    </record>
+    <record id="demo_users.user_alice" model="res.users">
+        <field name="action_id" ref="action_business_trip"/>
+    </record>
+    <record id="demo_users.user_bob" model="res.users">
+        <field name="action_id" ref="dwo_approval_flow.action_dwo_approval_pending"/>
+    </record>
+    <record id="demo_users.user_carol" model="res.users">
+        <field name="action_id" ref="dwo_approval_flow.action_dwo_approval_pending"/>
+    </record>
+    <record id="user_finance" model="res.users">
+        <field name="action_id" ref="dwo_approval_flow.action_dwo_approval_pending"/>
+    </record>
+    <record id="user_travel" model="res.users">
+        <field name="action_id" ref="dwo_approval_flow.action_dwo_approval_pending"/>
+    </record>
+</odoo>
