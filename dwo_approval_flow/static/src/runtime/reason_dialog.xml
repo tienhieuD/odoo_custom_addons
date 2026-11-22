@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_approval_flow.ReasonDialog">
+        <Dialog title="this.props.title" size="'md'">
+            <label class="form-label">Reason (required)</label>
+            <textarea class="form-control" rows="4" t-model.proxy="this.state.reason" autofocus="autofocus"/>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-att-disabled="!this.state.reason.trim() or this.state.busy" t-on-click="this.onConfirm">Confirm</button>
+                <button class="btn btn-secondary" t-on-click="this.props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_approval_manager" model="res.groups">
+        <field name="name">Approval Flow: administrator</field>
+        <field name="comment">Members design the approval flows, see every notification and every waiting request.</field>
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_approval_manager'))]"/>
+    </record>
+</odoo>

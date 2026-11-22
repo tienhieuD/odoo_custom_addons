@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_approval_flow.Designer">
+        <div class="o_dwo_designer">
+            <div class="alert alert-info py-2 mb-2">
+                Each box is a <b>state</b> of the document. Each arrow is a <b>button</b> that moves it to the next state.
+                <b>Click an arrow</b> to set who can press it and what else happens.
+            </div>
+            <div t-if="this.problems.length" class="mb-2">
+                <div t-foreach="this.problems" t-as="problem" t-key="problem_index"
+                     class="alert alert-warning py-1 mb-1" role="button"
+                     t-on-click="() => { this.state.selected = { kind: 'state', cid: problem.cid } }">
+                    <i class="oi me-1" data-icon="warning"/><t t-esc="problem.text"/>
+                </div>
+            </div>
+            <div class="o_dwo_designer_grid">
+                <div class="o_dwo_designer_canvas card">
+                    <div class="d-flex gap-2 align-items-center p-2 border-bottom flex-wrap">
+                        <button t-if="!this.readonly and !this.isFieldMode" type="button" class="btn btn-primary btn-sm" t-on-click="this.addState">+ State</button>
+                        <span t-if="this.isFieldMode" class="text-muted small">States come from the field. Pick the field and they appear here.</span>
+                        <span t-elif="!this.readonly" class="text-muted small">Drag the dot of a box onto another box to add an arrow.</span>
+                        <span class="ms-auto"/>
+                        <button type="button" class="btn btn-secondary btn-sm" t-on-click="this.copyJson">Copy JSON</button>
+                        <button t-if="!this.readonly" type="button" class="btn btn-secondary btn-sm" t-on-click="this.loadJson">Load JSON</button>
+                        <button t-if="!this.readonly" type="button" class="btn btn-primary btn-sm" t-on-click="this.aiFlow" t-att-title="this.aiTitle"><i class="oi me-1" data-icon="auto_awesome"/>AI</button>
+                    </div>
+                    <div class="o_dwo_canvas_scroll">
+                        <svg t-ref="this.svgRef" class="o_dwo_svg" style="min-width: 100%" t-att-width="this.canvasSize.width" t-att-height="this.canvasSize.height"
+                             t-on-pointerdown="this.clearSelection">
+                            <defs>
+                                <marker id="dwo_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                                    <path d="M0 0L10 5L0 10z" fill="context-stroke"/>
+                                </marker>
+                            </defs>
+                            <t t-set="lay" t-value="this.layout"/>
+                            <g t-foreach="this.graph.transitions" t-as="t" t-key="t.cid">
+                                <t t-set="g" t-value="lay[t.cid]"/>
+                                <g t-if="g" class="o_dwo_edge" t-att-class="{ o_selected: this.state.selected and this.state.selected.cid === t.cid }"
+                                   t-on-pointerdown="(ev) => this.selectTransition(ev, t)">
+                                    <circle t-if="g.any" t-att-cx="g.x1" t-att-cy="g.y1" r="4" class="o_dwo_any_dot"/>
+                                    <path t-att-d="g.d" marker-end="url(#dwo_arrow)" class="o_dwo_edge_line" t-att-style="this.edgeStyle(t)"/>
+                                    <path t-att-d="g.d" class="o_dwo_edge_hit"/>
+                                    <g class="o_dwo_label">
+                                        <rect t-att-x="g.mx - g.width / 2" t-att-y="g.my - 11" t-att-width="g.width" height="22" rx="11" t-att-style="this.labelStyle(t)"/>
+                                        <text t-att-x="g.mx" t-att-y="g.my + 4" text-anchor="middle"><t t-esc="t.name"/></text>
+                                    </g>
+                                </g>
+                            </g>
+                            <g t-foreach="this.graph.states" t-as="s" t-key="s.cid" class="o_dwo_node" t-att-data-skey="s.key"
+                               t-att-class="{ o_selected: this.state.selected and this.state.selected.cid === s.cid, o_missing: s.missing, o_dim: s.visible === false, o_drop: this.state.connecting and this.state.connecting.target === s.key }"
+                               t-att-transform="'translate(' + s.x + ' ' + s.y + ')'"
+                               t-on-pointerdown="(ev) => this.startDrag(ev, s)">
+                                <rect class="o_dwo_node_bg" width="150" height="52" rx="10"/>
+                                <rect t-if="this.stroke(s.color)" class="o_dwo_node_tint" width="150" height="52" rx="10" t-att-style="this.nodeStyle(s)"/>
+                                <text x="75" y="25" text-anchor="middle" class="o_dwo_node_name"><t t-esc="s.name"/></text>
+                                <text x="75" y="40" text-anchor="middle" class="o_dwo_node_key">state = <t t-esc="s.key"/></text>
+                                <circle t-if="!this.readonly" class="o_dwo_handle" cx="150" cy="26" r="7"
+                                        t-on-pointerdown="(ev) => this.startConnect(ev, s)"/>
+                            </g>
+                            <line t-if="this.state.connecting" class="o_dwo_connecting"
+                                  t-att-x1="this.state.connecting.x1" t-att-y1="this.state.connecting.y1"
+                                  t-att-x2="this.state.connecting.x2" t-att-y2="this.state.connecting.y2"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="o_dwo_designer_panel card p-3">
+                    <t t-set="selState" t-value="this.selectedState"/>
+                    <t t-set="selTr" t-value="this.selectedTransition"/>
+                    <t t-if="selState">
+                        <t t-set="s" t-value="selState"/>
+                        <h5>State</h5>
+                        <label class="form-label">Name shown to users</label>
+                        <input type="text" class="form-control" t-att-value="s.name" t-att-readonly="this.readonly or this.isFieldMode"
+                               t-on-input="(ev) => this.onNameInput(s, ev)" t-on-change="() => this.onStateNameChange(s)"/>
+                        <label class="form-label mt-2">Technical value</label>
+                        <input type="text" class="form-control" t-att-value="s.key" t-att-readonly="this.readonly or this.isFieldMode"
+                               t-on-change="(ev) => this.setStateKey(s, ev.target.value)"/>
+                        <label class="form-label mt-2">Color</label>
+                        <ColorList colors="this.colorIds" selectedColor="s.color or 0" forceExpanded="true"
+                                   onColorSelected="(color) => this.setColor(s, color)"/>
+                        <div class="form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="dwo_state_visible"
+                                   t-att-checked="s.visible !== false" t-att-disabled="this.readonly"
+                                   t-on-change="(ev) => this.setVisible(s, ev.target.checked)"/>
+                            <label class="form-check-label" for="dwo_state_visible" title="Off: the status bar shows this state only while the document is in it.">Always show on the status bar</label>
+                        </div>
+                        <div class="text-muted small mt-3">
+                            Buttons leaving this state:
+                            <t t-set="leaving" t-value="this.graph.transitions.filter((x) => x.from === s.key)"/>
+                            <t t-if="leaving.length"><b t-esc="leaving.map((x) => x.name).join(', ')"/></t>
+                            <t t-else="">none</t>
+                        </div>
+                        <div t-if="!this.readonly and !this.isFieldMode" class="mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-danger" t-on-click="() => this.deleteState(s)">Delete state</button>
+                        </div>
+                    </t>
+                    <t t-elif="selTr">
+                        <t t-set="t" t-value="selTr"/>
+                        <h5><t t-esc="t.from ? (this.stateByKey(t.from) or {}).name : 'Any state'"/> → <t t-esc="(this.stateByKey(t.to) or {}).name"/></h5>
+                        <input type="text" class="form-control" t-att-value="t.name" t-att-readonly="this.readonly"
+                               title="Button name" t-on-input="(ev) => this.onNameInput(t, ev)" t-on-change="this.onNameChange"/>
+
+                        <div class="d-flex align-items-center mt-3 mb-1 fw-bold">
+                            Who can press it <span class="text-muted fw-normal ms-1">(all must be true)</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-auto font-monospace"
+                                    title="Show what is checked" t-on-click="() => { this.state.showChecks = !this.state.showChecks }">&lt;/&gt;</button>
+                        </div>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex gap-2 align-items-center">
+                                <span class="badge text-bg-secondary flex-shrink-0">State</span>
+                                <span class="flex-grow-1">The document is in <b t-esc="t.from ? (this.stateByKey(t.from) or {}).name : 'any state'"/></span>
+                                <i class="oi text-muted" data-icon="lock" title="Built in, cannot be removed"/>
+                            </div>
+                            <div t-if="t.who" class="list-group-item d-flex gap-2 align-items-center">
+                                <span class="badge text-bg-primary flex-shrink-0">Who</span>
+                                <span class="flex-grow-1">
+                                    <t t-esc="this.approverText(t)"/>
+                                    <div class="text-muted small" t-esc="this.approvalsText(t)"/>
+                                    <div t-if="this.notifyText(t)" class="text-muted small"><i class="oi" data-icon="notifications"/> <t t-esc="this.notifyText(t)"/></div>
+                                </span>
+                                <t t-if="!this.readonly">
+                                    <button type="button" class="btn btn-link p-0" title="Edit" t-on-click="() => this.editWho(t)"><i class="oi" data-icon="edit"/></button>
+                                    <button type="button" class="btn btn-link p-0 text-danger" title="Remove" t-on-click="() => this.removeWho(t)"><i class="oi" data-icon="close"/></button>
+                                </t>
+                            </div>
+                            <div t-foreach="t.rules" t-as="rule" t-key="rule_index" class="list-group-item d-flex gap-2 align-items-center">
+                                <span class="badge text-bg-warning flex-shrink-0">Rule</span>
+                                <span class="flex-grow-1 small" style="min-width: 0">
+                                    <DomainSelector resModel="this.modelName" domain="rule" readonly="true"/>
+                                </span>
+                                <t t-if="!this.readonly">
+                                    <button type="button" class="btn btn-link p-0" title="Edit" t-on-click="() => this.editRule(t, rule_index)"><i class="oi" data-icon="edit"/></button>
+                                    <button type="button" class="btn btn-link p-0 text-danger" title="Remove" t-on-click="() => this.removeRule(t, rule_index)"><i class="oi" data-icon="close"/></button>
+                                </t>
+                            </div>
+                        </div>
+                        <div t-if="this.state.showChecks" class="alert alert-secondary py-2 mt-2 mb-0 small">
+                            <div t-foreach="this.checkLines(t)" t-as="line" t-key="line_index">
+                                <span t-if="line_index" class="text-primary">AND </span><t t-esc="line"/>
+                            </div>
+                        </div>
+                        <button t-if="!this.readonly and !t.who" type="button" class="btn btn-link ps-0" t-on-click="() => this.editWho(t)">+ Set who can press it</button>
+                        <button t-if="!this.readonly" type="button" class="btn btn-link ps-0" t-on-click="() => this.addCondition(t)">+ Add a condition</button>
+
+                        <div class="mt-3 mb-1 fw-bold">When pressed</div>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex gap-2 align-items-center">
+                                <span class="badge text-bg-secondary flex-shrink-0">Step</span>
+                                <span class="flex-grow-1" t-esc="this.stepText(t)"/>
+                                <button t-if="!this.readonly" type="button" class="btn btn-link p-0" title="Edit" t-on-click="() => this.editStep(t)"><i class="oi" data-icon="edit"/></button>
+                                <i class="oi text-muted" data-icon="lock" title="Built in, cannot be removed"/>
+                            </div>
+                            <div t-foreach="t.actions" t-as="action" t-key="action_index" class="list-group-item d-flex gap-2 align-items-center">
+                                <span class="badge text-bg-success flex-shrink-0">Action</span>
+                                <span class="flex-grow-1 text-break" t-esc="this.actionText(action)"/>
+                                <t t-if="!this.readonly">
+                                    <button type="button" class="btn btn-link p-0" title="Edit" t-on-click="() => this.editAction(t, action_index)"><i class="oi" data-icon="edit"/></button>
+                                    <button type="button" class="btn btn-link p-0 text-danger" title="Remove" t-on-click="() => this.removeAction(t, action_index)"><i class="oi" data-icon="close"/></button>
+                                </t>
+                            </div>
+                        </div>
+                        <button t-if="!this.readonly" type="button" class="btn btn-link ps-0" t-on-click="() => this.editAction(t, -1)">+ Add an action</button>
+
+                        <div class="mt-3 mb-1 fw-bold">Options</div>
+                        <label class="form-label mb-0">Color</label>
+                        <ColorList colors="this.colorIds" selectedColor="t.color or 0" forceExpanded="true"
+                                   onColorSelected="(color) => this.setColor(t, color)"/>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="dwo_reason" t-att-checked="t.ask_reason"
+                                   t-att-disabled="this.readonly" t-on-change="(ev) => this.toggleReason(t, ev)"/>
+                            <label class="form-check-label" for="dwo_reason">Ask for a reason when pressed</label>
+                        </div>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="dwo_list" t-att-checked="t.list_action"
+                                   t-att-disabled="this.readonly" t-on-change="(ev) => this.toggleListAction(t, ev)"/>
+                            <label class="form-check-label" for="dwo_list">Also allow from the list view (Action menu)</label>
+                        </div>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="dwo_notify_creator" t-att-checked="t.notify and t.notify.creator"
+                                   t-att-disabled="this.readonly" t-on-change="(ev) => this.toggleNotify(t, 'creator', ev)"/>
+                            <label class="form-check-label" for="dwo_notify_creator">Notify the creator of the document when this is pressed or voted</label>
+                        </div>
+                        <div t-if="!this.readonly" class="mt-3 d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-danger" t-on-click="() => this.deleteTransition(t)">Delete arrow</button>
+                            <button t-if="t.from" type="button" class="btn btn-sm btn-secondary" t-on-click="() => this.addWayBack(t)">Add the way back</button>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <h5>Nothing selected</h5>
+                        <p class="text-muted">Click a <b>box</b> to rename a state, or an <b>arrow</b> to set who can press the button and what it does.</p>
+                        <p class="text-muted">The first box is where new documents start.</p>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

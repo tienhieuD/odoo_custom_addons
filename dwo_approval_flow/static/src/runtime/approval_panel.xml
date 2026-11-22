@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_approval_flow.Panel">
+        <div class="o_dwo_approval_panel" t-if="this.state.data and this.state.data.flow">
+            <div t-if="this.props.showStatusbar" class="o_field_statusbar o_dwo_approval_statusbar">
+                <div class="o_statusbar_status" role="radiogroup" aria-label="Statusbar">
+                    <t t-foreach="this.states" t-as="item" t-key="item.id">
+                        <button type="button" class="btn btn-secondary o_arrow_button" disabled="disabled"
+                                t-att-class="{ o_first: item_first, o_last: item_last, o_arrow_button_current: item.id === this.state.data.current }"
+                                role="radio" t-att-aria-checked="(item.id === this.state.data.current).toString()"
+                                t-att-aria-current="item.id === this.state.data.current and 'step'"
+                                t-esc="item.name"/>
+                    </t>
+                </div>
+            </div>
+            <div t-if="this.props.showWaiting and this.state.data.waiting.length" class="o_dwo_approval_waiting mt-3">
+                <div t-foreach="this.state.data.waiting" t-as="wait" t-key="wait.id" class="alert alert-warning py-2 mb-2">
+                    <i class="oi me-1" data-icon="hourglass_top"/>
+                    <b><t t-esc="wait.name"/></b>:
+                    <t t-esc="wait.count"/> of <t t-esc="wait.needed"/> approvals
+                    (<t t-esc="wait.voters.join(', ')"/>). Waiting for the others.
+                </div>
+            </div>
+            <div t-if="this.props.showHistory" class="o_dwo_approval_history mt-3">
+                <h6 class="text-muted">Approval history</h6>
+                <div t-if="!this.state.data.history.length" class="text-muted">No approval activity yet.</div>
+                <div t-foreach="this.state.data.history" t-as="item" t-key="item.id" class="d-flex gap-2 py-2 border-bottom">
+                    <img t-if="item.user" class="o_avatar rounded-circle flex-shrink-0"
+                         style="width: 32px; height: 32px"
+                         t-att-src="'/web/image/res.users/' + item.user.id + '/avatar_128'"/>
+                    <div class="flex-grow-1">
+                        <b t-esc="item.user ? item.user.name : ''"/>
+                        <t t-if="item.kind === 'vote'">
+                            approved <b t-esc="item.button"/>
+                            <span class="badge text-bg-secondary ms-1">vote <t t-esc="item.votes"/></span>
+                        </t>
+                        <t t-else="">
+                            pressed <b t-esc="item.button"/>: <t t-esc="item.from"/> → <t t-esc="item.to"/>
+                        </t>
+                        <div t-if="item.reason" class="border-start border-3 ps-2 mt-1 text-muted" t-esc="item.reason"/>
+                    </div>
+                    <div class="text-muted small text-nowrap" t-esc="this.formatDate(item.date)"/>
+                </div>
+                <div t-if="this.state.data.has_more" class="text-center mt-2">
+                    <button type="button" class="btn btn-link" t-on-click="this.showMore">Show more</button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

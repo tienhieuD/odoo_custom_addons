@@ -1,0 +1,19 @@
+id,name,model_id,group_id/id,operation,domain
+access_flow_manager,dwo.approval.flow manager,dwo.approval.flow,group_approval_manager,crud,
+access_flow_company,dwo.approval.flow company,dwo.approval.flow,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_state_manager,dwo.approval.state manager,dwo.approval.state,group_approval_manager,crud,
+access_state_user,dwo.approval.state user,dwo.approval.state,base.group_user,r,
+access_transition_manager,dwo.approval.transition manager,dwo.approval.transition,group_approval_manager,crud,
+access_approver_manager,dwo.approval.approver manager,dwo.approval.approver,group_approval_manager,crud,
+access_rule_manager,dwo.approval.rule manager,dwo.approval.rule,group_approval_manager,crud,
+access_action_manager,dwo.approval.action manager,dwo.approval.action,group_approval_manager,crud,
+access_log_manager,dwo.approval.log manager,dwo.approval.log,group_approval_manager,r,
+access_test_manager,dwo.approval.test manager,dwo.approval.test,group_approval_manager,crud,
+access_history_user,dwo.approval.history user,dwo.approval.history,base.group_user,crud,
+access_history_line_user,dwo.approval.history.line user,dwo.approval.history.line,base.group_user,crud,
+access_ir_model_flow_manager,ir.model flow manager (read),ir.model,group_approval_manager,r,
+access_ir_model_fields_flow_manager,ir.model.fields flow manager (read),ir.model.fields,group_approval_manager,r,
+access_server_action_flow_manager,ir.actions.server flow manager (read),ir.actions.server,group_approval_manager,r,
+access_pending_own,dwo.approval.pending own,dwo.approval.pending,base.group_user,r,"[('user_id', '=', user.id)]"
+access_pending_manager,dwo.approval.pending manager,dwo.approval.pending,group_approval_manager,rd,
+access_notify_log_manager,dwo.approval.notify.log manager,dwo.approval.notify.log,group_approval_manager,r,
