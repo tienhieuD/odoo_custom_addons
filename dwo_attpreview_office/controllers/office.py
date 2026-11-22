@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2026 Duotek. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
+import base64
 import os
 
 from odoo import http
@@ -13,6 +14,28 @@ ASSET_DIRS = ("viewer/", "lib/silurus/")
 ASSET_EXT = (".html", ".css", ".js", ".mjs", ".wasm", ".json")
 
 
+def lib_alias(name):
+    """Public name of a library folder under ``lib/``: its name in base64url without padding (``silurus`` is
+    ``c2lsdXJ1cw``), so the network tab does not tell which library is behind a file. Same rule as the other
+    viewers of the family (dwo_attpreview_webgl/controllers/assets.py). The folder on the disk keeps its name."""
+    return base64.urlsafe_b64encode(name.encode()).decode().rstrip("=")
+
+
+def _lib_real_path(rel):
+    """``lib/<alias>/x`` -> ``lib/<real name>/x``; ``rel`` itself when not under ``lib/``; ``None`` when the alias
+    is not valid (a real folder name is not accepted in a URL)."""
+    if not rel.startswith("lib/"):
+        return rel
+    head, _, tail = rel[4:].partition("/")
+    try:
+        real = base64.urlsafe_b64decode(head + "=" * (-len(head) % 4)).decode()
+    except (ValueError, UnicodeDecodeError):
+        return None
+    if not real or lib_alias(real) != head or "/" in real or real.startswith("."):
+        return None
+    return "lib/%s/%s" % (real, tail)
+
+
 class AttPreviewOfficeController(http.Controller):
 
     @http.route("/dwo_attpreview_office/asset/<path:path>", type="http", auth="none", cors="*")
@@ -22,7 +45,8 @@ class AttPreviewOfficeController(http.Controller):
         and wasm it loads, which the plain /static route of Odoo does not send. Public (no session needed, the
         files are not secret), whitelisted directories and extensions, correct MIME (application/wasm)."""
         rel = os.path.normpath(path).replace(os.sep, "/")
-        if (rel.startswith("..") or not rel.startswith(ASSET_DIRS)
+        rel = None if rel.startswith("..") else _lib_real_path(rel)
+        if (rel is None or not rel.startswith(ASSET_DIRS)
                 or not rel.lower().endswith(ASSET_EXT)):
             return request.not_found()
         try:

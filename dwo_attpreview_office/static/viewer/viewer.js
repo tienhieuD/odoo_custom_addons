@@ -33,9 +33,9 @@ window.addEventListener("unhandledrejection", (e) => fail(e.reason));
 // such a file is opened (its WebAssembly parser is about 1.3 MB). maxInputBytes: the add-on has no ceiling of its own;
 // the server already refused what is above the Core limit, this one is the hard stop in the browser.
 const LEGACY = {
-    doc: { target: "docx", module: "../lib/silurus/doc.mjs", factory: "createLegacyDoc", option: "legacyDoc" },
-    xls: { target: "xlsx", module: "../lib/silurus/xls.mjs", factory: "createLegacyXls", option: "legacyXls" },
-    ppt: { target: "pptx", module: "../lib/silurus/ppt.mjs", factory: "createLegacyPpt", option: "legacyPpt" },
+    doc: { target: "docx", module: "../lib/c2lsdXJ1cw/doc.mjs", factory: "createLegacyDoc", option: "legacyDoc" },
+    xls: { target: "xlsx", module: "../lib/c2lsdXJ1cw/xls.mjs", factory: "createLegacyXls", option: "legacyXls" },
+    ppt: { target: "pptx", module: "../lib/c2lsdXJ1cw/ppt.mjs", factory: "createLegacyPpt", option: "legacyPpt" },
 };
 const LEGACY_MAX_INPUT_BYTES = 128 * 1024 * 1024;
 
@@ -50,9 +50,9 @@ async function legacyOption(kind) {
 // started in the parser Worker). The factories take only { moduleUrl, wasmUrl }: the defaults point next to the
 // module, i.e. the asset route of this module. The server sends odt/ods/odp also for the templates ott/ots/otp.
 const OPENDOCUMENT = {
-    odt: { target: "docx", module: "../lib/silurus/odt.mjs", factory: "createOdt", option: "odt" },
-    ods: { target: "xlsx", module: "../lib/silurus/ods.mjs", factory: "createOds", option: "ods" },
-    odp: { target: "pptx", module: "../lib/silurus/odp.mjs", factory: "createOdp", option: "odp" },
+    odt: { target: "docx", module: "../lib/c2lsdXJ1cw/odt.mjs", factory: "createOdt", option: "odt" },
+    ods: { target: "xlsx", module: "../lib/c2lsdXJ1cw/ods.mjs", factory: "createOds", option: "ods" },
+    odp: { target: "pptx", module: "../lib/c2lsdXJ1cw/odp.mjs", factory: "createOdp", option: "odp" },
 };
 
 async function openDocumentOption(kind) {
@@ -92,7 +92,7 @@ function detectDelimiter(buffer, kind) {
 }
 
 async function openDelimited(buffer, opts, kind) {
-    const { XlsxSheetViewer } = await import("../lib/silurus/xlsx.mjs");
+    const { XlsxSheetViewer } = await import("../lib/c2lsdXJ1cw/xlsx.mjs");
     const bytes = new Uint8Array(buffer);
     if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) {
         buffer = buffer.slice(3); // UTF-8 byte order mark
@@ -111,7 +111,7 @@ async function openDelimited(buffer, opts, kind) {
 }
 
 async function openXlsx(buffer, opts) {
-    const { XlsxViewer } = await import("../lib/silurus/xlsx.mjs");
+    const { XlsxViewer } = await import("../lib/c2lsdXJ1cw/xlsx.mjs");
     stage.classList.add("xlsx");
     stage.style.overflow = "hidden";
     stage.innerHTML = "";
@@ -139,7 +139,7 @@ function wireToolbar(handlers) {
 
 // pptx: one slide at a time, with Previous / Next (PptxViewer draws on a canvas)
 async function openSlides(buffer, opts) {
-    const { PptxViewer } = await import("../lib/silurus/pptx.mjs");
+    const { PptxViewer } = await import("../lib/c2lsdXJ1cw/pptx.mjs");
     const canvas = document.createElement("canvas");
     stage.innerHTML = "";
     stage.append(canvas);
@@ -164,7 +164,7 @@ async function openSlides(buffer, opts) {
 // docx: continuous vertical scroll like a PDF reader (DocxScrollViewer owns the scroll host and only keeps the
 // visible pages mounted, so a long document stays smooth). The container needs a bounded height: it is the stage.
 async function openScroll(buffer, opts) {
-    const { DocxScrollViewer } = await import("../lib/silurus/docx.mjs");
+    const { DocxScrollViewer } = await import("../lib/c2lsdXJ1cw/docx.mjs");
     stage.classList.add("docx");
     stage.style.overflow = "hidden";
     stage.innerHTML = "";

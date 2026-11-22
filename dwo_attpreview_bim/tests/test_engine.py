@@ -39,9 +39,9 @@ class TestBimEngine(TransactionCase):
 class TestBimRoutes(HttpCase):
 
     def test_01_asset_route_serves_only_the_viewer_and_its_library(self):
-        for path, ok in (("viewer/viewer.html", True), ("viewer/viewer.js", True), ("lib/web-ifc/web-ifc-api.js", True), ("lib/web-ifc/web-ifc.wasm", True),
-                         ("lib/web-ifc/LICENSE-web-ifc-MPL-2.0.txt", False), ("../__manifest__.py", False),
-                         ("models/engine.py", False), ("lib/web-ifc/../../__manifest__.py", False)):
+        for path, ok in (("viewer/viewer.html", True), ("viewer/viewer.js", True), ("lib/d2ViLWlmYw/web-ifc-api.js", True), ("lib/d2ViLWlmYw/web-ifc.wasm", True),
+                         ("lib/d2ViLWlmYw/LICENSE-web-ifc-MPL-2.0.txt", False), ("../__manifest__.py", False),
+                         ("models/engine.py", False), ("lib/d2ViLWlmYw/../../__manifest__.py", False)):
             self.assertEqual(self.url_open("/dwo_attpreview_bim/asset/" + path).status_code == 200, ok, path)
         res = self.url_open("/dwo_attpreview_bim/asset/viewer/viewer.html")
         self.assertIn("default-src 'none'", res.headers["Content-Security-Policy"])
