@@ -140,6 +140,7 @@ Keep `n` only meaningful with `"mode": "n"`; for the other modes write `"n": 1`.
 - `call_method`: the module calls an existing public method of the model (for example the standard "Confirm" button method) and the method is responsible for moving the record. Use only when the description says that a standard button/method must run, AND the method name or server action appears in CONTEXT. Never guess a method name.
 - `verify` (default true): after the call the record must be in the target state, otherwise everything is rolled back.
 - `run_as`: `"user"` (default) the person who pressed, or `"system"` to run with full rights.
+- `guard`: `"direct"` (default, leave it out) sends a press of the original button of the screen through this arrow, so nobody skips the approval; `"none"` does not protect the method.
 - If you set `mode` to `call_method` you must give either `method` or `server_action`.
 
 ### 3.5 Colors (0 to 11)
