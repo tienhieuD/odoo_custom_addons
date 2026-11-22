@@ -190,9 +190,10 @@ class DwoLoginTheme(models.AbstractModel):
         }
         style = ".dwo_lc{%s}" % ";".join("--dwo-%s:%s" % item for item in css.items())
         ctx.update({
-            "root_class": "dwo_lc dwo_l_%s dwo_logo_%s dwo_bgt_%s%s" % (
+            "root_class": "dwo_lc dwo_l_%s dwo_logo_%s dwo_bgt_%s%s%s" % (
                 layout, logo_size, bg_type if bg_type in dict(data.BG_TYPES) else "gallery",
-                " dwo_has_aside" if (self.param("intro_title") or intro_items) else ""),
+                " dwo_has_aside" if (self.param("intro_title") or intro_items) else "",
+                " dwo_card_dark" if tools.is_dark_color(css["card-bg"]) else ""),
             "style": Markup("<style>%s</style>") % Markup(style),
             "images": images,
             "logo_url": self.image_url("logo"),
