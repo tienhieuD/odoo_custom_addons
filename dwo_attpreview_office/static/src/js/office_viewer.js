@@ -37,6 +37,7 @@ export class OfficeViewer extends Component {
         this.viewerUrl = VIEWER_URL;
         this.onMessage = this.onMessage.bind(this);
         this.onKeydown = this.onKeydown.bind(this);
+        this._bufferPromise = this._fetchBuffer();
         onMounted(() => {
             window.addEventListener("message", this.onMessage);
             document.addEventListener("keydown", this.onKeydown);
@@ -53,6 +54,7 @@ export class OfficeViewer extends Component {
             window.removeEventListener("message", this.onMessage);
             document.removeEventListener("keydown", this.onKeydown);
             clearTimeout(this.timer);
+            this._unmounted = true;
         });
     }
 
@@ -104,7 +106,7 @@ export class OfficeViewer extends Component {
         }
         const data = ev.data;
         if (data.type === "ready") {
-            await this.sendFile();
+            await this.sendFile();  // await the already-in-flight promise
         } else if (data.type === "rendered") {
             clearTimeout(this.timer);
             this.state.loading = false;
@@ -123,20 +125,23 @@ export class OfficeViewer extends Component {
         }
     }
 
+    async _fetchBuffer() {
+        const url = this.props.fileUrl || `/dwo_attpreview_office/file/${this.props.attachmentId}`;
+        if (!url.startsWith("/") || url.startsWith("//")) {
+            throw new Error("unexpected file URL");
+        }
+        const response = await fetch(url, { credentials: "same-origin" });
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+        return response.arrayBuffer();
+    }
+
     async sendFile() {
+        if (this._unmounted) return;
         try {
-            const url = this.props.fileUrl || `/dwo_attpreview_office/file/${this.props.attachmentId}`;
-            if (!url.startsWith("/") || url.startsWith("//")) {
-                // only a path of this server, never another site
-                throw new Error("unexpected file URL");
-            }
-            const response = await fetch(url, {
-                credentials: "same-origin",
-            });
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
-            const buffer = await response.arrayBuffer();
+            const buffer = await this._bufferPromise;
+            if (this._unmounted) return;
             this.frame.el.contentWindow.postMessage(
                 { source: "dwo_attpreview_office_parent", type: "load", kind: this.props.content, buffer },
                 "*",

@@ -1,5 +1,11 @@
 # CHANGELOG - dwo_attpreview_office
 
+## 2026-11-24 - 19.0.1.1.3 - Parallel file fetch
+
+`OfficeViewer`: start the file fetch at component mount (setup) instead of waiting for the iframe
+"ready" message. The fetch and the iframe init now run in parallel; `sendFile` awaits the
+already-in-flight promise. Saves the iframe init time (~15–30 ms) on every open.
+
 ## 2026-11-18 - 19.0.1.1.2 - Ecosystem cards in the listing (#97)
 
 Listing only: a "More modules of the preview family" section with cards of the other modules (relative store links, icons in `static/description/img/`). No code change.
