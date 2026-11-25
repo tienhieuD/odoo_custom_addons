@@ -72,5 +72,6 @@ Screenshot helpers used before are throw-away Playwright scripts (`uv run script
 **C. Not verified:** OpenAI-compatible provider against a real service (only mocked); the AI settings form's OpenAI fields in a browser; WebKit/Safari on a real iPhone; SQL on a real production database; the owner's report that "admin cannot use the dashboard / add a page" could not be reproduced (they are investigating).
 
 ## 7. State of the repos at handoff
-- `odoo_custom_addons` branch `19.0`: this commit. The demo server runs `e760997` (before joins/SQL/groups follow-ups are deployed? check `git log`): **joins, SQL, blend and AI-dataset work are committed but NOT yet deployed**; deploying needs the owner's OK and `--rebuild`.
-- `_agent` repo: demo-server `dashboard.conf` and README already pushed.
+- `odoo_custom_addons` branch `19.0`: the demo server runs commit `e760997`. The commit that adds this file (related paths, blend, SQL, review fixes)
+  is pushed but **NOT deployed**; deploying needs the owner's OK and `--rebuild` (demo data changed: new blend dataset and widgets).
+- `_agent` repo: demo-server `dashboard.conf` and README are already pushed; nothing pending.
