@@ -93,7 +93,7 @@
                             <p t-elif="state.editing" class="mb-0">Press <b>Add widget</b> to start.</p>
                         </div>
                         <t t-if="state.editing">
-                            <div class="grid-stack dwo-grid-edit" t-ref="grid">
+                            <div class="grid-stack dwo-grid-edit" t-ref="grid" t-attf-style="--dwo-cols: #{cols}">
                                 <div t-foreach="widgets" t-as="w" t-key="w.id" class="grid-stack-item"
                                      t-att-gs-id="w.id" t-att-gs-x="w.x" t-att-gs-y="w.y" t-att-gs-w="w.w" t-att-gs-h="w.h">
                                     <div class="grid-stack-item-content">

@@ -1,5 +1,9 @@
 # Changelog
 
+## Interface pass 4 (not released)
+- On a computer the grid has a fixed size: one column is 84 px wide (12 columns = 1140 px), in the view and the edit mode alike. A wide
+  window shows an empty grey area at the right, a narrow one scrolls sideways. Only the phone layout (under 768 px) is responsive.
+
 ## Interface pass 3 (not released)
 - New widget key `icon` (a Font Awesome class) shown before the title; default per type (KPI `fa-hashtag`, table `fa-list`, pivot
   `fa-th`, charts their own). Chosen in Explore ("Icon and title"). Schema snapshot, `check_schema.py` and tests updated.

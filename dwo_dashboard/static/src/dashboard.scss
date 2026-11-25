@@ -3,6 +3,7 @@
 .dwo-dashboard {
     --dwo-gap: 12px; // between two cards (view and edit mode use the same value, or cards would jump)
     --dwo-radius: 12px;
+    --dwo-col: 84px; // the width of one grid column on a computer: the grid never stretches or shrinks with the window
     --dwo-card: #{$o-view-background-color}; // what Odoo paints a form with, in the light and in the dark bundle
     --dwo-canvas: color-mix(in srgb, var(--body-color) 5%, var(--body-bg, #f8f9fa));
     --dwo-line: var(--border-color, #dee2e6);
@@ -49,11 +50,14 @@
     .dwo-canvas { padding: var(--dwo-gap); min-width: 0; }
     .dwo-main { min-width: 0; }
 
+    // A fixed size on a computer (12 columns = 1140 px): a wide window shows an empty grey area at the right, a narrow one
+    // scrolls sideways. The phone layout below is the only responsive one.
     .dwo-grid {
         display: grid;
-        grid-template-columns: repeat(var(--dwo-cols, 12), minmax(0, 1fr));
+        grid-template-columns: repeat(var(--dwo-cols, 12), var(--dwo-col));
         grid-auto-rows: var(--dwo-row, 80px);
         gap: var(--dwo-gap);
+        width: max-content;
     }
 
     // ------------------------------------------------------------------------------------------ the cards
@@ -72,7 +76,8 @@
     }
 
     // gridstack (edit mode): the item is the card, spaced like the view grid
-    .dwo-grid-edit { margin: calc(var(--dwo-gap) / -2); }
+    // gridstack lays its items out in percentages of this box: cols x (column + gap), the same grid as the view mode
+    .dwo-grid-edit { margin: calc(var(--dwo-gap) / -2); width: calc(var(--dwo-cols, 12) * (var(--dwo-col) + var(--dwo-gap))); }
     .grid-stack > .grid-stack-item > .grid-stack-item-content {
         overflow: hidden;
         inset: calc(var(--dwo-gap) / 2);
@@ -178,7 +183,7 @@
         .dwo-page-item { flex: 0 0 auto; white-space: nowrap; .dwo-page-handle { display: none !important; } }
         .dwo-main { flex: 0 0 auto !important; overflow: visible !important; }
         .dwo-canvas { overflow: visible !important; }
-        .dwo-grid { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
+        .dwo-grid { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; width: auto; }
         .dwo-grid-item {
             grid-column: 1 / -1 !important;
             grid-row: auto !important;
