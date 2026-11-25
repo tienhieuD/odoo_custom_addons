@@ -556,7 +556,7 @@ export class DashboardAction extends Component {
         this.destroyGrid();
         this.setGridCols(this.state.editCols);
         this.grid = window.GridStack.init(
-            { column: this.state.editCols, cellHeight: ROW_HEIGHT + GAP, margin: GAP / 2, float: true, animate: false,
+            { column: this.state.editCols, cellHeight: ROW_HEIGHT + GAP, margin: GAP / 2, float: false, animate: false,
               handle: ".dwo-card-header", disableOneColumnMode: true },
             el
         );

@@ -11,8 +11,8 @@
   Providers: Odoo AI (default, no setup) or an OpenAI-compatible API (Dashboard > Configuration > AI assistant; the key is written
   and never read back). Validated as the caller; two harmless mistakes repaired; one retry with the errors. No record is sent.
   See SPEC "The assistant".
-- The grid is as wide as its widgets (up to 120 columns), widgets stay where they are dropped (no packing), and a page grows to
-  the right while editing, with a sheet-like cell grid.
+- The grid is as wide as its widgets (up to 120 columns) and a page grows to the right while editing, with a sheet-like cell
+  grid. Widgets are packed upwards, as before (gravity), and keep their column.
 - Drill-through of a widget of metrics lists the records the metrics count (all measures with the same `where`), or the whole
   group when they differ, with a notice.
 

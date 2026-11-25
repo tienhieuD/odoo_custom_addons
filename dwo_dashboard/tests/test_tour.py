@@ -88,7 +88,7 @@ class TestInteractTour(HttpCase):
 @tagged("post_install", "-at_install")
 class TestWideTour(HttpCase):
 
-    def test_a_widget_far_to_the_right_and_low_stays_there(self):
+    def test_a_widget_far_to_the_right_keeps_its_column_and_slides_up(self):
         user = self.env["res.users"].create({"name": "Wade", "login": "dash_wade", "password": "dash_wade",
                                              "group_ids": [(6, 0, [self.env.ref("base.group_user").id])]})
         page_id = self.env["dwo.dashboard"].with_user(user).get_my_dashboard()["pages"][0]["id"]
@@ -99,7 +99,7 @@ class TestWideTour(HttpCase):
         self.start_tour(URL, "dwo_wide", login="dash_wade")
         page.invalidate_recordset()
         widget = page.spec["widgets"][0]
-        self.assertEqual((widget["x"], widget["y"]), (30, 8))  # not packed to the top-left corner
+        self.assertEqual((widget["x"], widget["y"]), (30, 0))  # its column stays; it slides up, nothing is left hanging
         self.assertEqual(page.spec["grid"]["cols"], 33)         # the page grew to its content
 
 

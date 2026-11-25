@@ -241,6 +241,14 @@ class TestMetricStorageAndAccess(TransactionCase):
         manager = self.env["res.users"].create({"name": "Manny", "login": "mx_manager", "group_ids": [
             (6, 0, [self.env.ref("base.group_user").id, self.env.ref("dwo_dashboard.group_dwo_dashboard_manager").id])]})
         self.assertFalse(manager.has_group("base.group_system"))       # no Settings rights needed
+        # the pickers of the form: a model and a field, found by name, as the manager (read only: the names of models and fields)
+        models = self.env["ir.model"].with_user(manager).name_search("Contact")
+        self.assertIn("res.partner", [self.env["ir.model"].browse(i).model for i, _n in models])
+        self.assertTrue(self.env["ir.model.fields"].with_user(manager).name_search("Name"))
+        with self.assertRaises(AccessError):
+            self.env["ir.model"].with_user(manager).create({"name": "x", "model": "x.x"})    # read only
+        with self.assertRaises(AccessError):
+            self.env["ir.model"].with_user(self.user).name_search("Contact")                  # and only the managers
         Dataset.with_user(manager).create({"model_id": self.env.ref("base.model_res_users").id, "label": "Users"})
         self.dataset.with_user(manager).write({"label": "Contacts by the manager"})
         self.assertTrue(self.env["dwo.dashboard.spec"].with_user(manager).validate_dataset(

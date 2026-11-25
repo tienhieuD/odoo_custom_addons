@@ -27,7 +27,7 @@ to a field of each dataset.
 {"schema": "dwo-dashboard/1", "title": "Sales", "description": "optional", "grid": {"cols": 12},
  "filters": [ ... up to 10 ... ], "widgets": [ ... up to 40 ... ]}
 ```
-`grid.cols` 6 to 120 (default 12; the editor raises it to the right-most widget). Widgets sit on the grid with `x, y, w, h` (`x + w <= cols`, no overlap) and stay where they are put: nothing is packed upwards or to the left, so a page can have gaps and can be as wide as it needs.
+`grid.cols` 6 to 120 (default 12; the editor raises it to the right-most widget). Widgets sit on the grid with `x, y, w, h` (`x + w <= cols`, no overlap). The editor packs them upwards (a widget slides up until it meets another one) and never sideways, so a page can be as wide as it needs.
 
 ## Widget
 

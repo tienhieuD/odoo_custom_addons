@@ -18,7 +18,7 @@ registry.category("web_tour.tours").add("dwo_interact", {
     ],
 });
 
-// A page is as wide as its widgets, and a widget stays where it is dropped: far to the right and low, with gaps.
+// A page is as wide as its widgets: a widget dropped far to the right stays in its column, and slides up (no gaps).
 registry.category("web_tour.tours").add("dwo_wide", {
     steps: () => [
         { trigger: ".dwo-card[data-widget-id=total]" },
@@ -51,7 +51,7 @@ registry.category("web_tour.tours").add("dwo_wide", {
             },
         },
         { trigger: ".dwo-done", run: "click" },
-        { trigger: ".dwo-grid-item[style*='grid-column: 31'][style*='grid-row: 9'] [data-widget-id=total]" },
+        { trigger: ".dwo-grid-item[style*='grid-column: 31'][style*='grid-row: 1 /'] [data-widget-id=total]" },
         {
             trigger: ".dwo-canvas",
             run: () => {
