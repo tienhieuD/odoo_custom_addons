@@ -70,7 +70,7 @@ export class ExplorePanel extends Component {
         this.aggLabels = AGG_LABELS;
         this.presetLabels = Object.entries(PRESET_LABELS).filter(([key]) => key !== "all");
         this.state = useState({
-            datasets: [], visuals: {}, dataset: "", fields: [], model: "", type: "bar",
+            datasets: [], visuals: {}, dataset: "", fields: [], metrics: [], model: "", type: "bar",
             wells: {}, where: [], options: {}, limit: "", orderKey: "", title: "", icon: "", iconMenu: false,
             showFilter: false, preview: { loading: false, entry: null }, search: "", datasetOpen: false,
             compare: { enabled: false, field: "", period: "this_month", against: "previous_period" },
@@ -129,6 +129,7 @@ export class ExplorePanel extends Component {
         }
         const description = await this.orm.call("dwo.dashboard.explore", "describe_dataset", [ref]);
         s.fields = description.fields;
+        s.metrics = description.metrics || [];
         s.model = description.model;
         s.label = description.label;
         if (reset) {
@@ -314,8 +315,22 @@ export class ExplorePanel extends Component {
         this.schedulePreview();
     }
 
+    metric(name) {
+        return this.state.metrics.find((m) => m.name === name);
+    }
+
+    /** The "kind" selector of a value: a metric of the dataset ("metric:name") or an aggregate of a field. */
     setAgg(item, ev) {
-        item.agg = ev.target.value;
+        const value = ev.target.value;
+        if (value.startsWith("metric:")) {
+            item.metric = value.slice(7);
+            item.agg = "";
+            item.field = "";
+            this.schedulePreview();
+            return;
+        }
+        item.metric = "";
+        item.agg = value;
         if (item.agg === "count") {
             item.field = "";
         } else if (!this.fieldsFor({ accepts: "measure" }, item.agg).some((f) => f.name === item.field)) {
@@ -359,12 +374,15 @@ export class ExplorePanel extends Component {
         return this.wellList
             .filter((w) => w.accepts === "measure")
             .flatMap((w) => this.items(w))
-            .filter((i) => i.agg === "count" || i.field);
+            .filter((i) => i.metric || i.agg === "count" || i.field);
     }
 
     // ---------------------------------------------------------------------------------- build the widget
     cleanItem(well, item) {
         if (well.accepts === "measure") {
+            if (item.metric) {
+                return { metric: item.metric };
+            }
             if (item.agg === "count" && !item.field) {
                 return { agg: "count" };
             }
@@ -428,7 +446,10 @@ export class ExplorePanel extends Component {
             widget.trend = { field: s.trend.field, interval: s.trend.interval, points: s.trend.points };
         }
         if (s.orderKey) {
-            const [kind, name, dir] = s.orderKey.split(":");
+            const parts = s.orderKey.split(":"); // "m:amount_total:sum:desc": the name of a measure holds a colon too
+            const kind = parts[0];
+            const dir = parts[parts.length - 1];
+            const name = parts.slice(1, -1).join(":");
             widget.order = [kind === "d" ? { field: name, dir } : { measure: name, dir }];
         }
         return widget;
@@ -447,8 +468,9 @@ export class ExplorePanel extends Component {
                     continue;
                 }
                 if (well.accepts === "measure") {
-                    const key = clean.field ? `${clean.field}:${clean.agg}` : "__count";
-                    const label = clean.field ? `${this.field(clean.field).label} (${clean.agg})` : _t("Count");
+                    const metric = clean.metric ? this.metric(clean.metric) : null;
+                    const key = clean.metric || (clean.field ? `${clean.field}:${clean.agg}` : "__count");
+                    const label = metric ? metric.label : clean.field ? `${this.field(clean.field).label} (${clean.agg})` : _t("Count");
                     out.push({ key: `m:${key}:desc`, label: `${label} ↓` }, { key: `m:${key}:asc`, label: `${label} ↑` });
                 } else if (well.accepts !== "measure") {
                     const label = this.field(clean.field).label;
@@ -599,7 +621,8 @@ export class ExplorePanel extends Component {
         const dim = this.firstDimensionField();
         if (measure) {
             const field = measure.field ? this.field(measure.field) : null;
-            parts.push(field ? `${this.aggLabels[measure.agg] || measure.agg} ${_t("of")} ${field.label}` : _t("Count"));
+            const metric = measure.metric ? this.metric(measure.metric) : null;
+            parts.push(metric ? metric.label : field ? `${this.aggLabels[measure.agg] || measure.agg} ${_t("of")} ${field.label}` : _t("Count"));
             if (!field && !dim && this.state.label) {
                 parts.push(`· ${this.state.label}`);
             }

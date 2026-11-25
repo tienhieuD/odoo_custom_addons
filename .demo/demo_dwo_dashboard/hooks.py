@@ -21,6 +21,8 @@ def post_init_hook(env):
     sellers = env["res.users"].browse([env.ref("demo_users.user_%s" % n).id for n in ("alice", "bob", "carol")])
     sellers.write({"group_ids": [(4, env.ref("sales_team.group_sale_salesman_all_leads").id)]})
     env = env(context=dict(env.context, tracking_disable=True, mail_notrack=True, mail_create_nolog=True))
+    # the assistant is on in the demo (the owner's choice); dwo_dashboard.ai_enabled = 0 switches it off
+    _metrics(env)
     _orders(env, rnd, sellers)
     for user in sellers:
         _dashboards(env(user=user.id))
@@ -66,3 +68,21 @@ def _dashboards(env):
     home.write({"name": "Sales", "spec": sales_page()})
     env["dwo.dashboard.page"].create({"dashboard_id": dashboard["id"], "name": "Contacts", "sequence": 20,
                                       "spec": contacts_page()})
+
+
+def _metrics(env):
+    """Named measures for the sales orders: what the Sales page uses, and what Explore offers under "Metrics"."""
+    field = lambda model, name: env["ir.model.fields"]._get(model, name).id  # noqa: E731
+    env["dwo.dataset"].create({
+        "model_id": env.ref("sale.model_sale_order").id, "label": "Sales orders",
+        "metric_ids": [
+            (0, 0, {"name": "revenue", "label": "Revenue", "agg": "sum", "field_id": field("sale.order", "amount_total"),
+                    "where": "[('state', 'in', ['sale', 'done'])]", "format": "currency"}),
+            (0, 0, {"name": "orders", "label": "Orders", "agg": "count", "where": "[('state', 'in', ['sale', 'done'])]"}),
+            (0, 0, {"name": "avg_order", "label": "Average order", "agg": "avg", "field_id": field("sale.order", "amount_total"),
+                    "where": "[('state', 'in', ['sale', 'done'])]", "format": "currency"}),
+            (0, 0, {"name": "quotations", "label": "Open quotations", "agg": "count",
+                    "where": "[('state', 'in', ['draft', 'sent'])]"}),
+            (0, 0, {"name": "quoted", "label": "Quoted amount", "agg": "sum", "field_id": field("sale.order", "amount_total"),
+                    "where": "[('state', 'in', ['draft', 'sent'])]", "format": "currency"}),
+        ]})

@@ -59,7 +59,12 @@ class DwoDashboardExplore(models.AbstractModel):
                 "column": kind not in NOT_COLUMN,
                 "intervals": list(C.INTERVALS) if kind in DATE else [],
             })
-        return {"ref": ref, "model": name, "label": self.env["ir.model"]._get(name).name,
+        readable = set(model.fields_get(attributes=["type"]))
+        defn = self.env["dwo.dashboard.spec"]._dwo_resolve_dataset(ref) or {}
+        metrics = [{"name": m["name"], "label": m.get("label") or m["name"], "agg": m["agg"], "field": m.get("field"),
+                    "format": m.get("format"), "conditional": bool(m.get("where"))}
+                   for m in defn.get("metrics", []) if not m.get("field") or m["field"] in readable]
+        return {"ref": ref, "model": name, "label": self.env["ir.model"]._get(name).name, "metrics": metrics,
                 "fields": sorted(out, key=lambda x: x["label"].lower())}
 
     @api.model

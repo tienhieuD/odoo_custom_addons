@@ -238,6 +238,13 @@ class TestPageStructure(TransactionCase):
         spec = page()
         spec["grid"] = {"cols": 4}
         self.assertIn(("/grid/cols", "range"), self.codes(spec))
+        spec["grid"] = {"cols": 121}
+        self.assertIn(("/grid/cols", "range"), self.codes(spec))
+        spec["grid"] = {"cols": 120}  # a wide page: a widget far to the right is valid, and one beyond the grid is not
+        widget(spec, "total").update(x=116, w=4)
+        self.assertEqual([c for c in self.codes(spec) if c[0].startswith("/widgets/0") or c[0] == "/grid/cols"], [])
+        widget(spec, "total").update(x=118, w=4)
+        self.assertIn(("/widgets/0/w", "layout"), self.codes(spec))
 
     def test_ids(self):
         spec = page()

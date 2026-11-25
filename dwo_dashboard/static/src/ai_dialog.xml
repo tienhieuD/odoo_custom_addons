@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.AiDialog">
+        <Dialog title="'Ask the assistant'" size="'lg'">
+            <div t-if="state.status and state.status.enabled and !state.status.configured" class="alert alert-warning dwo-ai-unset">
+                The assistant is not set up yet: an administrator has to add the key in <b>Dashboard &gt; Configuration &gt; AI assistant</b>.
+            </div>
+            <label class="form-label fw-bold">What should change on this page?</label>
+            <textarea class="form-control dwo-ai-request" rows="3" maxlength="1500" t-model="state.request"
+                      placeholder="Describe it in your own words"/>
+            <div class="small text-muted mt-1">
+                For example:
+                <a t-foreach="examples" t-as="example" t-key="example_index" href="#" class="d-block" t-on-click.prevent="() => state.request = example" t-out="example"/>
+            </div>
+            <div class="mt-3">
+                <span class="fw-bold small">Data it may use</span>
+                <span t-foreach="chosen" t-as="ref" t-key="ref" class="badge text-bg-light border ms-1" t-out="label(ref)"/>
+                <select class="form-select form-select-sm d-inline-block w-auto ms-2" style="max-width: 16rem" t-model="state.extra">
+                    <option value="">Add other data...</option>
+                    <option t-foreach="state.options" t-as="o" t-key="o.ref" t-att-value="o.ref" t-out="o.label"/>
+                </select>
+            </div>
+            <p class="small text-muted mt-3 mb-2">
+                Sent to <b t-out="state.status ? state.status.label : ''"/>: the format of a page, the names of the fields you can read in the data above,
+                the metrics, this page as it is now (its titles and the values of its conditions, which can name customers or products),
+                your request and the identifier of this database. <b>No record</b> is sent. You review the answer before anything is saved.
+            </p>
+            <div t-if="state.busy" class="d-flex align-items-center gap-2 text-muted dwo-ai-busy">
+                <i class="fa fa-circle-o-notch fa-spin"/> Working on it... this can take half a minute.
+            </div>
+            <div t-if="state.error" class="alert alert-danger mt-2 dwo-ai-error">
+                <div t-out="state.error"/>
+                <ul class="mb-0 small"><li t-foreach="state.errors" t-as="e" t-key="e_index"><code t-out="e.path"/> <t t-out="e.message"/></li></ul>
+            </div>
+            <div t-if="state.proposal" class="alert alert-success mt-2 dwo-ai-proposal">
+                <div class="fw-bold mb-1">Proposal ready</div>
+                <div t-if="state.proposal.diff.added.length">Added: <t t-foreach="state.proposal.diff.added" t-as="id" t-key="id"><span class="badge text-bg-success me-1" t-out="titleOf(id)"/></t></div>
+                <div t-if="state.proposal.diff.changed.length">Changed: <t t-foreach="state.proposal.diff.changed" t-as="id" t-key="id"><span class="badge text-bg-primary me-1" t-out="titleOf(id)"/></t></div>
+                <div t-if="state.proposal.diff.removed.length">Removed: <t t-foreach="state.proposal.diff.removed" t-as="id" t-key="id"><span class="badge text-bg-danger me-1" t-out="titleOf(id)"/></t></div>
+                <div t-if="!state.proposal.diff.added.length and !state.proposal.diff.changed.length and !state.proposal.diff.removed.length">No widget changes.</div>
+                <div class="small mt-1">Load it into the page, look at it, then Save or Discard.</div>
+            </div>
+            <t t-set-slot="footer">
+                <button t-if="state.proposal" class="btn btn-primary dwo-ai-apply" t-on-click="apply">Load into the page</button>
+                <button class="btn btn-primary dwo-ai-generate" t-att-disabled="state.busy or !state.request.trim() or (state.status and !state.status.configured)" t-on-click="generate">
+                    <t t-if="state.proposal">Try again</t><t t-else="">Generate</t>
+                </button>
+                <button class="btn btn-secondary" t-on-click="props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

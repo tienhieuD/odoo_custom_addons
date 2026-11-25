@@ -244,7 +244,8 @@ export class ChartRenderer extends Component {
         const percent = !!options.percent;
         const stacked = !!options.stacked || percent;
         const legend = options.legend || (slice || data.datasets.length > 1 ? "top" : "none");
-        const number = (v) => formatNumber(v, options);
+        const metricFormat = result.measures && result.measures[0] && result.measures[0].format;
+        const number = (v) => formatNumber(v, metricFormat ? { format: metricFormat, decimals: 0, ...options } : options);
         const config = {
             type: widget.type === "area" ? "line" : widget.type,
             data,

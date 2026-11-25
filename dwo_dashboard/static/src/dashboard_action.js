@@ -8,11 +8,12 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { useSortable } from "@web/core/utils/sortable_owl";
 import { PageNameDialog } from "./page_name_dialog";
+import { AiDialog } from "./ai_dialog";
 import { ExplorePanel } from "./explore_panel";
 import { ShareDialog } from "./share_dialog";
 import { FilterBar } from "./filter_bar";
 import { FilterEditor } from "./filter_editor";
-import { COLS_DEFAULT, GAP, INTERVAL_LABELS, ROW_HEIGHT, drillChain, newWidgetId, nextPosition } from "./utils";
+import { COLS_DEFAULT, COLS_MAX, COLS_SPARE, GAP, INTERVAL_LABELS, ROW_HEIGHT, drillChain, newWidgetId, nextPosition } from "./utils";
 import { WidgetCard } from "./widget_card";
 import "./renderers/index";
 
@@ -57,7 +58,7 @@ export class DashboardAction extends Component {
             ready: false, pages: [], shared: [], level: "owner", owner: "", pageId: null, name: "", revision: 0,
             spec: { schema: "dwo-dashboard/1", widgets: [] }, savedSpec: "", editing: false, snapshot: null,
             data: {}, filterValues: {}, explore: null, saving: false, pageMenu: null, filterEditor: false,
-            select: null, drills: {}, pick: null, // what was clicked (cross-filter, drill-down); never saved
+            editCols: COLS_DEFAULT, ai: false, select: null, drills: {}, pick: null, // what was clicked (cross-filter, drill-down); never saved
         });
         useExternalListener(window, "click", () => {
             this.state.pageMenu = null;
@@ -90,6 +91,7 @@ export class DashboardAction extends Component {
         this.dashboardId = dashboard.id;
         this.state.pages = dashboard.pages;
         this.state.shared = dashboard.shared || [];
+        this.orm.call("dwo.dashboard.ai", "get_status", []).then((status) => (this.state.ai = status.enabled)).catch(() => {});
         await this.openPage(dashboard.pages[0].id, true);
         this.state.ready = true;
     }
@@ -115,12 +117,47 @@ export class DashboardAction extends Component {
         return dashboard;
     }
 
+    openAi() {
+        this.dialog.add(AiDialog, {
+            pageId: this.state.pageId, spec: clone(this.state.spec), datasets: this.pageDatasets, onApply: (spec) => this.applyAi(spec),
+        });
+    }
+
+    /** The proposal becomes the draft of the editor: not saved, so Save and Discard decide. */
+    applyAi(spec) {
+        const s = this.state;
+        s.spec = spec;
+        s.data = {};
+        s.filterValues = {};
+        s.explore = null;
+        s.editCols = Math.min(COLS_MAX, Math.max(this.cols, this.rightmost) + COLS_SPARE);
+        this.runAll();
+    }
+
     openShare() {
         this.dialog.add(ShareDialog, { pageId: this.state.pageId, pageName: this.state.name });
     }
 
+    /** The right-most column used by a widget. */
+    get rightmost() {
+        return this.state.spec.widgets.reduce((max, w) => Math.max(max, w.x + w.w), 0);
+    }
+
+    /** Columns of the grid: the page's own, or as many as its widgets need. A page is as wide as its content. */
     get cols() {
-        return (this.state.spec.grid && this.state.spec.grid.cols) || COLS_DEFAULT;
+        const own = (this.state.spec.grid && this.state.spec.grid.cols) || COLS_DEFAULT;
+        return Math.min(COLS_MAX, Math.max(own, this.rightmost));
+    }
+
+    /** Like a sheet: while editing there are always COLS_SPARE empty columns to the right of the last widget. */
+    growGrid() {
+        const wanted = Math.min(COLS_MAX, this.rightmost + COLS_SPARE);
+        if (wanted > this.state.editCols) {
+            this.state.editCols = wanted;
+            if (this.grid) {
+                this.grid.column(wanted, "none"); // more columns, every widget stays where it is
+            }
+        }
     }
 
     get widgets() {
@@ -334,7 +371,10 @@ export class DashboardAction extends Component {
             this.notification.add(answer.error.message, { type: "warning" });
             return;
         }
-        const { model, ids, total } = answer.result;
+        const { model, ids, total, mixed } = answer.result;
+        if (mixed) {
+            this.notification.add(_t("This widget mixes measures that count different records: all the records of the group are shown."), { type: "info" });
+        }
         if (total > ids.length) {
             this.notification.add(_t("Showing the first %s of %s records.", ids.length, total), { type: "info" });
         }
@@ -447,6 +487,7 @@ export class DashboardAction extends Component {
         if (!this.canEdit) {
             return;
         }
+        this.state.editCols = Math.min(COLS_MAX, this.cols + COLS_SPARE);
         this.state.select = null; // editing works on the widgets as they are saved
         this.state.drills = {};
         this.state.pick = null;
@@ -477,6 +518,10 @@ export class DashboardAction extends Component {
         const s = this.state;
         s.saving = true;
         try {
+            const wanted = Math.min(COLS_MAX, Math.max(COLS_DEFAULT, this.rightmost)); // as wide as the widgets, 12 at least
+            if (((s.spec.grid && s.spec.grid.cols) || COLS_DEFAULT) !== wanted) {
+                s.spec.grid = { ...(s.spec.grid || {}), cols: wanted };
+            }
             const answer = await this.orm.call("dwo.dashboard.page", "save_spec", [[s.pageId], s.spec, s.revision]);
             s.revision = answer.revision;
             s.savedSpec = JSON.stringify(s.spec);
@@ -500,7 +545,7 @@ export class DashboardAction extends Component {
         }
         this.destroyGrid();
         this.grid = window.GridStack.init(
-            { column: this.cols, cellHeight: ROW_HEIGHT + GAP, margin: GAP / 2, float: false, animate: false,
+            { column: this.state.editCols, cellHeight: ROW_HEIGHT + GAP, margin: GAP / 2, float: true, animate: false,
               handle: ".dwo-card-header", disableOneColumnMode: true },
             el
         );
@@ -511,6 +556,7 @@ export class DashboardAction extends Component {
                     Object.assign(widget, { x: node.x, y: node.y, w: node.w, h: node.h });
                 }
             }
+            this.growGrid();
         });
     }
 

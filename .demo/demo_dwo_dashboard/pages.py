@@ -4,9 +4,10 @@
 OPEN = ["state", "in", ["sale", "done"]]
 
 
-def _kpi(wid, title, x, wells, **extra):
+def _kpi(wid, title, x, metric, **extra):
+    """A KPI of a metric of the dataset (see hooks._metrics): the metric knows which orders it counts."""
     return dict({"id": wid, "type": "kpi", "title": title, "x": x, "y": 0, "w": 3, "h": 3, "dataset": "orm:sale.order",
-                 "where": [OPEN], "wells": {"value": wells}}, **extra)
+                 "wells": {"value": {"metric": metric}}}, **extra)
 
 
 def sales_page():
@@ -23,19 +24,15 @@ def sales_page():
                       {"dataset": "orm:sale.order.line", "field": "salesman_id"}]},
         ],
         "widgets": [
-            _kpi("revenue", "Revenue", 0, {"field": "amount_total", "agg": "sum"}, compare=compare, trend=trend,
-                 options={"format": "currency", "decimals": 0}),
-            _kpi("orders", "Orders", 3, {"agg": "count"}, compare=compare, trend=trend),
-            _kpi("average", "Average order", 6, {"field": "amount_total", "agg": "avg"}, compare=compare, trend=trend,
-                 options={"format": "currency", "decimals": 0}),
-            {"id": "quotes", "type": "kpi", "title": "Open quotations", "x": 9, "y": 0, "w": 3, "h": 3,
-             "dataset": "orm:sale.order", "where": [["state", "in", ["draft", "sent"]]],
-             "wells": {"value": {"agg": "count"}}, "ignore_filters": ["period"],
-             "trend": {"field": "date_order", "interval": "month", "points": 12}},
+            _kpi("revenue", "Revenue", 0, "revenue", compare=compare, trend=trend, options={"decimals": 0}),
+            _kpi("orders", "Orders", 3, "orders", compare=compare, trend=trend),
+            _kpi("average", "Average order", 6, "avg_order", compare=compare, trend=trend, options={"decimals": 0}),
+            _kpi("quotes", "Open quotations", 9, "quotations", ignore_filters=["period"],
+                 trend={"field": "date_order", "interval": "month", "points": 12}),
             {"id": "monthly", "type": "bar", "title": "Revenue per month and salesperson", "x": 0, "y": 3, "w": 8, "h": 4,
-             "dataset": "orm:sale.order", "where": [OPEN],
+             "dataset": "orm:sale.order",
              "wells": {"axis": {"field": "date_order", "interval": "month"}, "legend": {"field": "user_id"},
-                       "values": [{"field": "amount_total", "agg": "sum", "label": "Revenue"}]},
+                       "values": [{"metric": "revenue"}]},
              "order": [{"field": "date_order", "dir": "asc"}], "limit": 12, "series_limit": 5,
              "options": {"stacked": True, "legend": "bottom"}},
             {"id": "categories", "type": "doughnut", "title": "Revenue by category", "x": 8, "y": 3, "w": 4, "h": 4,
@@ -45,15 +42,15 @@ def sales_page():
              "order": [{"measure": "price_subtotal:sum", "dir": "desc"}], "limit": 5,
              "options": {"other": True, "show_percent": True}},
             {"id": "yearly", "type": "line", "title": "Revenue this year against last year", "x": 0, "y": 7, "w": 6,
-             "h": 4, "dataset": "orm:sale.order", "where": [OPEN],
+             "h": 4, "dataset": "orm:sale.order",
              "wells": {"axis": {"field": "date_order", "interval": "month"},
-                       "values": [{"field": "amount_total", "agg": "sum", "label": "Revenue"}]},
+                       "values": [{"metric": "revenue"}]},
              "compare": {"field": "date_order", "period": "this_year", "against": "previous_year"},
              "options": {"smooth": True, "y_min": 0}, "ignore_filters": ["period"]},
             {"id": "matrix", "type": "pivot", "title": "Salesperson by quarter", "x": 6, "y": 7, "w": 6, "h": 4,
-             "dataset": "orm:sale.order", "where": [OPEN],
+             "dataset": "orm:sale.order",
              "wells": {"rows": [{"field": "user_id"}], "columns": [{"field": "date_order", "interval": "quarter"}],
-                       "values": [{"field": "amount_total", "agg": "sum", "label": "Revenue"}]},
+                       "values": [{"metric": "revenue"}]},
              "options": {"show_totals": True, "heatmap": True}, "ignore_filters": ["period"]},
             {"id": "top", "type": "table", "title": "Biggest orders", "x": 0, "y": 11, "w": 12, "h": 5,
              "dataset": "orm:sale.order", "where": [OPEN],

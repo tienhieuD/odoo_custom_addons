@@ -9,6 +9,8 @@ import { formatCurrency } from "@web/core/currency";
 import { user } from "@web/core/user";
 
 export const COLS_DEFAULT = 12;
+export const COLS_MAX = 120; // as the spec (spec/constants.py)
+export const COLS_SPARE = 12; // empty columns kept to the right of the last widget while editing
 export const ROW_HEIGHT = 80;
 export const GAP = 12; // px between two cards: the same as --dwo-gap in dashboard.scss
 

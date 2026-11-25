@@ -1,5 +1,24 @@
 # Changelog
 
+## Phase 4 (not released): the assistant
+- "Ask AI" in the editor: a request in words becomes a proposed page, loaded as the draft (nothing is saved by the assistant).
+  Providers: Odoo AI (default, no setup) or an OpenAI-compatible API (Dashboard > Configuration > AI assistant; the key is written
+  and never read back). Validated as the caller; two harmless mistakes repaired; one retry with the errors. No record is sent.
+  See SPEC "The assistant".
+- The grid is as wide as its widgets (up to 120 columns), widgets stay where they are dropped (no packing), and a page grows to
+  the right while editing, with a sheet-like cell grid.
+- Drill-through of a widget of metrics lists the records the metrics count (all measures with the same `where`), or the whole
+  group when they differ, with a notice.
+
+## Phase 3 (not released): metrics
+- `dwo.dataset` and `dwo.dataset.metric` (admin form with a field picker and Odoo's domain widget), compiled to `dwo-dataset/1`;
+  `_dwo_resolve_dataset` reads them. Metrics with and without `where`, see SPEC "Metrics". `engine/measures.py` is the only
+  place that calls `formatted_read_group`. `other` with a non-additive metric is refused on save; the author's access to a
+  metric's fields is checked on save and the viewer's at render. Explore lists the metrics under "Metrics of this data"; a
+  metric's `format` is the default format of the widget that shows it.
+- Fixed in Explore: sorting by the sum (or any other aggregate) of a field was parsed wrongly ("amount_total:sum").
+- Demo: the Sales page runs on five metrics (revenue, orders, average order, open quotations, quoted amount).
+
 ## Interface pass 4 (not released)
 - On a computer the grid has a fixed size: one column is 84 px wide (12 columns = 1140 px), in the view and the edit mode alike. A wide
   window shows an empty grey area at the right, a narrow one scrolls sideways. Only the phone layout (under 768 px) is responsive.

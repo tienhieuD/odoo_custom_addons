@@ -43,8 +43,12 @@ class DwoDashboardSpec(models.AbstractModel):
 
     @api.model
     def _dwo_resolve_dataset(self, ref):
-        """The definition (dwo-dataset/1) of a dataset reference, or None. Stored definitions arrive in a later
-        phase; tests and plugins can override it."""
+        """The definition (dwo-dataset/1) of a dataset reference, or None: the ``dwo.dataset`` of the model for an ``orm:``
+        reference (a model without one has no metrics, and needs none). Plugins add their own types."""
+        prefix, _sep, name = (ref or "").partition(":")
+        if prefix == "orm":
+            dataset = self.env["dwo.dataset"].sudo().search([("model_name", "=", name)], limit=1)
+            return dataset._definition() if dataset else None
         return None
 
     @api.model

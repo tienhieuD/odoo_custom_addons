@@ -9,7 +9,8 @@ from odoo.fields import Domain
 
 from ..spec import constants as C
 from . import dates, fill, guard
-from .domain import first_weekday
+from .domain import first_weekday, resolve_ctx
+from .measures import read as mread
 
 YES_NO = {True: "Yes", False: "No"}
 
@@ -19,6 +20,7 @@ class Plan:
 
     def __init__(self, model, vdef, widget):
         self.model, self.widget = model, widget
+        self.truncated = False  # a read stopped at the row cap (set by engine/measures.py)
         wells = widget["wells"]
         self.dims = []      # {"well", "field", "interval", "spec"}
         self.measures = []  # {"key", "spec", "label", "agg", "field"}
@@ -43,13 +45,18 @@ class Plan:
     def measure(self, item):
         field = item.get("field")
         agg = item["agg"]
-        spec = "__count" if agg == "count" and not field else "%s:%s" % (field, agg)
-        if spec == "__count":
+        read = "__count" if agg == "count" and not field else "%s:%s" % (field, agg)
+        where = resolve_ctx(self.model.env, self.model, item["where"]) if item.get("where") else None
+        # a metric with its own ``where`` is read by a query of its own: its column gets a name of its own, so that two
+        # metrics of the same field and aggregate (all the revenue, the revenue of won orders) never collide
+        spec = "%s@%s" % (read, C.measure_key(item)) if where else read
+        if read == "__count":
             label = item.get("label") or _("Count")
         else:
             string = self.model._fields[field].string
             label = item.get("label") or ("%s (%s)" % (string, agg) if agg != "sum" else string)
-        return {"key": C.measure_key(item), "spec": spec, "label": label, "agg": agg, "field": field}
+        return {"key": C.measure_key(item), "spec": spec, "read": read, "where": where, "label": label, "agg": agg,
+                "field": field, "format": item.get("format")}
 
     def order_string(self, default):
         """The ``order`` of ``formatted_read_group`` from the widget's ``order`` (or ``default``)."""
@@ -76,11 +83,11 @@ def run(env, model, vdef, widget, domain, compare=None, trend=None):
         return _series_with_previous(env, model, plan, domain, aggregates, compare, flags, cap)
 
     if not plan.dims:  # a KPI: one row
-        groups = model.formatted_read_group(domain, [], aggregates)
+        groups = mread(env, model, plan, domain, [])
         rows = [_row(model, plan, g, []) for g in groups]
         result = _result(model, plan, rows, flags)
         if compare and rows:
-            previous = model.formatted_read_group(compare["previous_domain"], [], aggregates)
+            previous = mread(env, model, plan, compare["previous_domain"], [])
             before = _row(model, plan, previous[0], [])["values"][0] if previous else None
             now = rows[0]["values"][0]
             change = None if before in (None, 0) or now is None else (now - before) / abs(before) * 100
@@ -94,7 +101,7 @@ def run(env, model, vdef, widget, domain, compare=None, trend=None):
     default = "%s asc" % first["spec"] if first["interval"] else "%s desc" % first_measure
     order1 = plan.order_string(default)
     limit = plan.limit
-    top = model.formatted_read_group(domain, [first["spec"]], aggregates, order=order1, limit=(limit or cap) + 1)
+    top = mread(env, model, plan, domain, [first["spec"]], order=order1, limit=(limit or cap) + 1, cap=cap)
     if limit and len(top) > limit:
         flags["axis"] = True
         top = top[:limit]
@@ -109,7 +116,7 @@ def run(env, model, vdef, widget, domain, compare=None, trend=None):
         return _result(model, plan, [], flags)
     restricted = Domain(domain) & Domain.OR(extra)
     specs = [d["spec"] for d in plan.dims]
-    groups = model.formatted_read_group(restricted, specs, aggregates, limit=cap)
+    groups = mread(env, model, plan, restricted, specs, limit=cap, cap=cap)
     flags["rows"] = len(groups) >= cap
     rows = [_row(model, plan, g, plan.dims) for g in groups]
     axis_position = {_group_key(model, first, g[first["spec"]]): i for i, g in enumerate(top)}
@@ -130,7 +137,7 @@ def _with_other(model, plan, domain, rows):
     """A last slice "Other" = the total minus the slices shown. Only for sums and counts (the validator refuses the other
     aggregates: an average or a distinct count of the rest is not the total minus the top)."""
     spec = plan.measures[0]["spec"]
-    total = model.formatted_read_group(domain, [], [spec])
+    total = mread(model.env, model, plan, domain, [], measures=plan.measures[:1])
     rest = float((total[0].get(spec) if total else 0) or 0) - sum(r["values"][0] or 0 for r in rows)
     if rest > 0:
         rows.append({"keys": ["__other"], "labels": [_("Other")], "values": [rest]})
@@ -160,7 +167,7 @@ def _totals(env, model, plan, domain, aggregates):
     for name, dims in (("rows", by_well("rows")), ("columns", by_well("columns")), ("grand", [])):
         if name != "grand" and not dims:
             continue
-        groups = model.formatted_read_group(domain, [d["spec"] for d in dims], aggregates, limit=guard.max_rows(env))
+        groups = mread(env, model, plan, domain, [d["spec"] for d in dims], limit=guard.max_rows(env), cap=guard.max_rows(env))
         out[name] = [_row(model, plan, g, dims) for g in groups]
     return out
 
@@ -216,6 +223,8 @@ def _target(model, dim):
 
 
 def _result(model, plan, rows, flags):
+    if plan.truncated:
+        flags["rows"] = True
     dims = []
     for d in plan.dims:
         owner = _target(model, d)
@@ -223,7 +232,7 @@ def _result(model, plan, rows, flags):
         dims.append({"well": d["well"], "field": d["field"], "interval": d["interval"],
                      "label": d["label"] or owner._fields[name].string, "type": owner._fields[name].type})
     return {"kind": "grouped", "dims": dims, "rows": rows, "truncated": flags,
-            "measures": [{"key": m["key"], "label": m["label"], "agg": m["agg"]} for m in plan.measures]}
+            "measures": [{"key": m["key"], "label": m["label"], "agg": m["agg"], "format": m["format"]} for m in plan.measures]}
 
 
 # ------------------------------------------------------------------------------------------------ KPI trend (sparkline)
@@ -231,7 +240,7 @@ def _trend(model, plan, aggregates, trend):
     """The measure over the last ``points`` intervals. Odoo's ``fill_temporal`` writes the empty intervals (with their
     labels, in the viewer's time zone), so a quiet month is a zero on the line, not a missing point."""
     spec = "%s:%s" % (trend["field"], trend["interval"])
-    groups = model.formatted_read_group(trend["domain"], [spec], aggregates[:1])
+    groups = mread(model.env, model, plan, trend["domain"], [spec], measures=plan.measures[:1])
     groups = fill.fill(model.env, model, spec, groups, aggregates[:1], dates.fromiso(trend["from"]),
                        dates.fromiso(trend["to"]), first_weekday(model.env))
     measure = plan.measures[0]
@@ -253,7 +262,7 @@ def _series_with_previous(env, model, plan, domain, aggregates, compare, flags, 
     bounds = info["fill"]
 
     def series(dom, start, end):
-        groups = model.formatted_read_group(dom, [axis["spec"]], aggregates, limit=cap)
+        groups = mread(env, model, plan, dom, [axis["spec"]], limit=cap, cap=cap)
         return fill.fill(model.env, model, axis["spec"], groups, aggregates, dates.fromiso(start), dates.fromiso(end),
                          first_weekday(model.env))[:cap]
 
@@ -294,7 +303,7 @@ def _pivot_other(env, model, plan, domain, restricted, aggregates, rows, flags, 
     labels = {}  # (kind, key tuple) -> the labels of that row or column, to write them on the "Other" cells
 
     def read(dom, dims, kind=None):
-        groups = model.formatted_read_group(dom, [d["spec"] for d in dims], aggregates, limit=cap)
+        groups = mread(env, model, plan, dom, [d["spec"] for d in dims], limit=cap, cap=cap)
         out = {}
         for g in groups:
             r = _row(model, plan, g, dims)

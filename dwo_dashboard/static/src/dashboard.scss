@@ -77,7 +77,16 @@
 
     // gridstack (edit mode): the item is the card, spaced like the view grid
     // gridstack lays its items out in percentages of this box: cols x (column + gap), the same grid as the view mode
-    .dwo-grid-edit { margin: calc(var(--dwo-gap) / -2); width: calc(var(--dwo-cols, 12) * (var(--dwo-col) + var(--dwo-gap))); }
+    // (the cell lines are the sheet: nothing is packed, a widget stays where it is dropped)
+    .dwo-grid-edit {
+        margin: calc(var(--dwo-gap) / -2);
+        width: calc(var(--dwo-cols, 12) * (var(--dwo-col) + var(--dwo-gap)));
+        min-height: 70vh;
+        background-image:
+            linear-gradient(to right, color-mix(in srgb, var(--body-color) 7%, transparent) 1px, transparent 1px),
+            linear-gradient(to bottom, color-mix(in srgb, var(--body-color) 7%, transparent) 1px, transparent 1px);
+        background-size: calc(var(--dwo-col) + var(--dwo-gap)) calc(var(--dwo-row, 80px) + var(--dwo-gap));
+    }
     .grid-stack > .grid-stack-item > .grid-stack-item-content {
         overflow: hidden;
         inset: calc(var(--dwo-gap) / 2);

@@ -168,6 +168,11 @@ class _Check:
                     ctx.column(ipath, item)
                 else:
                     ctx.measure(ipath, item)
+                    if widget.get("options", {}).get("other") and "metric" in item and defn:
+                        metric = next((m for m in defn.get("metrics", []) if m["name"] == item["metric"]), None)
+                        if metric and metric["agg"] not in ("sum", "count"):
+                            self.add(ptr(path, "options", "other"), "constraint", "'other' is only valid when the measure is "
+                                     "sum or count: metric %r is %s, which cannot be added up" % (item["metric"], metric["agg"]))
 
     # --------------------------------------------------------------------------------------------- field access
     def field_readable(self, path, model, field, what):
@@ -340,7 +345,15 @@ class _Orm:
             m = self.metrics.get(item["metric"])
             if m is None:
                 self.chk.add(ptr(path, "metric"), "metric", "dataset has no metric %r" % item["metric"])
-            return  # the metric itself is checked with its definition
+                return
+            # whoever uses a metric must be able to read what it reads (its field and the fields of its ``where``); the
+            # errors are written at the metric, which is the only place of the page they can be about
+            before = len(self.chk.errors)
+            self.metric_def(path, m)
+            for error in self.chk.errors[before:]:
+                error["path"] = ptr(path, "metric")
+                error["message"] = "metric %r: %s" % (m["name"], error["message"])
+            return
         self.measure_def(path, item)
 
     def measure_def(self, path, item):

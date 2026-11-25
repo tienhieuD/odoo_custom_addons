@@ -11,7 +11,9 @@ export class KpiRenderer extends Component {
     static props = { widget: Object, result: Object, onPick: { type: Function, optional: true } };
 
     get options() {
-        return this.props.widget.options || {};
+        // the format of a metric is the default of the widget that shows it; an option of the widget wins
+        const format = this.props.result.measures && this.props.result.measures[0] && this.props.result.measures[0].format;
+        return format ? { format, ...(this.props.widget.options || {}) } : this.props.widget.options || {};
     }
 
     get row() {

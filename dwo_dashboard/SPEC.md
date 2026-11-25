@@ -27,7 +27,7 @@ to a field of each dataset.
 {"schema": "dwo-dashboard/1", "title": "Sales", "description": "optional", "grid": {"cols": 12},
  "filters": [ ... up to 10 ... ], "widgets": [ ... up to 40 ... ]}
 ```
-`grid.cols` 6 to 24 (default 12). Widgets sit on the grid with `x, y, w, h` (`x + w <= cols`, no overlap).
+`grid.cols` 6 to 120 (default 12; the editor raises it to the right-most widget). Widgets sit on the grid with `x, y, w, h` (`x + w <= cols`, no overlap) and stay where they are put: nothing is packed upwards or to the left, so a page can have gaps and can be as wide as it needs.
 
 ## Widget
 
@@ -103,8 +103,7 @@ Per type (a key a type does not list is an error). Kinds: yes/no, a choice, an i
 | `pivot` | `show_totals`, `heatmap` (the larger the value, the stronger the colour), `other` (see below) |
 | `table` | `open_records` (a click on a row opens the record in its form: the standard action enforces access) |
 
-Known limit: `other` is checked on inline measures; a `{"metric": ...}` on a non-additive aggregate is only caught when
-metrics are resolved (Phase 3).
+`other` is checked on inline measures and on metrics (a metric whose aggregate is not sum or count is refused).
 
 `y_min` must be lower than `y_max`; neither can be used with `percent` (a 100% stack has its own axis).
 
@@ -231,6 +230,36 @@ the author); `hidden`; `capability` (needs a newer Odoo); `unchecked` (a plugin 
   saved), but a stored page must still open, with a placeholder in that widget only.
 - `schema` is `dwo-dashboard/<major>`. A non-compatible change gets a new major (a migration upgrades saved pages);
   additive changes (a new type, a new option, a new aggregate) stay in the same major and go in CHANGELOG.
+
+## Metrics (Phase 3)
+A dataset can have a stored definition (`dwo.dataset`, Dashboard > Configuration > Datasets and metrics, system administrators
+write, everybody reads: a definition holds no data). It compiles to a `dwo-dataset/1` document; `{"metric": "revenue"}` in a
+value well is replaced by the measure it names (field, aggregate, label, format, `where`) before the widget runs, and the
+metric's name stays the key of the measure (`order: [{"measure": "revenue"}]`). A metric is not a permission: the engine runs
+as the viewer, saving a page checks that the author can read the metric's field and the fields of its `where`, and `hidden`
+flags of a definition only hide a field in the interface.
+
+A metric without `where` is one more column of the widget's single `formatted_read_group`. A metric with a `where` (a plain
+domain; dynamic values are not supported yet) is read by a query of its own, over the same groups, and merged by group:
+- the groups are those of the widget's own domain and page filters, whatever the metric matches: a group with records but none
+  matching keeps its place, with 0 for a sum, a count or a distinct count and an empty value for an average, minimum or maximum;
+- `order` and `limit` of such a widget are applied after the merge, in Python (the top N by a metric computed from its own
+  subset would not be the top N of the widget); a date group is ordered by its date, a many2one group by its name;
+- two metrics of the same field and aggregate with different `where` keep separate columns;
+- `other` accepts sum and count metrics only; `show_totals`, `compare` and `trend` work with metrics.
+
+## The assistant (Phase 4)
+`dwo.dashboard.ai.propose(page_id, request, datasets, current)` returns a new page for a request in words; it never saves. The
+caller must be able to edit the page. The page proposed is validated as the caller (`validate`), so the assistant can never
+produce what the person could not write by hand; two harmless mistakes are repaired (a widget laid over another goes to the
+bottom, a sort by something that is not a measure is dropped); anything else goes back to the model once with the errors, then
+the answer is refused. The editor loads a proposal as its draft: Save and Discard decide, and the revision check protects the page.
+
+What leaves the server: the format of a page (`spec/grammar.py`, generated from the registry), the names and kinds of the fields
+the caller can read in the datasets in play (those of the page and the ones chosen), the metrics, the page as it is now and the
+request. No record. Providers (`_dwo_ai_providers`): Odoo's gateway `olg.api.odoo.com` (what the HTML editor uses: plain text in,
+plain text out, no system role, one prompt of about 9 000 characters is accepted, a call takes 15 to 30 s) or any
+OpenAI-compatible chat API. The provider and the key are set by system administrators; the key is written, never read back.
 
 ## Sharing and clicks (Phase 2)
 Sharing is a property of a stored page, not of its spec: who may read or edit it is decided by record rules on

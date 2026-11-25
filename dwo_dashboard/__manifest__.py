@@ -16,6 +16,7 @@
         "security/ir.model.access.csv",
         "security/dwo_dashboard_security.xml",
         "views/menu.xml",
+        "views/dataset_views.xml",
     ],
     "assets": {
         "web.assets_backend": ["dwo_dashboard/static/src/**/*"],

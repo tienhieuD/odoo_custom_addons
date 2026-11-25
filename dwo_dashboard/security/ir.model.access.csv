@@ -3,3 +3,7 @@ access_dwo_dashboard_user,dwo.dashboard user,model_dwo_dashboard,base.group_user
 access_dwo_dashboard_page_user,dwo.dashboard.page user,model_dwo_dashboard_page,base.group_user,1,1,1,1
 access_dwo_dashboard_share_user,dwo.dashboard.share user,model_dwo_dashboard_share,base.group_user,1,1,1,1
 access_dwo_dashboard_share_log_user,dwo.dashboard.share.log user,model_dwo_dashboard_share_log,base.group_user,1,0,0,0
+access_dwo_dataset_user,dwo.dataset user,model_dwo_dataset,base.group_user,1,0,0,0
+access_dwo_dataset_admin,dwo.dataset admin,model_dwo_dataset,base.group_system,1,1,1,1
+access_dwo_dataset_metric_user,dwo.dataset.metric user,model_dwo_dataset_metric,base.group_user,1,0,0,0
+access_dwo_dataset_metric_admin,dwo.dataset.metric admin,model_dwo_dataset_metric,base.group_system,1,1,1,1

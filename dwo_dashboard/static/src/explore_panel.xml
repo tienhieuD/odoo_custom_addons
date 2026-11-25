@@ -56,11 +56,24 @@
                         <div t-foreach="items(well)" t-as="item" t-key="item_index" class="d-flex gap-1 mb-1 dwo-well-item">
                             <t t-if="well.accepts === 'measure'">
                                 <select class="form-select form-select-sm w-auto" t-on-change="(ev) => this.setAgg(item, ev)">
-                                    <option value="count" t-att-selected="item.agg === 'count'">Count</option>
-                                    <option t-foreach="aggChoices" t-as="a" t-key="a.value" t-att-value="a.value"
-                                            t-att-selected="item.agg === a.value" t-out="a.label"/>
+                                    <t t-if="state.metrics.length">
+                                        <optgroup label="Metrics of this data">
+                                            <option t-foreach="state.metrics" t-as="m" t-key="m.name" t-att-value="'metric:' + m.name"
+                                                    t-att-selected="item.metric === m.name" t-out="m.label"/>
+                                        </optgroup>
+                                        <optgroup label="Aggregate of a field">
+                                            <option value="count" t-att-selected="!item.metric and item.agg === 'count'">Count</option>
+                                            <option t-foreach="aggChoices" t-as="a" t-key="a.value" t-att-value="a.value"
+                                                    t-att-selected="!item.metric and item.agg === a.value" t-out="a.label"/>
+                                        </optgroup>
+                                    </t>
+                                    <t t-else="">
+                                        <option value="count" t-att-selected="item.agg === 'count'">Count</option>
+                                        <option t-foreach="aggChoices" t-as="a" t-key="a.value" t-att-value="a.value"
+                                                t-att-selected="item.agg === a.value" t-out="a.label"/>
+                                    </t>
                                 </select>
-                                <select t-if="item.agg !== 'count'" class="form-select form-select-sm"
+                                <select t-if="!item.metric and item.agg !== 'count'" class="form-select form-select-sm"
                                         t-on-change="(ev) => this.setField(item, ev)">
                                     <option value="">Field...</option>
                                     <option t-foreach="fieldsFor(well, item.agg)" t-as="f" t-key="f.name" t-att-value="f.name"

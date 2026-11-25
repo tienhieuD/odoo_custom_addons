@@ -8,3 +8,5 @@ from . import test_explore
 from . import test_tour
 from . import test_sharing
 from . import test_interact
+from . import test_metrics
+from . import test_ai

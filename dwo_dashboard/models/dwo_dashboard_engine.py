@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 
 import psycopg2.errors
@@ -6,7 +7,7 @@ import psycopg2.errors
 from odoo import _, api, models
 from odoo.exceptions import AccessError
 
-from ..engine import dates, interact, domain as dom, grouped, guard, records
+from ..engine import dates, interact, measures, domain as dom, grouped, guard, records
 from ..spec import validate_semantics, validate_structure
 
 _logger = logging.getLogger(__name__)
@@ -62,9 +63,10 @@ class DwoDashboardEngine(models.AbstractModel):
             applied = interact.apply(env, spec, widget, interactions) if interactions else widget
             applied = dict(applied, where=list(applied.get("where", [])) + interact.key_leaves(
                 env, env[widget["dataset"][4:]], item, interval, key))
-            error = self._check_widget(spec, applied)
+            error = self._check_widget(spec, applied)  # the widget as saved, with the click: what the author could have written
             if error:
                 return error
+            applied, mixed = self._with_metric_where(applied)
             model = env[widget["dataset"][4:]]
             with guard.guarded(env):
                 domain = dom.widget_domain(env, model, self._mini_page(spec, applied), applied, filter_values)
@@ -77,7 +79,22 @@ class DwoDashboardEngine(models.AbstractModel):
         except Exception:
             _logger.exception("drill-through of widget %s failed", widget_id)
             return self._error("failed")
-        return {"ok": True, "result": {"model": model._name, "ids": ids, "total": total}}
+        return {"ok": True, "result": {"model": model._name, "ids": ids, "total": total, "mixed": mixed}}
+
+    def _with_metric_where(self, widget):
+        """The records behind a bar are those its measures count: when every measure carries the same ``where`` (a widget of one
+        metric, or of several that share it) it is added to the domain. With different ones, or a mix of metrics and plain
+        measures, no single list of records is "the" answer: the whole group is listed and ``mixed`` tells the client."""
+        if any("metric" in i for w in widget["wells"].values() for i in (w if isinstance(w, list) else [w])):
+            defn = self.env["dwo.dashboard.spec"]._dwo_resolve_dataset(widget["dataset"])
+            widget = measures.resolve_metrics(widget, defn)
+        items = [i for v in widget["wells"].values() for i in (v if isinstance(v, list) else [v])
+                 if isinstance(i, dict) and "agg" in i]
+        wheres = {json.dumps(i.get("where") or None, sort_keys=True) for i in items}
+        if len(wheres) == 1 and wheres != {"null"}:
+            where = next(i["where"] for i in items if i.get("where"))
+            return dict(widget, where=list(widget.get("where", [])) + list(where)), False
+        return widget, len(wheres) > 1
 
     def _check_widget(self, spec, widget):
         """The error to answer for a widget that is not valid for the caller, else None."""
@@ -158,6 +175,8 @@ class DwoDashboardEngine(models.AbstractModel):
             return self._error("unsupported")  # SQL and plugin datasets arrive in later phases
         vdef = registry.visuals[widget["type"]]
         model = self.env[name]
+        if any("metric" in i for w in widget["wells"].values() for i in (w if isinstance(w, list) else [w])):
+            widget = measures.resolve_metrics(widget, Spec._dwo_resolve_dataset(widget["dataset"]))
         try:
             with guard.guarded(self.env):
                 extra = {}
