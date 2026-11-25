@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.WidgetCard">
+        <div class="dwo-card d-flex flex-column h-100" t-att-data-widget-id="props.widget.id">
+            <div class="dwo-card-header d-flex align-items-center gap-2 px-2 pt-1">
+                <span class="dwo-card-title flex-grow-1 text-truncate fw-bold" t-out="title"/>
+                <span t-if="truncatedNote" class="badge text-bg-warning" t-out="truncatedNote"/>
+                <span t-if="timezoneNote" class="badge text-bg-secondary" t-out="timezoneNote"/>
+                <t t-if="props.editing">
+                    <button class="btn btn-sm btn-link p-0 dwo-card-edit" t-on-click.stop="() => props.onEdit(props.widget)"
+                            title="Edit"><i class="fa fa-pencil"/></button>
+                    <button class="btn btn-sm btn-link p-0 text-danger dwo-card-remove" t-on-click.stop="() => props.onRemove(props.widget)"
+                            title="Remove"><i class="fa fa-trash"/></button>
+                </t>
+            </div>
+            <div class="dwo-card-body flex-grow-1 position-relative p-2 overflow-hidden">
+                <div t-if="!props.entry or props.entry.loading" class="d-flex h-100 align-items-center justify-content-center text-muted">
+                    <i class="fa fa-circle-o-notch fa-spin"/>
+                </div>
+                <div t-elif="props.entry.error" class="dwo-card-error d-flex h-100 flex-column align-items-center justify-content-center text-center text-muted">
+                    <i t-attf-class="fa #{errorIcon} fa-2x mb-1"/>
+                    <span t-out="props.entry.error.message"/>
+                </div>
+                <t t-elif="Renderer">
+                    <t t-component="Renderer" widget="props.widget" result="props.entry.result"/>
+                </t>
+                <div t-else="" class="d-flex h-100 align-items-center justify-content-center text-muted text-center">
+                    This kind of widget is not installed on this database.
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

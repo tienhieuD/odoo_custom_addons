@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.FilterBar">
+        <div class="dwo-filter-bar d-flex flex-wrap align-items-center gap-3">
+            <div t-foreach="props.filters" t-as="flt" t-key="flt.id" class="dwo-filter d-flex align-items-center gap-1"
+                 t-att-data-filter-id="flt.id">
+                <span class="text-muted small" t-out="label(flt)"/>
+                <select t-if="flt.type === 'date'" class="form-select form-select-sm w-auto"
+                        t-on-change="(ev) => this.setPreset(flt, ev)">
+                    <option t-foreach="Object.keys(presets)" t-as="key" t-key="key" t-att-value="key"
+                            t-att-selected="presetOf(flt) === key" t-out="presets[key]"/>
+                </select>
+                <div t-elif="flt.type === 'selection'" class="d-flex flex-wrap gap-1">
+                    <button t-foreach="flt.values" t-as="value" t-key="value" type="button"
+                            t-attf-class="btn btn-sm #{selectionValue(flt).includes(value) ? 'btn-primary' : 'btn-outline-secondary'}"
+                            t-on-click="() => this.toggleValue(flt, value)" t-out="value"/>
+                </div>
+                <div t-else="" class="d-flex flex-wrap align-items-center gap-1 position-relative">
+                    <span t-foreach="chips(flt)" t-as="chip" t-key="chip.id" class="badge text-bg-secondary">
+                        <t t-out="chip.name"/>
+                        <a href="#" class="text-reset ms-1" t-on-click.prevent="() => this.unpick(flt, chip)">×</a>
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => this.open(flt)">+</button>
+                    <div t-if="state.openId === flt.id" class="dwo-filter-menu card p-2 position-absolute">
+                        <input class="form-control form-control-sm mb-1" placeholder="Search..." t-att-value="state.query"
+                               t-on-input="(ev) => this.search(flt, ev.target.value)"/>
+                        <div t-foreach="state.options" t-as="option" t-key="option.id" class="dwo-filter-option"
+                             t-on-click="() => this.pick(flt, option)" t-out="option.name"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

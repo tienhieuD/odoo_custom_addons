@@ -1,0 +1,22 @@
+{
+  "schema": "dwo-dataset/1",
+  "type": "sql",
+  "code": "sales_by_person",
+  "label": "Revenue by salesperson",
+  "sql": {
+    "query": "SELECT so.id AS order_id,\n       so.date_order::date AS order_date,\n       p.name AS salesperson,\n       so.amount_untaxed AS revenue\n  FROM sale_order so\n  JOIN res_users u ON u.id = so.user_id\n  JOIN res_partner p ON p.id = u.partner_id\n WHERE so.state IN ('sale', 'done')\n   AND so.company_id = ANY(%(company_ids)s)",
+    "params": ["company_ids"],
+    "company_scoped": true,
+    "groups": ["sales_team.group_sale_manager"],
+    "columns": [
+      {"name": "order_id", "type": "integer", "role": "dimension", "label": "Order"},
+      {"name": "order_date", "type": "date", "role": "dimension", "label": "Order date"},
+      {"name": "salesperson", "type": "text", "role": "dimension", "label": "Salesperson"},
+      {"name": "revenue", "type": "numeric", "role": "measure", "label": "Revenue"}
+    ]
+  },
+  "metrics": [
+    {"name": "revenue_total", "label": "Revenue", "agg": "sum", "field": "revenue", "format": "currency"},
+    {"name": "orders", "label": "Orders", "agg": "count_distinct", "field": "order_id"}
+  ]
+}

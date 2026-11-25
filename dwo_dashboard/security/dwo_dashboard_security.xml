@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Phase 1: a dashboard is private. Global rules (no group): nobody, administrators included, reads the dashboard
+         of somebody else. Sharing (Phase 2) widens them on purpose. -->
+    <record id="rule_dwo_dashboard_owner" model="ir.rule">
+        <field name="name">Dashboard: owner only</field>
+        <field name="model_id" ref="model_dwo_dashboard"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_dwo_dashboard_page_owner" model="ir.rule">
+        <field name="name">Dashboard page: owner only</field>
+        <field name="model_id" ref="model_dwo_dashboard_page"/>
+        <field name="domain_force">[('dashboard_id.user_id', '=', user.id)]</field>
+    </record>
+</odoo>

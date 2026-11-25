@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.Dashboard">
+        <div class="dwo-dashboard d-flex h-100 overflow-hidden">
+            <t t-if="state.ready">
+                <!-- pages: the menu inside the dashboard -->
+                <nav class="dwo-pages border-end d-flex flex-column p-2 gap-1">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="fw-bold flex-grow-1">Pages</span>
+                        <button class="btn btn-sm btn-outline-secondary dwo-page-add" t-on-click="addPage" title="New page">+</button>
+                    </div>
+                    <div t-foreach="state.pages" t-as="page" t-key="page.id"
+                         t-attf-class="dwo-page-item d-flex align-items-center gap-1 rounded px-2 py-1 #{page.id === state.pageId ? 'active' : ''}"
+                         t-att-data-page-id="page.id">
+                        <t t-if="state.renaming and state.renaming.id === page.id">
+                            <input class="form-control form-control-sm dwo-page-rename" t-model="state.renaming.name"
+                                   t-on-blur="finishRename" t-on-keydown="(ev) => ev.key === 'Enter' and ev.target.blur()"/>
+                        </t>
+                        <t t-else="">
+                            <a href="#" class="flex-grow-1 text-truncate dwo-page-name" t-on-click.prevent="() => this.openPage(page.id)"
+                               t-on-dblclick="() => this.startRename(page)" t-out="page.name"/>
+                            <span class="dwo-page-tools d-flex">
+                                <button class="btn btn-sm btn-link p-0" t-on-click="() => this.movePage(page, -1)" title="Move up"><i class="fa fa-arrow-up"/></button>
+                                <button class="btn btn-sm btn-link p-0" t-on-click="() => this.movePage(page, 1)" title="Move down"><i class="fa fa-arrow-down"/></button>
+                                <button class="btn btn-sm btn-link p-0" t-on-click="() => this.startRename(page)" title="Rename"><i class="fa fa-pencil"/></button>
+                                <button class="btn btn-sm btn-link p-0" t-on-click="() => this.duplicatePage(page)" title="Duplicate"><i class="fa fa-clone"/></button>
+                                <button t-if="state.pages.length > 1" class="btn btn-sm btn-link p-0 text-danger dwo-page-delete"
+                                        t-on-click="() => this.deletePage(page)" title="Delete"><i class="fa fa-trash"/></button>
+                            </span>
+                        </t>
+                    </div>
+                </nav>
+
+                <!-- the grid -->
+                <main class="dwo-main flex-grow-1 d-flex flex-column overflow-hidden">
+                    <div class="dwo-toolbar d-flex align-items-center flex-wrap gap-3 p-2 border-bottom">
+                        <h4 class="mb-0 dwo-title" t-out="state.name"/>
+                        <FilterBar t-if="filters.length" filters="filters" values="state.filterValues" onChange.bind="onFilter"/>
+                        <span class="flex-grow-1"/>
+                        <t t-if="state.editing">
+                            <button class="btn btn-outline-primary dwo-add-widget" t-on-click="() => this.openExplore(null)">+ Add widget</button>
+                            <button class="btn btn-secondary dwo-cancel" t-on-click="cancelEdit">Cancel</button>
+                            <button class="btn btn-primary dwo-done" t-att-disabled="state.saving" t-on-click="done">Done</button>
+                        </t>
+                        <button t-else="" class="btn btn-outline-secondary dwo-edit" t-on-click="startEdit">Edit</button>
+                    </div>
+                    <div class="dwo-canvas flex-grow-1 overflow-auto p-2">
+                        <div t-if="!widgets.length" class="dwo-empty text-center text-muted p-5">
+                            <p>This page is empty.</p>
+                            <p t-if="!state.editing">Press <b>Edit</b>, then <b>Add widget</b>.</p>
+                        </div>
+                        <t t-if="state.editing">
+                            <div class="grid-stack dwo-grid-edit" t-ref="grid">
+                                <div t-foreach="widgets" t-as="w" t-key="w.id" class="grid-stack-item"
+                                     t-att-gs-id="w.id" t-att-gs-x="w.x" t-att-gs-y="w.y" t-att-gs-w="w.w" t-att-gs-h="w.h">
+                                    <div class="grid-stack-item-content">
+                                        <WidgetCard widget="w" entry="state.data[w.id]" editing="true"
+                                                    onEdit.bind="openExplore" onRemove.bind="removeWidget"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="dwo-grid" t-attf-style="--dwo-cols: #{cols}; --dwo-row: #{rowHeight}px">
+                                <div t-foreach="widgets" t-as="w" t-key="w.id" class="dwo-grid-item" t-att-style="itemStyle(w)">
+                                    <WidgetCard widget="w" entry="state.data[w.id]"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </main>
+
+                <aside t-if="state.explore" class="dwo-explore-drawer border-start">
+                    <ExplorePanel t-key="state.explore.widget ? state.explore.widget.id : 'new'" widget="state.explore.widget"
+                                  filters="filters" onApply.bind="applyExplore" onClose.bind="closeExplore"/>
+                </aside>
+            </t>
+            <div t-else="" class="d-flex flex-grow-1 align-items-center justify-content-center text-muted">
+                <i class="fa fa-circle-o-notch fa-spin fa-2x"/>
+            </div>
+        </div>
+    </t>
+</templates>

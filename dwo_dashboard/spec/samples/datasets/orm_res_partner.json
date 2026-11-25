@@ -1,0 +1,14 @@
+{
+  "schema": "dwo-dataset/1",
+  "type": "orm",
+  "model": "res.partner",
+  "label": "Contacts",
+  "fields": {
+    "complete_name": {"label": "Full name"},
+    "comment": {"hidden": true}
+  },
+  "metrics": [
+    {"name": "contacts", "label": "Contacts", "agg": "count"},
+    {"name": "companies", "label": "Companies", "agg": "count", "where": [["is_company", "=", true]]}
+  ]
+}

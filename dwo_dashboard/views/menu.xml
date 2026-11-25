@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_dwo_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">dwo_dashboard.main</field>
+    </record>
+    <menuitem id="menu_dwo_dashboard" name="Dashboard" action="action_dwo_dashboard" sequence="5"
+              groups="base.group_user"/>
+</odoo>

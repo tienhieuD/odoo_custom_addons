@@ -1,0 +1,1446 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://duotek.io.vn/schema/dwo-dashboard-1.schema.json",
+  "title": "Dynamic Dashboard page specification",
+  "description": "One dashboard page: a grid of widgets and the page filters. A widget picks a dataset and puts fields in the named wells of its visual type. Queries always run with the permissions of the person who views the page.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "widgets"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dwo-dashboard/1"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cols": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 24,
+          "default": 12
+        }
+      }
+    },
+    "filters": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/$defs/filter"
+      }
+    },
+    "widgets": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/widget_area"
+          },
+          {
+            "$ref": "#/$defs/widget_bar"
+          },
+          {
+            "$ref": "#/$defs/widget_doughnut"
+          },
+          {
+            "$ref": "#/$defs/widget_kpi"
+          },
+          {
+            "$ref": "#/$defs/widget_line"
+          },
+          {
+            "$ref": "#/$defs/widget_pie"
+          },
+          {
+            "$ref": "#/$defs/widget_pivot"
+          },
+          {
+            "$ref": "#/$defs/widget_table"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,31}$"
+    },
+    "dataset_ref": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,15}:[A-Za-z0-9_.]{1,64}$",
+      "description": "<dataset type>:<name>, e.g. orm:sale.order or sql:sales_by_person"
+    },
+    "domain": {
+      "type": "array",
+      "default": [],
+      "description": "Odoo domain, prefix notation. Values: plain, or {\"ctx\": ...}.",
+      "items": {
+        "oneOf": [
+          {
+            "enum": [
+              "&",
+              "|",
+              "!"
+            ]
+          },
+          {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "prefixItems": [
+              {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]{0,63}(\\.[a-z_][a-z0-9_]{0,63}){0,4}$"
+              },
+              {
+                "enum": [
+                  "=",
+                  "!=",
+                  ">",
+                  ">=",
+                  "<",
+                  "<=",
+                  "like",
+                  "not like",
+                  "ilike",
+                  "not ilike",
+                  "=like",
+                  "=ilike",
+                  "in",
+                  "not in",
+                  "child_of",
+                  "parent_of",
+                  "any",
+                  "not any"
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "ctx"
+                    ],
+                    "properties": {
+                      "ctx": {
+                        "enum": [
+                          "uid",
+                          "company_id",
+                          "today",
+                          "now",
+                          "company_ids"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "ctx"
+                          ],
+                          "properties": {
+                            "ctx": {
+                              "enum": [
+                                "uid",
+                                "company_id",
+                                "today",
+                                "now"
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "description": "sub-domain for any / not any"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "pattern": "^[a-z_][a-z0-9_]{0,63}(\\.[a-z_][a-z0-9_]{0,63}){0,4}$"
+        },
+        "interval": {
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "quarter",
+            "year"
+          ],
+          "description": "required for date and datetime fields"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      }
+    },
+    "measure": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "metric"
+          ],
+          "properties": {
+            "metric": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,31}$"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agg"
+          ],
+          "properties": {
+            "agg": {
+              "enum": [
+                "sum",
+                "avg",
+                "min",
+                "max",
+                "count",
+                "count_distinct"
+              ]
+            },
+            "field": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+              "description": "omit only for agg=count"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          }
+        }
+      ]
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "pattern": "^[a-z_][a-z0-9_]{0,63}(\\.[a-z_][a-z0-9_]{0,63}){0,4}$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      }
+    },
+    "order": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "measure": {
+            "type": "string"
+          },
+          "dir": {
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "field"
+            ]
+          },
+          {
+            "required": [
+              "measure"
+            ]
+          }
+        ]
+      }
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "bind"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "enum": [
+            "date",
+            "relation",
+            "selection"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "default": {
+          "type": "string",
+          "description": "date: one of all, today, yesterday, last_7_days, last_30_days, last_90_days, this_week, last_week, this_month, last_month, this_quarter, last_quarter, this_year, last_year; selection: one of values; relation: none"
+        },
+        "model": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.]{0,63}$",
+          "description": "relation only: the model whose records the picker offers; every bound ORM field must point to it (a SQL integer column is trusted to)"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "description": "selection only: the values offered"
+        },
+        "bind": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "dataset",
+              "field"
+            ],
+            "properties": {
+              "dataset": {
+                "$ref": "#/$defs/dataset_ref"
+              },
+              "field": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]{0,63}$"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "relation"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "model"
+            ],
+            "not": {
+              "required": [
+                "default"
+              ]
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "model"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "selection"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "values"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "widget_area": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Area chart",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "area"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "axis",
+            "values"
+          ],
+          "properties": {
+            "axis": {
+              "$ref": "#/$defs/dimension"
+            },
+            "legend": {
+              "$ref": "#/$defs/dimension"
+            },
+            "values": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/$defs/measure"
+              }
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "colors": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "items": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            },
+            "legend": {
+              "enum": [
+                "none",
+                "top",
+                "bottom",
+                "left",
+                "right"
+              ]
+            },
+            "smooth": {
+              "type": "boolean"
+            },
+            "stacked": {
+              "type": "boolean"
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 100
+        },
+        "series_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 10
+        }
+      }
+    },
+    "widget_bar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Bar chart",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "bar"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "axis",
+            "values"
+          ],
+          "properties": {
+            "axis": {
+              "$ref": "#/$defs/dimension"
+            },
+            "legend": {
+              "$ref": "#/$defs/dimension"
+            },
+            "values": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/$defs/measure"
+              }
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "colors": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "items": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            },
+            "legend": {
+              "enum": [
+                "none",
+                "top",
+                "bottom",
+                "left",
+                "right"
+              ]
+            },
+            "stacked": {
+              "type": "boolean"
+            },
+            "horizontal": {
+              "type": "boolean"
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 100
+        },
+        "series_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 10
+        }
+      }
+    },
+    "widget_doughnut": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Doughnut chart",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "doughnut"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "category",
+            "value"
+          ],
+          "properties": {
+            "category": {
+              "$ref": "#/$defs/dimension"
+            },
+            "value": {
+              "$ref": "#/$defs/measure"
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "colors": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "items": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            },
+            "legend": {
+              "enum": [
+                "none",
+                "top",
+                "bottom",
+                "left",
+                "right"
+              ]
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      }
+    },
+    "widget_kpi": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "KPI",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "kpi"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value"
+          ],
+          "properties": {
+            "value": {
+              "$ref": "#/$defs/measure"
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "widget_line": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Line chart",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "line"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "axis",
+            "values"
+          ],
+          "properties": {
+            "axis": {
+              "$ref": "#/$defs/dimension"
+            },
+            "legend": {
+              "$ref": "#/$defs/dimension"
+            },
+            "values": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/$defs/measure"
+              }
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "colors": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "items": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            },
+            "legend": {
+              "enum": [
+                "none",
+                "top",
+                "bottom",
+                "left",
+                "right"
+              ]
+            },
+            "smooth": {
+              "type": "boolean"
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 100
+        },
+        "series_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 10
+        }
+      }
+    },
+    "widget_pie": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Pie chart",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "pie"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "category",
+            "value"
+          ],
+          "properties": {
+            "category": {
+              "$ref": "#/$defs/dimension"
+            },
+            "value": {
+              "$ref": "#/$defs/measure"
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "colors": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "items": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            },
+            "legend": {
+              "enum": [
+                "none",
+                "top",
+                "bottom",
+                "left",
+                "right"
+              ]
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      }
+    },
+    "widget_pivot": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Pivot table",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "pivot"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "values"
+          ],
+          "properties": {
+            "rows": {
+              "type": "array",
+              "minItems": 0,
+              "maxItems": 3,
+              "items": {
+                "$ref": "#/$defs/dimension"
+              }
+            },
+            "columns": {
+              "type": "array",
+              "minItems": 0,
+              "maxItems": 2,
+              "items": {
+                "$ref": "#/$defs/dimension"
+              }
+            },
+            "values": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/$defs/measure"
+              }
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "show_totals": {
+              "type": "boolean"
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 200
+        },
+        "series_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24,
+          "default": 12
+        }
+      }
+    },
+    "widget_table": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Table",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "w",
+        "h",
+        "dataset",
+        "wells"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "const": "table"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dataset": {
+          "$ref": "#/$defs/dataset_ref"
+        },
+        "wells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "columns"
+          ],
+          "properties": {
+            "columns": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 20,
+              "items": {
+                "$ref": "#/$defs/column"
+              }
+            }
+          }
+        },
+        "where": {
+          "$ref": "#/$defs/domain"
+        },
+        "order": {
+          "$ref": "#/$defs/order"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "format": {
+              "enum": [
+                "number",
+                "currency",
+                "percent"
+              ]
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            }
+          }
+        },
+        "ignore_filters": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 50
+        }
+      }
+    }
+  }
+}

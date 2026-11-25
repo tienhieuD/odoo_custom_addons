@@ -1,0 +1,27 @@
+{
+  "schema": "dwo-dashboard/1",
+  "title": "Attachment storage",
+  "grid": {"cols": 12},
+  "filters": [
+    {"id": "period", "type": "date", "label": "Uploaded", "default": "last_90_days",
+     "bind": [{"dataset": "orm:ir.attachment", "field": "create_date"}]},
+    {"id": "kind", "type": "selection", "label": "Kind", "values": ["binary", "url"],
+     "bind": [{"dataset": "orm:ir.attachment", "field": "type"}]}
+  ],
+  "widgets": [
+    {"id": "files", "type": "kpi", "title": "Files", "x": 0, "y": 0, "w": 4, "h": 2,
+     "dataset": "orm:ir.attachment", "wells": {"value": {"agg": "count"}}},
+    {"id": "bytes", "type": "kpi", "title": "Total size (bytes)", "x": 4, "y": 0, "w": 4, "h": 2,
+     "dataset": "orm:ir.attachment", "wells": {"value": {"field": "file_size", "agg": "sum"}},
+     "options": {"format": "number", "decimals": 0}},
+    {"id": "by_type", "type": "pie", "title": "Files by type", "x": 8, "y": 0, "w": 4, "h": 4,
+     "dataset": "orm:ir.attachment",
+     "wells": {"category": {"field": "mimetype"}, "value": {"agg": "count"}},
+     "order": [{"measure": "__count", "dir": "desc"}], "limit": 8},
+    {"id": "growth", "type": "area", "title": "Uploaded size per week", "x": 0, "y": 2, "w": 8, "h": 4,
+     "dataset": "orm:ir.attachment",
+     "wells": {"axis": {"field": "create_date", "interval": "week"},
+               "values": [{"field": "file_size", "agg": "sum"}, {"field": "file_size", "agg": "avg"}]},
+     "order": [{"field": "create_date", "dir": "asc"}], "limit": 26, "options": {"stacked": false}}
+  ]
+}

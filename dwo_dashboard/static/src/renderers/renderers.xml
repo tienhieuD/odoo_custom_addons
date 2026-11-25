@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="dwo_dashboard.KpiRenderer">
+        <div class="dwo-kpi d-flex flex-column justify-content-center align-items-center h-100 text-center">
+            <div class="dwo-kpi-value" t-out="value"/>
+            <div class="dwo-kpi-label text-muted" t-out="label"/>
+        </div>
+    </t>
+
+    <t t-name="dwo_dashboard.TableRenderer">
+        <div class="dwo-table-wrap h-100 overflow-auto">
+            <table class="table table-sm table-hover mb-0 dwo-table">
+                <thead>
+                    <tr>
+                        <th t-foreach="props.result.columns" t-as="col" t-key="col_index"
+                            t-att-class="isNumber(col) ? 'text-end' : ''" t-out="col.label"/>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="props.result.rows" t-as="row" t-key="row_index">
+                        <td t-foreach="row" t-as="value" t-key="value_index"
+                            t-att-class="isNumber(props.result.columns[value_index]) ? 'text-end' : ''"
+                            t-out="cell(value, props.result.columns[value_index])"/>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </t>
+
+    <t t-name="dwo_dashboard.ChartRenderer">
+        <div class="dwo-chart h-100 position-relative">
+            <canvas t-ref="canvas"/>
+        </div>
+    </t>
+
+    <t t-name="dwo_dashboard.PivotRenderer">
+        <div class="dwo-pivot-wrap h-100 overflow-auto">
+            <table class="table table-sm mb-0 dwo-pivot">
+                <thead>
+                    <tr>
+                        <th t-att-colspan="matrix.rowDims.length or 1"/>
+                        <t t-foreach="colEntries" t-as="col" t-key="col[0]">
+                            <th t-att-colspan="measures.length" class="text-center" t-out="colLabel(col[1])"/>
+                        </t>
+                        <th t-if="showTotals and matrix.rowDims.length" t-att-colspan="measures.length" class="text-center">Total</th>
+                    </tr>
+                    <tr t-if="measures.length > 1">
+                        <th t-att-colspan="matrix.rowDims.length or 1"/>
+                        <t t-foreach="colEntries" t-as="col" t-key="col[0]">
+                            <th t-foreach="measures" t-as="m" t-key="m.key" class="text-end text-muted" t-out="m.label"/>
+                        </t>
+                        <t t-if="showTotals and matrix.rowDims.length">
+                            <th t-foreach="measures" t-as="m" t-key="m.key" class="text-end text-muted" t-out="m.label"/>
+                        </t>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="rowEntries" t-as="row" t-key="row[0]">
+                        <th t-foreach="row[1]" t-as="label" t-key="label_index" class="fw-normal" t-out="label"/>
+                        <th t-if="!row[1].length"/>
+                        <t t-foreach="colEntries" t-as="col" t-key="col[0]">
+                            <td t-foreach="measures" t-as="m" t-key="m.key" class="text-end"
+                                t-out="value(row[0], col[0], m_index)"/>
+                        </t>
+                        <t t-if="showTotals">
+                            <td t-foreach="measures" t-as="m" t-key="m.key" class="text-end fw-bold"
+                                t-out="rowTotal(row[0], m_index)"/>
+                        </t>
+                    </tr>
+                </tbody>
+                <tfoot t-if="showTotals">
+                    <tr>
+                        <th t-att-colspan="matrix.rowDims.length or 1">Total</th>
+                        <t t-foreach="colEntries" t-as="col" t-key="col[0]">
+                            <td t-foreach="measures" t-as="m" t-key="m.key" class="text-end fw-bold"
+                                t-out="colTotal(col[0], m_index)"/>
+                        </t>
+                        <td t-if="matrix.rowDims.length" t-foreach="measures" t-as="m" t-key="m.key" class="text-end fw-bold"
+                            t-out="grand(m_index)"/>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </t>
+
+</templates>

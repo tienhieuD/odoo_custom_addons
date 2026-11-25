@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://duotek.io.vn/schema/dwo-dataset-1.schema.json",
+  "title": "Dynamic Dashboard dataset definition",
+  "description": "Metrics and field overrides of an Odoo model (orm), or a SQL dataset (query, columns, groups).",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "type",
+        "model"
+      ],
+      "properties": {
+        "schema": {
+          "const": "dwo-dataset/1"
+        },
+        "type": {
+          "const": "orm"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "model": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.]{0,63}$"
+        },
+        "fields": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z_][a-z0-9_]{0,63}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "role": {
+                "enum": [
+                  "dimension",
+                  "measure"
+                ]
+              },
+              "hidden": {
+                "type": "boolean"
+              },
+              "format": {
+                "enum": [
+                  "number",
+                  "currency",
+                  "percent"
+                ]
+              }
+            }
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "agg"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,31}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "agg": {
+                "enum": [
+                  "sum",
+                  "avg",
+                  "min",
+                  "max",
+                  "count",
+                  "count_distinct"
+                ]
+              },
+              "field": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+                "description": "omit only for agg=count"
+              },
+              "where": {
+                "type": "array",
+                "description": "domain (ORM datasets only), same shape as in a page"
+              },
+              "format": {
+                "enum": [
+                  "number",
+                  "currency",
+                  "percent"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "type",
+        "code",
+        "sql"
+      ],
+      "properties": {
+        "schema": {
+          "const": "dwo-dataset/1"
+        },
+        "type": {
+          "const": "sql"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "sql": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "query",
+            "columns",
+            "groups"
+          ],
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 20000,
+              "description": "one SELECT / WITH...SELECT; parameters as %(name)s, a literal percent sign as %%"
+            },
+            "params": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "uid",
+                  "company_id",
+                  "company_ids",
+                  "lang",
+                  "today",
+                  "now"
+                ]
+              }
+            },
+            "company_scoped": {
+              "type": "boolean"
+            },
+            "groups": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 20,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9_]+\\.[a-z0-9_]+$"
+              }
+            },
+            "columns": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "type",
+                  "role"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-z_][a-z0-9_]{0,62}$"
+                  },
+                  "type": {
+                    "enum": [
+                      "text",
+                      "integer",
+                      "numeric",
+                      "boolean",
+                      "date",
+                      "datetime"
+                    ]
+                  },
+                  "role": {
+                    "enum": [
+                      "dimension",
+                      "measure"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                }
+              }
+            }
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "agg"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,31}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "agg": {
+                "enum": [
+                  "sum",
+                  "avg",
+                  "min",
+                  "max",
+                  "count",
+                  "count_distinct"
+                ]
+              },
+              "field": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+                "description": "omit only for agg=count"
+              },
+              "where": {
+                "type": "array",
+                "description": "domain (ORM datasets only), same shape as in a page"
+              },
+              "format": {
+                "enum": [
+                  "number",
+                  "currency",
+                  "percent"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "dwo-dataset/1",
+  "type": "orm",
+  "model": "sale.order",
+  "label": "Sales orders",
+  "metrics": [
+    {"name": "revenue", "label": "Revenue", "agg": "sum", "field": "amount_untaxed", "format": "currency",
+     "where": [["state", "in", ["sale", "done"]]]},
+    {"name": "orders", "label": "Orders", "agg": "count", "where": [["state", "in", ["sale", "done"]]]}
+  ]
+}
