@@ -25,11 +25,14 @@ export class FilterEditor extends Component {
         this.presets = Object.entries(PRESET_LABELS);
         this.state = useState({ loading: true, candidates: [], type: "date", key: "", label: "", default: "all" });
         onWillStart(async () => {
-            const orm = this.props.datasets.filter((d) => d.startsWith("orm:"));
+            // every dataset of the page: an Odoo model, a blend (its dimensions) or a SQL dataset (its columns); one that cannot be
+            // described for this person is simply left out
             const descriptions = await Promise.all(
-                orm.map((ref) => this.orm.call("dwo.dashboard.explore", "describe_dataset", [ref]))
+                this.props.datasets.map((ref) =>
+                    this.orm.call("dwo.dashboard.explore", "describe_dataset", [ref]).catch(() => null)
+                )
             );
-            this.state.candidates = this.collect(descriptions);
+            this.state.candidates = this.collect(descriptions.filter(Boolean));
             this.state.loading = false;
             this.pick(this.visible[0]);
         });

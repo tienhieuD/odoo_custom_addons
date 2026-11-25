@@ -93,6 +93,8 @@ class DwoDashboardAI(models.AbstractModel):
         explore = self.env["dwo.dashboard.explore"]
         lines = []
         for ref in refs:
+            if not ref.startswith("orm:"):
+                continue  # a blend or a SQL dataset is never described to the service (a SQL one has a query nobody should send out)
             try:
                 d = explore.describe_dataset(ref)
             except AccessError:

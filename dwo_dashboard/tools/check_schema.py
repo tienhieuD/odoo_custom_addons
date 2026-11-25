@@ -50,6 +50,12 @@ def must_reject(label, validator, document, change):
     print("REJECTED" if rejected else "ACCEPTED (bug)", label)
 
 
+blend = load("spec", "samples", "datasets", "blend_sales_vs_purchases.json")
+must_reject("a blend with one source", dataset_v, blend, lambda d: d.update(sources=d["sources"][:1]))
+must_reject("a blend source that is not an Odoo model", dataset_v, blend, lambda d: d["sources"][0].update(dataset="sql:x"))
+must_reject("a blend dimension of an unknown kind", dataset_v, blend, lambda d: d["dimensions"][0].update(kind="money"))
+must_reject("a blend with no metrics", dataset_v, blend, lambda d: d.update(metrics=[]))
+must_reject("a blend with an unknown key", dataset_v, blend, lambda d: d.update(sql={"query": "select 1"}))
 must_reject("icon with a space and a second class", page_v, base, lambda s: widget(s, "total").update(icon="fa fa-list"))
 must_reject("icon that is not Font Awesome", page_v, base, lambda s: widget(s, "total").update(icon="<script>"))
 must_reject("unknown top-level key", page_v, base, lambda s: s.update(colour="red"))

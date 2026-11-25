@@ -46,10 +46,17 @@ class DwoDashboardSpec(models.AbstractModel):
         """The definition (dwo-dataset/1) of a dataset reference, or None: the ``dwo.dataset`` of the model for an ``orm:``
         reference (a model without one has no metrics, and needs none). Plugins add their own types."""
         prefix, _sep, name = (ref or "").partition(":")
-        if prefix == "orm":
-            dataset = self.env["dwo.dataset"].sudo().search([("model_name", "=", name)], limit=1)
+        if prefix in ("orm", "blend", "sql"):
+            dataset = self.env["dwo.dataset"].sudo().search([("ref", "=", ref), ("kind", "=", prefix)], limit=1)
             return dataset._definition() if dataset else None
         return None
+
+    @api.model
+    def _sql_enabled(self):
+        """SQL datasets run only where a read-only database login is configured and the switch is not turned off."""
+        from ..engine import sql as sql_engine
+        return sql_engine.available() and self.env["ir.config_parameter"].sudo().get_param("dwo_dashboard.sql_enabled", "1") \
+            not in ("0", "False", "false")
 
     @api.model
     def _dwo_dataset_checkers(self):

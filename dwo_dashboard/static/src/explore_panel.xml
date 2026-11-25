@@ -61,7 +61,7 @@
                                             <option t-foreach="state.metrics" t-as="m" t-key="m.name" t-att-value="'metric:' + m.name"
                                                     t-att-selected="item.metric === m.name" t-out="m.label"/>
                                         </optgroup>
-                                        <optgroup label="Aggregate of a field">
+                                        <optgroup t-if="state.kind === 'orm'" label="Aggregate of a field">
                                             <option value="count" t-att-selected="!item.metric and item.agg === 'count'">Count</option>
                                             <option t-foreach="aggChoices" t-as="a" t-key="a.value" t-att-value="a.value"
                                                     t-att-selected="!item.metric and item.agg === a.value" t-out="a.label"/>
@@ -81,10 +81,11 @@
                                 </select>
                             </t>
                             <t t-else="">
-                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setField(item, ev)">
+                                <select t-foreach="levels(well, item)" t-as="lv" t-key="lv.level" class="form-select form-select-sm dwo-field-select"
+                                        t-att-data-level="lv.level" t-on-change="(ev) => this.pick(item, lv.level, ev)">
                                     <option value="">Choose a field...</option>
-                                    <option t-foreach="fieldsFor(well)" t-as="f" t-key="f.name" t-att-value="f.name"
-                                            t-att-selected="item.field === f.name" t-out="f.label"/>
+                                    <option t-foreach="lv.options" t-as="o" t-key="o.value" t-att-value="o.value"
+                                            t-att-selected="lv.selected === o.value" t-out="o.label"/>
                                 </select>
                                 <select t-if="well.accepts === 'dimension' and isDate(item)" class="form-select form-select-sm w-auto"
                                         t-on-change="(ev) => this.setInterval(item, ev)">

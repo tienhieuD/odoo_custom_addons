@@ -58,6 +58,7 @@ export class ExplorePanel extends Component {
     static template = "dwo_dashboard.ExplorePanel";
     static components = { WidgetCard, DomainSelector };
     static props = {
+        pageId: { type: Number, optional: true },
         widget: { type: [Object, { value: null }], optional: true },
         pageDatasets: { type: Array, optional: true },
         filters: Array,
@@ -70,7 +71,7 @@ export class ExplorePanel extends Component {
         this.aggLabels = AGG_LABELS;
         this.presetLabels = Object.entries(PRESET_LABELS).filter(([key]) => key !== "all");
         this.state = useState({
-            datasets: [], visuals: {}, dataset: "", fields: [], metrics: [], model: "", type: "bar",
+            datasets: [], visuals: {}, dataset: "", kind: "orm", fields: [], related: {}, metrics: [], model: "", type: "bar",
             wells: {}, where: [], options: {}, limit: "", orderKey: "", title: "", icon: "", iconMenu: false,
             showFilter: false, preview: { loading: false, entry: null }, search: "", datasetOpen: false,
             compare: { enabled: false, field: "", period: "this_month", against: "previous_period" },
@@ -104,6 +105,18 @@ export class ExplorePanel extends Component {
         s.title = widget.title || "";
         s.icon = widget.icon || "";
         s.wells = JSON.parse(JSON.stringify(widget.wells || {}));
+        for (const value of Object.values(s.wells)) {
+            for (const item of Array.isArray(value) ? value : [value]) {
+                if (item && item.field && item.field.includes(".")) {
+                    const parts = item.field.split(".");
+                    parts.pop();
+                    item.rel = parts.join(".");
+                    for (let k = 1; k <= parts.length; k++) {
+                        await this.loadRelated(parts.slice(0, k).join("."));
+                    }
+                }
+            }
+        }
         s.where = JSON.parse(JSON.stringify(widget.where || []));
         s.options = JSON.parse(JSON.stringify(widget.options || {}));
         if (widget.trend) {
@@ -129,6 +142,8 @@ export class ExplorePanel extends Component {
         }
         const description = await this.orm.call("dwo.dashboard.explore", "describe_dataset", [ref]);
         s.fields = description.fields;
+        s.related = {};
+        s.kind = description.kind || "orm";
         s.metrics = description.metrics || [];
         s.model = description.model;
         s.label = description.label;
@@ -278,7 +293,10 @@ export class ExplorePanel extends Component {
     }
 
     addItem(well) {
-        const item = well.accepts === "measure" ? { agg: "count", field: "" } : { field: "", interval: "" };
+        const first = this.state.kind === "blend" && this.state.metrics[0];
+        const item = well.accepts === "measure"
+            ? first ? { metric: first.name, agg: "", field: "" } : { agg: "count", field: "" }  // a blend has metrics only
+            : { field: "", interval: "" };
         // (a measure starts as "Count": the preview works as soon as the other selectors are filled)
         if (this.isMulti(well)) {
             this.state.wells[well.name] = [...(this.state.wells[well.name] || []), item];
@@ -300,8 +318,74 @@ export class ExplorePanel extends Component {
         this.schedulePreview();
     }
 
+    /** A field of the dataset, or of a record it points to ("partner_id.country_id": loaded by ``loadRelated``). */
     field(name) {
-        return this.state.fields.find((f) => f.name === name);
+        const own = this.state.fields.find((f) => f.name === name);
+        if (own || !name || !name.includes(".")) {
+            return own;
+        }
+        const parts = name.split(".");
+        const sub = parts.pop();
+        const found = (this.state.related[parts.join(".")] || []).find((f) => f.name === sub);
+        return found ? { ...found, name, label: `${this.pathLabel(parts)} › ${found.label}` } : undefined;
+    }
+
+    pathLabel(parts) {
+        let label = "";
+        let fields = this.state.fields;
+        parts.forEach((part, i) => {
+            const f = fields.find((x) => x.name === part);
+            label = label ? `${label} › ${f ? f.label : part}` : f ? f.label : part;
+            fields = this.state.related[parts.slice(0, i + 1).join(".")] || [];
+        });
+        return label;
+    }
+
+    /** The records a many2one path points to: their fields are loaded once, as the caller can read them. */
+    async loadRelated(path) {
+        if (!this.state.related[path]) {
+            const answer = await this.orm.call("dwo.dashboard.explore", "describe_related", [this.state.dataset, path]);
+            this.state.related[path] = answer.fields;
+        }
+    }
+
+    /** Every level of the selectors of a dimension or a column: its own fields, then those of the record it points to... */
+    levels(well, item) {
+        const segments = item.rel ? item.rel.split(".") : [];
+        const out = [];
+        for (let k = 0; k <= segments.length; k++) {
+            const prefix = segments.slice(0, k).join(".");
+            const fields = k === 0 ? this.state.fields : this.state.related[prefix] || [];
+            const wanted = (f) => (well.accepts === "dimension" ? f.dimension : f.column);
+            const options = [
+                ...fields.filter(wanted).map((f) => ({ value: f.name, label: f.label })),
+                ...fields.filter((f) => f.expandable).map((f) => ({ value: "rel:" + f.name, label: `${f.label} ›` })),
+            ];
+            let selected = "";
+            if (k < segments.length) {
+                selected = "rel:" + segments[k];
+            } else if (item.field && item.field.split(".").length === k + 1 && item.field.startsWith(prefix)) {
+                selected = item.field.split(".")[k];
+            }
+            out.push({ level: k, options, selected });
+        }
+        return out;
+    }
+
+    async pick(item, level, ev) {
+        const value = ev.target.value;
+        const prefix = (item.rel ? item.rel.split(".") : []).slice(0, level);
+        if (value.startsWith("rel:")) {
+            item.rel = [...prefix, value.slice(4)].join(".");
+            item.field = "";
+            item.interval = "";
+            await this.loadRelated(item.rel);
+            return;
+        }
+        item.rel = prefix.join(".");
+        item.field = [...prefix, value].join(".");
+        item.interval = this.isDate(item) ? item.interval || "month" : "";
+        this.schedulePreview();
     }
 
     isDate(item) {
@@ -589,7 +673,7 @@ export class ExplorePanel extends Component {
         }
         const token = ++this.token;
         p.loading = true;
-        const answer = await this.orm.call("dwo.dashboard.engine", "run_preview", [widget, this.props.filters, {}]);
+        const answer = await this.orm.call("dwo.dashboard.engine", "run_preview", [widget, this.props.filters, {}, this.props.pageId]);
         if (token !== this.token) {
             return;
         }

@@ -6,7 +6,8 @@
         <field name="arch" type="xml">
             <list>
                 <field name="label"/>
-                <field name="model_id"/>
+                <field name="kind"/>
+                <field name="ref"/>
             </list>
         </field>
     </record>
@@ -15,18 +16,55 @@
         <field name="model">dwo.dataset</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="action_check" type="object" string="Check" class="btn-primary" invisible="kind == 'orm'"
+                            help="Checks the definition with your own access rights."/>
+                    <button name="action_test" type="object" string="Test the query" invisible="kind != 'sql'"
+                            help="Runs the query (20 rows) with every protection and shows what it returns."/>
+                    <button name="action_fill_columns" type="object" string="Fill the columns from the query" invisible="kind != 'sql'"
+                            help="Lists the columns the query returns; you only choose which are dimensions and which are measures."/>
+                </header>
                 <sheet>
                     <group>
-                        <field name="model_id" options="{'no_create': True}"/>
+                        <field name="kind" readonly="id"/>
+                        <field name="model_id" options="{'no_create': True}" invisible="kind != 'orm'" required="kind == 'orm'"/>
+                        <field name="code" invisible="kind == 'orm'" required="kind != 'orm'" readonly="id"/>
                         <field name="label"/>
                         <field name="model_name" invisible="1"/>
                     </group>
-                    <separator string="Metrics"/>
-                    <p class="text-muted">
+                    <div invisible="kind != 'blend'" class="alert alert-info">
+                        <p class="mb-1"><b>A blend</b> reads two or three Odoo models one by one, each with the rights of the person who looks at the
+                        dashboard, and merges the results by the dimensions they share (for example the month, the customer): revenue from the sales
+                        and spending from the purchases on the same axis. It joins grouped results, not records one by one.</p>
+                        <pre class="mb-0 small">{"schema": "dwo-dataset/1", "type": "blend", "code": "sales_vs_purchases", "label": "Sales and purchases",
+ "sources": [{"name": "sales", "dataset": "orm:sale.order"}, {"name": "buy", "dataset": "orm:purchase.order"}],
+ "dimensions": [{"name": "month", "label": "Date", "kind": "date", "map": {"sales": "date_order", "buy": "date_order"}}],
+ "metrics": [{"name": "revenue", "source": "sales", "agg": "sum", "field": "amount_total", "label": "Revenue"},
+             {"name": "spend", "source": "buy", "agg": "sum", "field": "amount_total", "label": "Purchases"}]}</pre>
+                    </div>
+                    <div invisible="kind != 'sql'" class="alert alert-warning">
+                        <p class="mb-1"><b>A SQL dataset ignores the record rules of Odoo.</b> Everybody who can open a page that uses it sees what the
+                        query returns, whoever they are in Odoo (limited to the groups in <b>Who can use it</b>, by default every dashboard user).
+                        Write it with that in mind: no data that a person should not see.</p>
+<pre class="mb-0 small">SELECT user_id AS person, date_order::date AS day, amount_total AS total
+FROM sale_order WHERE state IN ('sale', 'done')</pre>
+                        <p class="mt-2 mb-0">Write the query, choose who can use it, save, then press <b>Fill the columns from the query</b>: the
+                        columns are written from what the query returns and you only choose which are dimensions and which are measures.</p>
+                    </div>
+                    <field name="definition_text" widget="ace" options="{'mode': 'json'}" nolabel="1" invisible="kind != 'blend'"/>
+                    <group invisible="kind != 'sql'">
+                        <field name="sql_group_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                    <label for="sql_query" invisible="kind != 'sql'"/>
+                    <field name="sql_query" widget="ace" options="{'mode': 'sql'}" invisible="kind != 'sql'"/>
+                    <label for="sql_options" invisible="kind != 'sql'"/>
+                    <field name="sql_options" widget="ace" options="{'mode': 'json'}" invisible="kind != 'sql'"/>
+                    <separator string="Metrics" invisible="kind != 'orm'"/>
+                    <p class="text-muted" invisible="kind != 'orm'">
                         A metric is a named measure that dashboards can use (for example <i>won_revenue</i>: the sum of the amount of the
                         confirmed orders). It always runs with the access rights of the person who looks at the dashboard.
                     </p>
-                    <field name="metric_ids">
+                    <field name="metric_ids" invisible="kind != 'orm'">
                         <list editable="bottom">
                             <field name="sequence" widget="handle"/>
                             <field name="model_name" column_invisible="1"/>

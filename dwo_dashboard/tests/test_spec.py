@@ -342,7 +342,7 @@ class TestRegistry(TransactionCase):
     def test_core_registry(self):
         reg = Registry.core()
         self.assertEqual(set(reg.visuals), {"kpi", "table", "bar", "line", "area", "pie", "doughnut", "pivot"})
-        self.assertEqual(set(reg.datasets), {"orm", "sql"})
+        self.assertEqual(set(reg.datasets), {"orm", "sql", "blend"})
 
     def test_malformed_plugin_definitions_are_refused_with_a_reason(self):
         for mutate, text in [

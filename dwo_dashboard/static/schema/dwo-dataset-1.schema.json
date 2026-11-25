@@ -271,6 +271,168 @@
           }
         }
       }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "type",
+        "code",
+        "sources",
+        "dimensions",
+        "metrics"
+      ],
+      "properties": {
+        "schema": {
+          "const": "dwo-dataset/1"
+        },
+        "type": {
+          "const": "blend"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "dataset"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,31}$"
+              },
+              "dataset": {
+                "type": "string",
+                "pattern": "^orm:[a-z][a-z0-9_.]{0,63}$"
+              },
+              "where": {
+                "type": "array"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              }
+            }
+          }
+        },
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "kind",
+              "map"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,31}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "kind": {
+                "enum": [
+                  "date",
+                  "many2one",
+                  "selection",
+                  "char",
+                  "integer",
+                  "boolean"
+                ]
+              },
+              "comodel": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_.]{0,63}$"
+              },
+              "map": {
+                "type": "object",
+                "description": "source name -> field or path of that source",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[a-z_][a-z0-9_]{0,63}(\\.[a-z_][a-z0-9_]{0,63}){0,4}$"
+                }
+              }
+            }
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "source",
+              "agg"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,31}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "agg": {
+                "enum": [
+                  "sum",
+                  "avg",
+                  "min",
+                  "max",
+                  "count",
+                  "count_distinct"
+                ]
+              },
+              "field": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+                "description": "omit only for agg=count"
+              },
+              "where": {
+                "type": "array",
+                "description": "domain (ORM datasets only), same shape as in a page"
+              },
+              "format": {
+                "enum": [
+                  "number",
+                  "currency",
+                  "percent"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,31}$"
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }

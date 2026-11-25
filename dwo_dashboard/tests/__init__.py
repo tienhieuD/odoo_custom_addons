@@ -10,3 +10,5 @@ from . import test_sharing
 from . import test_interact
 from . import test_metrics
 from . import test_ai
+from . import test_blend
+from . import test_sql

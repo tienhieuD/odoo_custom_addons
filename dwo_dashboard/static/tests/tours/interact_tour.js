@@ -99,3 +99,21 @@ registry.category("web_tour.tours").add("dwo_metric_pick", {
         { trigger: ".dwo-grid .dwo-card[data-widget-id=w1] .dwo-kpi-value" },
     ],
 });
+
+// Explore: a field of a related record, picked in a second selector (the join without SQL).
+registry.category("web_tour.tours").add("dwo_related_pick", {
+    steps: () => [
+        { trigger: ".dwo-main" },
+        { trigger: ".dwo-edit", run: "click" },
+        { trigger: ".dwo-add-widget", run: "click" },
+        { trigger: ".dwo-dataset-input", run: "edit Contact" },
+        { trigger: ".dwo-dataset-option:contains(res.partner)", run: "click" },
+        { trigger: ".dwo-visual-bar", run: "click" },
+        { trigger: ".dwo-well[data-well=axis] .dwo-field-select[data-level='0']", run: "select rel:parent_id" },
+        { trigger: ".dwo-well[data-well=axis] .dwo-field-select[data-level='1']", run: "select country_id" },
+        { trigger: ".dwo-explore-apply:not(:disabled)", run: "click" },
+        { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w1]" },
+        { trigger: ".dwo-done", run: "click" },
+        { trigger: ".dwo-grid .dwo-card[data-widget-id=w1]" },
+    ],
+});

@@ -1,0 +1,65 @@
+{
+  "schema": "dwo-dataset/1",
+  "type": "blend",
+  "code": "sales_vs_purchases",
+  "label": "Sales and purchases",
+  "sources": [
+    {
+      "name": "sales",
+      "dataset": "orm:sale.order",
+      "where": [
+        [
+          "state",
+          "in",
+          [
+            "sale",
+            "done"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "buy",
+      "dataset": "orm:purchase.order"
+    }
+  ],
+  "dimensions": [
+    {
+      "name": "month",
+      "label": "Date",
+      "kind": "date",
+      "map": {
+        "sales": "date_order",
+        "buy": "date_order"
+      }
+    },
+    {
+      "name": "partner",
+      "label": "Partner",
+      "kind": "many2one",
+      "comodel": "res.partner",
+      "map": {
+        "sales": "partner_id",
+        "buy": "partner_id"
+      }
+    }
+  ],
+  "metrics": [
+    {
+      "name": "revenue",
+      "source": "sales",
+      "agg": "sum",
+      "field": "amount_total",
+      "label": "Revenue",
+      "format": "currency"
+    },
+    {
+      "name": "spend",
+      "source": "buy",
+      "agg": "sum",
+      "field": "amount_total",
+      "label": "Purchases",
+      "format": "currency"
+    }
+  ]
+}

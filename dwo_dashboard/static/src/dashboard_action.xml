@@ -129,7 +129,7 @@
 
                 <aside t-if="state.explore" class="dwo-explore-drawer border-start">
                     <ExplorePanel t-key="state.explore.widget ? state.explore.widget.id : 'new'" widget="state.explore.widget"
-                                  pageDatasets="pageDatasets" filters="filters" onApply.bind="applyExplore" onClose.bind="closeExplore"/>
+                                  pageId="state.pageId" pageDatasets="pageDatasets" filters="filters" onApply.bind="applyExplore" onClose.bind="closeExplore"/>
                 </aside>
             </t>
             <div t-else="" class="d-flex flex-grow-1 align-items-center justify-content-center text-muted">

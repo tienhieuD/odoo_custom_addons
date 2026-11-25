@@ -61,6 +61,8 @@ def validate_dataset_semantics(env, defn, registry, check_access=True):
     chk = _Check(env, registry, lambda ref: None, check_access)
     if defn.get("type") == "orm":
         chk.orm_definition(defn)
+    elif defn.get("type") == "blend":
+        chk.blend_definition(defn)
     return chk.errors
 
 
@@ -98,6 +100,8 @@ class _Check:
         defn = self.resolve(ref)
         if defn is None:
             return self.unavailable(path, "dataset", "no dataset %r" % ref)
+        if prefix == "blend":
+            return True  # its sources are checked, as the person who looks, with every widget that uses it
         if prefix == "sql":
             groups = defn["sql"]["groups"]
             if self.check_access and not self.in_groups(groups):
@@ -148,6 +152,15 @@ class _Check:
                 self.domain(ptr(path, "where"), widget["where"], model)
         elif prefix == "sql":
             ctx = _Sql(self, defn)
+            self.blend_widget_rules(path, widget, vdef, "SQL")  # same limits: one dimension, no comparison, totals or 'other'
+        elif prefix == "blend":
+            ctx = _Blend(self, defn)
+            before = len(self.errors)
+            self.blend_definition(defn)  # the sources, their fields and their conditions, for whoever looks
+            for error in self.errors[before:]:
+                error["message"] = "blend %s %s: %s" % (name, error["path"], error["message"])
+                error["path"] = ptr(path, "dataset")
+            self.blend_widget_rules(path, widget, vdef)
         else:
             self.errors.extend(self.checkers[prefix](ref, path, widget, defn))
             return
@@ -243,6 +256,17 @@ class _Check:
             prefix, name = ref.split(":", 1)
             if prefix == "orm":
                 self.orm_bind(p, flt, self.env[name], bind["field"])
+            elif prefix == "blend":
+                dim = {d["name"]: d for d in self.resolve(ref)["dimensions"]}.get(bind["field"])
+                want = {"date": ("date",), "relation": ("many2one",), "selection": ("selection",)}[flt["type"]]
+                if dim is None:
+                    self.add(ptr(p, "field"), "field", "dataset %s has no dimension %r" % (name, bind["field"]))
+                elif dim["kind"] not in want:
+                    self.add(ptr(p, "field"), "type", "a %s filter needs a %s dimension; %s is %s" % (
+                        flt["type"], "/".join(want), bind["field"], dim["kind"]))
+                elif flt["type"] == "relation" and dim.get("comodel") != flt["model"]:
+                    self.add(ptr(p, "field"), "type", "%s points to %s, but the filter offers %s records" % (
+                        bind["field"], dim.get("comodel"), flt["model"]))
             elif prefix == "sql":
                 col = {c["name"]: c for c in self.resolve(ref)["sql"]["columns"]}.get(bind["field"])
                 if col is None:
@@ -273,6 +297,58 @@ class _Check:
             missing = [v for v in flt["values"] if v not in keys]
             if missing:
                 self.add(fpath, "type", "%s.%s has no value %s" % (model._name, fname, ", ".join(map(repr, missing))))
+
+    # ------------------------------------------------------------------------------------- blend
+    BLEND_FIELD_TYPES = {"date": DATE_TYPES, "many2one": ("many2one",), "selection": ("selection",), "char": ("char",),
+                         "integer": ("integer",), "boolean": ("boolean",)}
+
+    def blend_definition(self, defn):
+        """The sources of a blend (readable models), what each dimension is in each source (a readable field of the kind the
+        dimension says, the same model behind a many2one) and its metrics (readable fields and conditions)."""
+        models = {}
+        for i, src in enumerate(defn["sources"]):
+            p = ptr("/sources", i)
+            model = self.model(ptr(p, "dataset"), src["dataset"][4:])
+            models[src["name"]] = model
+            if model is not None and "where" in src:
+                self.domain(ptr(p, "where"), src["where"], model)
+        for i, dim in enumerate(defn["dimensions"]):
+            for name, path in dim["map"].items():
+                model = models.get(name)
+                if model is None:
+                    continue
+                p = ptr("/dimensions", i, "map", name)
+                found = self.follow(p, model, path, "dimension")
+                if found is None:
+                    continue
+                field = found[1]
+                if field.type not in self.BLEND_FIELD_TYPES[dim["kind"]]:
+                    self.add(p, "type", "%s is %s, but the dimension %r is a %s" % (path, field.type, dim["name"], dim["kind"]))
+                elif not groupable(self.env, field):
+                    self.add(p, "type", "Odoo cannot group by %s (%s%s)" % (path, field.type, "" if field.store else ", not stored"))
+                elif dim["kind"] == "many2one" and field.comodel_name != dim.get("comodel"):
+                    self.add(p, "type", "%s points to %s, not %s" % (path, field.comodel_name, dim.get("comodel")))
+                elif dim["kind"] == "selection":
+                    pass  # two sources may offer different choices: the values that meet are the ones that merge
+        for i, m in enumerate(defn["metrics"]):
+            model = models.get(m["source"])
+            if model is not None:
+                _Orm(self, model, {}).metric_def(ptr("/metrics", i), m)
+
+    def blend_widget_rules(self, path, widget, vdef, what="blend"):
+        """What a widget on a blend or a SQL dataset cannot do (strict, so that nothing half-works): no conditions of its own,
+        no comparison, no totals or 'other', one dimension. A blend has no table either (a SQL dataset does)."""
+        if vdef["query"] != "grouped" and what == "blend":
+            self.add(ptr(path, "type"), "capability", "a blend dataset has no table: it is read grouped by its dimensions")
+        if "where" in widget:
+            self.add(ptr(path, "where"), "not_allowed", "a blend widget has no conditions of its own: put them on the sources")
+        options = widget.get("options", {})
+        for name in ("other", "show_totals"):
+            if options.get(name):
+                self.add(ptr(path, "options", name), "capability", "%r is not available on a %s dataset" % (name, what))
+        for well in ("legend", "columns"):
+            if widget["wells"].get(well) and vdef["wells"].get(well, {}).get("accepts") == "dimension":  # a table's columns are fine
+                self.add(ptr(path, "wells", well), "capability", "a %s widget is grouped by one dimension: no %s" % (what, well))
 
     # ------------------------------------------------------------------------------------- orm definitions
     def orm_definition(self, defn):
@@ -380,6 +456,36 @@ class _Orm:
             self.chk.domain(ptr(path, "where"), metric["where"], self.model)
 
 
+class _Blend:
+    """Checks of the items of a widget on a blend: dimensions and metrics of the dataset, nothing else."""
+
+    def __init__(self, chk, defn):
+        self.chk = chk
+        self.dims = {d["name"]: d for d in defn["dimensions"]}
+        self.metrics = {m["name"] for m in defn["metrics"]}
+
+    def dimension(self, path, item, query_kind):
+        dim = self.dims.get(item["field"])
+        if dim is None:
+            self.chk.add(ptr(path, "field"), "field", "the blend has no dimension %r" % item["field"])
+        elif dim["kind"] == "date" and "interval" not in item:
+            self.chk.add(ptr(path, "interval"), "required", "a date dimension needs an interval (%s)" % ", ".join(C.INTERVALS))
+        elif dim["kind"] != "date" and "interval" in item:
+            self.chk.add(ptr(path, "interval"), "type", "an interval only applies to a date dimension")
+
+    def compare(self, path, name):
+        self.chk.add(path, "capability", "a comparison is not available on a blend dataset")
+
+    def column(self, path, item):
+        self.chk.add(path, "capability", "a blend dataset has no table")
+
+    def measure(self, path, item):
+        if "metric" not in item:
+            self.chk.add(path, "metric", "a blend widget shows metrics of the dataset: {\"metric\": name}")
+        elif item["metric"] not in self.metrics:
+            self.chk.add(ptr(path, "metric"), "metric", "dataset has no metric %r" % item["metric"])
+
+
 class _Sql:
     """Checks of the items of a widget on a SQL dataset: its columns and roles are hard rules."""
 
@@ -406,9 +512,7 @@ class _Sql:
             self.chk.add(ptr(path, "interval"), "type", "an interval only applies to date and datetime columns")
 
     def compare(self, path, name):
-        col = self.columns.get(name)
-        if col is None or col["type"] not in C.SQL_DATE_TYPES:
-            self.chk.add(path, "type", "a comparison needs a date or datetime column of the dataset")
+        self.chk.add(path, "capability", "a comparison is not available on a SQL dataset")
 
     def column(self, path, item):
         self._column(path, item["field"], "column")

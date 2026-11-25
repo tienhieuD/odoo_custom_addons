@@ -46,6 +46,11 @@ SQL_NUMERIC_TYPES = ("integer", "numeric")
 SQL_DATE_TYPES = ("date", "datetime")
 SQL_PARAMS = ("uid", "company_id", "company_ids", "lang", "today", "now")
 
+# blend datasets: several Odoo models read separately and merged by shared dimensions
+BLEND_DIM_KINDS = ("date", "many2one", "selection", "char", "integer", "boolean")
+MAX_BLEND_SOURCES = 3
+MAX_BLEND_DIMS = 4
+
 # limits
 MAX_WIDGETS = 40
 MAX_FILTERS = 10

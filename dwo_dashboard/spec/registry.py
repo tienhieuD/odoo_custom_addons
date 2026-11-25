@@ -130,6 +130,8 @@ def core_dataset_types():
                 "definition": {"required": ["model"], "optional": ["fields"]}},
         "sql": {"label": "SQL dataset", "name_pattern": C.ID_PATTERN, "where": False,
                 "definition": {"required": ["code", "sql"], "optional": []}},
+        "blend": {"label": "Blend of Odoo models", "name_pattern": C.ID_PATTERN, "where": False,
+                  "definition": {"required": ["code", "sources", "dimensions", "metrics"], "optional": []}},
     }
 
 

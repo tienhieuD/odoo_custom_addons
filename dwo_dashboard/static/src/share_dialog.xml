@@ -6,6 +6,10 @@
                 People you share with see this page with <b>their own data</b>: each widget runs with their access rights, so they
                 never see more than they could see in Odoo. "Edit" lets them change the widgets, not rename or delete the page.
             </p>
+            <div t-if="props.hasSql" class="alert alert-warning py-2 small dwo-share-sql-warning">
+                <b>This page shows SQL data.</b> A SQL query ignores the access rights of Odoo: everybody you share this page with sees what
+                the query returns, even if they could not read those records in Odoo.
+            </div>
             <div class="d-flex gap-2 mb-2">
                 <input class="form-control dwo-share-search" placeholder="Add a person or a group..." t-att-value="state.query"
                        t-on-input="onQuery"/>

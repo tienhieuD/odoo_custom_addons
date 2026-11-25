@@ -14,7 +14,7 @@ export class TableRenderer extends Component {
     }
 
     get canOpen() {
-        return !!(this.props.widget.options && this.props.widget.options.open_records) && !!this.props.result.ids;
+        return !!(this.props.widget.options && this.props.widget.options.open_records) && !!this.props.result.ids && !!this.props.result.model;
     }
 
     /** Open the record of a row in its form: the standard action enforces access by itself. */

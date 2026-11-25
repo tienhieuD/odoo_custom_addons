@@ -38,6 +38,7 @@ def format_help(registry):
         '"wells":{...},"where":[domain],"order":[{"field":F,"dir":"asc"}|{"measure":M,"dir":"desc"}],"limit":n,"options":{...}}.\n'
         'Widgets sit on a grid: x+w<=cols (cols 6..%(max)s, 12 by default), no two overlap, a KPI is about w3 h3, a chart w6 h4, a table w12 h5.\n'
         'id is lower case letters, digits and _, unique, and an existing id keeps its meaning (do not reuse it for something else).\n'
+        'A field of a dimension or a table column may be a path through many2one fields, up to 2 steps ("partner_id.country_id": the country of the customer).\n'
         'A dimension item is {"field":F} or, for a date field, {"field":F,"interval":"day|week|month|quarter|year"} (an interval is required for dates).\n'
         'A measure item is {"field":F,"agg":"sum|avg|min|max|count_distinct"}, {"agg":"count"} (count of records) or {"metric":NAME} (a metric listed under the data).\n'
         'A date filter is {"id":"period","type":"date","label":str,"default":"last_90_days","bind":[{"dataset":"orm:x","field":F}]}; '

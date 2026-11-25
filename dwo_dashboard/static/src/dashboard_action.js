@@ -135,7 +135,10 @@ export class DashboardAction extends Component {
     }
 
     openShare() {
-        this.dialog.add(ShareDialog, { pageId: this.state.pageId, pageName: this.state.name });
+        this.dialog.add(ShareDialog, {
+            pageId: this.state.pageId, pageName: this.state.name,
+            hasSql: this.state.spec.widgets.some((w) => (w.dataset || "").startsWith("sql:")),
+        });
     }
 
     /** The right-most column used by a widget. */
@@ -411,7 +414,7 @@ export class DashboardAction extends Component {
         try {
             answer = stored
                 ? await this.orm.call("dwo.dashboard.engine", "run_widget", [this.state.pageId, id, this.serverValues(), this.interactions()])
-                : await this.orm.call("dwo.dashboard.engine", "run_preview", [widget, this.filters, this.serverValues()]);
+                : await this.orm.call("dwo.dashboard.engine", "run_preview", [widget, this.filters, this.serverValues(), this.state.pageId]);
         } catch {
             answer = { ok: false, error: { code: "failed", message: _t("This widget could not be computed.") } };
         }

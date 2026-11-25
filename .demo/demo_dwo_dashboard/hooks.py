@@ -29,6 +29,7 @@ def post_init_hook(env):
     env = env(context=dict(env.context, tracking_disable=True, mail_notrack=True, mail_create_nolog=True))
     # the assistant is on in the demo (the owner's choice); dwo_dashboard.ai_enabled = 0 switches it off
     _metrics(env)
+    _blend(env)
     _orders(env, rnd, sellers)
     for user in sellers | manager:
         _dashboards(env(user=user.id))
@@ -74,6 +75,21 @@ def _dashboards(env):
     home.write({"name": "Sales", "spec": sales_page()})
     env["dwo.dashboard.page"].create({"dashboard_id": dashboard["id"], "name": "Contacts", "sequence": 20,
                                       "spec": contacts_page()})
+
+
+def _blend(env):
+    """A blend: two readings of the sales orders (the won ones, the open quotations) side by side on the same months."""
+    import json
+    env["dwo.dataset"].create({"kind": "blend", "code": "won_open", "label": "Won and open sales", "definition_text": json.dumps({
+        "schema": "dwo-dataset/1", "type": "blend", "code": "won_open", "label": "Won and open sales",
+        "sources": [{"name": "won", "dataset": "orm:sale.order", "where": [["state", "in", ["sale", "done"]]]},
+                    {"name": "open", "dataset": "orm:sale.order", "where": [["state", "in", ["draft", "sent"]]]}],
+        "dimensions": [{"name": "month", "label": "Order date", "kind": "date", "map": {"won": "date_order", "open": "date_order"}},
+                       {"name": "seller", "label": "Salesperson", "kind": "many2one", "comodel": "res.users",
+                        "map": {"won": "user_id", "open": "user_id"}}],
+        "metrics": [{"name": "won", "source": "won", "agg": "sum", "field": "amount_total", "label": "Won", "format": "currency"},
+                    {"name": "open", "source": "open", "agg": "sum", "field": "amount_total", "label": "Open quotations",
+                     "format": "currency"}]})})
 
 
 def _metrics(env):

@@ -68,3 +68,58 @@ class TestExplore(TransactionCase):
         self.assertIn("orm:sale.report", refs)
         widget = {"id": "r", "type": "kpi", "dataset": "orm:sale.report", "wells": {"value": {"agg": "count"}}}
         self.assertTrue(self.env["dwo.dashboard.engine"].with_user(user).run_preview(widget)["ok"])
+
+
+class TestRelatedFields(TransactionCase):
+    """The join of Explore: the fields of a record a many2one points to, read as the caller."""
+
+    def setUp(self):
+        super().setUp()
+        self.explore = self.env["dwo.dashboard.explore"]
+        self.user = self.env["res.users"].create({"name": "Rel", "login": "rel_user",
+                                                  "group_ids": [(6, 0, [self.env.ref("base.group_user").id])]})
+
+    def test_a_readable_many2one_is_expandable(self):
+        fields = {f["name"]: f for f in self.explore.with_user(self.user).describe_dataset("orm:res.partner")["fields"]}
+        self.assertTrue(fields["country_id"]["expandable"])
+        self.assertTrue(fields["parent_id"]["expandable"])
+        self.assertFalse(fields["name"]["expandable"])
+
+    def test_the_fields_of_the_related_record(self):
+        answer = self.explore.with_user(self.user).describe_related("orm:res.partner", "country_id")
+        names = {f["name"]: f for f in answer["fields"]}
+        self.assertEqual(answer["label"], "Country")
+        self.assertTrue(names["name"]["dimension"] and names["name"]["column"])
+        self.assertTrue(names["currency_id"]["expandable"])          # one more step is allowed...
+        deeper = self.explore.with_user(self.user).describe_related("orm:res.partner", "country_id.currency_id")
+        self.assertTrue(deeper["fields"])
+        self.assertFalse(any(f["expandable"] for f in deeper["fields"]))  # ...and then it stops
+
+    def test_what_is_refused(self):
+        for path in ("name", "no_such_field", "country_id.name", "a.b.c", "", "country_id.currency_id.rate_ids"):
+            with self.assertRaises(AccessError, msg=path):
+                self.explore.with_user(self.user).describe_related("orm:res.partner", path)
+        with self.assertRaises(AccessError):
+            self.explore.with_user(self.user).describe_related("sql:x", "country_id")
+
+    def test_a_relation_to_a_model_the_caller_cannot_read_is_not_followed(self):
+        self.env["ir.model.access"].search([("model_id.model", "=", "res.country")]).write({"perm_read": False})
+        self.env.registry.clear_cache()
+        fields = {f["name"]: f for f in self.explore.with_user(self.user).describe_dataset("orm:res.partner")["fields"]}
+        self.assertFalse(fields["country_id"]["expandable"])
+        with self.assertRaises(AccessError):
+            self.explore.with_user(self.user).describe_related("orm:res.partner", "country_id")
+
+    def test_a_field_through_a_relation_is_a_dimension_of_the_engine(self):
+        """Ground truth: contacts grouped by the country of their parent company."""
+        Partner = self.env["res.partner"]
+        be, fr = (self.env["res.country"].search([("code", "=", c)]).id for c in ("BE", "FR"))
+        a, b = (Partner.create({"name": "Rel Co %s" % c, "country_id": cid}) for c, cid in (("BE", be), ("FR", fr)))
+        for i, parent in enumerate([a, a, a, b]):
+            Partner.create({"name": "Rel Person %d" % i, "parent_id": parent.id})
+        widget = {"id": "w", "type": "bar", "dataset": "orm:res.partner", "where": [["name", "like", "Rel Person"]],
+                  "wells": {"axis": {"field": "parent_id.country_id"}, "values": [{"agg": "count"}]},
+                  "order": [{"measure": "__count", "dir": "desc"}]}
+        answer = self.env["dwo.dashboard.engine"].with_user(self.user).run_preview(widget)
+        self.assertTrue(answer["ok"], answer)
+        self.assertEqual([(r["labels"][0], r["values"][0]) for r in answer["result"]["rows"]], [("Belgium", 3), ("France", 1)])

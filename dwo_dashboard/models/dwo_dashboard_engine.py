@@ -5,9 +5,9 @@ import logging
 import psycopg2.errors
 
 from odoo import _, api, models
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, MissingError
 
-from ..engine import dates, interact, measures, domain as dom, grouped, guard, records
+from ..engine import blend, dates, interact, measures, sql as sql_engine, domain as dom, grouped, guard, records
 from ..spec import validate_semantics, validate_structure
 
 _logger = logging.getLogger(__name__)
@@ -110,10 +110,21 @@ class DwoDashboardEngine(models.AbstractModel):
         return None
 
     @api.model
-    def run_preview(self, widget, filters=None, filter_values=None):
-        """Run a widget that is not saved yet (Explore). The same checks as for a stored widget."""
+    def run_preview(self, widget, filters=None, filter_values=None, page_id=None):
+        """Run a widget that is not saved yet (Explore). The same checks as for a stored widget; a widget on a SQL dataset also
+        needs the page it is being written on, and the right to change that page (nobody tries a query on nothing)."""
         if not isinstance(widget, dict):
             return self._error("invalid")
+        if str(widget.get("dataset", "")).startswith("sql:"):
+            try:
+                page = self.env["dwo.dashboard.page"].browse(page_id if isinstance(page_id, int) else 0)
+                if not page.exists():
+                    raise AccessError("no page")
+                page.check_access("write")
+                if page._level() == "view":
+                    raise AccessError("view only")
+            except (AccessError, MissingError):
+                return self._error("access")
         widget = dict(widget, id=widget.get("id") or "preview")
         for key, default in (("x", 0), ("y", 0), ("w", 6), ("h", 4)):
             widget.setdefault(key, default)
@@ -171,6 +182,10 @@ class DwoDashboardEngine(models.AbstractModel):
             code = "access" if any(e["code"] == "access" for e in errors) else "invalid"
             return self._error(code, errors[0]["message"] if code == "invalid" else None)
         prefix, name = widget["dataset"].split(":", 1)
+        if prefix == "blend":
+            return self._run_blend(mini, widget, filter_values, registry.visuals[widget["type"]])
+        if prefix == "sql":
+            return self._run_sql(mini, widget, filter_values, registry.visuals[widget["type"]])
         if prefix != "orm":
             return self._error("unsupported")  # SQL and plugin datasets arrive in later phases
         vdef = registry.visuals[widget["type"]]
@@ -200,6 +215,46 @@ class DwoDashboardEngine(models.AbstractModel):
             result["notes"] = ["timezone"]  # the time zone of the viewer is unknown to the database: buckets are in UTC
         return {"ok": True, "result": result}
 
+    def _run_sql(self, mini, widget, filter_values, vdef):
+        if not self.env["dwo.dashboard.spec"]._sql_enabled():
+            return self._error("sql_setup")
+        defn = self.env["dwo.dashboard.spec"]._dwo_resolve_dataset(widget["dataset"])
+        try:
+            result = sql_engine.run(self.env, mini, widget, defn, vdef, filter_values)
+        except sql_engine.SqlSetupError:
+            _logger.warning("dashboard sql: no safe database login for SQL datasets")
+            return self._error("sql_setup")
+        except sql_engine.SqlRefused as exc:
+            return self._error("invalid", str(exc))
+        except psycopg2.errors.QueryCanceled:
+            return self._error("timeout")
+        except psycopg2.errors.InsufficientPrivilege:
+            return self._error("access")
+        except psycopg2.Error:
+            _logger.warning("dashboard sql: dataset %s failed in the database", widget["dataset"])  # never the text or the message
+            return self._error("failed")
+        except Exception:
+            _logger.exception("dashboard sql %s failed", widget.get("id"))
+            return self._error("failed")
+        if self.env.context.get("dwo_tz_fallback"):
+            result["notes"] = ["timezone"]
+        return {"ok": True, "result": result}
+
+    def _run_blend(self, mini, widget, filter_values, vdef):
+        defn = self.env["dwo.dashboard.spec"]._dwo_resolve_dataset(widget["dataset"])
+        try:
+            result = blend.run(self.env, mini, widget, defn, vdef, filter_values)
+        except (psycopg2.errors.QueryCanceled, TimeoutError):
+            return self._error("timeout")
+        except AccessError:
+            return self._error("access")
+        except Exception:  # never leak SQL or a traceback to the client
+            _logger.exception("dashboard blend %s failed", widget.get("id"))
+            return self._error("failed")
+        if self.env.context.get("dwo_tz_fallback"):
+            result["notes"] = ["timezone"]
+        return {"ok": True, "result": result}
+
     @staticmethod
     def _mini_page(spec, widget):
         """The page reduced to one widget; filters keep only the binds of that widget's dataset."""
@@ -220,5 +275,6 @@ class DwoDashboardEngine(models.AbstractModel):
             "not_found": _("This widget does not exist."),
             "unsupported": _("This kind of data is not available yet."),
             "failed": _("This widget could not be computed."),
+            "sql_setup": _("SQL datasets are not set up on this server: an administrator has to configure the read-only database login."),
         }
         return {"ok": False, "error": {"code": code, "message": messages[code]}}

@@ -8,6 +8,7 @@ built in later phases. Pure Python, same error format as structure.py."""
 import re
 
 from . import constants as C
+from .sqlscan import scan
 from .structure import Errors, domain, ptr
 
 _ID = re.compile(C.ID_PATTERN)
@@ -40,6 +41,9 @@ def validate_dataset_structure(defn, registry):
         _orm(e, defn)
     elif kind == "sql":
         columns = _sql(e, defn)
+    elif kind == "blend":
+        _blend(e, defn)
+        return e.items  # its metrics are checked with its sources
     metrics = defn.get("metrics")
     if metrics is not None:
         _metrics(e, defn, metrics, dtype, kind, columns if kind == "sql" else None)
@@ -89,7 +93,10 @@ def _sql(e, defn):
                     e.add(ptr("/sql/params", i), "duplicate", "parameter %r is declared twice" % name)
                 declared.append(name)
     if ok_query:
-        used = set(_PLACEHOLDER.findall(query))
+        problems, names = scan(query)
+        for problem in problems:
+            e.add("/sql/query", "sql", problem)
+        used = set(names)
         for name in sorted(used - set(declared)):
             e.add("/sql/query", "param", "uses %%(%s)s, which is not in 'params'" % name)
         for name in sorted(set(declared) - used):
@@ -119,6 +126,82 @@ def _sql(e, defn):
                     e.add(ptr(p, "name"), "duplicate", "column %r is declared twice" % col["name"])
                 columns[col["name"]] = col
     return columns
+
+
+def _blend(e, defn):
+    """Several Odoo models read one by one and merged by shared dimensions (full outer join of the grouped results)."""
+    if "code" in defn:
+        e.string("/code", defn["code"], 32, _ID, "an identifier like 'sales_vs_purchases'")
+    names = []
+    sources = defn.get("sources")
+    if e.array("/sources", sources, 2, C.MAX_BLEND_SOURCES):
+        for i, src in enumerate(sources):
+            p = ptr("/sources", i)
+            if not e.obj(p, src, required=("name", "dataset"), optional=("where", "label")):
+                continue
+            if e.string(ptr(p, "name"), src.get("name"), 32, _ID, "an identifier like 'sales'"):
+                if src["name"] in names:
+                    e.add(ptr(p, "name"), "duplicate", "source %r is declared twice" % src["name"])
+                names.append(src["name"])
+            if e.string(ptr(p, "dataset"), src.get("dataset"), 90, what="a model reference like 'orm:sale.order'") \
+                    and not (src["dataset"].startswith("orm:") and _MODEL.match(src["dataset"][4:])):
+                e.add(ptr(p, "dataset"), "pattern", "a source is an Odoo model: 'orm:<model>'")
+            if "where" in src:
+                domain(e, ptr(p, "where"), src["where"])
+            if "label" in src:
+                e.string(ptr(p, "label"), src["label"], 120)
+    dims = []
+    dimensions = defn.get("dimensions")
+    if e.array("/dimensions", dimensions, 1, C.MAX_BLEND_DIMS):
+        for i, dim in enumerate(dimensions):
+            p = ptr("/dimensions", i)
+            if not e.obj(p, dim, required=("name", "kind", "map"), optional=("label", "comodel")):
+                continue
+            if e.string(ptr(p, "name"), dim.get("name"), 32, _ID, "an identifier like 'month'"):
+                if dim["name"] in dims:
+                    e.add(ptr(p, "name"), "duplicate", "dimension %r is declared twice" % dim["name"])
+                dims.append(dim["name"])
+            kind_ok = e.enum(ptr(p, "kind"), dim.get("kind"), C.BLEND_DIM_KINDS)
+            if "label" in dim:
+                e.string(ptr(p, "label"), dim["label"], 120)
+            if kind_ok and dim["kind"] == "many2one":
+                if "comodel" not in dim:
+                    e.add(ptr(p, "comodel"), "required", "a many2one dimension names the model it points to")
+                else:
+                    e.string(ptr(p, "comodel"), dim["comodel"], 64, _MODEL, "a model name like 'res.partner'")
+            elif "comodel" in dim:
+                e.add(ptr(p, "comodel"), "not_allowed", "only a many2one dimension has a comodel")
+            mapping = dim.get("map")
+            if isinstance(mapping, dict) and e.obj(ptr(p, "map"), mapping, optional=tuple(names)):
+                for name in names:  # every source maps every dimension: a filter on it must reach every source
+                    if name not in mapping:
+                        e.add(ptr(p, "map"), "required", "source %r has no field for this dimension" % name)
+                for name, field in mapping.items():
+                    e.string(ptr(p, "map", name), field, 330, re.compile(C.FIELD_PATH_PATTERN), "a field name or a path")
+    metrics = defn.get("metrics")
+    if e.array("/metrics", metrics, 1, C.MAX_METRICS):
+        seen = set()
+        for i, m in enumerate(metrics):
+            p = ptr("/metrics", i)
+            if not e.obj(p, m, required=("name", "source", "agg"), optional=("label", "field", "where", "format")):
+                continue
+            if e.string(ptr(p, "name"), m.get("name"), 32, _ID, "an identifier like 'revenue'"):
+                if m["name"] in seen:
+                    e.add(ptr(p, "name"), "duplicate", "metric %r is declared twice" % m["name"])
+                seen.add(m["name"])
+            if e.string(ptr(p, "source"), m.get("source"), 32, _ID, "the name of a source") and m["source"] not in names:
+                e.add(ptr(p, "source"), "reference", "%r is not a source of this dataset" % m["source"])
+            ok = e.enum(ptr(p, "agg"), m.get("agg"), C.AGGS)
+            if "field" in m:
+                e.string(ptr(p, "field"), m["field"], 64, _FIELD, "a field name")
+            elif ok and m["agg"] != "count":
+                e.add(ptr(p, "field"), "required", "is required unless agg is 'count' (record count)")
+            if "label" in m:
+                e.string(ptr(p, "label"), m["label"], 120)
+            if "format" in m:
+                e.enum(ptr(p, "format"), m["format"], C.FORMATS)
+            if "where" in m:
+                domain(e, ptr(p, "where"), m["where"])
 
 
 def _metrics(e, defn, metrics, dtype, kind, sql_columns):

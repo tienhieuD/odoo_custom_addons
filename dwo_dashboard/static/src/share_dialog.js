@@ -12,7 +12,7 @@ import { formatDateTimeShort } from "./utils";
 export class ShareDialog extends Component {
     static template = "dwo_dashboard.ShareDialog";
     static components = { Dialog };
-    static props = { pageId: Number, pageName: String, close: Function };
+    static props = { pageId: Number, pageName: String, hasSql: { type: Boolean, optional: true }, close: Function };
 
     setup() {
         this.orm = useService("orm");

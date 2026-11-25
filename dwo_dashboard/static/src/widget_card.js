@@ -25,7 +25,9 @@ export class WidgetCard extends Component {
     }
 
     get pickHandler() {
-        return this.props.onPick ? (pick) => this.props.onPick(this.props.widget, pick) : undefined;
+        // clicking a bar filters, drills and lists records: for Odoo models only (a blend or SQL dataset has no such conditions)
+        const orm = (this.props.widget.dataset || "").startsWith("orm:");
+        return this.props.onPick && orm ? (pick) => this.props.onPick(this.props.widget, pick) : undefined;
     }
 
     get icon() {

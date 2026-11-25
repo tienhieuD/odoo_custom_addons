@@ -141,3 +141,15 @@ class TestMetricTour(HttpCase):
         page = self.env["dwo.dashboard.page"].sudo().search([("user_id", "=", user.id)], limit=1)
         self.assertEqual(page.spec["widgets"][0]["wells"], {"value": {"metric": "companies"}})
         self.assertEqual(page.spec["widgets"][0]["title"], "Companies · Contact")
+
+
+@tagged("post_install", "-at_install")
+class TestRelatedTour(HttpCase):
+
+    def test_pick_a_field_of_a_related_record(self):
+        self.env["res.users"].create({"name": "Rae", "login": "dash_rae", "password": "dash_rae",
+                                      "group_ids": [(6, 0, [self.env.ref("base.group_user").id])]})
+        self.start_tour(URL, "dwo_related_pick", login="dash_rae")
+        user = self.env["res.users"].search([("login", "=", "dash_rae")])
+        page = self.env["dwo.dashboard.page"].sudo().search([("user_id", "=", user.id)], limit=1)
+        self.assertEqual(page.spec["widgets"][0]["wells"]["axis"], {"field": "parent_id.country_id"})

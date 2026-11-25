@@ -1,5 +1,16 @@
 # Changelog
 
+## Joins (not released)
+- Explore: a field of a related record (`partner_id.country_id`) for dimensions and table columns, picked in a second selector.
+- **Blend** datasets (`blend:code`): several Odoo models merged by shared dimensions, as the viewer. `engine/blend.py`,
+  `dwo.dataset` kind Blend, semantic checks, SPEC "Joining models".
+- **SQL** datasets (`sql:code`), for dashboard managers, behind a read-only database login and the layers listed in SPEC; Test and
+  "Fill the columns" buttons in the form; a warning in the share dialog for pages that show SQL data; `tools/sql_role_setup.sql`.
+  `engine/sql.py`, `spec/sqlscan.py`. The assistant never sees a blend or SQL dataset.
+- Tests: `test_blend.py` (a date meets a datetime in the viewer's months, missing sides, order after the merge, filters, access) and
+  `test_sql.py` (a real read-only login; the scanner; attacks: multiple statements, secret tables even through a view, functions,
+  writes, timeouts, caps; who may run, preview and see).
+
 ## Groups (not released)
 - Two groups under Settings > Users > Dashboard: **User** (uses the dashboards; implied for every internal user, as before) and
   **Manager** (also writes datasets and metrics and configures the assistant; implies User; administrators are managers). A manager

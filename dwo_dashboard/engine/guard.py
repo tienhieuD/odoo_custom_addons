@@ -23,13 +23,13 @@ def max_rows(env):
 
 
 @contextlib.contextmanager
-def guarded(env):
+def guarded(env, seconds=None):
     """Savepoint + ``statement_timeout``. A query cancelled by PostgreSQL aborts the transaction; the savepoint is rolled
     back (and with it the timeout setting), the transaction stays usable and the caller sees ``QueryCanceled``."""
     cr = env.cr
     cr.execute("SHOW statement_timeout")
     previous = cr.fetchone()[0]
     with cr.savepoint():
-        cr.execute("SET LOCAL statement_timeout = %s", ["%ds" % timeout_seconds(env)])
+        cr.execute("SET LOCAL statement_timeout = %s", ["%ds" % (seconds or timeout_seconds(env))])
         yield
         cr.execute("SET LOCAL statement_timeout = %s", [previous])

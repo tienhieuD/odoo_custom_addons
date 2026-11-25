@@ -220,12 +220,31 @@ def build_dataset_schema(registry):
                                               "type": {"enum": list(C.SQL_TYPES)},
                                               "role": {"enum": list(C.ROLES)}, "label": _text(120)}}}}},
                "metrics": {"type": "array", "maxItems": C.MAX_METRICS, "items": metric}}}
+    blend_metric = dict(metric, required=["name", "source", "agg"], properties=dict(
+        metric["properties"], source={"type": "string", "pattern": C.ID_PATTERN}))
+    blend = {"type": "object", "additionalProperties": False, "required": ["schema", "type", "code", "sources", "dimensions", "metrics"],
+             "properties": {
+                 "schema": {"const": C.DATASET_SCHEMA_ID}, "type": {"const": "blend"}, "label": _text(120),
+                 "code": {"type": "string", "pattern": C.ID_PATTERN},
+                 "sources": {"type": "array", "minItems": 2, "maxItems": C.MAX_BLEND_SOURCES, "items": {
+                     "type": "object", "additionalProperties": False, "required": ["name", "dataset"], "properties": {
+                         "name": {"type": "string", "pattern": C.ID_PATTERN},
+                         "dataset": {"type": "string", "pattern": r"^orm:" + C.MODEL_PATTERN[1:]},
+                         "where": {"type": "array"}, "label": _text(120)}}},
+                 "dimensions": {"type": "array", "minItems": 1, "maxItems": C.MAX_BLEND_DIMS, "items": {
+                     "type": "object", "additionalProperties": False, "required": ["name", "kind", "map"], "properties": {
+                         "name": {"type": "string", "pattern": C.ID_PATTERN}, "label": _text(120),
+                         "kind": {"enum": list(C.BLEND_DIM_KINDS)},
+                         "comodel": {"type": "string", "pattern": C.MODEL_PATTERN},
+                         "map": {"type": "object", "description": "source name -> field or path of that source",
+                                 "additionalProperties": {"type": "string", "pattern": C.FIELD_PATH_PATTERN}}}}},
+                 "metrics": {"type": "array", "minItems": 1, "maxItems": C.MAX_METRICS, "items": blend_metric}}}
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": "https://duotek.io.vn/schema/dwo-dataset-1.schema.json",
         "title": "Dynamic Dashboard dataset definition",
         "description": "Metrics and field overrides of an Odoo model (orm), or a SQL dataset (query, columns, groups).",
-        "oneOf": [orm, sql],
+        "oneOf": [orm, sql, blend],
     }
 
 

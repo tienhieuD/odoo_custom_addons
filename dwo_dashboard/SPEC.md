@@ -248,6 +248,40 @@ domain; dynamic values are not supported yet) is read by a query of its own, ove
 - two metrics of the same field and aggregate with different `where` keep separate columns;
 - `other` accepts sum and count metrics only; `show_totals`, `compare` and `trend` work with metrics.
 
+## Joining models (Phase 3c, 3b)
+Three ways to use more than one table, from the safest. The first two run **as the viewer**, with the record rules of Odoo.
+
+1. **A path through many2one fields** in a dimension or a table column: `partner_id.country_id` (at most 2 steps). Explore offers
+   "Customer ›" in the field selector and loads the fields of the record behind it, as the caller can read them (`describe_related`).
+2. **A blend** (`blend:<code>`, `dwo.dataset` of kind Blend; 2 or 3 Odoo models, 1 to 4 shared dimensions, named metrics, each
+   metric on one source). Each source is read separately with the engine of its model, grouped by what the dimension is there
+   (`map`), and the results are merged by the *normalised* key of the group (a many2one id, a selection value, the first day of the
+   bucket in the viewer's calendar whether the field is a date or a datetime): a full outer join of grouped results, not of
+   records. A group only some sources have is a row, with 0 (sum, count) or empty (average, minimum, maximum) where a source has
+   nothing. Order and limit are applied after the merge. The viewer must be able to read every source, or the whole widget is
+   refused. A page filter bound to a blend dimension reaches every source. Not available on a blend (refused when the page is
+   saved): a condition on the widget, comparison, trend, totals, `other`, a legend or columns, a table, clicks (cross-filter,
+   drill-down, records). Limits: 3 sources, one time budget for all of them, each source cut at `max_rows`.
+3. **A SQL dataset** (`sql:<code>`; last resort). It **ignores the record rules**: everybody who can open a page that uses it
+   sees what the query returns, limited to the groups the definition lists (default: every dashboard user). Dashboard managers
+   write them (only managers can read the query text; whoever runs it sees the results, never the query); it runs only where the
+   server has a read-only database login (`DWO_SQL_USER`, `DWO_SQL_PASSWORD`, set up by `tools/sql_role_setup.sql`).
+   **The database login and its grants are the security boundary; the rest is convenience and defence in depth.** The login can
+   SELECT only the columns that do not look like credentials (password, secret, token, api key, private key, otp...), nothing on the
+   tables that hold secrets, in read-only transactions with a timeout. Odoo refuses a login that is a superuser, can create roles or
+   databases, or can read such a column (asked of PostgreSQL itself, remembered for a minute). Layers, each with a test:
+   - who: a stored page the viewer can read, in a listed group; Explore needs a page the person can edit (`run_preview(.., page_id)`);
+   - a separate connection as that login (refused if it is a superuser or can create roles or databases), read-only transaction,
+     `statement_timeout`, row cap, always rolled back and closed; no `SET ROLE` on the Odoo connection;
+   - the text (a convenience, not a boundary): one `SELECT`/`WITH`, no `;`, balanced parentheses and closed strings, comments and
+     dollar quotes understood, `%` escaped (`%%`, parameters as `%(uid)s`), calls that read files, run other SQL or change the
+     session refused, quoted names included;
+     it runs wrapped as `SELECT <declared columns> FROM (<query>) q`, identifiers from the declared columns, values bound;
+   - the plan: `EXPLAIN (VERBOSE)` must not touch a table of the denylist (users, API keys, configuration parameters, mail and payment
+     credentials, ... `dwo_dashboard.sql_denied_tables` adds more), views included, nor scan a function other than
+     `generate_series` and `unnest`.
+   Same limits as a blend (no comparison, trend, totals, `other`, legend, clicks). Datetime columns are UTC. Weeks start on Monday.
+
 ## The assistant (Phase 4)
 `dwo.dashboard.ai.propose(page_id, request, datasets, current)` returns a new page for a request in words; it never saves. The
 caller must be able to edit the page. The page proposed is validated as the caller (`validate`), so the assistant can never
