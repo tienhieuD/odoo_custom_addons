@@ -1,5 +1,11 @@
 # Changelog
 
+## Groups (not released)
+- Two groups under Settings > Users > Dashboard: **User** (uses the dashboards; implied for every internal user, as before) and
+  **Manager** (also writes datasets and metrics and configures the assistant; implies User; administrators are managers). A manager
+  needs no Settings right. The AI form is now its own model (`dwo.ai.config`, with an on/off switch) instead of the Settings app.
+- A manager has full rights on the configuration and none on private pages: nobody reads somebody else's private dashboard.
+
 ## Phase 4 (not released): the assistant
 - "Ask AI" in the editor: a request in words becomes a proposed page, loaded as the draft (nothing is saved by the assistant).
   Providers: Odoo AI (default, no setup) or an OpenAI-compatible API (Dashboard > Configuration > AI assistant; the key is written

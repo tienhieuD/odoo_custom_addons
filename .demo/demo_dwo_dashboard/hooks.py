@@ -19,12 +19,18 @@ ORDERS = 360
 def post_init_hook(env):
     rnd = random.Random(5)
     sellers = env["res.users"].browse([env.ref("demo_users.user_%s" % n).id for n in ("alice", "bob", "carol")])
-    sellers.write({"group_ids": [(4, env.ref("sales_team.group_sale_salesman_all_leads").id)]})
+    sales = env.ref("sales_team.group_sale_salesman_all_leads")
+    sellers.write({"group_ids": [(4, sales.id)]})
+    # demo_admin: a normal user who manages the dashboards (datasets, metrics, the assistant) without any Settings right
+    manager = env["res.users"].with_context(no_reset_password=True).create({
+        "name": "Dana Admin", "login": "demo_admin", "password": "demo", "email": "dana@example.com",
+        "group_ids": [(6, 0, [env.ref("base.group_user").id, env.ref("base.group_partner_manager").id, sales.id,
+                              env.ref("dwo_dashboard.group_dwo_dashboard_manager").id])]})
     env = env(context=dict(env.context, tracking_disable=True, mail_notrack=True, mail_create_nolog=True))
     # the assistant is on in the demo (the owner's choice); dwo_dashboard.ai_enabled = 0 switches it off
     _metrics(env)
     _orders(env, rnd, sellers)
-    for user in sellers:
+    for user in sellers | manager:
         _dashboards(env(user=user.id))
 
 

@@ -148,19 +148,26 @@ class TestWhatIsSentAndWho(AICase):
         self.assertIn("color(", text(self.admin))
         self.assertEqual(self.ai(self.stranger)._describe_datasets(["orm:no.such.model"]), "")
 
-    def test_the_provider_and_the_key_are_settings_of_administrators(self):
-        Settings = self.env["res.config.settings"]
+    def test_the_provider_and_the_key_are_settings_of_dashboard_managers(self):
+        Config = self.env["dwo.ai.config"]
         with self.assertRaises(AccessError):
-            Settings.with_user(self.owner).create({"dwo_ai_provider": "openai", "dwo_ai_api_key": "sk-secret"}).execute()
-        settings = Settings.with_user(self.admin).create({"dwo_ai_provider": "openai", "dwo_ai_api_key": "  sk-secret  "})
-        settings.execute()
+            Config.with_user(self.owner).default_get(["provider"])      # not even the form opens for a plain user
+        manager = self.env["res.users"].create({"name": "Manny", "login": "ai_manager", "group_ids": [
+            (6, 0, [self.env.ref("base.group_user").id, self.env.ref("dwo_dashboard.group_dwo_dashboard_manager").id])]})
+        self.assertFalse(manager.has_group("base.group_system"))          # a manager is not a system administrator
+        config = Config.with_user(manager).create({"provider": "openai", "api_key": "  sk-secret  ", "enabled": True})
+        config.action_save()
         self.assertEqual(self.env["ir.config_parameter"].sudo().get_param("dwo_dashboard.ai_api_key"), "sk-secret")
-        values = Settings.with_user(self.admin).get_values()
-        self.assertFalse(values["dwo_ai_api_key"])      # never sent back to a browser
-        self.assertTrue(values["dwo_ai_key_set"])
+        values = Config.with_user(manager).default_get(["api_key", "key_set", "provider"])
+        self.assertFalse(values["api_key"])      # never sent back to a browser
+        self.assertTrue(values["key_set"])
         status = self.ai(self.owner).get_status()
         self.assertNotIn("sk-secret", json.dumps(status))
         self.assertEqual((status["provider"], status["configured"]), ("openai", True))
+        with self.assertRaises(AccessError):
+            config.with_user(self.owner).action_save()
+        Config.with_user(manager).create({"provider": "odoo_olg", "enabled": False}).action_save()
+        self.assertFalse(self.ai(self.owner).get_status()["enabled"])    # the switch is in the form too
 
     def test_openai_provider_uses_the_key_and_never_repeats_it(self):
         self.env["ir.config_parameter"].sudo().set_param("dwo_dashboard.ai_provider", "openai")

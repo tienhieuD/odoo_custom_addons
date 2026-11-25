@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Two groups. Dashboard / User: uses the dashboards (implied for every internal user, as the app was open to all of them).
+         Dashboard / Manager: also configures the datasets and metrics and the AI assistant; the administrators are managers.
+         A manager has full rights on the configuration, not on what people keep private: nobody reads somebody else's private
+         dashboard, managers and administrators included (every widget runs with the rights of the person looking). -->
+    <record id="privilege_dwo_dashboard" model="res.groups.privilege">
+        <field name="name">Dashboard</field>
+        <field name="sequence">40</field>
+        <field name="category_id" ref="base.module_category_productivity"/>
+    </record>
+    <record id="group_dwo_dashboard_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="privilege_dwo_dashboard"/>
+        <field name="comment">Uses the dashboards: their own pages, the pages shared with them, Ask AI.</field>
+    </record>
+    <record id="group_dwo_dashboard_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="privilege_dwo_dashboard"/>
+        <field name="implied_ids" eval="[(4, ref('group_dwo_dashboard_user'))]"/>
+        <field name="comment">Also configures the datasets and metrics and the AI assistant.</field>
+    </record>
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_dwo_dashboard_user'))]"/>
+    </record>
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_dwo_dashboard_manager'))]"/>
+    </record>
+
     <!-- All rules are global (no group), so they are ANDed with each other: each operation has exactly one rule per model.
          A dashboard is private to its owner. A page can be shared with users and groups (model dwo.dashboard.share):
          the people it is shared with read it (level view) and also change its spec (level edit); only the owner

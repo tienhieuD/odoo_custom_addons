@@ -5,5 +5,5 @@
         <field name="tag">dwo_dashboard.main</field>
     </record>
     <menuitem id="menu_dwo_dashboard" name="Dashboard" action="action_dwo_dashboard" sequence="5"
-              groups="base.group_user"/>
+              groups="group_dwo_dashboard_user"/>
 </odoo>

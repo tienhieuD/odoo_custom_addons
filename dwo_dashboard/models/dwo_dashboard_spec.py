@@ -72,9 +72,9 @@ class DwoDashboardSpec(models.AbstractModel):
 
     @api.model
     def validate_dataset(self, defn):
-        """Validate a dataset definition (dict or JSON text). System administrators only: they write datasets."""
-        if not self.env.is_system():
-            raise AccessError(_("Only system administrators can validate dataset definitions."))
+        """Validate a dataset definition (dict or JSON text). Dashboard managers only: they write datasets."""
+        if not self.env.user.has_group("dwo_dashboard.group_dwo_dashboard_manager"):
+            raise AccessError(_("Only dashboard managers can validate dataset definitions."))
         return self._validate_dataset(defn, True)
 
     @api.model

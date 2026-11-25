@@ -229,7 +229,7 @@ class TestMetricStorageAndAccess(TransactionCase):
                   "wells": {"value": {"metric": metric}}}
         return {"schema": "dwo-dashboard/1", "grid": {"cols": 12}, "widgets": [widget]}
 
-    def test_only_administrators_write_definitions_and_everybody_reads_them(self):
+    def test_only_dashboard_managers_write_definitions_and_everybody_reads_them(self):
         Dataset = self.env["dwo.dataset"].with_user(self.user)
         self.assertEqual(Dataset.search_count([]), 1)
         with self.assertRaises(AccessError):
@@ -238,6 +238,13 @@ class TestMetricStorageAndAccess(TransactionCase):
             self.dataset.with_user(self.user).write({"label": "mine"})
         with self.assertRaises(AccessError):
             self.dataset.metric_ids[0].with_user(self.user).unlink()
+        manager = self.env["res.users"].create({"name": "Manny", "login": "mx_manager", "group_ids": [
+            (6, 0, [self.env.ref("base.group_user").id, self.env.ref("dwo_dashboard.group_dwo_dashboard_manager").id])]})
+        self.assertFalse(manager.has_group("base.group_system"))       # no Settings rights needed
+        Dataset.with_user(manager).create({"model_id": self.env.ref("base.model_res_users").id, "label": "Users"})
+        self.dataset.with_user(manager).write({"label": "Contacts by the manager"})
+        self.assertTrue(self.env["dwo.dashboard.spec"].with_user(manager).validate_dataset(
+            {"schema": "dwo-dataset/1", "type": "orm", "model": "res.users"})["valid"])
 
     def test_a_metric_on_a_field_the_viewer_cannot_read_cannot_be_used_or_run_by_them(self):
         result = self.env["dwo.dashboard.spec"].with_user(self.user).validate(self.page("secret"))
@@ -277,3 +284,30 @@ class TestMetricStorageAndAccess(TransactionCase):
                            "field_id": self.env["ir.model.fields"]._get("res.partner", "name").id})
         with self.assertRaises(Exception):  # one dataset per model
             self.env["dwo.dataset"].create({"model_id": self.partner_model.id, "label": "again"})
+
+
+class TestGroups(TransactionCase):
+
+    def test_the_two_groups(self):
+        user_group = self.env.ref("dwo_dashboard.group_dwo_dashboard_user")
+        manager_group = self.env.ref("dwo_dashboard.group_dwo_dashboard_manager")
+        self.assertIn(user_group, manager_group.implied_ids)               # a manager is a user
+        self.assertIn(user_group, self.env.ref("base.group_user").all_implied_ids)   # every internal user is a user
+        self.assertIn(manager_group, self.env.ref("base.group_system").all_implied_ids)  # administrators manage
+        self.assertEqual(manager_group.privilege_id, user_group.privilege_id)
+
+    def test_what_a_manager_can_and_cannot_see(self):
+        manager = self.env["res.users"].create({"name": "Manny", "login": "gr_manager", "group_ids": [
+            (6, 0, [self.env.ref("base.group_user").id, self.env.ref("dwo_dashboard.group_dwo_dashboard_manager").id])]})
+        user = self.env["res.users"].create({"name": "Una", "login": "gr_user", "group_ids": [(6, 0, [self.env.ref("base.group_user").id])]})
+        page_id = self.env["dwo.dashboard"].with_user(user).get_my_dashboard()["pages"][0]["id"]
+        # full rights on the configuration...
+        self.assertTrue(self.env["dwo.dashboard.explore"].with_user(manager).list_datasets())
+        # ...but not on what people keep private
+        with self.assertRaises(AccessError):
+            self.env["dwo.dashboard.page"].with_user(manager).get_page(page_id)
+        self.assertEqual(self.env["dwo.dashboard.page"].with_user(manager).search([("id", "=", page_id)]).ids, [])
+        with self.assertRaises(AccessError):
+            self.env["dwo.dashboard.spec"].with_user(user).validate_dataset({})
+        portal = self.env["res.users"].create({"name": "Pia", "login": "gr_portal", "group_ids": [(6, 0, [self.env.ref("base.group_portal").id])]})
+        self.assertFalse(portal.has_group("dwo_dashboard.group_dwo_dashboard_user"))

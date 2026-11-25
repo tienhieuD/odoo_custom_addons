@@ -232,7 +232,7 @@ the author); `hidden`; `capability` (needs a newer Odoo); `unchecked` (a plugin 
   additive changes (a new type, a new option, a new aggregate) stay in the same major and go in CHANGELOG.
 
 ## Metrics (Phase 3)
-A dataset can have a stored definition (`dwo.dataset`, Dashboard > Configuration > Datasets and metrics, system administrators
+A dataset can have a stored definition (`dwo.dataset`, Dashboard > Configuration > Datasets and metrics, dashboard managers
 write, everybody reads: a definition holds no data). It compiles to a `dwo-dataset/1` document; `{"metric": "revenue"}` in a
 value well is replaced by the measure it names (field, aggregate, label, format, `where`) before the widget runs, and the
 metric's name stays the key of the measure (`order: [{"measure": "revenue"}]`). A metric is not a permission: the engine runs

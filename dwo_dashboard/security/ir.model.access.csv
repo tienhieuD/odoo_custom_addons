@@ -1,9 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_dwo_dashboard_user,dwo.dashboard user,model_dwo_dashboard,base.group_user,1,1,1,1
-access_dwo_dashboard_page_user,dwo.dashboard.page user,model_dwo_dashboard_page,base.group_user,1,1,1,1
-access_dwo_dashboard_share_user,dwo.dashboard.share user,model_dwo_dashboard_share,base.group_user,1,1,1,1
-access_dwo_dashboard_share_log_user,dwo.dashboard.share.log user,model_dwo_dashboard_share_log,base.group_user,1,0,0,0
-access_dwo_dataset_user,dwo.dataset user,model_dwo_dataset,base.group_user,1,0,0,0
-access_dwo_dataset_admin,dwo.dataset admin,model_dwo_dataset,base.group_system,1,1,1,1
-access_dwo_dataset_metric_user,dwo.dataset.metric user,model_dwo_dataset_metric,base.group_user,1,0,0,0
-access_dwo_dataset_metric_admin,dwo.dataset.metric admin,model_dwo_dataset_metric,base.group_system,1,1,1,1
+access_dwo_dashboard_user,dwo.dashboard user,model_dwo_dashboard,dwo_dashboard.group_dwo_dashboard_user,1,1,1,1
+access_dwo_dashboard_page_user,dwo.dashboard.page user,model_dwo_dashboard_page,dwo_dashboard.group_dwo_dashboard_user,1,1,1,1
+access_dwo_dashboard_share_user,dwo.dashboard.share user,model_dwo_dashboard_share,dwo_dashboard.group_dwo_dashboard_user,1,1,1,1
+access_dwo_dashboard_share_log_user,dwo.dashboard.share.log user,model_dwo_dashboard_share_log,dwo_dashboard.group_dwo_dashboard_user,1,0,0,0
+access_dwo_dataset_user,dwo.dataset user,model_dwo_dataset,dwo_dashboard.group_dwo_dashboard_user,1,0,0,0
+access_dwo_dataset_manager,dwo.dataset manager,model_dwo_dataset,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1
+access_dwo_dataset_metric_user,dwo.dataset.metric user,model_dwo_dataset_metric,dwo_dashboard.group_dwo_dashboard_user,1,0,0,0
+access_dwo_dataset_metric_manager,dwo.dataset.metric manager,model_dwo_dataset_metric,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1
+access_dwo_ai_config_manager,dwo.ai.config manager,model_dwo_ai_config,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1

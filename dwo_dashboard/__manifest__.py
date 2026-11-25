@@ -13,8 +13,8 @@
     "category": "Extra Tools",
     "depends": ["base", "web"],
     "data": [
-        "security/ir.model.access.csv",
         "security/dwo_dashboard_security.xml",
+        "security/ir.model.access.csv",
         "views/menu.xml",
         "views/dataset_views.xml",
     ],

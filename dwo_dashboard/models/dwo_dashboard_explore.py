@@ -24,7 +24,7 @@ class DwoDashboardExplore(models.AbstractModel):
     @api.model
     def list_datasets(self):
         """The models the caller can read (technical models are hidden, except for system administrators)."""
-        show_all = self.env.is_system()
+        show_all = self.env.is_system() or self.env.user.has_group("dwo_dashboard.group_dwo_dashboard_manager")
         rows = []
         for rec in self.env["ir.model"].sudo().search([("transient", "=", False)]):
             name = rec.model

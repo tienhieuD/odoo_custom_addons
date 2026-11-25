@@ -3,31 +3,47 @@ from odoo import _, api, fields, models
 from odoo.exceptions import AccessError
 
 PREFIX = "dwo_dashboard.ai_"
+MANAGER = "dwo_dashboard.group_dwo_dashboard_manager"
 
 
-class ResConfigSettings(models.TransientModel):
-    """Who answers the assistant. System administrators only (the transient model and its view are theirs). The key is
-    written, never read back: the form shows only whether one is set."""
-    _inherit = "res.config.settings"
+class DwoAiConfig(models.TransientModel):
+    """Who answers the assistant, and whether it is on. Dashboard managers (and so administrators). The key is written, never
+    read back: the form shows only whether one is set. It is a form of its own, not the Settings app, so that a manager does
+    not need the rights of an administrator."""
+    _name = "dwo.ai.config"
+    _description = "Dashboard AI assistant settings"
 
-    dwo_ai_provider = fields.Selection([("odoo_olg", "Odoo AI (default, nothing to set up)"), ("openai", "OpenAI-compatible API")],
-                                       string="Provider", config_parameter=PREFIX + "provider", default="odoo_olg")
-    dwo_ai_endpoint = fields.Char(string="Endpoint", config_parameter=PREFIX + "endpoint",
-                                  help="Empty for api.openai.com. Any server that speaks the chat completions API.")
-    dwo_ai_model = fields.Char(string="Model", config_parameter=PREFIX + "model", help="Empty for gpt-4o-mini.")
-    dwo_ai_api_key = fields.Char(string="API key", help="Written, never shown again.")
-    dwo_ai_key_set = fields.Boolean(string="A key is set", readonly=True)
+    enabled = fields.Boolean(string="Assistant on", default=True)
+    provider = fields.Selection([("odoo_olg", "Odoo AI (default, nothing to set up)"), ("openai", "OpenAI-compatible API")],
+                                default="odoo_olg", required=True)
+    endpoint = fields.Char(help="Empty for api.openai.com. Any server that speaks the chat completions API.")
+    model = fields.Char(help="Empty for gpt-4o-mini.")
+    api_key = fields.Char(string="API key", help="Written, never shown again.")
+    key_set = fields.Boolean(string="A key is set", readonly=True)
+
+    def _manager(self):
+        if not self.env.user.has_group(MANAGER):
+            raise AccessError(_("Only dashboard managers configure the assistant."))
 
     @api.model
-    def get_values(self):
-        res = super().get_values()
-        res["dwo_ai_api_key"] = False  # never sent to the browser
-        res["dwo_ai_key_set"] = bool(self.env["ir.config_parameter"].sudo().get_param(PREFIX + "api_key"))
+    def default_get(self, names):
+        res = super().default_get(names)
+        self._manager()
+        params = self.env["ir.config_parameter"].sudo()
+        res.update(enabled=params.get_param(PREFIX + "enabled", "1") not in ("0", "False", "false"),
+                   provider=params.get_param(PREFIX + "provider") or "odoo_olg",
+                   endpoint=params.get_param(PREFIX + "endpoint") or False, model=params.get_param(PREFIX + "model") or False,
+                   key_set=bool(params.get_param(PREFIX + "api_key")), api_key=False)  # the key itself never leaves the server
         return res
 
-    def set_values(self):
-        super().set_values()
-        if self.dwo_ai_api_key:
-            if not self.env.is_system():
-                raise AccessError(_("Only administrators set the AI key."))
-            self.env["ir.config_parameter"].sudo().set_param(PREFIX + "api_key", self.dwo_ai_api_key.strip())
+    def action_save(self):
+        self._manager()
+        params = self.env["ir.config_parameter"].sudo()
+        for rec in self:
+            params.set_param(PREFIX + "enabled", "1" if rec.enabled else "0")
+            params.set_param(PREFIX + "provider", rec.provider)
+            params.set_param(PREFIX + "endpoint", (rec.endpoint or "").strip())
+            params.set_param(PREFIX + "model", (rec.model or "").strip())
+            if rec.api_key:
+                params.set_param(PREFIX + "api_key", rec.api_key.strip())
+        return {"type": "ir.actions.act_window_close"}
