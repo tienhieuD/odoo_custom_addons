@@ -1,11 +1,12 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import { Component, onWillStart, onWillUnmount, useState } from "@odoo/owl";
+import { browser } from "@web/core/browser/browser";
 import { Domain } from "@web/core/domain";
 import { DomainSelector } from "@web/core/domain_selector/domain_selector";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-import { suggestVisual } from "./utils";
+import { PRESET_LABELS, suggestVisual } from "./utils";
 import { WidgetCard } from "./widget_card";
 
 const AGG_LABELS = {
@@ -16,6 +17,40 @@ const AGG_LABELS = {
     count_distinct: _t("Distinct count"),
 };
 const DATE_TYPES = ["date", "datetime"];
+const VISUAL_ICONS = {
+    kpi: "fa-hashtag", table: "fa-table", bar: "fa-bar-chart", line: "fa-line-chart", area: "fa-area-chart",
+    pie: "fa-pie-chart", doughnut: "fa-circle-o-notch", pivot: "fa-th",
+};
+const OPTION_LABELS = {
+    format: _t("Number format"), decimals: _t("Decimals"), legend: _t("Legend"), stacked: _t("Stacked"),
+    horizontal: _t("Horizontal bars"), smooth: _t("Smooth lines"), show_totals: _t("Show totals"),
+    y_min: _t("Axis minimum"), y_max: _t("Axis maximum"), goal: _t("Goal"), trend_good: _t("Good news is"), prefix: _t("Prefix"), suffix: _t("Suffix"),
+    show_values: _t("Show values"), target: _t("Target line"), percent: _t("100% stacked"),
+    show_percent: _t("Show percentages"), other: _t("Group the rest as “Other”"), heatmap: _t("Heat map"),
+    open_records: _t("Click a row to open it"),
+};
+const ENUM_LABELS = {
+    up: _t("A rise"), down: _t("A fall"), none: _t("Hidden"), top: _t("Top"), bottom: _t("Bottom"), left: _t("Left"),
+    right: _t("Right"), number: _t("Number"), currency: _t("Currency"), percent: _t("Percent"),
+};
+const RECENT_KEY = "dwo_dashboard.recent_datasets";
+
+function recentDatasets() {
+    try {
+        return JSON.parse(browser.localStorage.getItem(RECENT_KEY) || "[]");
+    } catch {
+        return [];
+    }
+}
+
+function rememberDataset(ref) {
+    try {
+        const next = [ref, ...recentDatasets().filter((r) => r !== ref)].slice(0, 5);
+        browser.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+    } catch {
+        // private mode: nothing remembered, nothing lost
+    }
+}
 
 /** Explore: pick a dataset, a visual type, drop fields in its wells, see the result, add it to the page. The same panel edits
  * an existing widget. Everything shown (datasets, fields) is what the viewer may read: the server answers for the caller. */
@@ -24,6 +59,7 @@ export class ExplorePanel extends Component {
     static components = { WidgetCard, DomainSelector };
     static props = {
         widget: { type: [Object, { value: null }], optional: true },
+        pageDatasets: { type: Array, optional: true },
         filters: Array,
         onApply: Function,
         onClose: Function,
@@ -32,13 +68,17 @@ export class ExplorePanel extends Component {
     setup() {
         this.orm = useService("orm");
         this.aggLabels = AGG_LABELS;
+        this.presetLabels = Object.entries(PRESET_LABELS).filter(([key]) => key !== "all");
         this.state = useState({
             datasets: [], visuals: {}, dataset: "", fields: [], model: "", type: "bar",
             wells: {}, where: [], options: {}, limit: "", orderKey: "", title: "",
-            showFilter: false, preview: { loading: false, entry: null }, search: "",
+            showFilter: false, preview: { loading: false, entry: null }, search: "", datasetOpen: false,
+            compare: { enabled: false, field: "", period: "this_month", against: "previous_period" },
+            trend: { enabled: false, field: "", interval: "month", points: 12 },
         });
         this.timer = null;
         this.token = 0;
+        this.previousType = null;
         onWillStart(async () => {
             const [datasets, registry] = await Promise.all([
                 this.orm.call("dwo.dashboard.explore", "list_datasets", []),
@@ -48,6 +88,8 @@ export class ExplorePanel extends Component {
             this.state.visuals = registry.visuals;
             if (this.props.widget) {
                 await this.loadWidget(this.props.widget);
+            } else {
+                this.previousType = this.state.type;
             }
         });
         onWillUnmount(() => clearTimeout(this.timer));
@@ -58,10 +100,19 @@ export class ExplorePanel extends Component {
         await this.chooseDataset(widget.dataset, false);
         const s = this.state;
         s.type = widget.type;
+        this.previousType = widget.type;
         s.title = widget.title || "";
         s.wells = JSON.parse(JSON.stringify(widget.wells || {}));
         s.where = JSON.parse(JSON.stringify(widget.where || []));
         s.options = JSON.parse(JSON.stringify(widget.options || {}));
+        if (widget.trend) {
+            s.trend = { enabled: true, field: widget.trend.field, interval: widget.trend.interval || "month",
+                        points: widget.trend.points || 12 };
+        }
+        if (widget.compare) {
+            s.compare = { enabled: true, field: widget.compare.field, period: widget.compare.period || "this_month",
+                          against: widget.compare.against || "previous_period" };
+        }
         s.limit = widget.limit || "";
         const first = (widget.order || [])[0];
         s.orderKey = first ? (first.field ? `d:${first.field}:${first.dir || "asc"}` : `m:${first.measure}:${first.dir || "asc"}`) : "";
@@ -78,17 +129,76 @@ export class ExplorePanel extends Component {
         const description = await this.orm.call("dwo.dashboard.explore", "describe_dataset", [ref]);
         s.fields = description.fields;
         s.model = description.model;
+        s.label = description.label;
         if (reset) {
             s.wells = {};
             s.where = [];
             s.orderKey = "";
             this.state.type = this.state.type || "bar";
+            this.ensureWells();
             this.schedulePreview();
         }
     }
 
-    onDataset(ev) {
-        this.chooseDataset(ev.target.value);
+    // ------------------------------------------------------------------------------------- dataset combobox
+    get datasetLabel() {
+        const d = this.state.datasets.find((x) => x.ref === this.state.dataset);
+        return d ? d.label : "";
+    }
+
+    /** Matching datasets: the ones already on this page first, then the recent ones, then the rest. */
+    get datasetChoices() {
+        const q = this.state.search.trim().toLowerCase();
+        const onPage = this.props.pageDatasets || [];
+        const recent = recentDatasets();
+        const rank = (d) => (onPage.includes(d.ref) ? 0 : recent.includes(d.ref) ? 1 : 2);
+        return this.state.datasets
+            .filter((d) => !q || d.label.toLowerCase().includes(q) || d.model.includes(q))
+            .map((d) => ({ ...d, group: rank(d) }))
+            .sort((a, b) => a.group - b.group || a.label.localeCompare(b.label))
+            .slice(0, 12);
+    }
+
+    groupTitle(group) {
+        return group === 0 ? _t("On this page") : group === 1 ? _t("Recent") : _t("All data");
+    }
+
+    openDatasets() {
+        this.state.datasetOpen = true;
+        this.state.search = "";
+    }
+
+    pickDataset(d) {
+        this.state.datasetOpen = false;
+        this.state.search = "";
+        rememberDataset(d.ref);
+        this.chooseDataset(d.ref);
+    }
+
+    closeDatasets() {
+        // a blur happens before the click on an option: wait one tick
+        setTimeout(() => (this.state.datasetOpen = false), 150);
+    }
+
+    visualIcon(name) {
+        return VISUAL_ICONS[name] || "fa-puzzle-piece";
+    }
+
+    enumLabel(value) {
+        return ENUM_LABELS[value] || value;
+    }
+
+    optionLabel(name) {
+        return OPTION_LABELS[name] || name.replace(/_/g, " ");
+    }
+
+    /** One selector per required well as soon as a visual and a dataset are chosen; "Count" already filled in. */
+    ensureWells() {
+        for (const well of this.wellList) {
+            if (well.min >= 1 && !this.items(well).length) {
+                this.addItem(well);
+            }
+        }
     }
 
     // ----------------------------------------------------------------------------------------- the visual
@@ -101,11 +211,36 @@ export class ExplorePanel extends Component {
     }
 
     setType(name) {
+        const keep = this.state.wells;
         this.state.type = name;
-        this.state.wells = {};
         this.state.options = {};
         this.state.orderKey = "";
+        if (!this.state.visuals[name].compare) {
+            this.state.compare.enabled = false;
+        }
+        if (!this.state.visuals[name].trend) {
+            this.state.trend.enabled = false;
+        }
+        // keep what still fits the new visual: dimensions stay dimensions, measures stay measures
+        const fresh = {};
+        const old = Object.entries(this.vdefOf(this.previousType || name).wells || {});
+        const dims = old.filter(([, w]) => w.accepts === "dimension").flatMap(([n]) => [].concat(keep[n] || []));
+        const measures = old.filter(([, w]) => w.accepts === "measure").flatMap(([n]) => [].concat(keep[n] || []));
+        for (const well of Object.entries(this.state.visuals[name].wells).map(([n, w]) => ({ name: n, ...w }))) {
+            const source = well.accepts === "dimension" ? dims : well.accepts === "measure" ? measures : [];
+            const take = source.splice(0, well.max);
+            if (take.length) {
+                fresh[well.name] = well.max === 1 ? take[0] : take;
+            }
+        }
+        this.state.wells = fresh;
+        this.previousType = name;
+        this.ensureWells();
         this.schedulePreview();
+    }
+
+    vdefOf(name) {
+        return this.state.visuals[name] || { wells: {} };
     }
 
     get wellList() {
@@ -142,11 +277,16 @@ export class ExplorePanel extends Component {
 
     addItem(well) {
         const item = well.accepts === "measure" ? { agg: "count", field: "" } : { field: "", interval: "" };
+        // (a measure starts as "Count": the preview works as soon as the other selectors are filled)
         if (this.isMulti(well)) {
             this.state.wells[well.name] = [...(this.state.wells[well.name] || []), item];
         } else {
             this.state.wells[well.name] = item;
         }
+    }
+
+    canRemove(well) {
+        return this.items(well).length > well.min;
     }
 
     removeItem(well, index) {
@@ -276,6 +416,13 @@ export class ExplorePanel extends Component {
         if (vdef.limit && s.limit) {
             widget.limit = parseInt(s.limit, 10);
         }
+        const compareField = vdef.compare === "series" ? (this.axisDate || {}).field : s.compare.field;
+        if (vdef.compare && s.compare.enabled && compareField) {
+            widget.compare = { field: compareField, period: s.compare.period, against: s.compare.against };
+        }
+        if (vdef.trend && s.trend.enabled && s.trend.field) {
+            widget.trend = { field: s.trend.field, interval: s.trend.interval, points: s.trend.points };
+        }
         if (s.orderKey) {
             const [kind, name, dir] = s.orderKey.split(":");
             widget.order = [kind === "d" ? { field: name, dir } : { measure: name, dir }];
@@ -315,7 +462,12 @@ export class ExplorePanel extends Component {
     // ---------------------------------------------------------------------------------------------- options
     setOption(name, desc, ev) {
         const t = ev.target;
-        this.state.options[name] = desc.kind === "bool" ? t.checked : desc.kind === "int" ? parseInt(t.value, 10) || "" : t.value;
+        const parse = {
+            bool: () => t.checked,
+            int: () => parseInt(t.value, 10) || "",
+            number: () => (t.value === "" ? "" : Number(t.value)),
+        };
+        this.state.options[name] = (parse[desc.kind] || (() => t.value))();
         this.schedulePreview();
     }
 
@@ -323,6 +475,59 @@ export class ExplorePanel extends Component {
         return Object.entries(this.vdef && this.vdef.options ? this.vdef.options : {})
             .filter(([, desc]) => desc.kind !== "colors")
             .map(([name, desc]) => ({ name, ...desc }));
+    }
+
+    // ---------------------------------------------------------------------- compare with a previous period
+    get dateFields() {
+        return this.state.fields.filter((f) => f.intervals.length && f.dimension);
+    }
+
+    /** A KPI picks its own date; a line or area chart compares on its axis (the date it is already drawn over). */
+    get compareOnAxis() {
+        return this.vdef && this.vdef.compare === "series";
+    }
+
+    get axisDate() {
+        const well = this.wellList.find((w) => w.name === "axis");
+        const axis = well ? this.items(well)[0] : null;
+        return axis && axis.field && this.isDate(axis) ? axis : null;
+    }
+
+    get canCompare() {
+        return !!this.vdef && !!this.vdef.compare && (this.compareOnAxis ? !!this.axisDate : this.dateFields.length > 0);
+    }
+
+    get preferredDate() {
+        const preferred = this.dateFields.find((f) => ["date_order", "create_date"].includes(f.name));
+        return (preferred || this.dateFields[0] || { name: "" }).name;
+    }
+
+    toggleCompare(ev) {
+        const c = this.state.compare;
+        c.enabled = ev.target.checked;
+        if (c.enabled && !c.field) {
+            c.field = this.preferredDate;
+        }
+        this.schedulePreview();
+    }
+
+    toggleTrend(ev) {
+        const t = this.state.trend;
+        t.enabled = ev.target.checked;
+        if (t.enabled && !t.field) {
+            t.field = this.preferredDate;
+        }
+        this.schedulePreview();
+    }
+
+    setTrend(key, ev) {
+        this.state.trend[key] = key === "points" ? parseInt(ev.target.value, 10) || 12 : ev.target.value;
+        this.schedulePreview();
+    }
+
+    setCompare(key, ev) {
+        this.state.compare[key] = ev.target.value;
+        this.schedulePreview();
     }
 
     // ----------------------------------------------------------------------------------- filter (domain)
@@ -370,9 +575,30 @@ export class ExplorePanel extends Component {
         return this.buildWidget() || { type: this.state.type };
     }
 
+    /** "Count by Country", "Sum of Total by Month": written into the spec when the title is left empty. */
+    get autoTitle() {
+        const parts = [];
+        const measure = this.cleanMeasures()[0];
+        const dim = this.firstDimensionField();
+        if (measure) {
+            const field = measure.field ? this.field(measure.field) : null;
+            parts.push(field ? `${this.aggLabels[measure.agg] || measure.agg} ${_t("of")} ${field.label}` : _t("Count"));
+            if (!field && !dim && this.state.label) {
+                parts.push(`· ${this.state.label}`);
+            }
+        }
+        if (dim && this.state.type !== "kpi") {
+            parts.push(`${_t("by")} ${dim.label}`);
+        }
+        return parts.length ? parts.join(" ") : this.state.label || "";
+    }
+
     apply() {
         const widget = this.buildWidget();
         if (widget) {
+            if (!widget.title) {
+                widget.title = this.autoTitle;
+            }
             this.props.onApply(widget);
         }
     }

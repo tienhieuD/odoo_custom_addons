@@ -1,6 +1,6 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
-import { Component, onWillStart, useEffect, useRef, useState } from "@odoo/owl";
+import { Component, onWillStart, useEffect, useExternalListener, useRef, useState } from "@odoo/owl";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { loadCSS, loadJS } from "@web/core/assets";
 import { _t } from "@web/core/l10n/translation";
@@ -8,6 +8,7 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ExplorePanel } from "./explore_panel";
 import { FilterBar } from "./filter_bar";
+import { FilterEditor } from "./filter_editor";
 import { COLS_DEFAULT, ROW_HEIGHT, newWidgetId, nextPosition } from "./utils";
 import { WidgetCard } from "./widget_card";
 import "./renderers/index";
@@ -27,7 +28,7 @@ const clone = (value) => JSON.parse(JSON.stringify(value));
 /** "My dashboard": pages on the left, the grid of the current page, filters on top, Explore on the right. */
 export class DashboardAction extends Component {
     static template = "dwo_dashboard.Dashboard";
-    static components = { WidgetCard, FilterBar, ExplorePanel };
+    static components = { WidgetCard, FilterBar, FilterEditor, ExplorePanel };
     static props = { "*": true };
 
     setup() {
@@ -41,8 +42,9 @@ export class DashboardAction extends Component {
         this.state = useState({
             ready: false, pages: [], pageId: null, name: "", revision: 0,
             spec: { schema: "dwo-dashboard/1", widgets: [] }, savedSpec: "", editing: false, snapshot: null,
-            data: {}, filterValues: {}, explore: null, renaming: null, saving: false,
+            data: {}, filterValues: {}, explore: null, renaming: null, saving: false, pageMenu: null, filterEditor: false,
         });
+        useExternalListener(window, "click", () => (this.state.pageMenu = null));
         onWillStart(() => this.boot());
         useEffect(
             () => {
@@ -228,6 +230,18 @@ export class DashboardAction extends Component {
         }
     }
 
+    addFilter(filter) {
+        this.state.spec.filters = [...this.filters, filter];
+        this.state.filterEditor = false;
+        this.runAll();
+    }
+
+    removeFilter(filter) {
+        this.state.spec.filters = this.filters.filter((f) => f.id !== filter.id);
+        delete this.state.filterValues[filter.id];
+        this.runAll();
+    }
+
     onFilter(id, value) {
         this.state.filterValues[id] = value;
         this.runAll();
@@ -236,6 +250,23 @@ export class DashboardAction extends Component {
     // ---------------------------------------------------------------------------------------------- explore
     openExplore(widget) {
         this.state.explore = { widget: widget ? clone(widget) : null };
+    }
+
+    /** "Add widget" works from the view mode too: it switches to editing by itself (one click instead of two). */
+    addWidget() {
+        if (!this.state.editing) {
+            this.startEdit();
+        }
+        this.openExplore(null);
+    }
+
+    get pageDatasets() {
+        return [...new Set(this.widgets.map((w) => w.dataset))];
+    }
+
+    togglePageMenu(page, ev) {
+        ev.stopPropagation();
+        this.state.pageMenu = this.state.pageMenu === page.id ? null : page.id;
     }
 
     closeExplore() {
@@ -250,7 +281,8 @@ export class DashboardAction extends Component {
             widgets[index] = { ...widget, x: old.x, y: old.y, w: old.w, h: old.h };
         } else {
             widget.id = newWidgetId(widgets);
-            Object.assign(widget, nextPosition(widgets, 6, 4));
+            const size = widget.type === "kpi" ? [3, 3] : widget.type === "table" ? [12, 4] : [6, 4];
+            Object.assign(widget, nextPosition(widgets, ...size));
             widgets.push(widget);
         }
         this.state.explore = null;
@@ -336,7 +368,12 @@ export class DashboardAction extends Component {
     }
 
     itemStyle(w) {
-        return `grid-column: ${w.x + 1} / span ${w.w}; grid-row: ${w.y + 1} / span ${w.h};`;
+        return `grid-column: ${w.x + 1} / span ${w.w}; grid-row: ${w.y + 1} / span ${w.h}; --dwo-h: ${w.h};`;
+    }
+
+    /** Reading order (top to bottom, left to right): what a phone shows, one widget under the other. */
+    get orderedWidgets() {
+        return [...this.widgets].sort((a, b) => a.y - b.y || a.x - b.x);
     }
 }
 

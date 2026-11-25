@@ -2,5 +2,7 @@
 from . import test_spec
 from . import test_dashboard
 from . import test_engine
+from . import test_compare
+from . import test_deferred
 from . import test_explore
 from . import test_tour

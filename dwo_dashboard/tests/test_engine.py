@@ -318,7 +318,7 @@ class TestGuards(EngineCase):
     def test_a_cancelled_query_is_a_widget_error_and_the_transaction_survives(self):
         self.env["ir.config_parameter"].sudo().set_param("dwo_dashboard.query_timeout", "1")
 
-        def slow(env, model, vdef, widget, domain):
+        def slow(env, model, vdef, widget, domain, **kw):
             env.cr.execute("SELECT pg_sleep(3)")
 
         self.env.cr.execute("SHOW statement_timeout")

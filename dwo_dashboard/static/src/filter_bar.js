@@ -1,30 +1,19 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import { Component, useState } from "@odoo/owl";
-import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-
-const PRESET_LABELS = {
-    all: _t("All time"),
-    today: _t("Today"),
-    yesterday: _t("Yesterday"),
-    last_7_days: _t("Last 7 days"),
-    last_30_days: _t("Last 30 days"),
-    last_90_days: _t("Last 90 days"),
-    this_week: _t("This week"),
-    last_week: _t("Last week"),
-    this_month: _t("This month"),
-    last_month: _t("Last month"),
-    this_quarter: _t("This quarter"),
-    last_quarter: _t("Last quarter"),
-    this_year: _t("This year"),
-    last_year: _t("Last year"),
-};
+import { PRESET_LABELS } from "./utils";
 
 /** The filters of a page. ``values``: {filter id: value}; relation filters hold [{id, name}] so chips can be drawn. */
 export class FilterBar extends Component {
     static template = "dwo_dashboard.FilterBar";
-    static props = { filters: Array, values: Object, onChange: Function };
+    static props = {
+        filters: Array,
+        values: Object,
+        onChange: Function,
+        editing: { type: Boolean, optional: true },
+        onRemove: { type: Function, optional: true },
+    };
 
     setup() {
         this.orm = useService("orm");

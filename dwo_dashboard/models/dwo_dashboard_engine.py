@@ -103,9 +103,16 @@ class DwoDashboardEngine(models.AbstractModel):
         model = self.env[name]
         try:
             with guard.guarded(self.env):
-                domain = dom.widget_domain(self.env, model, mini, widget, filter_values)
+                extra = {}
+                setup = dom.compare_setup(self.env, model, mini, widget, filter_values) if widget.get("compare") else None
+                if setup:
+                    domain, extra = setup["domain"], {"compare": setup}
+                else:
+                    domain = dom.widget_domain(self.env, model, mini, widget, filter_values)
+                if widget.get("trend"):
+                    extra["trend"] = dom.trend_setup(self.env, model, mini, widget, filter_values)
                 engine = records if vdef["query"] == "records" else grouped
-                result = engine.run(self.env, model, vdef, widget, domain)
+                result = engine.run(self.env, model, vdef, widget, domain, **extra)
         except psycopg2.errors.QueryCanceled:
             return self._error("timeout")
         except AccessError:

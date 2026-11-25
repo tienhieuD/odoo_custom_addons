@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Domains of a widget: its own ``where`` (context values resolved), plus the page filters."""
+import datetime as dt
+
 from odoo import fields
 from odoo.tools import get_lang
 
@@ -98,11 +100,12 @@ def filter_domain(env, model, flt, value, field_name):
     return []
 
 
-def widget_domain(env, model, spec, widget, filter_values):
-    """AND of the widget's ``where`` (context resolved) and of every page filter that applies to it."""
+def widget_domain(env, model, spec, widget, filter_values, skip_filters=()):
+    """AND of the widget's ``where`` (context resolved) and of every page filter that applies to it, except the filters
+    listed in ``skip_filters`` (a comparison replaces the date condition of its own field)."""
     from odoo.fields import Domain
     domain = Domain(resolve_ctx(env, model, widget.get("where", [])))
-    ignored = set(widget.get("ignore_filters", []))
+    ignored = set(widget.get("ignore_filters", [])) | set(skip_filters)
     filter_values = filter_values if isinstance(filter_values, dict) else {}
     for flt in spec.get("filters", []):
         if flt["id"] in ignored:
@@ -111,3 +114,64 @@ def widget_domain(env, model, spec, widget, filter_values):
             if bind["dataset"] == widget["dataset"]:
                 domain &= Domain(filter_domain(env, model, flt, filter_values.get(flt["id"]), bind["field"]))
     return domain
+
+
+def compare_setup(env, model, spec, widget, filter_values):
+    """For a KPI with ``compare``: the domain of the current period, the domain of the previous one and what to tell the
+    client; None when there is nothing to compare (the period is ``all``).
+
+    The period is the one of a page date filter bound to the same dataset and field (unless the widget ignores it),
+    else ``compare.period``. That filter's own condition is REPLACED by the two ranges, not added to them: otherwise
+    the previous period would always be empty. Every other filter and the widget's ``where`` still apply to both."""
+    from odoo.fields import Domain
+    cmp = widget["compare"]
+    name, dataset = cmp["field"], widget["dataset"]
+    values = filter_values if isinstance(filter_values, dict) else {}
+    preset, skip = cmp.get("period", C.COMPARE_DEFAULT_PERIOD), []
+    for flt in spec.get("filters", []):
+        bound = flt["type"] == "date" and flt["id"] not in widget.get("ignore_filters", []) and any(
+            b["dataset"] == dataset and b["field"] == name for b in flt["bind"])
+        if bound:
+            skip.append(flt["id"])
+            if len(skip) == 1:
+                value = values.get(flt["id"])
+                preset = value if value in C.DATE_PRESETS else flt.get("default", "all")
+    if preset == "all":
+        return None
+    field = field_at(model, name)
+    start, end, prev_start, prev_end = dates.compare_ranges(
+        preset, viewer_today(env), first_weekday(env), cmp.get("against", "previous_period"))
+    base = widget_domain(env, model, spec, widget, filter_values, skip_filters=skip)
+
+    def within(a, b):
+        return base & Domain([(name, ">=", day_value(env, field, a)), (name, "<", day_value(env, field, b))])
+
+    one_day = dt.timedelta(days=1)
+    to_s = fields.Date.to_string
+    return {"domain": within(start, end), "previous_domain": within(prev_start, prev_end),
+            "info": {"field": name, "period": preset, "against": cmp.get("against", "previous_period"),
+                     "range": [to_s(start), to_s(end)], "previous_range": [to_s(prev_start), to_s(prev_end)],
+                     # inclusive bounds for Odoo's fill_temporal (a line chart draws every interval of both ranges)
+                     "fill": {"from": to_s(start), "to": to_s(end - one_day),
+                              "previous_from": to_s(prev_start), "previous_to": to_s(prev_end - one_day)}}}
+
+
+def trend_setup(env, model, spec, widget, filter_values):
+    """The sparkline of a KPI: its measure over the last ``points`` intervals up to today, whatever period the page shows
+    (a trend is about the evolution, so the page's date filter on the same field is replaced, like for a comparison; every
+    other filter and ``where`` still apply)."""
+    from odoo.fields import Domain
+    trend = widget["trend"]
+    name, dataset = trend["field"], widget["dataset"]
+    interval = trend.get("interval", C.TREND_INTERVAL_DEFAULT)
+    points = trend.get("points", C.TREND_POINTS_DEFAULT)
+    skip = [flt["id"] for flt in spec.get("filters", []) if flt["type"] == "date"
+            and flt["id"] not in widget.get("ignore_filters", [])
+            and any(b["dataset"] == dataset and b["field"] == name for b in flt["bind"])]
+    today = viewer_today(env)
+    start, end = dates.trend_range(interval, points, today, first_weekday(env))
+    field = field_at(model, name)
+    base = widget_domain(env, model, spec, widget, filter_values, skip_filters=skip)
+    domain = base & Domain([(name, ">=", day_value(env, field, start)), (name, "<", day_value(env, field, end))])
+    return {"domain": domain, "field": name, "interval": interval,
+            "from": fields.Date.to_string(start), "to": fields.Date.to_string(today)}

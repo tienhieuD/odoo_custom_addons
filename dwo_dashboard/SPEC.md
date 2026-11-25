@@ -86,9 +86,68 @@ date in their timezone; for a datetime field the comparison uses the start of th
 UTC. Data-dependent filtering of SQL datasets uses the page filters and the SQL parameters instead.
 
 ### Options
-Per type: `format` (`number currency percent`), `decimals` (0..6), `colors` (1..12 of `#rrggbb`), `legend`
-(`none top bottom left right`), `stacked` (bar, area), `horizontal` (bar), `smooth` (line, area), `show_totals` (pivot).
-A key a type does not list is an error.
+Per type (a key a type does not list is an error). Kinds: yes/no, a choice, an integer, a number, a short text (12 characters).
+
+| Type | Options |
+|---|---|
+| all | `format` (`number currency percent`), `decimals` (0..6); charts also `colors` (1..12 of `#rrggbb`) and `legend` (`none top bottom left right`) |
+| `kpi` | `goal` (number: draws a progress bar), `trend_good` (`up` default, or `down`: a falling cost is green), `prefix`, `suffix` (e.g. `$`, ` pcs`) |
+| `bar` | `stacked`, `horizontal`, `percent` (100% stacked), `show_values`, `target` (number: a dashed reference line), `y_min`, `y_max` |
+| `line` | `smooth`, `show_values`, `target`, `y_min`, `y_max` |
+| `area` | `smooth`, `stacked`, `percent`, `show_values`, `target`, `y_min`, `y_max` |
+| `pie`, `doughnut` | `show_percent`, `other` (the groups beyond `limit` become one "Other" slice) |
+| `pivot` | `show_totals`, `heatmap` (the larger the value, the stronger the colour), `other` (see below) |
+| `table` | `open_records` (a click on a row opens the record in its form: the standard action enforces access) |
+
+Known limit: `other` is checked on inline measures; a `{"metric": ...}` on a non-additive aggregate is only caught when
+metrics are resolved (Phase 3).
+
+`y_min` must be lower than `y_max`; neither can be used with `percent` (a 100% stack has its own axis).
+
+**`other` on a pivot** gathers what is beyond the limits: the first row dimension beyond `limit` becomes one row "Other", the
+first column dimension beyond `series_limit` one column "Other", and the corner (Other x Other) is computed too, so every row and
+column adds up to the real total. Cells are the real total minus what is shown, which is why it is for `sum` and `count` only.
+It needs a row dimension. With `show_totals`, the totals are over all rows, Other included.
+
+Rules: `percent` needs `stacked`, or a `legend` well (a 100% stack of one series says nothing). `other` is for `sum` and `count`
+only: an average, a minimum, a maximum or a distinct count of the rest is not the total minus the top, so the validator
+refuses it (`constraint`). Still not in v1: "Other" beyond the first dimension, drill-down.
+
+### `trend` (KPI only)
+```json
+"trend": {"field": "date_order", "interval": "month", "points": 12}
+```
+A small line under the number: the measure of the last `points` (3..60, default 12) days, weeks or months (default `month`) up to
+the current one, in the viewer's time zone. A quiet interval is a zero on the line (an average, minimum or maximum has a gap:
+nobody, so no average). The line is about the evolution, so a page date filter on the same field does **not** cut it (like for a
+comparison, its own condition is replaced); every other filter and `where` still apply.
+
+### `compare` on a line or area chart
+```json
+"compare": {"field": "create_date", "period": "this_month", "against": "previous_period"}
+```
+The previous period is drawn over the chart as a dashed grey line. The k-th point of one is the k-th interval of the other
+("the 3rd day of this month" against "the 3rd day of last month"), not the same calendar date, so months of different lengths
+line up from their start. Both series show every interval of their range (the empty ones as zero). The period and the ranges
+are those of the KPI comparison below. Constraints: `field` must be the axis field, the chart has one measure and no legend.
+
+### `compare` (KPI)
+```json
+"compare": {"field": "date_order", "period": "this_month", "against": "previous_period"}
+```
+Adds to the KPI result `compare: {current, previous, change_pct, range, previous_range, ...}`; the client shows the change
+since the previous period (green or red according to `trend_good`), what it is measured against, and "No data in ..." when
+there is nothing to divide by (`change_pct` is then null: never "+∞ %").
+- **Which period.** A page date filter bound to the same dataset and field (and not ignored by the widget) decides: its
+  current choice, or its default. Otherwise `period` (default `this_month`; `all` is refused: nothing to compare it with).
+  If the filter is at `all` there is nothing to compare and no `compare` result.
+- **The filter's own condition is replaced** by the two ranges, not added to them; every other filter, and `where`, apply to
+  both periods.
+- **Ranges** (end excluded, calendar units, the viewer's time zone). `this_*` are *to date*: on 25 Nov, `this_month` is
+  [1 Nov, 26 Nov) against [1 Oct, 26 Oct); the shift is a month, a quarter, a year or a week, never a number of days (31 Mar
+  minus a month clamps to the end of February). `last_*` are complete periods against the complete period before. `today`,
+  `yesterday` and `last_N_days` are compared with the span of the same length just before. `against: "previous_year"`
+  shifts the current range back one calendar year (29 Feb clamps to 28 Feb).
 
 ## Filters
 ```json

@@ -178,6 +178,48 @@ class TestPageStructure(TransactionCase):
         self.assertLessEqual({("/widgets/3/options/horizontal", "unknown_key"),
                               ("/widgets/2/options/colors/0", "pattern"), ("/widgets/2/options/decimals", "range")}, found)
 
+    def test_compare_is_for_a_kpi_and_has_a_shape(self):
+        spec = page()
+        widget(spec, "total")["compare"] = {"field": "create_date", "period": "this_month", "against": "previous_year"}
+        self.assertNotIn("/widgets/0/compare", {p for p, _c in self.codes(spec)})
+        widget(spec, "total")["compare"] = {"period": "all", "against": "last_decade", "colour": 1}
+        found = self.codes(spec)
+        self.assertLessEqual({("/widgets/0/compare/field", "required"), ("/widgets/0/compare/period", "enum"),
+                              ("/widgets/0/compare/against", "enum"), ("/widgets/0/compare/colour", "unknown_key")}, found)
+        widget(spec, "by_country")["compare"] = {"field": "create_date"}  # a bar cannot be compared
+        self.assertIn(("/widgets/2/compare", "not_allowed"), self.codes(spec))
+
+    def test_kpi_and_chart_options(self):
+        spec = page()
+        widget(spec, "total")["options"] = {"goal": 1000, "trend_good": "down", "prefix": "$", "suffix": " pcs"}
+        widget(spec, "by_country")["options"] = {"show_values": True, "target": 12.5, "horizontal": True}
+        self.assertFalse({p for p, _c in self.codes(spec) if "/options" in p})
+        widget(spec, "total")["options"] = {"goal": "lots", "trend_good": "sideways", "prefix": "a very long prefix"}
+        found = self.codes(spec)
+        self.assertLessEqual({("/widgets/0/options/goal", "type"), ("/widgets/0/options/trend_good", "enum"),
+                              ("/widgets/0/options/prefix", "too_long")}, found)
+
+    def test_percent_needs_a_stack(self):
+        spec = page("sales_example")
+        bar = widget(spec, "monthly")  # has a legend: a 100% stack is meaningful
+        bar["options"] = {"percent": True}
+        self.assertNotIn(("/widgets/2/options/percent", "constraint"), self.codes(spec))
+        bar["wells"].pop("legend")
+        self.assertIn(("/widgets/2/options/percent", "constraint"), self.codes(spec))
+        bar["options"] = {"percent": True, "stacked": True}  # stacked series of several measures
+        self.assertNotIn(("/widgets/2/options/percent", "constraint"), self.codes(spec))
+
+    def test_other_only_for_aggregates_that_add_up(self):
+        spec = page()
+        kind = widget(spec, "kind")
+        kind["options"] = {"other": True}
+        self.assertNotIn(("/widgets/4/wells/value", "constraint"), self.codes(spec))  # count
+        for agg in ("avg", "min", "max", "count_distinct"):
+            kind["wells"]["value"] = {"agg": agg, "field": "id"}
+            self.assertIn(("/widgets/4/wells/value", "constraint"), self.codes(spec), agg)
+        kind["wells"]["value"] = {"agg": "sum", "field": "id"}
+        self.assertNotIn(("/widgets/4/wells/value", "constraint"), self.codes(spec))
+
     def test_layout(self):
         spec = page()
         widget(spec, "companies")["x"] = 1  # overlaps "total"

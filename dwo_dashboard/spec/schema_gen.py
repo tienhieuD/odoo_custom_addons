@@ -105,6 +105,15 @@ def _option(desc):
         return {"enum": list(desc["values"])}
     if kind == "int":
         return {"type": "integer", "minimum": desc["min"], "maximum": desc["max"]}
+    if kind == "number":
+        out = {"type": "number"}
+        if "min" in desc:
+            out["minimum"] = desc["min"]
+        if "max" in desc:
+            out["maximum"] = desc["max"]
+        return out
+    if kind == "text":
+        return {"type": "string", "minLength": 1, "maxLength": desc["max"]}
     return {"type": "array", "minItems": 1, "maxItems": desc["max"],
             "items": {"type": "string", "pattern": C.COLOR_PATTERN}}
 
@@ -130,6 +139,22 @@ def _widget(name, vdef):
                     "properties": {k: _option(v) for k, v in (vdef.get("options") or {}).items()}},
         "ignore_filters": {"type": "array", "maxItems": C.MAX_FILTERS, "items": _ref("id")},
     }
+    if vdef.get("compare"):
+        props["compare"] = {
+            "type": "object", "additionalProperties": False, "required": ["field"], "properties": {
+                "field": {"type": "string", "pattern": C.FIELD_PATTERN,
+                          "description": "a date or datetime field" + (", the axis field of the chart"
+                                                                       if vdef["compare"] == "series" else "")},
+                "period": {"enum": [p for p in C.DATE_PRESETS if p != "all"], "default": C.COMPARE_DEFAULT_PERIOD,
+                           "description": "ignored when a page date filter is bound to the same field"},
+                "against": {"enum": list(C.COMPARE_AGAINST), "default": "previous_period"}}}
+    if vdef.get("trend"):
+        props["trend"] = {
+            "type": "object", "additionalProperties": False, "required": ["field"], "properties": {
+                "field": {"type": "string", "pattern": C.FIELD_PATTERN, "description": "a date or datetime field"},
+                "interval": {"enum": list(C.TREND_INTERVALS), "default": C.TREND_INTERVAL_DEFAULT},
+                "points": {"type": "integer", "minimum": C.TREND_POINTS_MIN, "maximum": C.TREND_POINTS_MAX,
+                           "default": C.TREND_POINTS_DEFAULT}}}
     for key in ("limit", "series_limit"):
         if vdef.get(key):
             props[key] = {"type": "integer", "minimum": 1, "maximum": vdef[key]["max"], "default": vdef[key]["default"]}

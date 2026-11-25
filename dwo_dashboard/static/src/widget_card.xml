@@ -4,7 +4,7 @@
         <div class="dwo-card d-flex flex-column h-100" t-att-data-widget-id="props.widget.id">
             <div class="dwo-card-header d-flex align-items-center gap-2 px-2 pt-1">
                 <span class="dwo-card-title flex-grow-1 text-truncate fw-bold" t-out="title"/>
-                <span t-if="truncatedNote" class="badge text-bg-warning" t-out="truncatedNote"/>
+                <span t-if="truncatedNote" class="dwo-note small text-muted" title="Only the top results are shown" t-out="truncatedNote"/>
                 <span t-if="timezoneNote" class="badge text-bg-secondary" t-out="timezoneNote"/>
                 <t t-if="props.editing">
                     <button class="btn btn-sm btn-link p-0 dwo-card-edit" t-on-click.stop="() => props.onEdit(props.widget)"
@@ -21,6 +21,7 @@
                     <i t-attf-class="fa #{errorIcon} fa-2x mb-1"/>
                     <span t-out="props.entry.error.message"/>
                 </div>
+                <div t-elif="isEmpty" class="dwo-empty-data d-flex h-100 align-items-center justify-content-center text-muted">No data</div>
                 <t t-elif="Renderer">
                     <t t-component="Renderer" widget="props.widget" result="props.entry.result"/>
                 </t>

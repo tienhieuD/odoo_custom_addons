@@ -9,8 +9,9 @@
         .dwo-page-item {
             a { color: inherit; text-decoration: none; }
             &.active { background: var(--bs-primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
-            .dwo-page-tools { opacity: 0; transition: opacity 0.15s; }
-            &:hover .dwo-page-tools, &.active .dwo-page-tools { opacity: 1; }
+            .dwo-page-more { opacity: 0; transition: opacity 0.15s; }
+            &:hover .dwo-page-more, &.active .dwo-page-more { opacity: 1; }
+            .dwo-page-popover { right: 0; top: 100%; z-index: 30; min-width: 140px; }
         }
     }
 
@@ -59,4 +60,51 @@
 
 .dwo-explore {
     label.form-label { display: block; }
+}
+
+.dwo-dashboard {
+    .dwo-filter-editor-wrap { top: 100%; left: 0; z-index: 40; width: 340px; margin-top: 4px; }
+    .dwo-kpi-value { font-size: 2.4rem; font-weight: 600; line-height: 1.1; }
+    .dwo-kpi-affix { font-size: 1.3rem; font-weight: 400; margin: 0 2px; opacity: 0.7; }
+    .dwo-kpi-delta { font-size: 0.95rem; margin-top: 2px; }
+    .dwo-row-link { cursor: pointer; &:hover td { background: var(--bs-secondary-bg); } }
+    .dwo-note { white-space: nowrap; }
+}
+
+.dwo-explore {
+    .dwo-explore-preview { height: 260px; flex: 0 0 260px; padding: 8px; background: var(--bs-tertiary-bg); }
+    .dwo-visual {
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+        width: 78px; height: 62px; font-size: 0.72rem; line-height: 1.1; text-align: center;
+        border: 1px solid var(--bs-border-color); border-radius: 6px; background: var(--bs-body-bg); color: inherit;
+        &:hover { border-color: var(--bs-primary); }
+        &.active { border-color: var(--bs-primary); background: var(--bs-primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
+    }
+    .dwo-dataset-list { z-index: 20; max-height: 280px; overflow-y: auto; top: 100%; }
+    .dwo-dataset-option { cursor: pointer; &:hover { background: var(--bs-secondary-bg); } }
+}
+
+// phone: the pages become a strip on top and the widgets one column, in reading order
+@media (max-width: 767px) {
+    .dwo-dashboard {
+        flex-direction: column;
+        .dwo-pages { width: 100%; flex: 0 0 auto; flex-direction: row !important; overflow-x: auto; padding: 4px; }
+        .dwo-pages > div:first-child { flex: 0 0 auto; }
+        .dwo-page-item { flex: 0 0 auto; }
+        .dwo-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+        .dwo-grid-item {
+            grid-column: 1 / -1 !important;
+            grid-row: auto !important;
+            height: calc(var(--dwo-h, 3) * var(--dwo-row, 80px) + (var(--dwo-h, 3) - 1) * 8px);
+            min-height: 160px;
+        }
+        .dwo-explore-drawer { position: fixed; inset: 0; width: 100%; flex: none; z-index: 1050; }
+        .dwo-explore-preview { height: 200px !important; flex-basis: 200px !important; }
+    }
+}
+
+.dwo-dashboard {
+    .dwo-kpi-trend svg { display: block; overflow: visible; }
+    .dwo-spark-line { fill: none; stroke: var(--bs-primary, #2997ff); stroke-width: 2; stroke-linejoin: round; }
+    .dwo-spark-area { fill: var(--bs-primary, #2997ff); opacity: 0.12; stroke: none; }
 }

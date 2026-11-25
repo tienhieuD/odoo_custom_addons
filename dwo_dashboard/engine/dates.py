@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Date presets of the page filters, computed in the viewer's timezone. Pure Python (pytz only)."""
+import calendar
 import datetime as dt
 
 import pytz
@@ -100,3 +101,60 @@ def to_utc(day, tz_name):
     """Midnight of ``day`` in the viewer's timezone, as a naive UTC datetime (what the database stores)."""
     local = tz_of(tz_name).localize(dt.datetime.combine(day, dt.time()))
     return local.astimezone(pytz.utc).replace(tzinfo=None)
+
+
+def shift_months(day, months):
+    """The same day ``months`` later or earlier; the 31st of March minus a month is the last day of February."""
+    index = day.year * 12 + day.month - 1 + months
+    year, month = divmod(index, 12)
+    month += 1
+    return dt.date(year, month, min(day.day, calendar.monthrange(year, month)[1]))
+
+
+_UNIT_MONTHS = {"month": 1, "quarter": 3, "year": 12}
+
+
+def compare_ranges(preset, today, first_weekday=MONDAY, against="previous_period"):
+    """``(start, end, previous_start, previous_end)``, ends excluded: the period of ``preset`` and the one to compare it with.
+
+    * ``this_*`` are period-to-date: on 25 Nov, this month is [1 Nov, 26 Nov) and its previous period is [1 Oct, 26 Oct),
+      shifted by calendar units (a month, a quarter, a year, a week), never by a number of days.
+    * ``last_*`` are complete periods; the previous one is the complete period before.
+    * today, yesterday and the rolling ``last_N_days`` are compared with the span of the same length just before.
+    * ``against="previous_year"`` shifts the current range back by one calendar year (29 Feb clamps to 28 Feb).
+    """
+    one = dt.timedelta(days=1)
+    if preset == "all":
+        raise ValueError("there is nothing to compare 'all' with")
+    start, end = preset_range(preset, today, first_weekday)
+    kind = preset.split("_", 1)[1] if preset.startswith(("this_", "last_")) else None
+    if preset.startswith("this_"):
+        end = min(end, today + one)  # to date
+    if against == "previous_year":
+        return start, end, shift_months(start, -12), shift_months(end - one, -12) + one
+    if kind == "week":
+        return start, end, start - dt.timedelta(days=7), end - dt.timedelta(days=7)
+    if kind in _UNIT_MONTHS:
+        n = _UNIT_MONTHS[kind]
+        previous_end = start if preset.startswith("last_") else shift_months(end - one, -n) + one
+        return start, end, shift_months(start, -n), previous_end
+    length = end - start  # today, yesterday, last_7/30/90_days
+    return start, end, start - length, start
+
+
+def trend_range(interval, points, today, first_weekday=MONDAY):
+    """``(start, end)``, end excluded: the last ``points`` days, weeks or months up to and including the current one."""
+    one = dt.timedelta(days=1)
+    if interval == "day":
+        return today - dt.timedelta(days=points - 1), today + one
+    if interval == "week":
+        this_week = _week_start(today, first_weekday)
+        return this_week - dt.timedelta(days=7 * (points - 1)), this_week + dt.timedelta(days=7)
+    if interval == "month":
+        this_month = dt.date(today.year, today.month, 1)
+        return shift_months(this_month, -(points - 1)), shift_months(this_month, 1)
+    raise ValueError("unknown trend interval %r" % interval)
+
+
+def fromiso(text):
+    return dt.date.fromisoformat(text)

@@ -37,6 +37,24 @@ export class PivotRenderer extends Component {
 
     setup() {
         this.matrix = pivotMatrix(this.props.result);
+        // min and max of each measure over the cells, for the heat map
+        this.span = this.props.result.measures.map((_, i) => {
+            const values = [...this.matrix.cells.values()].map((v) => v[i]).filter((v) => v !== null && v !== undefined);
+            return [Math.min(...values), Math.max(...values)];
+        });
+    }
+
+    /** Background of a cell: the larger the value in its column of measures, the stronger the blue. */
+    heat(rowKey, colKey, i) {
+        if (!(this.props.widget.options || {}).heatmap) {
+            return "";
+        }
+        const values = this.matrix.cells.get(rowKey + SEP + SEP + colKey);
+        const [low, high] = this.span[i];
+        if (!values || values[i] === null || high === low) {
+            return "";
+        }
+        return `background-color: rgba(78, 167, 242, ${(0.08 + 0.55 * (values[i] - low) / (high - low)).toFixed(2)})`;
     }
 
     get measures() {

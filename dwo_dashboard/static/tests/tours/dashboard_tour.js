@@ -7,26 +7,45 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour", {
     steps: () => [
         { trigger: ".dwo-dashboard .dwo-page-item.active .dwo-page-name:contains(Home)" },
         { trigger: ".dwo-empty" },
-        { trigger: ".dwo-edit", run: "click" },
+        // "+ Add widget" works from the view mode: it switches to editing by itself
         { trigger: ".dwo-add-widget", run: "click" },
-        { trigger: ".dwo-dataset-select", run: "selectByLabel Contact" },
+        { trigger: ".dwo-dataset-input", run: "edit Contact" },
+        { trigger: ".dwo-dataset-option:contains(res.partner)", run: "click" },
         { trigger: ".dwo-visual-kpi", run: "click" },
-        { trigger: ".dwo-well[data-well=value] .dwo-add-item", run: "click" },
         { trigger: ".dwo-explore-preview .dwo-kpi-value" },
+        // the change since the previous period (this month by default, as there is no date filter on the page yet)
+        { trigger: ".dwo-compare-toggle", run: "click" },
+        { trigger: ".dwo-explore-preview .dwo-kpi-delta" },
+        // and a small trend line under the number
+        { trigger: ".dwo-trend-toggle", run: "click" },
+        { trigger: ".dwo-explore-preview .dwo-kpi-trend svg" },
         { trigger: ".dwo-explore-apply:not(:disabled)", run: "click" },
-        { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w1] .dwo-kpi-value" },
+        { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w1] .dwo-kpi-delta" },
+        // a bar chart: the axis selector is already there, "Count" is already chosen
         { trigger: ".dwo-add-widget", run: "click" },
-        { trigger: ".dwo-dataset-select", run: "selectByLabel Contact" },
+        { trigger: ".dwo-dataset-input", run: "edit Contact" },
+        { trigger: ".dwo-dataset-option:contains(res.partner)", run: "click" },
         { trigger: ".dwo-visual-bar", run: "click" },
-        { trigger: ".dwo-well[data-well=axis] .dwo-add-item", run: "click" },
-        { trigger: ".dwo-well[data-well=axis] .dwo-well-item select", run: "selectByLabel Country" },
-        { trigger: ".dwo-well[data-well=values] .dwo-add-item", run: "click" },
+        { trigger: ".dwo-well[data-well=axis] .dwo-well-item select", run: "select country_id" },
         { trigger: ".dwo-explore-preview canvas" },
         { trigger: ".dwo-explore-apply:not(:disabled)", run: "click" },
         { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w2] canvas" },
+        // a page filter, bound by itself to both widgets
+        { trigger: ".dwo-add-filter", run: "click" },
+        { trigger: ".dwo-filter-add:not(:disabled)", run: "click" },
+        { trigger: ".dwo-filter .dwo-filter-remove" },
+        // a second filter, "some records" on the country: its model must match what the field points to
+        { trigger: ".dwo-add-filter", run: "click" },
+        { trigger: ".dwo-filter-kind-relation", run: "click" },
+        { trigger: ".dwo-filter-field", run: "select relation|country_id|res.country" },
+        { trigger: ".dwo-filter-add:not(:disabled)", run: "click" },
+        { trigger: ".dwo-filter[data-filter-id=country_id]" },
         { trigger: ".dwo-done", run: "click" },
         { trigger: ".dwo-grid .dwo-card[data-widget-id=w1] .dwo-kpi-value" },
+        // the date filter is on "All time": nothing to compare, and the card says what to do
+        { trigger: ".dwo-grid .dwo-card[data-widget-id=w1] .dwo-kpi-hint" },
         { trigger: ".dwo-grid .dwo-card[data-widget-id=w2] canvas" },
+        { trigger: ".dwo-filter select" },
     ],
 });
 

@@ -208,7 +208,8 @@ def _widgets(e, value, cols, filters, registry):
     for i, widget in enumerate(value):
         path = ptr("/widgets", i)
         if not e.obj(path, widget, required=("id", "type", "x", "y", "w", "h", "dataset", "wells"),
-                     optional=("title", "where", "order", "limit", "series_limit", "options", "ignore_filters")):
+                     optional=("title", "where", "order", "limit", "series_limit", "options", "ignore_filters",
+                               "compare", "trend")):
             continue
         if e.string(ptr(path, "id"), widget.get("id"), 32, _ID, "an identifier like 'w1'"):
             if widget["id"] in seen:
@@ -249,8 +250,57 @@ def _widgets(e, value, cols, filters, registry):
                         e.add(ptr(path, "ignore_filters", j), "reference", "unknown filter %r" % (fid,))
         if vdef is not None:
             _visual(e, path, widget, vdef)
+            if "compare" in widget:
+                _compare(e, ptr(path, "compare"), widget["compare"], vdef, widget)
+            if "trend" in widget:
+                _trend(e, ptr(path, "trend"), widget["trend"], vdef, widget["type"])
     _overlaps(e, boxes)
     return used
+
+
+def _compare(e, path, value, vdef, widget):
+    """``{"field": "date_order", "period": "this_month", "against": "previous_period"}``.
+
+    On a KPI (``compare`` = "value"): the same number for the previous period. On a line or area chart (``compare`` =
+    "series"): the previous period drawn over the chart, each point against the same position in the previous period; the
+    axis must be that date field, with one series (a legend or several values would not say what is compared with what).
+    The period is the one of a page date filter bound to the same field, if there is one."""
+    kind = widget["type"]
+    if not vdef.get("compare"):
+        e.add(path, "not_allowed", "a %s cannot be compared with a previous period" % kind)
+        return
+    if not e.obj(path, value, required=("field",), optional=("period", "against")):
+        return
+    e.string(ptr(path, "field"), value.get("field"), 64, _FIELD, "a date field")
+    if "period" in value and e.enum(ptr(path, "period"), value["period"], C.DATE_PRESETS) and value["period"] == "all":
+        e.add(ptr(path, "period"), "enum", "there is nothing to compare 'all' with")
+    if "against" in value:
+        e.enum(ptr(path, "against"), value["against"], C.COMPARE_AGAINST)
+    if vdef["compare"] == "series" and isinstance(widget.get("wells"), dict):
+        wells = widget["wells"]
+        axis = wells.get("axis")
+        if isinstance(axis, dict) and axis.get("field") != value.get("field"):
+            e.add(ptr(path, "field"), "constraint", "the comparison is drawn over the axis: it must be the axis field (%s)"
+                  % axis.get("field"))
+        if wells.get("legend"):
+            e.add(ptr(path, "field"), "constraint", "a chart with a legend cannot be compared with a previous period")
+        values = wells.get("values")
+        if isinstance(values, list) and len(values) > 1:
+            e.add(ptr(path, "field"), "constraint", "compare one measure at a time (this chart has %d)" % len(values))
+
+
+def _trend(e, path, value, vdef, kind):
+    """``{"field": "date_order", "interval": "month", "points": 12}`` on a KPI: a small line of its last points."""
+    if not vdef.get("trend"):
+        e.add(path, "not_allowed", "a %s has no trend line" % kind)
+        return
+    if not e.obj(path, value, required=("field",), optional=("interval", "points")):
+        return
+    e.string(ptr(path, "field"), value.get("field"), 64, _FIELD, "a date field")
+    if "interval" in value:
+        e.enum(ptr(path, "interval"), value["interval"], C.TREND_INTERVALS)
+    if "points" in value:
+        e.integer(ptr(path, "points"), value["points"], C.TREND_POINTS_MIN, C.TREND_POINTS_MAX)
 
 
 def _overlaps(e, boxes):
@@ -264,7 +314,7 @@ def _overlaps(e, boxes):
 
 def _visual(e, path, widget, vdef):
     """Wells, order, limits and options of one widget, against its visual type definition."""
-    facts = _wells(e, ptr(path, "wells"), widget.get("wells"), vdef)
+    facts = _wells(e, ptr(path, "wells"), widget.get("wells"), vdef, widget.get("options"))
     if "order" in widget:
         _order(e, ptr(path, "order"), widget["order"], facts, vdef["query"])
     for key in ("limit", "series_limit"):
@@ -279,15 +329,16 @@ def _visual(e, path, widget, vdef):
 
 
 # ----------------------------------------------------------------------------------------------------- wells
-def _wells(e, path, wells, vdef):
+def _wells(e, path, wells, vdef, options=None):
     """Returns {"dimensions": [field...], "measures": [key...], "columns": [field...]} of the valid items."""
     facts = {"dimensions": [], "measures": [], "columns": []}
     if not e.obj(path, wells, optional=tuple(vdef["wells"])):
         return facts
-    counts = {}
+    counts, raw = {}, {}
     for name, wdef in vdef["wells"].items():
         value, wpath = wells.get(name), ptr(path, name)
         counts[name] = 0
+        raw[name] = value
         if value is None:
             if wdef["min"] >= 1:
                 e.add(wpath, "required", "is required")
@@ -311,6 +362,30 @@ def _wells(e, path, wells, vdef):
         elif con["kind"] == "max_if_present" and counts.get(con["if"]) and counts.get(con["well"], 0) > con["max"]:
             e.add(ptr(path, con["well"]), "constraint", "at most %d item(s) in %r when %r is used"
                   % (con["max"], con["well"], con["if"]))
+        elif con["kind"] == "option_needs" and isinstance(options, dict) and options.get(con["option"]):
+            ok = any((c.get("option") and options.get(c["option"])) or (c.get("well") and counts.get(c["well"]))
+                     for c in con["any_of"])
+            if not ok:
+                e.add(ptr(path.rsplit("/wells", 1)[0], "options", con["option"]), "constraint",
+                      "%r needs %s" % (con["option"], " or ".join(c.get("option") or "a %s" % c["well"]
+                                                                  for c in con["any_of"])))
+        elif con["kind"] == "option_less" and isinstance(options, dict):
+            low, high = options.get(con["low"]), options.get(con["high"])
+            numbers = all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in (low, high))
+            if numbers and low >= high:
+                e.add(ptr(path.rsplit("/wells", 1)[0], "options", con["low"]), "constraint",
+                      "%s (%s) must be lower than %s (%s)" % (con["low"], low, con["high"], high))
+        elif con["kind"] == "option_excludes" and isinstance(options, dict) and options.get(con["option"]) is not None:
+            for other in con["with"]:
+                if options.get(other):
+                    e.add(ptr(path.rsplit("/wells", 1)[0], "options", con["option"]), "constraint",
+                          "%s cannot be used with %s" % (con["option"], other))
+        elif con["kind"] == "option_aggs" and isinstance(options, dict) and options.get(con["option"]):
+            items = raw.get(con["well"])
+            for item in items if isinstance(items, list) else [items]:
+                if isinstance(item, dict) and item.get("agg") not in con["aggs"] and "metric" not in item:
+                    e.add(ptr(path, con["well"]), "constraint", "%r is only valid when the measure is %s (the "
+                          "other aggregates cannot be added up)" % (con["option"], " or ".join(con["aggs"])))
     return facts
 
 
@@ -382,6 +457,13 @@ def _order(e, path, value, facts, query_kind):
             e.enum(ptr(p, "dir"), o["dir"], C.DIRECTIONS)
 
 
+def _number(e, path, value, minimum=None, maximum=None):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        e.add(path, "type", "must be a number")
+    elif minimum is not None and value < minimum or maximum is not None and value > maximum:
+        e.add(path, "range", "must be between %s and %s" % (minimum, maximum))
+
+
 def _options(e, path, value, allowed):
     if not e.obj(path, value, optional=tuple(allowed)):
         return
@@ -395,6 +477,10 @@ def _options(e, path, value, allowed):
             e.enum(p, v, desc["values"])
         elif kind == "int":
             e.integer(p, v, desc.get("min"), desc.get("max"))
+        elif kind == "number":
+            _number(e, p, v, desc.get("min"), desc.get("max"))
+        elif kind == "text":
+            e.string(p, v, desc.get("max", 12))
         elif kind == "colors" and e.array(p, v, 1, desc.get("max", 12)):
             for i, c in enumerate(v):
                 e.string(ptr(p, i), c, 7, _COLOR, "a colour like #2997ff")

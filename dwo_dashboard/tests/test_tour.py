@@ -4,6 +4,10 @@ from odoo.tests import HttpCase, tagged
 URL = "/odoo/action-dwo_dashboard.action_dwo_dashboard"
 
 
+def widget_by_id(page, wid):
+    return next(w for w in page.spec["widgets"] if w["id"] == wid)
+
+
 @tagged("post_install", "-at_install")
 class TestDashboardTour(HttpCase):
     """The main flow in a real browser: open, add a KPI and a chart with Explore, save, reload, add a page."""
@@ -22,6 +26,14 @@ class TestDashboardTour(HttpCase):
         self.start_tour(URL, "dwo_dashboard_tour", login="dash_tour")
         page = self.page()
         self.assertEqual([w["id"] for w in page.spec["widgets"]], ["w1", "w2"])
+        self.assertEqual(widget_by_id(page, "w1")["compare"]["field"], "create_date")
+        self.assertEqual(widget_by_id(page, "w1")["trend"]["field"], "create_date")
+        self.assertEqual(widget_by_id(page, "w1")["title"], "Count · Contact")  # written when the title was left empty
+        self.assertEqual(widget_by_id(page, "w2")["title"], "Count by Country")
+        date_filter, country_filter = page.spec["filters"]
+        self.assertEqual(date_filter["type"], "date")
+        self.assertEqual({b["dataset"] for b in date_filter["bind"]}, {"orm:res.partner"})
+        self.assertEqual((country_filter["type"], country_filter["model"]), ("relation", "res.country"))
         saved_once = page.revision
         self.start_tour(URL, "dwo_dashboard_tour_reload", login="dash_tour")
         page.invalidate_recordset()

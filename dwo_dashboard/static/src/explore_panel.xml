@@ -2,32 +2,52 @@
 <templates xml:space="preserve">
     <t t-name="dwo_dashboard.ExplorePanel">
         <div class="dwo-explore d-flex flex-column h-100">
-            <div class="dwo-explore-head d-flex align-items-center gap-2 p-3 border-bottom">
+            <div class="dwo-explore-head d-flex align-items-center gap-2 px-3 py-2 border-bottom">
                 <h5 class="mb-0 flex-grow-1"><t t-if="props.widget">Edit widget</t><t t-else="">Add a widget</t></h5>
                 <button class="btn btn-sm btn-outline-secondary dwo-explore-close" t-on-click="props.onClose">Close</button>
             </div>
+
+            <!-- the result stays in view while the choices are made below -->
+            <div class="dwo-explore-preview border-bottom">
+                <div t-if="!complete" class="dwo-explore-hint d-flex h-100 align-items-center justify-content-center text-muted text-center px-4">
+                    <span t-if="!state.dataset">Start by choosing the data you want to look at.</span>
+                    <span t-else="">Choose the fields below to see the result.</span>
+                </div>
+                <WidgetCard t-else="" widget="previewWidget" entry="state.preview.entry or {loading: true}"/>
+            </div>
+
             <div class="dwo-explore-body flex-grow-1 overflow-auto p-3">
-                <div class="mb-3">
+                <div class="mb-3 position-relative">
                     <label class="form-label fw-bold">Data</label>
-                    <input class="form-control form-control-sm mb-1" placeholder="Search a model..." t-model="state.search"/>
-                    <select class="form-select dwo-dataset-select" t-on-change="onDataset">
-                        <option value="">Choose...</option>
-                        <option t-foreach="filteredDatasets" t-as="d" t-key="d.ref" t-att-value="d.ref"
-                                t-att-selected="d.ref === state.dataset" t-out="d.label"/>
-                    </select>
+                    <input class="form-control dwo-dataset-input" placeholder="Search: Contact, Sales order, Invoice..."
+                           t-att-value="state.datasetOpen ? state.search : datasetLabel"
+                           t-on-focus="openDatasets" t-on-blur="closeDatasets" t-on-input="(ev) => state.search = ev.target.value"/>
+                    <div t-if="state.datasetOpen" class="dwo-dataset-list card position-absolute w-100 shadow">
+                        <t t-foreach="datasetChoices" t-as="d" t-key="d.ref">
+                            <div t-if="d_index === 0 or datasetChoices[d_index - 1].group !== d.group" class="dwo-dataset-group small text-muted px-2 pt-1"
+                                 t-out="groupTitle(d.group)"/>
+                            <div class="dwo-dataset-option px-2 py-1" t-on-mousedown.prevent="() => this.pickDataset(d)">
+                                <span t-out="d.label"/> <span class="text-muted small" t-out="d.model"/>
+                            </div>
+                        </t>
+                        <div t-if="!datasetChoices.length" class="px-2 py-1 text-muted">Nothing found.</div>
+                    </div>
                 </div>
 
                 <t t-if="state.dataset">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Visual</label>
-                        <div class="d-flex flex-wrap gap-1">
+                        <label class="form-label fw-bold">Show it as</label>
+                        <div class="dwo-visuals d-flex flex-wrap gap-2">
                             <button t-foreach="visualTypes" t-as="v" t-key="v.name" type="button"
-                                    t-attf-class="btn btn-sm dwo-visual-#{v.name} #{state.type === v.name ? 'btn-primary' : 'btn-outline-secondary'}"
-                                    t-on-click="() => this.setType(v.name)" t-out="v.label"/>
+                                    t-attf-class="dwo-visual dwo-visual-#{v.name} #{state.type === v.name ? 'active' : ''}"
+                                    t-on-click="() => this.setType(v.name)">
+                                <i t-attf-class="fa #{visualIcon(v.name)} fa-lg"/>
+                                <span t-out="v.label"/>
+                            </button>
                         </div>
                         <div t-if="hint" class="small mt-1">
-                            Suggested for these fields:
-                            <a href="#" t-on-click.prevent="() => this.setType(hint)" t-out="state.visuals[hint].label"/>
+                            Dates on the axis? Try
+                            <a href="#" t-on-click.prevent="() => this.setType(hint)" t-out="state.visuals[hint].label"/>.
                         </div>
                     </div>
 
@@ -49,7 +69,7 @@
                             </t>
                             <t t-else="">
                                 <select class="form-select form-select-sm" t-on-change="(ev) => this.setField(item, ev)">
-                                    <option value="">Field...</option>
+                                    <option value="">Choose a field...</option>
                                     <option t-foreach="fieldsFor(well)" t-as="f" t-key="f.name" t-att-value="f.name"
                                             t-att-selected="item.field === f.name" t-out="f.label"/>
                                 </select>
@@ -59,57 +79,120 @@
                                             t-att-selected="item.interval === i" t-out="i"/>
                                 </select>
                             </t>
-                            <button type="button" class="btn btn-sm btn-link text-danger" t-on-click="() => this.removeItem(well, item_index)">×</button>
+                            <button t-if="canRemove(well)" type="button" class="btn btn-sm btn-link text-danger px-1"
+                                    t-on-click="() => this.removeItem(well, item_index)" title="Remove">×</button>
                         </div>
-                        <button t-if="canAdd(well)" type="button" class="btn btn-sm btn-outline-secondary dwo-add-item"
-                                t-on-click="() => this.addItem(well)">+ Add</button>
+                        <button t-if="canAdd(well)" type="button" class="btn btn-sm btn-link px-0 dwo-add-item"
+                                t-on-click="() => this.addItem(well)">+ Add<t t-if="well.accepts === 'measure'"> another value</t><t t-else=""> a field</t></button>
+                    </div>
+
+                    <div t-if="canCompare" class="mb-3 dwo-compare">
+                        <label class="form-check d-flex align-items-center gap-2 mb-1">
+                            <input type="checkbox" class="form-check-input mt-0 dwo-compare-toggle" t-att-checked="state.compare.enabled"
+                                   t-on-change="toggleCompare"/>
+                            <span class="fw-bold"><t t-if="compareOnAxis">Draw the previous period over the chart</t><t t-else="">Show the change since the previous period</t></span>
+                        </label>
+                        <div t-if="state.compare.enabled" class="row g-2">
+                            <div t-if="!compareOnAxis" class="col-6">
+                                <label class="form-label small">Date</label>
+                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setCompare('field', ev)">
+                                    <option t-foreach="dateFields" t-as="f" t-key="f.name" t-att-value="f.name"
+                                            t-att-selected="state.compare.field === f.name" t-out="f.label"/>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small">Compared with</label>
+                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setCompare('against', ev)">
+                                    <option value="previous_period" t-att-selected="state.compare.against === 'previous_period'">the previous period</option>
+                                    <option value="previous_year" t-att-selected="state.compare.against === 'previous_year'">the same period last year</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small">Period</label>
+                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setCompare('period', ev)">
+                                    <option t-foreach="presetLabels" t-as="p" t-key="p[0]" t-att-value="p[0]"
+                                            t-att-selected="state.compare.period === p[0]" t-out="p[1]"/>
+                                </select>
+                                <div class="form-text">If the page has a date filter on this date, its period is used instead.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div t-if="vdef and vdef.trend and dateFields.length" class="mb-3 dwo-trend">
+                        <label class="form-check d-flex align-items-center gap-2 mb-1">
+                            <input type="checkbox" class="form-check-input mt-0 dwo-trend-toggle" t-att-checked="state.trend.enabled"
+                                   t-on-change="toggleTrend"/>
+                            <span class="fw-bold">Draw a small trend line</span>
+                        </label>
+                        <div t-if="state.trend.enabled" class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small">Date</label>
+                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setTrend('field', ev)">
+                                    <option t-foreach="dateFields" t-as="f" t-key="f.name" t-att-value="f.name"
+                                            t-att-selected="state.trend.field === f.name" t-out="f.label"/>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label small">Per</label>
+                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setTrend('interval', ev)">
+                                    <option value="day" t-att-selected="state.trend.interval === 'day'">day</option>
+                                    <option value="week" t-att-selected="state.trend.interval === 'week'">week</option>
+                                    <option value="month" t-att-selected="state.trend.interval === 'month'">month</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label small">Points</label>
+                                <input type="number" min="3" max="60" class="form-control form-control-sm" t-att-value="state.trend.points"
+                                       t-on-input="(ev) => this.setTrend('points', ev)"/>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" t-on-click="() => state.showFilter = !state.showFilter">
-                            Filter records <t t-if="state.where.length">(<t t-out="state.where.length"/>)</t>
+                        <button type="button" class="btn btn-sm btn-link px-0" t-on-click="() => state.showFilter = !state.showFilter">
+                            <i class="fa fa-filter"/> Only some records <t t-if="state.where.length">(<t t-out="state.where.length"/>)</t>
                         </button>
                         <div t-if="state.showFilter and state.model" class="mt-2">
                             <DomainSelector resModel="state.model" domain="domainString" readonly="false" update.bind="onDomain"/>
                         </div>
                     </div>
 
-                    <div class="mb-3 row g-2">
+                    <div class="dwo-options row g-2 mb-3">
                         <div class="col-6" t-if="vdef and vdef.limit">
-                            <label class="form-label">Max groups</label>
+                            <label class="form-label small">How many</label>
                             <input type="number" min="1" class="form-control form-control-sm" t-att-placeholder="vdef.limit.default"
                                    t-att-max="vdef.limit.max" t-model="state.limit" t-on-input="schedulePreview"/>
                         </div>
                         <div class="col-6">
-                            <label class="form-label">Sort</label>
+                            <label class="form-label small">Sort by</label>
                             <select class="form-select form-select-sm" t-model="state.orderKey" t-on-change="schedulePreview">
                                 <option t-foreach="orderChoices" t-as="o" t-key="o.key" t-att-value="o.key" t-out="o.label"/>
                             </select>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Title</label>
-                            <input class="form-control form-control-sm" t-model="state.title" t-on-input="schedulePreview"/>
+                            <label class="form-label small">Title</label>
+                            <input class="form-control form-control-sm" t-att-placeholder="autoTitle" t-model="state.title"/>
                         </div>
-                        <div t-foreach="optionList" t-as="opt" t-key="opt.name" class="col-6">
-                            <label class="form-label text-capitalize" t-out="opt.name.replace('_', ' ')"/>
-                            <input t-if="opt.kind === 'bool'" type="checkbox" class="form-check-input ms-2"
-                                   t-att-checked="state.options[opt.name]" t-on-change="(ev) => this.setOption(opt.name, opt, ev)"/>
-                            <select t-elif="opt.kind === 'enum'" class="form-select form-select-sm"
-                                    t-on-change="(ev) => this.setOption(opt.name, opt, ev)">
-                                <option value="">Default</option>
-                                <option t-foreach="opt.values" t-as="v" t-key="v" t-att-value="v"
-                                        t-att-selected="state.options[opt.name] === v" t-out="v"/>
-                            </select>
-                            <input t-elif="opt.kind === 'int'" type="number" class="form-control form-control-sm"
-                                   t-att-min="opt.min" t-att-max="opt.max" t-att-value="state.options[opt.name]"
-                                   t-on-input="(ev) => this.setOption(opt.name, opt, ev)"/>
-                        </div>
-                    </div>
-
-                    <div class="dwo-explore-preview border rounded mb-3">
-                        <div t-if="!complete" class="p-3 text-muted text-center">Choose the fields to see the result.</div>
-                        <div t-else="" style="height: 280px">
-                            <WidgetCard widget="previewWidget" entry="state.preview.entry or {loading: true}"/>
+                        <div t-foreach="optionList" t-as="opt" t-key="opt.name" t-attf-class="#{opt.kind === 'bool' ? 'col-12' : 'col-6'}">
+                            <label t-if="opt.kind === 'bool'" class="form-check d-flex align-items-center gap-2 mb-0">
+                                <input type="checkbox" class="form-check-input mt-0" t-att-checked="state.options[opt.name]"
+                                       t-on-change="(ev) => this.setOption(opt.name, opt, ev)"/>
+                                <span class="small" t-out="optionLabel(opt.name)"/>
+                            </label>
+                            <t t-else="">
+                                <label class="form-label small" t-out="optionLabel(opt.name)"/>
+                                <select t-if="opt.kind === 'enum'" class="form-select form-select-sm"
+                                        t-on-change="(ev) => this.setOption(opt.name, opt, ev)">
+                                    <option value="">Default</option>
+                                    <option t-foreach="opt.values" t-as="v" t-key="v" t-att-value="v"
+                                            t-att-selected="state.options[opt.name] === v" t-out="enumLabel(v)"/>
+                                </select>
+                                <input t-elif="opt.kind === 'int' or opt.kind === 'number'" type="number" class="form-control form-control-sm"
+                                       t-att-min="opt.min" t-att-max="opt.max" t-att-value="state.options[opt.name]"
+                                       t-on-input="(ev) => this.setOption(opt.name, opt, ev)"/>
+                                <input t-elif="opt.kind === 'text'" class="form-control form-control-sm" t-att-maxlength="opt.max"
+                                       t-att-value="state.options[opt.name]" t-on-input="(ev) => this.setOption(opt.name, opt, ev)"/>
+                            </t>
                         </div>
                     </div>
                 </t>

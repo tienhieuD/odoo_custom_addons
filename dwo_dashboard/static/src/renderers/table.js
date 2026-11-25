@@ -1,11 +1,34 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import { Component } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+import { deserializeDate, deserializeDateTime, formatDate, formatDateTime } from "@web/core/l10n/dates";
 import { formatNumber } from "../utils";
 
 export class TableRenderer extends Component {
     static template = "dwo_dashboard.TableRenderer";
     static props = { widget: Object, result: Object };
+
+    setup() {
+        this.action = useService("action");
+    }
+
+    get canOpen() {
+        return !!(this.props.widget.options && this.props.widget.options.open_records) && !!this.props.result.ids;
+    }
+
+    /** Open the record of a row in its form: the standard action enforces access by itself. */
+    open(index) {
+        if (this.canOpen) {
+            this.action.doAction({
+                type: "ir.actions.act_window",
+                res_model: this.props.result.model,
+                res_id: this.props.result.ids[index],
+                views: [[false, "form"]],
+                target: "current",
+            });
+        }
+    }
 
     cell(value, meta) {
         if (value === null || value === undefined) {
@@ -17,6 +40,10 @@ export class TableRenderer extends Component {
             case "many2many":
             case "one2many":
                 return value.map((v) => v[1]).join(", ");
+            case "date":
+                return formatDate(deserializeDate(value));
+            case "datetime":
+                return formatDateTime(deserializeDateTime(value));
             case "boolean":
                 return value ? "✓" : "";
             case "selection":

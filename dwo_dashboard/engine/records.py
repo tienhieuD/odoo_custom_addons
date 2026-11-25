@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """The ``records`` engine (table): ``search`` + the readable columns, as the viewer."""
+from odoo import fields
 from odoo.exceptions import AccessError
 
 from . import guard
@@ -16,7 +17,8 @@ def run(env, model, vdef, widget, domain):
     records = records[:limit]
     metas = [_meta(model, c) for c in columns]
     rows = [[_cell(rec, c["field"], meta) for c, meta in zip(columns, metas)] for rec in records]
-    return {"kind": "records", "columns": metas, "rows": rows, "truncated": {"rows": truncated}}
+    return {"kind": "records", "columns": metas, "rows": rows, "ids": records.ids, "model": model._name,
+            "truncated": {"rows": truncated}}
 
 
 def _meta(model, column):
@@ -45,8 +47,10 @@ def _jsonable(value, kind):
         return [value.id, value.display_name] if value else None
     if kind in ("many2many", "one2many"):
         return [[r.id, r.display_name] for r in value[:SEE_MORE]] + ([["more", "…"]] if len(value) > SEE_MORE else [])
-    if kind in ("date", "datetime"):
-        return value.isoformat(sep=" ") if value else None
+    if kind == "date":  # server formats: the client shows them in the viewer's language and time zone
+        return fields.Date.to_string(value) if value else None
+    if kind == "datetime":
+        return fields.Datetime.to_string(value) if value else None
     if kind == "monetary" or kind == "float":
         return float(value)
     if kind in ("integer", "boolean"):

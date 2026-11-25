@@ -5,6 +5,8 @@
             <div t-foreach="props.filters" t-as="flt" t-key="flt.id" class="dwo-filter d-flex align-items-center gap-1"
                  t-att-data-filter-id="flt.id">
                 <span class="text-muted small" t-out="label(flt)"/>
+                <a t-if="props.editing" href="#" class="text-danger small dwo-filter-remove" title="Remove this filter"
+                   t-on-click.prevent="() => props.onRemove(flt)">×</a>
                 <select t-if="flt.type === 'date'" class="form-select form-select-sm w-auto"
                         t-on-change="(ev) => this.setPreset(flt, ev)">
                     <option t-foreach="Object.keys(presets)" t-as="key" t-key="key" t-att-value="key"

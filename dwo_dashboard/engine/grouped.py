@@ -8,7 +8,8 @@ from odoo import _
 from odoo.fields import Domain
 
 from ..spec import constants as C
-from . import guard
+from . import dates, fill, guard
+from .domain import first_weekday
 
 YES_NO = {True: "Yes", False: "No"}
 
@@ -32,6 +33,8 @@ class Plan:
                                       "spec": spec, "label": item.get("label")})
                 elif wdef["accepts"] == "measure":
                     self.measures.append(self.measure(item))
+        self.row_dims = [d for d in self.dims if d["well"] == "rows"]
+        self.col_dims = [d for d in self.dims if d["well"] == "columns"]
         self.series_well = "legend" if "legend" in vdef["wells"] else "columns" if "columns" in vdef["wells"] else None
         limits, series = vdef.get("limit"), vdef.get("series_limit")
         self.limit = widget.get("limit", limits["default"] if limits else None)
@@ -61,16 +64,30 @@ class Plan:
         return ", ".join(parts) or default
 
 
-def run(env, model, vdef, widget, domain):
+def run(env, model, vdef, widget, domain, compare=None, trend=None):
+    """``compare``: {"previous_domain", "info"} (a KPI against the previous period, or a line/area chart with the previous
+    period over it). ``trend``: {"domain", "field", "interval", "from", "to"} (the sparkline of a KPI)."""
     plan = Plan(model, vdef, widget)
     cap = guard.max_rows(env)
     aggregates = [m["spec"] for m in plan.measures]
     flags = {"axis": False, "series": False, "rows": False}
 
+    if compare and vdef.get("compare") == "series":
+        return _series_with_previous(env, model, plan, domain, aggregates, compare, flags, cap)
+
     if not plan.dims:  # a KPI: one row
         groups = model.formatted_read_group(domain, [], aggregates)
         rows = [_row(model, plan, g, []) for g in groups]
-        return _result(model, plan, rows, flags)
+        result = _result(model, plan, rows, flags)
+        if compare and rows:
+            previous = model.formatted_read_group(compare["previous_domain"], [], aggregates)
+            before = _row(model, plan, previous[0], [])["values"][0] if previous else None
+            now = rows[0]["values"][0]
+            change = None if before in (None, 0) or now is None else (now - before) / abs(before) * 100
+            result["compare"] = dict(compare["info"], current=now, previous=before, change_pct=change)
+        if trend and rows:
+            result["trend"] = _trend(model, plan, aggregates, trend)
+        return result
 
     first = plan.dims[0]
     first_measure = plan.measures[0]["spec"]
@@ -82,7 +99,10 @@ def run(env, model, vdef, widget, domain):
         flags["axis"] = True
         top = top[:limit]
     if len(plan.dims) == 1:
-        return _result(model, plan, [_row(model, plan, g, [first]) for g in top], flags)
+        rows = [_row(model, plan, g, [first]) for g in top]
+        if flags["axis"] and widget.get("options", {}).get("other"):
+            rows = _with_other(model, plan, domain, rows)
+        return _result(model, plan, rows, flags)
 
     extra = [Domain(g["__extra_domain"]) for g in top]
     if not extra:
@@ -95,10 +115,26 @@ def run(env, model, vdef, widget, domain):
     axis_position = {_group_key(model, first, g[first["spec"]]): i for i, g in enumerate(top)}
     rows.sort(key=lambda r: axis_position.get(r["keys"][0], len(axis_position)))  # stable: keeps the order inside
     rows = _cap_series(plan, rows, flags)
+    other = None
+    if widget.get("options", {}).get("other") and plan.row_dims and (flags["axis"] or flags["series"]):
+        other = _pivot_other(env, model, plan, domain, restricted, aggregates, rows, flags,
+                             bool(widget.get("options", {}).get("show_totals")))
+        rows = rows + other["rows"]
     result = _result(model, plan, rows, flags)
     if widget.get("options", {}).get("show_totals"):
-        result["totals"] = _totals(env, model, plan, restricted, aggregates)
+        result["totals"] = other["totals"] if other else _totals(env, model, plan, restricted, aggregates)
     return result
+
+
+def _with_other(model, plan, domain, rows):
+    """A last slice "Other" = the total minus the slices shown. Only for sums and counts (the validator refuses the other
+    aggregates: an average or a distinct count of the rest is not the total minus the top)."""
+    spec = plan.measures[0]["spec"]
+    total = model.formatted_read_group(domain, [], [spec])
+    rest = float((total[0].get(spec) if total else 0) or 0) - sum(r["values"][0] or 0 for r in rows)
+    if rest > 0:
+        rows.append({"keys": ["__other"], "labels": [_("Other")], "values": [rest]})
+    return rows
 
 
 def _cap_series(plan, rows, flags):
@@ -188,3 +224,145 @@ def _result(model, plan, rows, flags):
                      "label": d["label"] or owner._fields[name].string, "type": owner._fields[name].type})
     return {"kind": "grouped", "dims": dims, "rows": rows, "truncated": flags,
             "measures": [{"key": m["key"], "label": m["label"], "agg": m["agg"]} for m in plan.measures]}
+
+
+# ------------------------------------------------------------------------------------------------ KPI trend (sparkline)
+def _trend(model, plan, aggregates, trend):
+    """The measure over the last ``points`` intervals. Odoo's ``fill_temporal`` writes the empty intervals (with their
+    labels, in the viewer's time zone), so a quiet month is a zero on the line, not a missing point."""
+    spec = "%s:%s" % (trend["field"], trend["interval"])
+    groups = model.formatted_read_group(trend["domain"], [spec], aggregates[:1])
+    groups = fill.fill(model.env, model, spec, groups, aggregates[:1], dates.fromiso(trend["from"]),
+                       dates.fromiso(trend["to"]), first_weekday(model.env))
+    measure = plan.measures[0]
+    points = []
+    for g in groups:
+        value = g.get(aggregates[0])
+        points.append({"label": g[spec][1] if isinstance(g[spec], (tuple, list)) else str(g[spec]),
+                       "value": float(value) if value is not None else (None if measure["agg"] in ("avg", "min", "max") else 0)})
+    return {"interval": trend["interval"], "points": points}
+
+
+# --------------------------------------------------------------------- line / area with the previous period over it
+def _series_with_previous(env, model, plan, domain, aggregates, compare, flags, cap):
+    """The chart of the period and, aligned point by point, the chart of the previous one. Both are filled by Odoo's
+    ``fill_temporal`` (every interval of the range is there, in the viewer's time zone), so the k-th point of one is the
+    k-th interval of the other: "the 3rd day of this month" against "the 3rd day of last month"."""
+    axis = plan.dims[0]
+    info = compare["info"]
+    bounds = info["fill"]
+
+    def series(dom, start, end):
+        groups = model.formatted_read_group(dom, [axis["spec"]], aggregates, limit=cap)
+        return fill.fill(model.env, model, axis["spec"], groups, aggregates, dates.fromiso(start), dates.fromiso(end),
+                         first_weekday(model.env))[:cap]
+
+    current = series(domain, bounds["from"], bounds["to"])
+    previous = series(compare["previous_domain"], bounds["previous_from"], bounds["previous_to"])
+    rows = [_row(model, plan, g, [axis]) for g in current]
+    before = [_row(model, plan, g, [axis]) for g in previous]
+    flags["rows"] = len(current) >= cap
+    result = _result(model, plan, rows, flags)
+    result["compare"] = dict(info, series={
+        "labels": [b["labels"][0] for b in before],
+        "values": [b["values"][0] for b in before] + [None] * max(0, len(rows) - len(before)),
+    })
+    return result
+
+
+# ------------------------------------------------------------------------------------------------ pivot "Other"
+def _pivot_other(env, model, plan, domain, restricted, aggregates, rows, flags, want_totals):
+    """The row "Other" (the first row dimension beyond the limit) and the column "Other" (the first column dimension beyond
+    ``series_limit``), with their cells, so that every row and column adds up to the real total. Only for sums and counts
+    (the validator refuses the rest), so "the rest" is exactly the total minus what is shown.
+
+    With R the shown rows and C the shown columns, per measure:
+      Other row, column c      = total of column c (all rows)      - sum over R of cell(r, c)
+      row r, Other column      = total of row r (all columns)      - sum over C of cell(r, c)
+      Other row, Other column  = grand total - everything above.
+    Returns ``{"rows": [...], "totals": {...} or None}``; the totals are over ALL the rows, the Other row included."""
+    nr, nc = len(plan.row_dims), len(plan.col_dims)
+    cap = guard.max_rows(env)
+    zero = [0.0] * len(plan.measures)
+
+    def add(a, b):
+        return [x + y for x, y in zip(a, b)]
+
+    def sub(a, b):
+        return [x - y for x, y in zip(a, b)]
+
+    labels = {}  # (kind, key tuple) -> the labels of that row or column, to write them on the "Other" cells
+
+    def read(dom, dims, kind=None):
+        groups = model.formatted_read_group(dom, [d["spec"] for d in dims], aggregates, limit=cap)
+        out = {}
+        for g in groups:
+            r = _row(model, plan, g, dims)
+            out[tuple(r["keys"])] = [float(v or 0) for v in r["values"]]
+            if kind:
+                labels[(kind, tuple(r["keys"]))] = r["labels"]
+        return out
+
+    cells = {(tuple(r["keys"][:nr]), tuple(r["keys"][nr:])): [v or 0 for v in r["values"]] for r in rows}
+    for r in rows:
+        labels[("row", tuple(r["keys"][:nr]))] = r["labels"][:nr]
+        labels[("col", tuple(r["keys"][nr:]))] = r["labels"][nr:]
+    shown_rows = list(dict.fromkeys(rk for rk, _ck in cells))
+    grand = read(domain, []).get((), zero)
+    col_all = read(domain, plan.col_dims, "col") if nc and (flags["axis"] or want_totals) else {}
+    kept_cols = list(dict.fromkeys(ck for _rk, ck in cells)) if flags["series"] else (list(col_all) if nc else [()])
+    row_shown = read(restricted, plan.row_dims) if (nc and flags["series"]) or want_totals else {}
+    other_row = ("__other",) + (None,) * (nr - 1)
+    other_col = (("__other",) + (None,) * (nc - 1)) if nc else ()
+
+    def cell_sum(rs, cs):
+        total = zero
+        for r in rs:
+            for c in cs:
+                total = add(total, cells.get((r, c), zero))
+        return total
+
+    out = []
+
+    def named(kind, key):
+        if key and key[0] == "__other":
+            return [_("Other")] + [""] * (len(key) - 1)
+        return labels.get((kind, key)) or [""] * len(key)
+
+    def emit(rk, ck, values):
+        if any(abs(v) > 1e-9 for v in values):
+            out.append({"keys": list(rk) + list(ck), "values": values, "labels": named("row", rk) + named("col", ck)})
+
+    row_other = {}  # column -> the cell of the Other row
+    col_other = {}  # row -> the cell of the Other column
+    if flags["axis"]:
+        for c in kept_cols:
+            row_other[c] = sub(col_all.get(c, zero) if nc else grand, cell_sum(shown_rows, [c]))
+            emit(other_row, c, row_other[c])
+    if nc and flags["series"]:
+        for r in shown_rows:
+            col_other[r] = sub(row_shown.get(r, zero), cell_sum([r], kept_cols))
+            emit(r, other_col, col_other[r])
+        if flags["axis"]:
+            used = cell_sum(shown_rows, kept_cols)
+            for values in list(col_other.values()) + list(row_other.values()):
+                used = add(used, values)
+            emit(other_row, other_col, sub(grand, used))
+
+    totals = None
+    if want_totals:
+        totals = {"grand": [{"keys": [], "labels": [], "values": grand}], "rows": []}
+        shown_total = zero
+        for r in shown_rows:
+            totals["rows"].append({"keys": list(r), "labels": [], "values": row_shown.get(r, zero)})
+            shown_total = add(shown_total, row_shown.get(r, zero))
+        if flags["axis"]:
+            totals["rows"].append({"keys": list(other_row), "labels": [], "values": sub(grand, shown_total)})
+        if nc:
+            totals["columns"], shown_cols = [], zero
+            for c in kept_cols:
+                totals["columns"].append({"keys": list(c), "labels": [], "values": col_all.get(c, zero)})
+                shown_cols = add(shown_cols, col_all.get(c, zero))
+            if flags["series"]:
+                totals["columns"].append({"keys": list(other_col), "labels": [], "values": sub(grand, shown_cols)})
+    return {"rows": out, "totals": totals}

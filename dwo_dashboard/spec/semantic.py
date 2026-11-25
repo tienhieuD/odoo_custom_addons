@@ -151,6 +151,10 @@ class _Check:
         else:
             self.errors.extend(self.checkers[prefix](ref, path, widget, defn))
             return
+        if "compare" in widget:
+            ctx.compare(ptr(path, "compare", "field"), widget["compare"]["field"])
+        if "trend" in widget:
+            ctx.compare(ptr(path, "trend", "field"), widget["trend"]["field"])
         for wname, wdef in vdef["wells"].items():
             value = widget["wells"].get(wname)
             if value is None:
@@ -314,6 +318,15 @@ class _Orm:
         elif field.type not in DATE_TYPES and "interval" in item:
             self.chk.add(ptr(path, "interval"), "type", "an interval only applies to date and datetime fields")
 
+    def compare(self, path, name):
+        """The date field a KPI compares periods on."""
+        if self._hidden(path, name):
+            return
+        found = self.chk.follow(path, self.model, name, "compare")
+        if found is not None and (found[1].type not in DATE_TYPES or not found[1].store):
+            self.chk.add(path, "type", "a comparison needs a stored date or datetime field; %s is %s" % (
+                name, found[1].type))
+
     def column(self, path, item):
         field_path = ptr(path, "field")
         if self._hidden(field_path, item["field"]):
@@ -378,6 +391,11 @@ class _Sql:
             self.chk.add(ptr(path, "interval"), "required", "a %s column needs an interval" % col["type"])
         elif col["type"] not in C.SQL_DATE_TYPES and "interval" in item:
             self.chk.add(ptr(path, "interval"), "type", "an interval only applies to date and datetime columns")
+
+    def compare(self, path, name):
+        col = self.columns.get(name)
+        if col is None or col["type"] not in C.SQL_DATE_TYPES:
+            self.chk.add(path, "type", "a comparison needs a date or datetime column of the dataset")
 
     def column(self, path, item):
         self._column(path, item["field"], "column")

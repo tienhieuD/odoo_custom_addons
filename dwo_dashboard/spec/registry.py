@@ -13,7 +13,12 @@ Visual type definition:
      "limit": {"default": 100, "max": 500} | None,         # grouped: top-N groups of the first dimension well
      "series_limit": {"default": 10, "max": 20} | None,    # grouped: groups of the second dimension well
      "constraints": [{"kind": "any_of", "wells": ["rows", "columns"]},
-                     {"kind": "max_if_present", "well": "values", "if": "legend", "max": 1}]}
+                     {"kind": "max_if_present", "well": "values", "if": "legend", "max": 1},
+                     {"kind": "option_needs", "option": "percent", "any_of": [{"option": "stacked"}, {"well": "legend"}]},
+                     {"kind": "option_aggs", "option": "other", "well": "value", "aggs": ["sum", "count"]}],
+     "compare": False | "value" | "series",  # a ``compare`` key: "value" = a KPI against the previous period, "series" = a
+                                              # line/area chart with the previous period drawn over it
+     "trend": True | False}                   # a ``trend`` key (KPI sparkline) is allowed on the widget
 A well whose ``max`` is 1 holds one object, any other holds an array. Most new charts are just a new entry with a
 JS renderer: they reuse the "grouped" engine.
 
@@ -39,6 +44,19 @@ def int_option(minimum, maximum):
     return {"kind": "int", "min": minimum, "max": maximum}
 
 
+def number_option(minimum=None, maximum=None):
+    out = {"kind": "number"}
+    if minimum is not None:
+        out["min"] = minimum
+    if maximum is not None:
+        out["max"] = maximum
+    return out
+
+
+def text_option(maximum=12):
+    return {"kind": "text", "max": maximum}
+
+
 def colors_option(maximum=12):
     return {"kind": "colors", "max": maximum}
 
@@ -50,41 +68,59 @@ def _well(accepts, minimum, maximum):
 def core_visual_types():
     fmt = {"format": enum_option(C.FORMATS), "decimals": int_option(0, 6)}
     chart = dict(fmt, colors=colors_option(), legend=enum_option(C.LEGENDS))
-    series = [{"kind": "max_if_present", "well": "values", "if": "legend", "max": 1}]
+    bar_like = {"show_values": bool_option(), "target": number_option(), "y_min": number_option(),
+                "y_max": number_option()}
+    axis_limits = [{"kind": "option_less", "low": "y_min", "high": "y_max"},
+                   {"kind": "option_excludes", "option": "y_min", "with": ["percent"]},
+                   {"kind": "option_excludes", "option": "y_max", "with": ["percent"]}]
+    one_measure_per_series = {"kind": "max_if_present", "well": "values", "if": "legend", "max": 1}
+    percent_needs = {"kind": "option_needs", "option": "percent", "any_of": [{"option": "stacked"}, {"well": "legend"}]}
     series_limit = {"default": 10, "max": 20}
 
-    def axis_chart(label, **extra):
+    def axis_chart(label, compare=False, **extra):
         return {
-            "label": label, "query": "grouped",
+            "label": label, "query": "grouped", "compare": compare, "trend": False,
             "wells": {"axis": _well("dimension", 1, 1), "legend": _well("dimension", 0, 1),
                       "values": _well("measure", 1, 5)},
-            "options": dict(chart, **extra), "limit": {"default": 100, "max": 500},
-            "series_limit": dict(series_limit), "constraints": copy.deepcopy(series)}
+            "options": dict(chart, **bar_like, **extra), "limit": {"default": 100, "max": 500},
+            "series_limit": dict(series_limit),
+            "constraints": [copy.deepcopy(one_measure_per_series)]
+            + ([copy.deepcopy(percent_needs)] if "percent" in extra else [])
+            + [c for c in copy.deepcopy(axis_limits) if c["kind"] == "option_less" or "percent" in extra]}
 
     def slice_chart(label):
         return {
-            "label": label, "query": "grouped",
+            "label": label, "query": "grouped", "compare": False, "trend": False,
             "wells": {"category": _well("dimension", 1, 1), "value": _well("measure", 1, 1)},
-            "options": dict(chart), "limit": {"default": 20, "max": 100}, "series_limit": None, "constraints": []}
+            "options": dict(chart, show_percent=bool_option(), other=bool_option()),
+            "limit": {"default": 20, "max": 100}, "series_limit": None,
+            "constraints": [{"kind": "option_aggs", "option": "other", "well": "value", "aggs": ["sum", "count"]}]}
 
     return {
-        "kpi": {"label": "KPI", "query": "grouped", "wells": {"value": _well("measure", 1, 1)},
-                "options": dict(fmt), "limit": None, "series_limit": None, "constraints": []},
-        "table": {"label": "Table", "query": "records", "wells": {"columns": _well("column", 1, 20)},
-                  "options": dict(fmt), "limit": {"default": 50, "max": 500}, "series_limit": None,
-                  "constraints": []},
-        "bar": axis_chart("Bar chart", stacked=bool_option(), horizontal=bool_option()),
-        "line": axis_chart("Line chart", smooth=bool_option()),
-        "area": axis_chart("Area chart", smooth=bool_option(), stacked=bool_option()),
+        "kpi": {"label": "KPI", "query": "grouped", "compare": "value", "trend": True,
+                "wells": {"value": _well("measure", 1, 1)},
+                "options": dict(fmt, goal=number_option(), trend_good=enum_option(C.TRENDS), prefix=text_option(),
+                                suffix=text_option()),
+                "limit": None, "series_limit": None, "constraints": []},
+        "table": {"label": "Table", "query": "records", "compare": False, "trend": False,
+                  "wells": {"columns": _well("column", 1, 20)},
+                  "options": dict(fmt, open_records=bool_option()), "limit": {"default": 50, "max": 500},
+                  "series_limit": None, "constraints": []},
+        "bar": axis_chart("Bar chart", stacked=bool_option(), horizontal=bool_option(), percent=bool_option()),
+        "line": axis_chart("Line chart", compare="series", smooth=bool_option()),
+        "area": axis_chart("Area chart", compare="series", smooth=bool_option(), stacked=bool_option(),
+                           percent=bool_option()),
         "pie": slice_chart("Pie chart"),
         "doughnut": slice_chart("Doughnut chart"),
         "pivot": {
-            "label": "Pivot table", "query": "grouped",
+            "label": "Pivot table", "query": "grouped", "compare": False, "trend": False,
             "wells": {"rows": _well("dimension", 0, 3), "columns": _well("dimension", 0, 2),
                       "values": _well("measure", 1, 5)},
-            "options": dict(fmt, show_totals=bool_option()),
+            "options": dict(fmt, show_totals=bool_option(), heatmap=bool_option(), other=bool_option()),
             "limit": {"default": 200, "max": 500}, "series_limit": {"default": 12, "max": 24},
-            "constraints": [{"kind": "any_of", "wells": ["rows", "columns"]}]},
+            "constraints": [{"kind": "any_of", "wells": ["rows", "columns"]},
+                            {"kind": "option_aggs", "option": "other", "well": "values", "aggs": ["sum", "count"]},
+                            {"kind": "option_needs", "option": "other", "any_of": [{"well": "rows"}]}]},
     }
 
 
@@ -166,6 +202,8 @@ class Registry:
                 out.append("option %r: kind must be one of %s" % (oname, ", ".join(C.OPTION_KINDS)))
             elif kind == "enum" and not odef.get("values"):
                 out.append("option %r: enum needs values" % oname)
+            elif kind == "text" and not isinstance(odef.get("max"), int):
+                out.append("option %r: text needs an integer max" % oname)
         for key in ("limit", "series_limit"):
             spec = vdef.get(key)
             if spec is not None and not (isinstance(spec, dict) and 1 <= spec.get("default", 0) <= spec.get("max", 0)):
@@ -181,8 +219,28 @@ class Registry:
             elif kind == "max_if_present":
                 if not {con.get("well"), con.get("if")} <= set(wells) or not isinstance(con.get("max"), int):
                     out.append("constraint max_if_present: unknown wells or max")
+            elif kind == "option_needs":
+                if con.get("option") not in (vdef.get("options") or {}) or not con.get("any_of") or not all(
+                        ("option" in c and c["option"] in (vdef.get("options") or {})) or c.get("well") in wells
+                        for c in con["any_of"]):
+                    out.append("constraint option_needs: unknown option or well")
+            elif kind == "option_aggs":
+                if con.get("option") not in (vdef.get("options") or {}) or con.get("well") not in wells or not set(
+                        con.get("aggs", ())) <= set(C.AGGS) or not con.get("aggs"):
+                    out.append("constraint option_aggs: unknown option or well, or bad aggregates")
+            elif kind == "option_less":
+                if not {con.get("low"), con.get("high")} <= set(vdef.get("options") or {}):
+                    out.append("constraint option_less: unknown option")
+            elif kind == "option_excludes":
+                if con.get("option") not in (vdef.get("options") or {}) or not set(con.get("with", ())) <= set(
+                        vdef.get("options") or {}):
+                    out.append("constraint option_excludes: unknown option")
             else:
                 out.append("unknown constraint kind %r" % kind)
+        if vdef.get("compare", False) not in (False, "value", "series"):
+            out.append("compare must be false, 'value' or 'series'")
+        if not isinstance(vdef.get("trend", False), bool):
+            out.append("trend must be true or false")
         return out
 
     # ---------------------------------------------------------------------------------------------- helpers

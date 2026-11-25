@@ -68,6 +68,18 @@ must_reject("relation filter without model", page_v, base, lambda s: s["filters"
 must_reject("date filter with a model", page_v, base, lambda s: s["filters"][0].update(model="res.country"))
 must_reject("selection filter without values", page_v,
             load("spec", "samples", "pages", "attachments_usage.json"), lambda s: s["filters"][1].pop("values"))
+must_reject("compare on a bar", page_v, base, lambda s: widget(s, "by_country").update(compare={"field": "create_date"}))
+must_reject("compare with period all", page_v, base,
+            lambda s: widget(s, "total").update(compare={"field": "create_date", "period": "all"}))
+must_reject("goal as text", page_v, base, lambda s: widget(s, "total").update(options={"goal": "lots"}))
+must_reject("prefix too long", page_v, base, lambda s: widget(s, "total").update(options={"prefix": "x" * 20}))
+must_reject("heatmap on a bar", page_v, base, lambda s: widget(s, "by_country")["options"].update(heatmap=True))
+must_reject("trend on a bar", page_v, base, lambda s: widget(s, "by_country").update(trend={"field": "create_date"}))
+must_reject("trend with 1 point", page_v, base, lambda s: widget(s, "total").update(trend={"field": "create_date", "points": 1}))
+must_reject("trend with a year interval", page_v, base,
+            lambda s: widget(s, "total").update(trend={"field": "create_date", "interval": "year"}))
+must_reject("y_min on a pie", page_v, base, lambda s: widget(s, "kind")["options"].update(y_min=0))
+must_reject("other on a table", page_v, base, lambda s: widget(s, "latest").update(options={"other": True}))
 must_reject("sql dataset without groups", dataset_v, sql, lambda d: d["sql"].pop("groups"))
 must_reject("sql column with unknown type", dataset_v, sql, lambda d: d["sql"]["columns"][0].update(type="money"))
 must_reject("orm dataset with a sql block", dataset_v, load("spec", "samples", "datasets", "orm_res_partner.json"),

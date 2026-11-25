@@ -19,7 +19,13 @@ DIRECTIONS = ("asc", "desc")
 ROLES = ("dimension", "measure")
 WELL_KINDS = ("dimension", "measure", "column")
 QUERY_KINDS = ("grouped", "records")
-OPTION_KINDS = ("bool", "enum", "int", "colors")
+OPTION_KINDS = ("bool", "enum", "int", "number", "text", "colors")
+TRENDS = ("up", "down")
+COMPARE_AGAINST = ("previous_period", "previous_year")
+COMPARE_DEFAULT_PERIOD = "this_month"
+TREND_INTERVALS = ("day", "week", "month")
+TREND_POINTS_MIN, TREND_POINTS_MAX, TREND_POINTS_DEFAULT = 3, 60, 12
+TREND_INTERVAL_DEFAULT = "month"
 
 # domain. `any!` / `not any!` exist in Odoo 19 (they skip the record rules of the comodel): never allowed here.
 DOMAIN_LOGIC = ("&", "|", "!")

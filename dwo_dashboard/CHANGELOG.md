@@ -1,5 +1,23 @@
 # Changelog
 
+## Phase 1, second pass (not released): interface review
+- KPI cards: change since the previous period (`compare`), goal bar, prefix and suffix, `trend_good`.
+- New options: `show_values`, `target`, `percent` (100% stack), `show_percent`, `other`, `heatmap`, `open_records`; new
+  option kinds `number` and `text`; registry constraints `option_needs` and `option_aggs`.
+- Charts use a categorical palette (6 clearly different colours); tables show dates in the viewer's language and time zone,
+  numbers right-aligned, rows can open the record; empty widgets say "No data"; notes such as "Top 8" are muted.
+- Explore: one selector per required well already in place and "Count" already chosen, icons for the visuals, the preview on
+  top, a searchable data list (this page's data first, then recent), titles written for you ("Count by Country"), options with
+  readable names. "+ Add widget" works from the view mode. Page tools moved into a menu.
+- Page filters can now be created in the interface ("Add filter": a period, some records, or a choice), bound by themselves
+  to every data source of the page that has the field.
+- Third pass: the options that were deferred: `y_min` / `y_max` (checked: lower than each other, not with `percent`), a KPI
+  `trend` (sparkline), the previous period drawn over a line or area chart (`compare` on a chart), `other` on a pivot (Other
+  row, Other column and the corner, totals over all rows). Empty intervals are filled by `engine/fill.py` with the keys and
+  labels of `formatted_read_group` (Odoo's own `fill_temporal` fails with a datetime and a time zone); a test compares them for
+  every interval, both field types and four time zones.
+- Still deferred: drill-down (Phase 2), the `other` check on metrics (Phase 3).
+
 ## Phase 1 (not released): the dashboard, usable by one person
 - Models `dwo.dashboard` (one per user, private: global record rules, administrators included) and `dwo.dashboard.page`
   (`spec` JSON validated as the person who saves it, in `create`/`write`: ORM constraints run as superuser and cannot

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.FilterEditor">
+        <div class="dwo-filter-editor card shadow p-3">
+            <div class="fw-bold mb-2">Filter the whole page by...</div>
+            <div t-if="state.loading" class="text-muted"><i class="fa fa-circle-o-notch fa-spin"/></div>
+            <t t-else="">
+                <div class="d-flex gap-2 mb-2">
+                    <button t-foreach="kinds" t-as="k" t-key="k.type" type="button"
+                            t-attf-class="btn btn-sm dwo-filter-kind-#{k.type} #{state.type === k.type ? 'btn-primary' : 'btn-outline-secondary'}"
+                            t-att-title="k.hint" t-on-click="() => this.setType(k.type)" t-out="k.label"/>
+                </div>
+                <div t-if="!visible.length" class="text-muted small mb-2">The widgets of this page have no field of this kind.</div>
+                <t t-else="">
+                    <select class="form-select form-select-sm mb-2 dwo-filter-field" t-on-change="onField">
+                        <option t-foreach="visible" t-as="c" t-key="c.key" t-att-value="c.key" t-att-selected="c.key === state.key">
+                            <t t-out="c.label"/> (<t t-out="sources(c.datasets.length)"/>)
+                        </option>
+                    </select>
+                    <input class="form-control form-control-sm mb-2" placeholder="Name" t-model="state.label"/>
+                    <select t-if="state.type === 'date'" class="form-select form-select-sm mb-2" t-model="state.default">
+                        <option t-foreach="presets" t-as="p" t-key="p[0]" t-att-value="p[0]" t-out="p[1]"/>
+                    </select>
+                </t>
+                <div class="d-flex justify-content-end gap-2">
+                    <button class="btn btn-sm btn-secondary" t-on-click="props.onClose">Cancel</button>
+                    <button class="btn btn-sm btn-primary dwo-filter-add" t-att-disabled="!canAdd" t-on-click="add">Add filter</button>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

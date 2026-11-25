@@ -3,8 +3,28 @@
 
     <t t-name="dwo_dashboard.KpiRenderer">
         <div class="dwo-kpi d-flex flex-column justify-content-center align-items-center h-100 text-center">
-            <div class="dwo-kpi-value" t-out="value"/>
-            <div class="dwo-kpi-label text-muted" t-out="label"/>
+            <div class="dwo-kpi-value">
+                <span t-if="prefix" class="dwo-kpi-affix" t-out="prefix"/><t t-out="value"/><span t-if="suffix" class="dwo-kpi-affix" t-out="suffix"/>
+            </div>
+            <div t-if="label" class="dwo-kpi-label text-muted" t-out="label"/>
+            <div t-if="compare" class="dwo-kpi-period small text-muted" t-out="periodText"/>
+            <div t-elif="needsPeriod" class="dwo-kpi-hint small text-muted">Pick a period in the filter to see the change.</div>
+            <div t-if="compare" t-attf-class="dwo-kpi-delta #{deltaClass}">
+                <t t-if="change !== null and change !== undefined"><i t-attf-class="fa #{deltaIcon}"/> <b t-out="deltaText"/></t>
+                <div class="text-muted small" t-out="versus"/>
+            </div>
+            <div t-if="trend" class="dwo-kpi-trend w-75 mt-1" t-att-title="trend.title">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" width="100%" height="32">
+                    <path t-att-d="trend.area" class="dwo-spark-area"/>
+                    <path t-att-d="trend.line" class="dwo-spark-line" vector-effect="non-scaling-stroke"/>
+                </svg>
+            </div>
+            <div t-if="goal" class="dwo-kpi-goal w-75 mt-2">
+                <div class="progress" style="height: 6px">
+                    <div class="progress-bar" t-attf-style="width: #{goalPercent}%"/>
+                </div>
+                <div class="small text-muted" t-out="goalText"/>
+            </div>
         </div>
     </t>
 
@@ -18,7 +38,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr t-foreach="props.result.rows" t-as="row" t-key="row_index">
+                    <tr t-foreach="props.result.rows" t-as="row" t-key="row_index"
+                        t-attf-class="#{canOpen ? 'dwo-row-link' : ''}" t-on-click="() => this.open(row_index)">
                         <td t-foreach="row" t-as="value" t-key="value_index"
                             t-att-class="isNumber(props.result.columns[value_index]) ? 'text-end' : ''"
                             t-out="cell(value, props.result.columns[value_index])"/>
@@ -60,7 +81,7 @@
                         <th t-foreach="row[1]" t-as="label" t-key="label_index" class="fw-normal" t-out="label"/>
                         <th t-if="!row[1].length"/>
                         <t t-foreach="colEntries" t-as="col" t-key="col[0]">
-                            <td t-foreach="measures" t-as="m" t-key="m.key" class="text-end"
+                            <td t-foreach="measures" t-as="m" t-key="m.key" class="text-end" t-att-style="heat(row[0], col[0], m_index)"
                                 t-out="value(row[0], col[0], m_index)"/>
                         </t>
                         <t t-if="showTotals">

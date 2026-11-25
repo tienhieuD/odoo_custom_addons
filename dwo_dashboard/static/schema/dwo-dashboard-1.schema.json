@@ -566,10 +566,25 @@
                 "right"
               ]
             },
+            "show_values": {
+              "type": "boolean"
+            },
+            "target": {
+              "type": "number"
+            },
+            "y_min": {
+              "type": "number"
+            },
+            "y_max": {
+              "type": "number"
+            },
             "smooth": {
               "type": "boolean"
             },
             "stacked": {
+              "type": "boolean"
+            },
+            "percent": {
               "type": "boolean"
             }
           }
@@ -579,6 +594,46 @@
           "maxItems": 10,
           "items": {
             "$ref": "#/$defs/id"
+          }
+        },
+        "compare": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "field"
+          ],
+          "properties": {
+            "field": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+              "description": "a date or datetime field, the axis field of the chart"
+            },
+            "period": {
+              "enum": [
+                "today",
+                "yesterday",
+                "last_7_days",
+                "last_30_days",
+                "last_90_days",
+                "this_week",
+                "last_week",
+                "this_month",
+                "last_month",
+                "this_quarter",
+                "last_quarter",
+                "this_year",
+                "last_year"
+              ],
+              "default": "this_month",
+              "description": "ignored when a page date filter is bound to the same field"
+            },
+            "against": {
+              "enum": [
+                "previous_period",
+                "previous_year"
+              ],
+              "default": "previous_period"
+            }
           }
         },
         "limit": {
@@ -707,10 +762,25 @@
                 "right"
               ]
             },
+            "show_values": {
+              "type": "boolean"
+            },
+            "target": {
+              "type": "number"
+            },
+            "y_min": {
+              "type": "number"
+            },
+            "y_max": {
+              "type": "number"
+            },
             "stacked": {
               "type": "boolean"
             },
             "horizontal": {
+              "type": "boolean"
+            },
+            "percent": {
               "type": "boolean"
             }
           }
@@ -839,6 +909,12 @@
                 "left",
                 "right"
               ]
+            },
+            "show_percent": {
+              "type": "boolean"
+            },
+            "other": {
+              "type": "boolean"
             }
           }
         },
@@ -938,6 +1014,25 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 6
+            },
+            "goal": {
+              "type": "number"
+            },
+            "trend_good": {
+              "enum": [
+                "up",
+                "down"
+              ]
+            },
+            "prefix": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 12
+            },
+            "suffix": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 12
             }
           }
         },
@@ -946,6 +1041,74 @@
           "maxItems": 10,
           "items": {
             "$ref": "#/$defs/id"
+          }
+        },
+        "compare": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "field"
+          ],
+          "properties": {
+            "field": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+              "description": "a date or datetime field"
+            },
+            "period": {
+              "enum": [
+                "today",
+                "yesterday",
+                "last_7_days",
+                "last_30_days",
+                "last_90_days",
+                "this_week",
+                "last_week",
+                "this_month",
+                "last_month",
+                "this_quarter",
+                "last_quarter",
+                "this_year",
+                "last_year"
+              ],
+              "default": "this_month",
+              "description": "ignored when a page date filter is bound to the same field"
+            },
+            "against": {
+              "enum": [
+                "previous_period",
+                "previous_year"
+              ],
+              "default": "previous_period"
+            }
+          }
+        },
+        "trend": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "field"
+          ],
+          "properties": {
+            "field": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+              "description": "a date or datetime field"
+            },
+            "interval": {
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "month"
+            },
+            "points": {
+              "type": "integer",
+              "minimum": 3,
+              "maximum": 60,
+              "default": 12
+            }
           }
         }
       }
@@ -1062,6 +1225,18 @@
                 "right"
               ]
             },
+            "show_values": {
+              "type": "boolean"
+            },
+            "target": {
+              "type": "number"
+            },
+            "y_min": {
+              "type": "number"
+            },
+            "y_max": {
+              "type": "number"
+            },
             "smooth": {
               "type": "boolean"
             }
@@ -1072,6 +1247,46 @@
           "maxItems": 10,
           "items": {
             "$ref": "#/$defs/id"
+          }
+        },
+        "compare": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "field"
+          ],
+          "properties": {
+            "field": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]{0,63}$",
+              "description": "a date or datetime field, the axis field of the chart"
+            },
+            "period": {
+              "enum": [
+                "today",
+                "yesterday",
+                "last_7_days",
+                "last_30_days",
+                "last_90_days",
+                "this_week",
+                "last_week",
+                "this_month",
+                "last_month",
+                "this_quarter",
+                "last_quarter",
+                "this_year",
+                "last_year"
+              ],
+              "default": "this_month",
+              "description": "ignored when a page date filter is bound to the same field"
+            },
+            "against": {
+              "enum": [
+                "previous_period",
+                "previous_year"
+              ],
+              "default": "previous_period"
+            }
           }
         },
         "limit": {
@@ -1191,6 +1406,12 @@
                 "left",
                 "right"
               ]
+            },
+            "show_percent": {
+              "type": "boolean"
+            },
+            "other": {
+              "type": "boolean"
             }
           }
         },
@@ -1314,6 +1535,12 @@
             },
             "show_totals": {
               "type": "boolean"
+            },
+            "heatmap": {
+              "type": "boolean"
+            },
+            "other": {
+              "type": "boolean"
             }
           }
         },
@@ -1424,6 +1651,9 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 6
+            },
+            "open_records": {
+              "type": "boolean"
             }
           }
         },
