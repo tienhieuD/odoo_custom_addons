@@ -6,7 +6,7 @@ import { Domain } from "@web/core/domain";
 import { DomainSelector } from "@web/core/domain_selector/domain_selector";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-import { PRESET_LABELS, suggestVisual } from "./utils";
+import { ICON_CHOICES, PRESET_LABELS, suggestVisual, widgetIcon } from "./utils";
 import { WidgetCard } from "./widget_card";
 
 const AGG_LABELS = {
@@ -71,7 +71,7 @@ export class ExplorePanel extends Component {
         this.presetLabels = Object.entries(PRESET_LABELS).filter(([key]) => key !== "all");
         this.state = useState({
             datasets: [], visuals: {}, dataset: "", fields: [], model: "", type: "bar",
-            wells: {}, where: [], options: {}, limit: "", orderKey: "", title: "",
+            wells: {}, where: [], options: {}, limit: "", orderKey: "", title: "", icon: "", iconMenu: false,
             showFilter: false, preview: { loading: false, entry: null }, search: "", datasetOpen: false,
             compare: { enabled: false, field: "", period: "this_month", against: "previous_period" },
             trend: { enabled: false, field: "", interval: "month", points: 12 },
@@ -102,6 +102,7 @@ export class ExplorePanel extends Component {
         s.type = widget.type;
         this.previousType = widget.type;
         s.title = widget.title || "";
+        s.icon = widget.icon || "";
         s.wells = JSON.parse(JSON.stringify(widget.wells || {}));
         s.where = JSON.parse(JSON.stringify(widget.where || []));
         s.options = JSON.parse(JSON.stringify(widget.options || {}));
@@ -401,6 +402,9 @@ export class ExplorePanel extends Component {
         if (s.title.trim()) {
             widget.title = s.title.trim();
         }
+        if (s.icon) {
+            widget.icon = s.icon; // without one, the card shows the icon of its type
+        }
         if (s.where.length) {
             widget.where = s.where;
         }
@@ -573,6 +577,19 @@ export class ExplorePanel extends Component {
 
     get previewWidget() {
         return this.buildWidget() || { type: this.state.type };
+    }
+
+    get iconChoices() {
+        return ICON_CHOICES;
+    }
+
+    get currentIcon() {
+        return this.state.icon || widgetIcon({ type: this.state.type });
+    }
+
+    setIcon(icon) {
+        this.state.icon = icon;
+        this.state.iconMenu = false;
     }
 
     /** "Count by Country", "Sum of Total by Month": written into the spec when the title is left empty. */

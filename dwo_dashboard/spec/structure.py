@@ -11,6 +11,7 @@ import re
 from . import constants as C
 
 _ID = re.compile(C.ID_PATTERN)
+_ICON = re.compile(C.ICON_PATTERN)
 _FIELD = re.compile(C.FIELD_PATTERN)
 _FIELD_PATH = re.compile(C.FIELD_PATH_PATTERN)
 _COLOR = re.compile(C.COLOR_PATTERN)
@@ -208,7 +209,7 @@ def _widgets(e, value, cols, filters, registry):
     for i, widget in enumerate(value):
         path = ptr("/widgets", i)
         if not e.obj(path, widget, required=("id", "type", "x", "y", "w", "h", "dataset", "wells"),
-                     optional=("title", "where", "order", "limit", "series_limit", "options", "ignore_filters",
+                     optional=("title", "icon", "where", "order", "limit", "series_limit", "options", "ignore_filters",
                                "compare", "trend")):
             continue
         if e.string(ptr(path, "id"), widget.get("id"), 32, _ID, "an identifier like 'w1'"):
@@ -221,6 +222,8 @@ def _widgets(e, value, cols, filters, registry):
             e.add(ptr(path, "type"), "enum", "must be one of: %s" % ", ".join(sorted(registry.visuals)))
         if "title" in widget:
             e.string(ptr(path, "title"), widget["title"], 120)
+        if "icon" in widget:
+            e.string(ptr(path, "icon"), widget["icon"], 50, _ICON, "a Font Awesome class like 'fa-list'")
         ok_box = all([
             e.integer(ptr(path, "x"), widget.get("x"), 0, cols - 1),
             e.integer(ptr(path, "y"), widget.get("y"), 0, 10000),

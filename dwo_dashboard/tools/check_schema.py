@@ -50,6 +50,8 @@ def must_reject(label, validator, document, change):
     print("REJECTED" if rejected else "ACCEPTED (bug)", label)
 
 
+must_reject("icon with a space and a second class", page_v, base, lambda s: widget(s, "total").update(icon="fa fa-list"))
+must_reject("icon that is not Font Awesome", page_v, base, lambda s: widget(s, "total").update(icon="<script>"))
 must_reject("unknown top-level key", page_v, base, lambda s: s.update(colour="red"))
 must_reject("sql text in a widget", page_v, base, lambda s: widget(s, "total").update(sql="select 1"))
 must_reject("old-style query", page_v, base, lambda s: widget(s, "total").update(query={"model": "res.partner"}))

@@ -60,7 +60,7 @@ class DwoDashboardShare(models.Model):
 
     def _log(self, action):
         Log = self.env["dwo.dashboard.share.log"].sudo()
-        Log.create([{"actor_id": self.env.uid, "page_name": share.page_id.sudo().name, "action": action,
+        Log.create([{"actor_id": self.env.uid, "page_id": share.page_id.id, "page_name": share.page_id.sudo().name, "action": action,
                      "target": share.target, "level": share.level} for share in self])
 
 
@@ -71,6 +71,7 @@ class DwoDashboardShareLog(models.Model):
     _order = "id desc"
 
     actor_id = fields.Many2one("res.users", required=True, ondelete="cascade", index=True)
+    page_id = fields.Integer(index=True)  # not a Many2one: the log outlives the page
     page_name = fields.Char()
     action = fields.Selection([("grant", "Shared"), ("change", "Level changed"), ("revoke", "Revoked")], required=True)
     target = fields.Char()

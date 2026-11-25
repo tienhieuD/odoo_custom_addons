@@ -1,39 +1,134 @@
+// Dynamic Dashboard. Colours come from Odoo's own CSS variables. NOTE: Odoo compiles Bootstrap without its "bs" prefix
+// (--body-bg, --border-color, --table-bg ...); a --bs-* name is silently empty and the whole declaration is dropped.
 .dwo-dashboard {
-    background: var(--bs-body-bg);
+    --dwo-gap: 12px; // between two cards (view and edit mode use the same value, or cards would jump)
+    --dwo-radius: 12px;
+    --dwo-card: #{$o-view-background-color}; // what Odoo paints a form with, in the light and in the dark bundle
+    --dwo-canvas: color-mix(in srgb, var(--body-color) 5%, var(--body-bg, #f8f9fa));
+    --dwo-line: var(--border-color, #dee2e6);
+    --dwo-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 2px 8px rgba(16, 24, 40, 0.05);
+    background: var(--dwo-canvas);
+    overflow-x: auto;
+    overflow-y: hidden;
 
+    // Opening the editor must not squeeze the page: the main area keeps its width (the screen minus the pages menu) and
+    // the whole dashboard scrolls sideways; the menu stays at the left and the editor at the right while it does.
+    @media (min-width: 768px) {
+        .dwo-main { flex: 0 0 calc(100% - 232px) !important; }
+        .dwo-pages { position: sticky; left: 0; z-index: 3; }
+        .dwo-explore-drawer { position: sticky; right: 0; z-index: 4; box-shadow: -6px 0 16px rgba(16, 24, 40, 0.12); }
+    }
+
+    // ------------------------------------------------------------------------------------------ pages (left)
     .dwo-pages {
-        width: 220px;
-        flex: 0 0 220px;
+        width: 232px;
+        flex: 0 0 232px;
         overflow-y: auto;
+        background: var(--dwo-card);
 
         .dwo-page-item {
+            position: relative;
             a { color: inherit; text-decoration: none; }
-            &.active { background: var(--bs-primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
+            &:hover { background: var(--secondary-bg); }
+            &.active { background: var(--primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
+            .dwo-page-handle { cursor: grab; opacity: 0; width: 14px; color: var(--secondary-color); flex: 0 0 14px; touch-action: none; }
             .dwo-page-more { opacity: 0; transition: opacity 0.15s; }
-            &:hover .dwo-page-more, &.active .dwo-page-more { opacity: 1; }
+            &:hover .dwo-page-more, &.active .dwo-page-more,
+            &:hover .dwo-page-handle { opacity: 1; }
             .dwo-page-popover { right: 0; top: 100%; z-index: 30; min-width: 140px; }
         }
+        .dwo-page-item.o_dragged, .dwo-page-item.dwo-dragging { box-shadow: var(--dwo-shadow); background: var(--dwo-card); z-index: 5; }
+        .dwo-page-ghost { opacity: 0.4; }
     }
+    @media (hover: none) {
+        .dwo-pages .dwo-page-item { .dwo-page-handle, .dwo-page-more { opacity: 1; } }
+    }
+
+    // ------------------------------------------------------------------------------------------ toolbar and canvas
+    .dwo-toolbar { background: var(--dwo-card); min-height: 48px; flex: 0 0 auto; }
+    .dwo-canvas { padding: var(--dwo-gap); min-width: 0; }
+    .dwo-main { min-width: 0; }
 
     .dwo-grid {
         display: grid;
         grid-template-columns: repeat(var(--dwo-cols, 12), minmax(0, 1fr));
         grid-auto-rows: var(--dwo-row, 80px);
-        gap: 8px;
+        gap: var(--dwo-gap);
     }
 
+    // ------------------------------------------------------------------------------------------ the cards
     .dwo-card {
-        background: var(--bs-body-bg);
-        border: 1px solid var(--bs-border-color);
-        border-radius: 6px;
+        background: var(--dwo-card);
+        border: 1px solid var(--dwo-line);
+        border-radius: var(--dwo-radius);
+        box-shadow: var(--dwo-shadow);
         overflow: hidden;
+        // the header and the body share the same left and right space (16px), so the icon, the title and the chart line up
+        .dwo-card-header { padding: 0 16px; min-height: 46px; border-bottom: 1px solid var(--dwo-line); flex: 0 0 auto; }
+        .dwo-card-icon { color: var(--primary); width: 1.1em; text-align: center; }
+        .dwo-card-title { font-weight: 600; font-size: 0.95rem; }
+        .dwo-card-body { padding: 12px 16px 16px; }
+        .dwo-card-body.dwo-flush { padding: 0; }
     }
 
-    .dwo-kpi-value { font-size: 2.2rem; font-weight: 600; line-height: 1.1; }
+    // gridstack (edit mode): the item is the card, spaced like the view grid
+    .dwo-grid-edit { margin: calc(var(--dwo-gap) / -2); }
+    .grid-stack > .grid-stack-item > .grid-stack-item-content {
+        overflow: hidden;
+        inset: calc(var(--dwo-gap) / 2);
+        background: transparent;
+    }
+    .dwo-grid-edit .dwo-card {
+        height: 100%;
+        outline: 1px dashed color-mix(in srgb, var(--primary) 45%, transparent);
+        outline-offset: -1px;
+        .dwo-card-header { cursor: move; }
+    }
+
+    // ------------------------------------------------------------------------------------------ numbers
+    .dwo-kpi-content { padding-top: 8px; padding-bottom: 8px; &.has-trend { padding-bottom: 12%; } position: relative; z-index: 1; }
+    .dwo-kpi-value { font-size: 2.2rem; font-weight: 600; line-height: 1.15; }
+    .dwo-kpi-affix { font-size: 1.3rem; font-weight: 400; margin: 0 2px; opacity: 0.7; }
     .dwo-kpi-label { font-size: 0.85rem; }
+    .dwo-kpi-delta { font-size: 0.95rem; margin-top: 2px; }
+    // the trend is a background: full width, stuck to the bottom edge, a quarter to a third of the card
+    .dwo-kpi-trend { position: absolute; left: 0; right: 0; bottom: 0; height: 30%; min-height: 40px; z-index: 0; pointer-events: auto; }
+    .dwo-kpi-trend svg { display: block; width: 100%; height: 100%; }
+    .dwo-spark-line { fill: none; stroke: var(--primary, #2997ff); stroke-width: 2; stroke-linejoin: round; }
+    .dwo-spark-area { fill: var(--primary, #2997ff); opacity: 0.14; stroke: none; }
+    .dwo-note { white-space: nowrap; }
 
-    .dwo-table th { position: sticky; top: 0; background: var(--bs-body-bg); }
+    // ------------------------------------------------------------------------------------------ tables and pivots
+    // The header stays on top while the rows scroll under it: every cell has the card's own colour (Bootstrap paints
+    // cells with --table-bg and an inset shadow, so that is the variable to set, not a background on the th).
+    .dwo-table, .dwo-pivot {
+        --table-bg: var(--dwo-card);
+        --table-hover-bg: var(--secondary-bg);
+        --table-accent-bg: transparent;
+        --table-striped-bg: transparent;
+        thead { position: sticky; top: 0; z-index: 3; }
+        thead th { background: var(--dwo-card); box-shadow: inset 0 -1px 0 var(--dwo-line); white-space: nowrap; font-weight: 600; }
+        td, th { vertical-align: middle; }
+    }
+    .dwo-pivot {
+        th, td { white-space: nowrap; }
+        tbody th, tfoot th { position: sticky; left: 0; z-index: 2; background: var(--dwo-card); box-shadow: inset -1px 0 0 var(--dwo-line); }
+        thead tr:first-child th:first-child { position: sticky; left: 0; z-index: 4; }
+        th.dwo-pick { cursor: pointer; &:hover { color: var(--primary); } }
+    }
+    .dwo-table th, .dwo-table td { white-space: nowrap; }
+    .dwo-table, .dwo-pivot { margin: 0; th:first-child, td:first-child { padding-left: 16px; } th:last-child, td:last-child { padding-right: 16px; } }
+    .dwo-row-link { cursor: pointer; &:hover td { background: var(--secondary-bg); } }
+    // a scroll cue at the edges that still hide something
+    .dwo-table-wrap, .dwo-pivot-wrap {
+        background:
+            linear-gradient(to right, var(--dwo-card) 30%, transparent) 0 0 / 40px 100% no-repeat local,
+            linear-gradient(to left, var(--dwo-card) 30%, transparent) 100% 0 / 40px 100% no-repeat local,
+            radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, 0.1), transparent) 0 0 / 8px 100% no-repeat scroll,
+            radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, 0.1), transparent) 100% 0 / 8px 100% no-repeat scroll;
+    }
 
+    // ------------------------------------------------------------------------------------------ menus and editors
     .dwo-filter-menu {
         top: 100%;
         left: 0;
@@ -41,72 +136,26 @@
         min-width: 200px;
         max-height: 260px;
         overflow-y: auto;
-        .dwo-filter-option { cursor: pointer; padding: 2px 4px; &:hover { background: var(--bs-secondary-bg); } }
+        .dwo-filter-option { cursor: pointer; padding: 2px 4px; &:hover { background: var(--secondary-bg); } }
     }
-
-    .dwo-explore-drawer {
-        width: 480px;
-        flex: 0 0 480px;
-        background: var(--bs-body-bg);
-    }
-
-    // gridstack: the items are the cards
-    .grid-stack > .grid-stack-item > .grid-stack-item-content {
-        overflow: hidden;
-        inset: 4px;
-    }
-    .dwo-grid-edit .dwo-card-header { cursor: move; }
+    .dwo-filter-editor-wrap { top: 100%; left: 0; z-index: 40; width: 340px; margin-top: 4px; }
+    .dwo-explore-drawer { width: 480px; flex: 0 0 480px; background: var(--dwo-card); }
+    .dwo-empty { background: var(--dwo-card); border: 1px dashed var(--dwo-line); border-radius: var(--dwo-radius); }
 }
 
 .dwo-explore {
     label.form-label { display: block; }
-}
-
-.dwo-dashboard {
-    .dwo-filter-editor-wrap { top: 100%; left: 0; z-index: 40; width: 340px; margin-top: 4px; }
-    .dwo-kpi-value { font-size: 2.4rem; font-weight: 600; line-height: 1.1; }
-    .dwo-kpi-affix { font-size: 1.3rem; font-weight: 400; margin: 0 2px; opacity: 0.7; }
-    .dwo-kpi-delta { font-size: 0.95rem; margin-top: 2px; }
-    .dwo-row-link { cursor: pointer; &:hover td { background: var(--bs-secondary-bg); } }
-    .dwo-note { white-space: nowrap; }
-}
-
-.dwo-explore {
-    .dwo-explore-preview { height: 260px; flex: 0 0 260px; padding: 8px; background: var(--bs-tertiary-bg); }
+    .dwo-icon-menu { top: 100%; left: 0; z-index: 30; width: 100%; margin-top: 4px; .btn { width: 32px; height: 32px; padding: 0; } }
+    .dwo-explore-preview { height: 260px; flex: 0 0 260px; padding: 8px; background: var(--tertiary-bg); }
     .dwo-visual {
         display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
         width: 78px; height: 62px; font-size: 0.72rem; line-height: 1.1; text-align: center;
-        border: 1px solid var(--bs-border-color); border-radius: 6px; background: var(--bs-body-bg); color: inherit;
-        &:hover { border-color: var(--bs-primary); }
-        &.active { border-color: var(--bs-primary); background: var(--bs-primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
+        border: 1px solid var(--border-color); border-radius: 8px; background: var(--body-bg); color: inherit;
+        &:hover { border-color: var(--primary); }
+        &.active { border-color: var(--primary); background: var(--primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
     }
     .dwo-dataset-list { z-index: 20; max-height: 280px; overflow-y: auto; top: 100%; }
-    .dwo-dataset-option { cursor: pointer; &:hover { background: var(--bs-secondary-bg); } }
-}
-
-// phone: the pages become a strip on top and the widgets one column, in reading order
-@media (max-width: 767px) {
-    .dwo-dashboard {
-        flex-direction: column;
-        .dwo-pages { width: 100%; flex: 0 0 auto; flex-direction: row !important; overflow-x: auto; padding: 4px; }
-        .dwo-pages > div:first-child { flex: 0 0 auto; }
-        .dwo-page-item { flex: 0 0 auto; }
-        .dwo-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
-        .dwo-grid-item {
-            grid-column: 1 / -1 !important;
-            grid-row: auto !important;
-            height: calc(var(--dwo-h, 3) * var(--dwo-row, 80px) + (var(--dwo-h, 3) - 1) * 8px);
-            min-height: 160px;
-        }
-        .dwo-explore-drawer { position: fixed; inset: 0; width: 100%; flex: none; z-index: 1050; }
-        .dwo-explore-preview { height: 200px !important; flex-basis: 200px !important; }
-    }
-}
-
-.dwo-dashboard {
-    .dwo-kpi-trend svg { display: block; overflow: visible; }
-    .dwo-spark-line { fill: none; stroke: var(--bs-primary, #2997ff); stroke-width: 2; stroke-linejoin: round; }
-    .dwo-spark-area { fill: var(--bs-primary, #2997ff); opacity: 0.12; stroke: none; }
+    .dwo-dataset-option { cursor: pointer; &:hover { background: var(--secondary-bg); } }
 }
 
 .dwo-pick-menu {
@@ -114,5 +163,30 @@
     z-index: 1060;
     min-width: 13rem;
     transform: translate(8px, 8px);
+    border-radius: 10px;
 }
-.dwo-pick { cursor: pointer; text-decoration: underline dotted; }
+
+.dwo-share-level { min-width: 6.5rem; }
+
+// phone: the pages become a strip on top and the widgets one column, in reading order
+@media (max-width: 767px) {
+    .dwo-dashboard {
+        flex-direction: column;
+        overflow-y: auto !important;
+        .dwo-pages { width: 100%; flex: 0 0 auto; flex-direction: row !important; align-items: center; overflow-x: auto; overflow-y: hidden; padding: 4px; }
+        .dwo-pages > div:first-child { flex: 0 0 auto; }
+        .dwo-page-item { flex: 0 0 auto; white-space: nowrap; .dwo-page-handle { display: none !important; } }
+        .dwo-main { flex: 0 0 auto !important; overflow: visible !important; }
+        .dwo-canvas { overflow: visible !important; }
+        .dwo-grid { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
+        .dwo-grid-item {
+            grid-column: 1 / -1 !important;
+            grid-row: auto !important;
+            min-width: 0;
+            height: calc(var(--dwo-h, 3) * var(--dwo-row, 80px) + (var(--dwo-h, 3) - 1) * var(--dwo-gap));
+            min-height: 160px;
+        }
+        .dwo-explore-drawer { position: fixed; inset: 0; width: 100%; flex: none; z-index: 1050; }
+        .dwo-explore-preview { height: 200px !important; flex-basis: 200px !important; }
+    }
+}

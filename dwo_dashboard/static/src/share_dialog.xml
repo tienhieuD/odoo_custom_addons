@@ -9,7 +9,7 @@
             <div class="d-flex gap-2 mb-2">
                 <input class="form-control dwo-share-search" placeholder="Add a person or a group..." t-att-value="state.query"
                        t-on-input="onQuery"/>
-                <select class="form-select w-auto dwo-share-newlevel" t-model="state.level">
+                <select class="form-select w-auto dwo-share-level dwo-share-newlevel" t-model="state.level">
                     <option value="view">View</option>
                     <option value="edit">Edit</option>
                 </select>
@@ -27,7 +27,7 @@
                 <tr t-foreach="state.shares" t-as="s" t-key="s.id">
                     <td><i t-attf-class="fa #{s.kind === 'group' ? 'fa-users' : 'fa-user'}"/> <t t-out="s.name"/></td>
                     <td class="text-end">
-                        <select class="form-select form-select-sm d-inline-block w-auto" t-on-change="(ev) => this.setLevel(s, ev)">
+                        <select class="form-select form-select-sm d-inline-block w-auto dwo-share-level" t-on-change="(ev) => this.setLevel(s, ev)">
                             <option value="view" t-att-selected="s.level === 'view'">View</option>
                             <option value="edit" t-att-selected="s.level === 'edit'">Edit</option>
                         </select>
@@ -35,10 +35,10 @@
                     </td>
                 </tr>
             </table>
-            <a href="#" class="small d-block mt-2" t-on-click.prevent="toggleLog">History of my sharing</a>
+            <a href="#" class="small d-block mt-2" t-on-click.prevent="toggleLog">History of this page</a>
             <table t-if="state.log" class="table table-sm small mt-1">
                 <tr t-foreach="state.log" t-as="r" t-key="r.id">
-                    <td t-out="r.create_date"/><td t-out="r.action"/><td t-out="r.page_name"/><td t-out="r.target"/><td t-out="r.level"/>
+                    <td class="text-muted text-nowrap" t-out="r.when"/><td t-out="r.text"/><td class="text-end text-muted" t-out="r.level"/>
                 </tr>
             </table>
             <t t-set-slot="footer">

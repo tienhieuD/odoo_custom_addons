@@ -480,6 +480,11 @@
           "minLength": 1,
           "maxLength": 120
         },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
+        },
         "x": {
           "type": "integer",
           "minimum": 0,
@@ -676,6 +681,11 @@
           "minLength": 1,
           "maxLength": 120
         },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
+        },
         "x": {
           "type": "integer",
           "minimum": 0,
@@ -832,6 +842,11 @@
           "minLength": 1,
           "maxLength": 120
         },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
+        },
         "x": {
           "type": "integer",
           "minimum": 0,
@@ -958,6 +973,11 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 120
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
         },
         "x": {
           "type": "integer",
@@ -1138,6 +1158,11 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 120
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
         },
         "x": {
           "type": "integer",
@@ -1329,6 +1354,11 @@
           "minLength": 1,
           "maxLength": 120
         },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
+        },
         "x": {
           "type": "integer",
           "minimum": 0,
@@ -1455,6 +1485,11 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 120
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
         },
         "x": {
           "type": "integer",
@@ -1590,6 +1625,11 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 120
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$",
+          "maxLength": 50
         },
         "x": {
           "type": "integer",

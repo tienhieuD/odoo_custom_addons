@@ -77,6 +77,14 @@ class TestPageStructure(TransactionCase):
         found = self.codes(spec)
         self.assertLessEqual({("/schema", "schema"), ("/colour", "unknown_key"), ("/widgets", "required")}, found)
 
+    def test_the_icon_of_a_widget(self):
+        spec = page()
+        widget(spec, "total")["icon"] = "fa-line-chart"
+        self.assertEqual(self.codes(spec), set())
+        for bad in ("fa fa-list", "list", "fa-", "FA-list", "fa-list;color:red", "<b>", 5, "", "fa-" + "a" * 60):
+            widget(spec, "total")["icon"] = bad
+            self.assertTrue(any(path == "/widgets/0/icon" for path, _code in self.codes(spec)), bad)
+
     def test_paths_are_json_pointers(self):
         spec = page()
         widget(spec, "total")["wells"]["value"]["agg"] = "sum"  # a metric item cannot also have an agg

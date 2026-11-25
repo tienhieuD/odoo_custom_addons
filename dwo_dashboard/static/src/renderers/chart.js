@@ -259,7 +259,7 @@ export class ChartRenderer extends Component {
                 indexAxis: horizontal ? "y" : "x",
                 plugins: {
                     legend: { display: legend !== "none", position: legend === "none" ? "top" : legend,
-                              labels: { color: text } },
+                              labels: { color: text, usePointStyle: true, boxWidth: 8, boxHeight: 8 } },
                     tooltip: {
                         callbacks: {
                             title: (items) => {

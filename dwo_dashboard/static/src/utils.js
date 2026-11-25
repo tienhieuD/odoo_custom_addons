@@ -1,6 +1,8 @@
 /** @odoo-module **/
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import { cookie } from "@web/core/browser/cookie";
+import { formatDateTime } from "@web/core/l10n/dates";
+import { localization } from "@web/core/l10n/localization";
 import { _t } from "@web/core/l10n/translation";
 import { getColor } from "@web/core/colors/colors";
 import { formatCurrency } from "@web/core/currency";
@@ -8,6 +10,7 @@ import { user } from "@web/core/user";
 
 export const COLS_DEFAULT = 12;
 export const ROW_HEIGHT = 80;
+export const GAP = 12; // px between two cards: the same as --dwo-gap in dashboard.scss
 
 /** The colour of the ``index``-th series or slice. ``total``: how many there are, so that a short list gets the
  * 6 clearly different colours of Odoo's small palette (the default palette is a gradient of blues). */
@@ -106,4 +109,31 @@ export function primaryItem(widget) {
 export function drillChain(widget) {
     const item = primaryItem(widget);
     return item && INTERVALS.includes(item.interval) ? INTERVALS.slice(INTERVALS.indexOf(item.interval)) : [];
+}
+
+/** A date and time in the viewer's format, without the seconds. */
+export function formatDateTimeShort(value) {
+    return formatDateTime(value, { format: localization.dateTimeFormat.replace(/[:.]ss/, "") });
+}
+
+/** The icon in front of a widget's title when the author chose none: one per kind of widget (Font Awesome 4, as in Odoo). */
+export const DEFAULT_ICONS = {
+    kpi: "fa-hashtag", table: "fa-list", pivot: "fa-th", bar: "fa-bar-chart", line: "fa-line-chart",
+    area: "fa-area-chart", pie: "fa-pie-chart", doughnut: "fa-circle-o-notch",
+};
+export const DEFAULT_ICON = "fa-square-o"; // a widget type added by a plugin
+
+/** A short list to choose from (any `fa-*` name is valid in the spec). */
+export const ICON_CHOICES = [
+    "fa-hashtag", "fa-list", "fa-th", "fa-table", "fa-bar-chart", "fa-line-chart", "fa-area-chart", "fa-pie-chart",
+    "fa-money", "fa-usd", "fa-shopping-cart", "fa-credit-card", "fa-percent", "fa-balance-scale",
+    "fa-users", "fa-user", "fa-handshake-o", "fa-building", "fa-briefcase", "fa-globe",
+    "fa-truck", "fa-cube", "fa-cubes", "fa-tags", "fa-ticket", "fa-wrench",
+    "fa-calendar", "fa-clock-o", "fa-envelope", "fa-phone", "fa-comments", "fa-bell",
+    "fa-star", "fa-heart", "fa-flag", "fa-bolt", "fa-fire", "fa-trophy", "fa-bullseye", "fa-rocket",
+    "fa-check-circle", "fa-exclamation-triangle", "fa-info-circle", "fa-eye",
+];
+
+export function widgetIcon(widget) {
+    return widget.icon || DEFAULT_ICONS[widget.type] || DEFAULT_ICON;
 }

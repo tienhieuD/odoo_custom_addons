@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.PageNameDialog">
+        <Dialog title="props.title" size="'sm'">
+            <label class="form-label" for="dwo-page-name-input">Name</label>
+            <input id="dwo-page-name-input" class="form-control dwo-page-name-input" t-ref="input" t-model="state.name"
+                   t-att-maxlength="max" placeholder="e.g. Sales overview" t-on-keydown="onKeydown"/>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary dwo-page-name-ok" t-att-disabled="!valid or state.busy" t-on-click="confirm">
+                    <t t-out="props.confirmLabel or 'OK'"/>
+                </button>
+                <button class="btn btn-secondary dwo-page-name-cancel" t-on-click="props.close">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

@@ -6,11 +6,13 @@ import { loadCSS, loadJS } from "@web/core/assets";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { useSortable } from "@web/core/utils/sortable_owl";
+import { PageNameDialog } from "./page_name_dialog";
 import { ExplorePanel } from "./explore_panel";
 import { ShareDialog } from "./share_dialog";
 import { FilterBar } from "./filter_bar";
 import { FilterEditor } from "./filter_editor";
-import { COLS_DEFAULT, INTERVAL_LABELS, ROW_HEIGHT, drillChain, newWidgetId, nextPosition } from "./utils";
+import { COLS_DEFAULT, GAP, INTERVAL_LABELS, ROW_HEIGHT, drillChain, newWidgetId, nextPosition } from "./utils";
 import { WidgetCard } from "./widget_card";
 import "./renderers/index";
 
@@ -38,13 +40,23 @@ export class DashboardAction extends Component {
         this.dialog = useService("dialog");
         this.action = useService("action");
         this.gridRef = useRef("grid");
+        this.pagesRef = useRef("pages");
+        // the pages are sorted by their handle only (it shows on hover); the other parts of an item stay clickable
+        useSortable({
+            ref: this.pagesRef,
+            elements: ".dwo-page-own",
+            handle: ".dwo-page-handle",
+            cursor: "grabbing",
+            delay: 0,
+            onDrop: ({ element, previous }) => this.dropPage(element, previous),
+        });
         this.grid = null;
         this.tokens = {};
         this.saved = new Map(); // widget id -> JSON of the saved widget (decides run_widget or run_preview)
         this.state = useState({
             ready: false, pages: [], shared: [], level: "owner", owner: "", pageId: null, name: "", revision: 0,
             spec: { schema: "dwo-dashboard/1", widgets: [] }, savedSpec: "", editing: false, snapshot: null,
-            data: {}, filterValues: {}, explore: null, renaming: null, saving: false, pageMenu: null, filterEditor: false,
+            data: {}, filterValues: {}, explore: null, saving: false, pageMenu: null, filterEditor: false,
             select: null, drills: {}, pick: null, // what was clicked (cross-filter, drill-down); never saved
         });
         useExternalListener(window, "click", () => {
@@ -85,6 +97,11 @@ export class DashboardAction extends Component {
     /** Owner or editor: the rest read only. */
     get canEdit() {
         return this.state.level !== "view";
+    }
+
+    /** Laying out a grid needs a real screen: on a phone the dashboard is for reading (decision to confirm with the owner). */
+    get canEditHere() {
+        return this.canEdit && !this.env.isSmall;
     }
 
     get isOwner() {
@@ -164,31 +181,32 @@ export class DashboardAction extends Component {
         });
     }
 
-    async addPage() {
-        const created = await this.orm.create("dwo.dashboard.page", [
-            { name: _t("New page"), dashboard_id: this.dashboardId },
-        ]);
-        const dashboard = await this.orm.call("dwo.dashboard", "get_my_dashboard", []);
-        this.state.pages = dashboard.pages;
-        await this.openPage(created[0]);
-        this.state.renaming = { id: created[0], name: _t("New page") };
+    /** "+": ask for a name first; the page exists only after OK. */
+    addPage() {
+        this.dialog.add(PageNameDialog, {
+            title: _t("New page"),
+            confirmLabel: _t("Create"),
+            onConfirm: async (name) => {
+                const created = await this.orm.create("dwo.dashboard.page", [{ name, dashboard_id: this.dashboardId }]);
+                await this.refreshLists();
+                await this.openPage(created[0]);
+            },
+        });
     }
 
     startRename(page) {
-        this.state.renaming = { id: page.id, name: page.name };
-    }
-
-    async finishRename() {
-        const r = this.state.renaming;
-        this.state.renaming = null;
-        if (!r || !r.name.trim()) {
-            return;
-        }
-        await this.orm.write("dwo.dashboard.page", [r.id], { name: r.name.trim() });
-        this.state.pages.find((p) => p.id === r.id).name = r.name.trim();
-        if (r.id === this.state.pageId) {
-            this.state.name = r.name.trim();
-        }
+        this.state.pageMenu = null;
+        this.dialog.add(PageNameDialog, {
+            title: _t("Rename page"),
+            initial: page.name,
+            onConfirm: async (name) => {
+                await this.orm.write("dwo.dashboard.page", [page.id], { name });
+                this.state.pages.find((p) => p.id === page.id).name = name;
+                if (page.id === this.state.pageId) {
+                    this.state.name = name;
+                }
+            },
+        });
     }
 
     async duplicatePage(page) {
@@ -214,6 +232,25 @@ export class DashboardAction extends Component {
         });
     }
 
+    async dropPage(element, previous) {
+        const moved = Number(element.dataset.pageId);
+        const ids = this.state.pages.map((p) => p.id).filter((id) => id !== moved);
+        const after = previous && previous.dataset.pageId ? ids.indexOf(Number(previous.dataset.pageId)) : -1;
+        ids.splice(after + 1, 0, moved);
+        await this.saveOrder(ids);
+    }
+
+    async saveOrder(ids) {
+        const before = this.state.pages;
+        this.state.pages = ids.map((id) => before.find((p) => p.id === id));
+        try {
+            await this.orm.call("dwo.dashboard.page", "reorder", [ids]);
+        } catch (error) {
+            this.state.pages = before;
+            throw error;
+        }
+    }
+
     async movePage(page, delta) {
         const ids = this.state.pages.map((p) => p.id);
         const from = ids.indexOf(page.id);
@@ -222,8 +259,7 @@ export class DashboardAction extends Component {
             return;
         }
         ids.splice(to, 0, ids.splice(from, 1)[0]);
-        await this.orm.call("dwo.dashboard.page", "reorder", [ids]);
-        this.state.pages = ids.map((id) => this.state.pages.find((p) => p.id === id));
+        await this.saveOrder(ids);
     }
 
     // --------------------------------------------------------------------------------------------- widgets
@@ -251,7 +287,8 @@ export class DashboardAction extends Component {
         const chain = drillChain(widget);
         const next = chain[steps.length + 1];
         this.state.pick = {
-            widget, key: pick.key, label: pick.label, x: pick.x, y: pick.y,
+            widget, key: pick.key, label: pick.label,
+            x: Math.max(8, Math.min(pick.x, window.innerWidth - 240)), y: Math.max(8, Math.min(pick.y, window.innerHeight - 190)),
             selected: !!this.state.select && this.state.select.widget === widget.id && this.state.select.key === pick.key,
             drillTo: next ? INTERVAL_LABELS[next] : null,
         };
@@ -463,7 +500,7 @@ export class DashboardAction extends Component {
         }
         this.destroyGrid();
         this.grid = window.GridStack.init(
-            { column: this.cols, cellHeight: ROW_HEIGHT, margin: 4, float: false, animate: false,
+            { column: this.cols, cellHeight: ROW_HEIGHT + GAP, margin: GAP / 2, float: false, animate: false,
               handle: ".dwo-card-header", disableOneColumnMode: true },
             el
         );

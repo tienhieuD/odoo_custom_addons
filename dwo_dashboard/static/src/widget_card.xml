@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="dwo_dashboard.WidgetCard">
-        <div class="dwo-card d-flex flex-column h-100" t-att-data-widget-id="props.widget.id">
-            <div class="dwo-card-header d-flex align-items-center gap-2 px-2 pt-1">
-                <span class="dwo-card-title flex-grow-1 text-truncate fw-bold" t-out="title"/>
+        <div class="dwo-card d-flex flex-column h-100" t-att-data-widget-id="props.widget.id" t-att-data-type="props.widget.type">
+            <div class="dwo-card-header d-flex align-items-center gap-2">
+                <i t-attf-class="fa #{icon} dwo-card-icon"/>
+                <span class="dwo-card-title flex-grow-1 text-truncate" t-out="title"/>
                 <span t-if="props.drill and props.drill.length" class="dwo-drill small text-muted text-truncate">
                     <t t-foreach="props.drill" t-as="step" t-key="step_index"><t t-if="step_index"> › </t><t t-out="step"/></t>
                     <button class="btn btn-sm btn-link p-0 ms-1 dwo-drill-up" t-on-click.stop="() => props.onDrillUp(props.widget)"
@@ -18,7 +19,7 @@
                             title="Remove"><i class="fa fa-trash"/></button>
                 </t>
             </div>
-            <div class="dwo-card-body flex-grow-1 position-relative p-2 overflow-hidden">
+            <div t-attf-class="dwo-card-body flex-grow-1 position-relative overflow-hidden #{flush ? 'dwo-flush' : ''}">
                 <div t-if="!props.entry or props.entry.loading" class="d-flex h-100 align-items-center justify-content-center text-muted">
                     <i class="fa fa-circle-o-notch fa-spin"/>
                 </div>

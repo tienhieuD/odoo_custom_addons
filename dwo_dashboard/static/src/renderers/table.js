@@ -2,8 +2,8 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import { Component } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { deserializeDate, deserializeDateTime, formatDate, formatDateTime } from "@web/core/l10n/dates";
-import { formatNumber } from "../utils";
+import { deserializeDate, deserializeDateTime, formatDate } from "@web/core/l10n/dates";
+import { formatDateTimeShort, formatNumber } from "../utils";
 
 export class TableRenderer extends Component {
     static template = "dwo_dashboard.TableRenderer";
@@ -43,7 +43,7 @@ export class TableRenderer extends Component {
             case "date":
                 return formatDate(deserializeDate(value));
             case "datetime":
-                return formatDateTime(deserializeDateTime(value));
+                return formatDateTimeShort(deserializeDateTime(value));
             case "boolean":
                 return value ? "✓" : "";
             case "selection":

@@ -7,7 +7,9 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour", {
     steps: () => [
         { trigger: ".dwo-dashboard .dwo-page-item.active .dwo-page-name:contains(Home)" },
         { trigger: ".dwo-empty" },
-        // "+ Add widget" works from the view mode: it switches to editing by itself
+        // "Add widget" lives in the edit mode only
+        { trigger: ".dwo-dashboard:not(:has(.dwo-add-widget))" },
+        { trigger: ".dwo-edit", run: "click" },
         { trigger: ".dwo-add-widget", run: "click" },
         { trigger: ".dwo-dataset-input", run: "edit Contact" },
         { trigger: ".dwo-dataset-option:contains(res.partner)", run: "click" },
@@ -19,7 +21,13 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour", {
         // and a small trend line under the number
         { trigger: ".dwo-trend-toggle", run: "click" },
         { trigger: ".dwo-explore-preview .dwo-kpi-trend svg" },
+        // the icon in front of the title: the default of the type until one is chosen
+        { trigger: ".dwo-icon-button .fa-hashtag" },
+        { trigger: ".dwo-icon-button", run: "click" },
+        { trigger: ".dwo-icon-choice[title=fa-money]", run: "click" },
+        { trigger: ".dwo-icon-button .fa-money" },
         { trigger: ".dwo-explore-apply:not(:disabled)", run: "click" },
+        { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w1] .dwo-card-icon.fa-money" },
         { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w1] .dwo-kpi-delta" },
         // a bar chart: the axis selector is already there, "Count" is already chosen
         { trigger: ".dwo-add-widget", run: "click" },
@@ -30,6 +38,7 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour", {
         { trigger: ".dwo-explore-preview canvas" },
         { trigger: ".dwo-explore-apply:not(:disabled)", run: "click" },
         { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w2] canvas" },
+        { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w2] .dwo-card-icon.fa-bar-chart" },
         // a page filter, bound by itself to both widgets
         { trigger: ".dwo-add-filter", run: "click" },
         { trigger: ".dwo-filter-add:not(:disabled)", run: "click" },
@@ -66,9 +75,16 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour_reload", {
         { trigger: ".dwo-done", run: "click" },
         { trigger: ".dwo-grid .dwo-grid-item[style*='span 8'] [data-widget-id=w1]" },
         // a second page, with the "+" of the page list
+        // Cancel creates nothing
         { trigger: ".dwo-page-add", run: "click" },
-        { trigger: ".dwo-page-rename", run: "edit Sales" },
-        { trigger: ".dwo-title", run: "click" },
+        { trigger: ".dwo-page-name-input", run: "edit Ghost" },
+        { trigger: ".dwo-page-name-cancel", run: "click" },
+        { trigger: ".dwo-pages:not(:has(.dwo-page-name:contains(Ghost)))" },
+        // an empty name cannot be confirmed; OK creates the page and opens it
+        { trigger: ".dwo-page-add", run: "click" },
+        { trigger: ".dwo-page-name-ok:disabled" },
+        { trigger: ".dwo-page-name-input", run: "edit Sales" },
+        { trigger: ".dwo-page-name-ok:not(:disabled)", run: "click" },
         { trigger: ".dwo-page-item .dwo-page-name:contains(Sales)" },
         { trigger: ".dwo-empty" },
     ],

@@ -3,6 +3,7 @@
 import { Component } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
+import { widgetIcon } from "./utils";
 
 /** One widget of the grid: title, state (loading / error / data) and the renderer of its visual type. Tolerant on
  * render: an unknown type or an error in this widget never touches the others. */
@@ -25,6 +26,15 @@ export class WidgetCard extends Component {
 
     get pickHandler() {
         return this.props.onPick ? (pick) => this.props.onPick(this.props.widget, pick) : undefined;
+    }
+
+    get icon() {
+        return widgetIcon(this.props.widget);
+    }
+
+    /** Tables and pivots run edge to edge in the card; the KPI draws its own trend to the edges. */
+    get flush() {
+        return ["table", "pivot", "kpi"].includes(this.props.widget.type);
     }
 
     get title() {

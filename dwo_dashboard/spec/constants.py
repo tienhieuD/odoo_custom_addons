@@ -61,6 +61,7 @@ MAX_HEIGHT = 40
 
 ID_PATTERN = r"^[a-z][a-z0-9_]{0,31}$"
 MODEL_PATTERN = r"^[a-z][a-z0-9_.]{0,63}$"
+ICON_PATTERN = r"^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$"  # a Font Awesome 4 class (the set Odoo ships), without the "fa" prefix class
 FIELD_PATTERN = r"^[a-z_][a-z0-9_]{0,63}$"
 FIELD_PATH_PATTERN = r"^[a-z_][a-z0-9_]{0,63}(\.[a-z_][a-z0-9_]{0,63}){0,4}$"
 COLUMN_PATTERN = r"^[a-z_][a-z0-9_]{0,62}$"

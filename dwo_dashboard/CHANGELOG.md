@@ -1,5 +1,28 @@
 # Changelog
 
+## Interface pass 3 (not released)
+- New widget key `icon` (a Font Awesome class) shown before the title; default per type (KPI `fa-hashtag`, table `fa-list`, pivot
+  `fa-th`, charts their own). Chosen in Explore ("Icon and title"). Schema snapshot, `check_schema.py` and tests updated.
+- Card header: more space (46 px, 16 px at the sides, the same as the body) and a border under it.
+- KPI: one block centred in the card both ways; the trend is a background, full width, stuck to the bottom edge, 30% of the card.
+- Tables and pivots run edge to edge in the card (their first and last cells keep the 16 px).
+
+## Interface pass 2 (not released)
+- Cards: white, rounded, soft shadow, on a faint grey canvas; the gap between cards is one value (12 px) shared by the view and
+  the edit mode (gridstack uses `cellHeight = row + gap`, so a card has the same height in both).
+- Colours use Odoo's own CSS variables, which are NOT prefixed in Odoo 19 (`--body-bg`, `--border-color`, `--table-bg`): a
+  `--bs-*` name is empty and drops the whole declaration. This was why table headers had no background and overlapped rows.
+- "Arrange" is "Edit", "Cancel" is "Discard" (as in Odoo forms); "Add widget" and "Add filter" only show while editing; buttons are
+  Odoo's standard ones with `gap-1`.
+- "+" asks for a name in a dialog and creates the page on OK only (Enter works, empty is refused); rename uses the same dialog.
+  A new page goes to the end of the list.
+- Pages are reordered by dragging their handle (shown on hover, always on touch screens; not on a phone, where "Move up/down"
+  stays). Dragging by the name does nothing.
+- Tables and pivots: sticky header with the card's colour, pivot with a sticky first column, no wrapping, scroll shadows; dates
+  without seconds; chart legends use round markers; KPI content starts at the same height in every card; the demo KPIs are 3 rows high.
+- Share dialog: select no longer overlaps its arrow, the history is of the page, with words and local times.
+- The click menu stays inside the window.
+
 ## Phase 2 (not released): sharing and interaction
 - **Sharing**: a page can be shared with users and groups (`dwo.dashboard.share`), level View or Edit. Recipients see it under
   "Shared with me" and run every widget with their own access rights. Editors change the content only (spec); the owner alone
@@ -23,7 +46,7 @@
   numbers right-aligned, rows can open the record; empty widgets say "No data"; notes such as "Top 8" are muted.
 - Explore: one selector per required well already in place and "Count" already chosen, icons for the visuals, the preview on
   top, a searchable data list (this page's data first, then recent), titles written for you ("Count by Country"), options with
-  readable names. "+ Add widget" works from the view mode. Page tools moved into a menu.
+  readable names. Page tools moved into a menu.
 - Page filters can now be created in the interface ("Add filter": a period, some records, or a choice), bound by themselves
   to every data source of the page that has the field.
 - Third pass: the options that were deferred: `y_min` / `y_max` (checked: lower than each other, not with `percent`), a KPI

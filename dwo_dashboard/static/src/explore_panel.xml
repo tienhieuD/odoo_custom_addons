@@ -170,8 +170,20 @@
                             </select>
                         </div>
                         <div class="col-12">
-                            <label class="form-label small">Title</label>
-                            <input class="form-control form-control-sm" t-att-placeholder="autoTitle" t-model="state.title"/>
+                            <label class="form-label small">Icon and title</label>
+                            <div class="input-group input-group-sm position-relative">
+                                <button type="button" class="btn btn-secondary dwo-icon-button" title="Choose the icon"
+                                        t-on-click="() => state.iconMenu = !state.iconMenu"><i t-attf-class="fa #{currentIcon}"/></button>
+                                <input class="form-control dwo-title-input" t-att-placeholder="autoTitle" t-model="state.title"/>
+                                <div t-if="state.iconMenu" class="dwo-icon-menu card shadow p-2 position-absolute">
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <button t-foreach="iconChoices" t-as="ic" t-key="ic" type="button" t-att-title="ic"
+                                                t-attf-class="btn btn-sm dwo-icon-choice #{ic === currentIcon ? 'btn-primary' : 'btn-light'}"
+                                                t-on-click="() => this.setIcon(ic)"><i t-attf-class="fa #{ic}"/></button>
+                                    </div>
+                                    <a href="#" class="small mt-2 d-block dwo-icon-default" t-on-click.prevent="() => this.setIcon('')">Use the default icon of this type</a>
+                                </div>
+                            </div>
                         </div>
                         <div t-foreach="optionList" t-as="opt" t-key="opt.name" t-attf-class="#{opt.kind === 'bool' ? 'col-12' : 'col-6'}">
                             <label t-if="opt.kind === 'bool'" class="form-check d-flex align-items-center gap-2 mb-0">

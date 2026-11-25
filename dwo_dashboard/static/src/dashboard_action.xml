@@ -1,37 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="dwo_dashboard.Dashboard">
-        <div class="dwo-dashboard d-flex h-100 overflow-hidden">
+        <div class="dwo-dashboard d-flex h-100">
             <t t-if="state.ready">
                 <!-- pages: the menu inside the dashboard -->
-                <nav class="dwo-pages border-end d-flex flex-column p-2 gap-1">
+                <nav class="dwo-pages border-end d-flex flex-column p-2 gap-1" t-ref="pages">
                     <div class="d-flex align-items-center mb-1">
                         <span class="fw-bold flex-grow-1">Pages</span>
-                        <button class="btn btn-sm btn-outline-secondary dwo-page-add" t-on-click="addPage" title="New page">+</button>
+                        <button class="btn btn-sm btn-secondary dwo-page-add" t-on-click="addPage" title="New page">+</button>
                     </div>
                     <div t-foreach="state.pages" t-as="page" t-key="page.id"
-                         t-attf-class="dwo-page-item d-flex align-items-center gap-1 rounded px-2 py-1 #{page.id === state.pageId ? 'active' : ''}"
+                         t-attf-class="dwo-page-item dwo-page-own d-flex align-items-center gap-1 rounded px-1 py-1 #{page.id === state.pageId ? 'active' : ''}"
                          t-att-data-page-id="page.id">
-                        <t t-if="state.renaming and state.renaming.id === page.id">
-                            <input class="form-control form-control-sm dwo-page-rename" t-model="state.renaming.name"
-                                   t-on-blur="finishRename" t-on-keydown="(ev) => ev.key === 'Enter' and ev.target.blur()"/>
-                        </t>
-                        <t t-else="">
-                            <a href="#" class="flex-grow-1 text-truncate dwo-page-name" t-on-click.prevent="() => this.openPage(page.id)"
-                               t-on-dblclick="() => this.startRename(page)" t-out="page.name"/>
-                            <div class="dwo-page-menu position-relative">
-                                <button class="btn btn-sm btn-link p-0 dwo-page-more" t-on-click="(ev) => this.togglePageMenu(page, ev)"
-                                        title="Page options"><i class="fa fa-ellipsis-v"/></button>
-                                <div t-if="state.pageMenu === page.id" class="dwo-page-popover card position-absolute shadow py-1">
-                                    <a href="#" class="dropdown-item" t-on-click.prevent="() => this.startRename(page)">Rename</a>
-                                    <a href="#" class="dropdown-item" t-on-click.prevent="() => this.duplicatePage(page)">Duplicate</a>
-                                    <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, -1)">Move up</a>
-                                    <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, 1)">Move down</a>
-                                    <a t-if="state.pages.length > 1" href="#" class="dropdown-item text-danger dwo-page-delete"
-                                       t-on-click.prevent="() => this.deletePage(page)">Delete</a>
-                                </div>
+                        <span class="dwo-page-handle d-flex align-items-center justify-content-center" title="Drag to reorder"><i class="oi oi-draggable"/></span>
+                        <a href="#" class="flex-grow-1 text-truncate dwo-page-name" t-on-click.prevent="() => this.openPage(page.id)"
+                           t-on-dblclick="() => this.startRename(page)" t-out="page.name"/>
+                        <div class="dwo-page-menu position-relative">
+                            <button class="btn btn-sm btn-link p-0 dwo-page-more" t-on-click="(ev) => this.togglePageMenu(page, ev)"
+                                    title="Page options"><i class="fa fa-ellipsis-v"/></button>
+                            <div t-if="state.pageMenu === page.id" class="dwo-page-popover card position-absolute shadow py-1">
+                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.startRename(page)">Rename</a>
+                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.duplicatePage(page)">Duplicate</a>
+                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, -1)">Move up</a>
+                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, 1)">Move down</a>
+                                <a t-if="state.pages.length > 1" href="#" class="dropdown-item text-danger dwo-page-delete"
+                                   t-on-click.prevent="() => this.deletePage(page)">Delete</a>
                             </div>
-                        </t>
+                        </div>
                     </div>
                     <t t-if="state.shared.length">
                         <div class="fw-bold mt-3 mb-1">Shared with me</div>
@@ -49,46 +44,53 @@
 
                 <!-- the grid -->
                 <main class="dwo-main flex-grow-1 d-flex flex-column overflow-hidden">
-                    <div class="dwo-toolbar d-flex align-items-center flex-wrap gap-3 p-2 border-bottom">
-                        <h4 class="mb-0 dwo-title" t-out="state.name"/>
+                    <div class="dwo-toolbar d-flex align-items-center flex-wrap gap-2 px-3 py-2 border-bottom">
+                        <h5 class="mb-0 me-1 dwo-title" t-out="state.name"/>
                         <span t-if="!isOwner" class="badge text-bg-light border dwo-shared-badge">
                             Shared by <t t-out="state.owner"/> · <t t-out="canEdit ? 'you can edit' : 'view only'"/>
                         </span>
                         <FilterBar t-if="filters.length" filters="filters" values="state.filterValues" onChange.bind="onFilter"
                                    editing="state.editing" onRemove.bind="removeFilter"/>
-                        <div t-if="state.editing" class="position-relative">
-                            <button class="btn btn-sm btn-outline-secondary dwo-add-filter" t-on-click="() => state.filterEditor = !state.filterEditor">
-                                <i class="fa fa-filter"/> Add filter
-                            </button>
-                            <div t-if="state.filterEditor" class="dwo-filter-editor-wrap position-absolute">
-                                <FilterEditor datasets="pageDatasets" existing="filters" onAdd.bind="addFilter"
-                                              onClose="() => state.filterEditor = false"/>
-                            </div>
-                        </div>
                         <span t-if="state.select" class="badge text-bg-primary d-inline-flex align-items-center gap-1 dwo-selection">
                             <t t-out="state.select.title or state.select.widget"/>: <t t-out="state.select.label"/>
                             <button class="btn-close btn-close-white ms-1 dwo-selection-clear" t-on-click="clearSelect" aria-label="Clear"/>
                         </span>
                         <span class="flex-grow-1"/>
-                        <button t-if="isOwner and !state.editing" class="btn btn-outline-secondary dwo-share" t-on-click="openShare">
-                            <i class="fa fa-share-alt"/> Share
-                        </button>
-                        <button t-if="!isOwner" class="btn btn-outline-secondary dwo-copy" t-on-click="() => this.duplicatePage({id: state.pageId})">
-                            <i class="fa fa-copy"/> Save a copy
-                        </button>
-                        <button t-if="canEdit" class="btn btn-outline-primary dwo-add-widget" t-on-click="addWidget">+ Add widget</button>
-                        <t t-if="state.editing">
-                            <button class="btn btn-secondary dwo-cancel" t-on-click="cancelEdit">Cancel</button>
-                            <button class="btn btn-primary dwo-done" t-att-disabled="state.saving" t-on-click="done">Save</button>
-                        </t>
-                        <button t-elif="canEdit" class="btn btn-outline-secondary dwo-edit" t-on-click="startEdit">
-                            <i class="fa fa-arrows"/> Arrange
-                        </button>
+                        <div class="d-flex flex-wrap gap-1 dwo-actions">
+                            <t t-if="state.editing">
+                                <div class="position-relative">
+                                    <button class="btn btn-secondary dwo-add-filter" t-on-click="() => state.filterEditor = !state.filterEditor">
+                                        <i class="fa fa-filter"/> Add filter
+                                    </button>
+                                    <div t-if="state.filterEditor" class="dwo-filter-editor-wrap position-absolute">
+                                        <FilterEditor datasets="pageDatasets" existing="filters" onAdd.bind="addFilter"
+                                                      onClose="() => state.filterEditor = false"/>
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary dwo-add-widget" t-on-click="addWidget">
+                                    <i class="fa fa-plus"/> Add widget
+                                </button>
+                                <button class="btn btn-primary dwo-done" t-att-disabled="state.saving" t-on-click="done">Save</button>
+                                <button class="btn btn-secondary dwo-cancel" t-on-click="cancelEdit">Discard</button>
+                            </t>
+                            <t t-else="">
+                                <button t-if="isOwner" class="btn btn-secondary dwo-share" t-on-click="openShare">
+                                    <i class="fa fa-share-alt"/> Share
+                                </button>
+                                <button t-if="!isOwner" class="btn btn-secondary dwo-copy" t-on-click="() => this.duplicatePage({id: state.pageId})">
+                                    <i class="fa fa-copy"/> Save a copy
+                                </button>
+                                <button t-if="canEditHere" class="btn btn-secondary dwo-edit" t-on-click="startEdit">
+                                    <i class="fa fa-pencil"/> Edit
+                                </button>
+                            </t>
+                        </div>
                     </div>
-                    <div class="dwo-canvas flex-grow-1 overflow-auto p-2">
+                    <div class="dwo-canvas flex-grow-1 overflow-auto">
                         <div t-if="!widgets.length" class="dwo-empty text-center text-muted p-5">
-                            <p>This page is empty.</p>
-                            <p t-if="!state.editing and canEdit">Press <b>+ Add widget</b> to start.</p>
+                            <p class="mb-1">This page is empty.</p>
+                            <p t-if="canEditHere and !state.editing" class="mb-0">Press <b>Edit</b>, then <b>Add widget</b> to start.</p>
+                            <p t-elif="state.editing" class="mb-0">Press <b>Add widget</b> to start.</p>
                         </div>
                         <t t-if="state.editing">
                             <div class="grid-stack dwo-grid-edit" t-ref="grid">

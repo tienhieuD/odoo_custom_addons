@@ -31,6 +31,16 @@ class TestDashboardModels(DashboardCase):
         self.assertEqual(first["id"], again["id"])  # idempotent
         self.assertEqual(self.Dashboard.search_count([("user_id", "=", self.alice.id)]), 1)
 
+    def test_a_new_page_goes_to_the_end(self):
+        mine = self.as_(self.alice).get_my_dashboard()
+        Page = self.as_(self.alice, "dwo.dashboard.page")
+        Page.reorder([mine["pages"][0]["id"]])
+        second = Page.create({"dashboard_id": mine["id"], "name": "Second"})
+        third = Page.create({"dashboard_id": mine["id"], "name": "Third"})
+        names = [p["name"] for p in self.as_(self.alice).get_my_dashboard()["pages"]]
+        self.assertEqual(names, ["Home", "Second", "Third"])
+        self.assertLess(second.sequence, third.sequence)
+
     def test_a_user_has_one_dashboard(self):
         self.Dashboard.create({"user_id": self.alice.id})
         with self.assertRaises(Exception):

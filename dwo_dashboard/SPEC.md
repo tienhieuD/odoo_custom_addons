@@ -41,6 +41,10 @@ to a field of each dataset.
  "options": {"stacked": true, "legend": "bottom"}, "ignore_filters": ["period"]}
 ```
 
+`icon` (optional): a Font Awesome 4 class (`^fa-[a-z0-9]+(-[a-z0-9]+){0,4}$`, e.g. `fa-money`) shown before the title; without it the card
+shows the icon of its type (`fa-hashtag` KPI, `fa-list` table, `fa-th` pivot, `fa-bar-chart`, `fa-line-chart`, `fa-area-chart`,
+`fa-pie-chart`, `fa-circle-o-notch` doughnut).
+
 `id`: `^[a-z][a-z0-9_]{0,31}$`, unique in the page, never reused for another meaning (diffs and AI edits refer to it).
 
 ### Dataset reference: `<type>:<name>`

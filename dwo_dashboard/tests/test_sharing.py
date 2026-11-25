@@ -168,4 +168,10 @@ class TestSharingAccess(SharingCase):
                          {("grant", "Sh_Viewer", "view"), ("grant", "Sh_Editor", "edit"), ("grant", "Dash team", "view")})
         self.page.revoke_share(self.page.share_ids[0].id)
         self.assertEqual(self.as_(self.owner, "dwo.dashboard.page").share_log()[0]["action"], "revoke")
-        self.assertEqual(self.as_(self.viewer, "dwo.dashboard.page").share_log(), [])  # nobody reads somebody else's log
+        self.assertEqual(self.as_(self.viewer, "dwo.dashboard.page").share_log(), [])
+        other = self.as_(self.owner, "dwo.dashboard.page").create({
+            "dashboard_id": self.as_(self.owner).get_my_dashboard()["id"], "name": "Other"})
+        other.share_with([self.viewer.id], [], "view")
+        mine = self.as_(self.owner, "dwo.dashboard.page")
+        self.assertEqual({r["page_name"] for r in mine.share_log(self.page_id)}, {self.page.name})
+        self.assertEqual({r["page_name"] for r in mine.share_log(other.id)}, {"Other"})  # nobody reads somebody else's log

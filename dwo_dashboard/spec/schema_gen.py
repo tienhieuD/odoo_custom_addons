@@ -128,6 +128,7 @@ def _widget(name, vdef):
             required_wells.append(wname)
     props = {
         "id": _ref("id"), "type": {"const": name}, "title": _text(120),
+        "icon": {"type": "string", "pattern": C.ICON_PATTERN, "maxLength": 50},
         "x": {"type": "integer", "minimum": 0, "maximum": C.GRID_COLS_MAX - 1},
         "y": {"type": "integer", "minimum": 0},
         "w": {"type": "integer", "minimum": 1, "maximum": C.GRID_COLS_MAX},

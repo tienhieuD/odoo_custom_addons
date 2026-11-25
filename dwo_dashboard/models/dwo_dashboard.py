@@ -101,9 +101,17 @@ class DwoDashboardPage(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        last = {}  # a new page goes to the end of its dashboard
         for vals in vals_list:
             if vals.get("spec"):
                 self._check_spec_as_caller(vals["spec"])
+            if "sequence" not in vals and vals.get("dashboard_id"):
+                dashboard = vals["dashboard_id"]
+                if dashboard not in last:
+                    top = self.search([("dashboard_id", "=", dashboard)], order="sequence desc", limit=1)
+                    last[dashboard] = top.sequence if top else 0
+                last[dashboard] += 10
+                vals["sequence"] = last[dashboard]
         return super().create(vals_list)
 
     @api.constrains("dashboard_id")
@@ -203,8 +211,10 @@ class DwoDashboardPage(models.Model):
                 "groups": [{"id": g.id, "name": g.display_name} for g in groups]}
 
     @api.model
-    def share_log(self, limit=50):
-        return self.env["dwo.dashboard.share.log"].search_read([], ["page_name", "action", "target", "level", "create_date"], limit=limit)
+    def share_log(self, page_id=None, limit=50):
+        """The log of the person who shared (of one page when ``page_id`` is given), newest first."""
+        domain = [("page_id", "=", page_id)] if page_id else []
+        return self.env["dwo.dashboard.share.log"].search_read(domain, ["page_name", "action", "target", "level", "create_date"], limit=limit)
 
     def _must_own(self):
         if self.sudo().user_id.id != self.env.uid:

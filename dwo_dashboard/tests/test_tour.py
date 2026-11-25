@@ -28,6 +28,8 @@ class TestDashboardTour(HttpCase):
         self.assertEqual([w["id"] for w in page.spec["widgets"]], ["w1", "w2"])
         self.assertEqual(widget_by_id(page, "w1")["compare"]["field"], "create_date")
         self.assertEqual(widget_by_id(page, "w1")["trend"]["field"], "create_date")
+        self.assertEqual(widget_by_id(page, "w1")["icon"], "fa-money")
+        self.assertNotIn("icon", widget_by_id(page, "w2"))  # no choice: the card shows the icon of its type
         self.assertEqual(widget_by_id(page, "w1")["title"], "Count · Contact")  # written when the title was left empty
         self.assertEqual(widget_by_id(page, "w2")["title"], "Count by Country")
         date_filter, country_filter = page.spec["filters"]
@@ -39,6 +41,8 @@ class TestDashboardTour(HttpCase):
         page.invalidate_recordset()
         self.assertEqual(page.revision, saved_once + 1)  # the resize was saved...
         self.assertEqual(next(w for w in page.spec["widgets"] if w["id"] == "w1")["w"], 8)
+        pages = self.env["dwo.dashboard.page"].sudo().search([("user_id", "=", page.user_id.id)])
+        self.assertEqual(sorted(pages.mapped("name")), ["Home", "Sales"])  # "Ghost" was cancelled
         self.start_tour(URL, "dwo_dashboard_tour_persist", login="dash_tour")
         page.invalidate_recordset()
         self.assertEqual(page.revision, saved_once + 1)  # ...and Edit then Done changed nothing
