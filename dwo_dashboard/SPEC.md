@@ -228,6 +228,19 @@ the author); `hidden`; `capability` (needs a newer Odoo); `unchecked` (a plugin 
 - `schema` is `dwo-dashboard/<major>`. A non-compatible change gets a new major (a migration upgrades saved pages);
   additive changes (a new type, a new option, a new aggregate) stay in the same major and go in CHANGELOG.
 
+## Sharing and clicks (Phase 2)
+Sharing is a property of a stored page, not of its spec: who may read or edit it is decided by record rules on
+`dwo.dashboard.page` and `dwo.dashboard.share`. The widgets always run as the person who views the page.
+
+`run_widget(page_id, widget_id, filter_values, interactions)`; `interactions` (never saved) is
+`{"select": {"widget": id, "key": k}, "drills": {widget id: [k1, k2]}}`, where the keys are those the server returned in
+`rows[].keys[0]`. The primary dimension of a widget is the first item of `axis`, `category` or `rows`. The server adds the
+conditions to the widget's `where` before validation: a selected key narrows every other widget of the same dataset, and the
+widgets of another dataset that have a field of the same name, type and comodel; a drill replaces the interval by the next one
+(year, quarter, month, week, day) and keeps the group chosen at each level. A key that does not fit (wrong type, `__other`,
+unknown widget) is ignored. `drill_records(page_id, widget_id, key, filter_values, interactions)` gives the ids behind a click
+(at most 1000, with the total).
+
 ## Editing guide for an AI assistant
 1. Start from the current page; change as little as possible; keep every existing `id`.
 2. Use only datasets, fields and metrics the person may read (the `describe_dataset` tool, Phase 4); never invent fields.

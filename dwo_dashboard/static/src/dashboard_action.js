@@ -7,9 +7,10 @@ import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ExplorePanel } from "./explore_panel";
+import { ShareDialog } from "./share_dialog";
 import { FilterBar } from "./filter_bar";
 import { FilterEditor } from "./filter_editor";
-import { COLS_DEFAULT, ROW_HEIGHT, newWidgetId, nextPosition } from "./utils";
+import { COLS_DEFAULT, INTERVAL_LABELS, ROW_HEIGHT, drillChain, newWidgetId, nextPosition } from "./utils";
 import { WidgetCard } from "./widget_card";
 import "./renderers/index";
 
@@ -35,16 +36,21 @@ export class DashboardAction extends Component {
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.dialog = useService("dialog");
+        this.action = useService("action");
         this.gridRef = useRef("grid");
         this.grid = null;
         this.tokens = {};
         this.saved = new Map(); // widget id -> JSON of the saved widget (decides run_widget or run_preview)
         this.state = useState({
-            ready: false, pages: [], pageId: null, name: "", revision: 0,
+            ready: false, pages: [], shared: [], level: "owner", owner: "", pageId: null, name: "", revision: 0,
             spec: { schema: "dwo-dashboard/1", widgets: [] }, savedSpec: "", editing: false, snapshot: null,
             data: {}, filterValues: {}, explore: null, renaming: null, saving: false, pageMenu: null, filterEditor: false,
+            select: null, drills: {}, pick: null, // what was clicked (cross-filter, drill-down); never saved
         });
-        useExternalListener(window, "click", () => (this.state.pageMenu = null));
+        useExternalListener(window, "click", () => {
+            this.state.pageMenu = null;
+            this.state.pick = null;
+        });
         onWillStart(() => this.boot());
         useEffect(
             () => {
@@ -71,8 +77,29 @@ export class DashboardAction extends Component {
         const dashboard = await this.orm.call("dwo.dashboard", "get_my_dashboard", []);
         this.dashboardId = dashboard.id;
         this.state.pages = dashboard.pages;
+        this.state.shared = dashboard.shared || [];
         await this.openPage(dashboard.pages[0].id, true);
         this.state.ready = true;
+    }
+
+    /** Owner or editor: the rest read only. */
+    get canEdit() {
+        return this.state.level !== "view";
+    }
+
+    get isOwner() {
+        return this.state.level === "owner";
+    }
+
+    async refreshLists() {
+        const dashboard = await this.orm.call("dwo.dashboard", "get_my_dashboard", []);
+        this.state.pages = dashboard.pages;
+        this.state.shared = dashboard.shared || [];
+        return dashboard;
+    }
+
+    openShare() {
+        this.dialog.add(ShareDialog, { pageId: this.state.pageId, pageName: this.state.name });
     }
 
     get cols() {
@@ -108,12 +135,17 @@ export class DashboardAction extends Component {
         s.pageId = id;
         s.name = page.name;
         s.revision = page.revision;
+        s.level = page.level;
+        s.owner = page.owner;
         s.spec = page.spec;
         s.savedSpec = JSON.stringify(page.spec);
         s.editing = false;
         s.explore = null;
         s.data = {};
         s.filterValues = {};
+        s.select = null;
+        s.drills = {};
+        s.pick = null;
         this.markSaved();
         this.runAll();
     }
@@ -161,8 +193,7 @@ export class DashboardAction extends Component {
 
     async duplicatePage(page) {
         const copy = await this.orm.call("dwo.dashboard.page", "duplicate_page", [[page.id]]);
-        const dashboard = await this.orm.call("dwo.dashboard", "get_my_dashboard", []);
-        this.state.pages = dashboard.pages;
+        await this.refreshLists();
         await this.openPage(copy.id);
     }
 
@@ -196,6 +227,86 @@ export class DashboardAction extends Component {
     }
 
     // --------------------------------------------------------------------------------------------- widgets
+    /** What the server needs to know about the clicks: the keys it gave us, nothing else. */
+    interactions() {
+        const drills = {};
+        for (const [id, steps] of Object.entries(this.state.drills)) {
+            if (steps.length) {
+                drills[id] = steps.map((step) => step.key);
+            }
+        }
+        const sel = this.state.select;
+        return sel || Object.keys(drills).length
+            ? { select: sel ? { widget: sel.widget, key: sel.key } : undefined, drills }
+            : undefined;
+    }
+
+    get interactive() {
+        return !this.state.editing;
+    }
+
+    /** A bar, a slice or a pivot row was clicked: ask what to do with it. */
+    onPick(widget, pick) {
+        const steps = this.state.drills[widget.id] || [];
+        const chain = drillChain(widget);
+        const next = chain[steps.length + 1];
+        this.state.pick = {
+            widget, key: pick.key, label: pick.label, x: pick.x, y: pick.y,
+            selected: !!this.state.select && this.state.select.widget === widget.id && this.state.select.key === pick.key,
+            drillTo: next ? INTERVAL_LABELS[next] : null,
+        };
+    }
+
+    pickFilter() {
+        const { widget, key, label, selected } = this.state.pick;
+        this.state.select = selected ? null : { widget: widget.id, key, label, title: widget.title || "" };
+        this.state.pick = null;
+        this.runAll();
+    }
+
+    pickDrill() {
+        const { widget, key, label } = this.state.pick;
+        this.state.drills[widget.id] = [...(this.state.drills[widget.id] || []), { key, label }];
+        this.state.select = null; // the key of a selection is of the level it was made on
+        this.state.pick = null;
+        this.runAll();
+    }
+
+    drillUp(widget) {
+        this.state.drills[widget.id] = (this.state.drills[widget.id] || []).slice(0, -1);
+        this.state.select = null;
+        this.runAll();
+    }
+
+    clearSelect() {
+        this.state.select = null;
+        this.runAll();
+    }
+
+    drillLabels(widget) {
+        return (this.state.drills[widget.id] || []).map((step) => step.label);
+    }
+
+    async pickRecords() {
+        const { widget, key } = this.state.pick;
+        this.state.pick = null;
+        const answer = await this.orm.call("dwo.dashboard.engine", "drill_records", [
+            this.state.pageId, widget.id, key, this.serverValues(), this.interactions(),
+        ]);
+        if (!answer.ok) {
+            this.notification.add(answer.error.message, { type: "warning" });
+            return;
+        }
+        const { model, ids, total } = answer.result;
+        if (total > ids.length) {
+            this.notification.add(_t("Showing the first %s of %s records.", ids.length, total), { type: "info" });
+        }
+        this.action.doAction({
+            type: "ir.actions.act_window", name: widget.title || _t("Records"), res_model: model,
+            domain: [["id", "in", ids]], views: [[false, "list"], [false, "form"]], target: "current",
+        });
+    }
+
     serverValues() {
         const out = {};
         for (const [id, value] of Object.entries(this.state.filterValues)) {
@@ -212,7 +323,7 @@ export class DashboardAction extends Component {
         let answer;
         try {
             answer = stored
-                ? await this.orm.call("dwo.dashboard.engine", "run_widget", [this.state.pageId, id, this.serverValues()])
+                ? await this.orm.call("dwo.dashboard.engine", "run_widget", [this.state.pageId, id, this.serverValues(), this.interactions()])
                 : await this.orm.call("dwo.dashboard.engine", "run_preview", [widget, this.filters, this.serverValues()]);
         } catch {
             answer = { ok: false, error: { code: "failed", message: _t("This widget could not be computed.") } };
@@ -296,6 +407,12 @@ export class DashboardAction extends Component {
 
     // -------------------------------------------------------------------------------------------- edit mode
     startEdit() {
+        if (!this.canEdit) {
+            return;
+        }
+        this.state.select = null; // editing works on the widgets as they are saved
+        this.state.drills = {};
+        this.state.pick = null;
         this.state.snapshot = clone(this.state.spec);
         this.state.editing = true;
     }

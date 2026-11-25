@@ -6,3 +6,5 @@ from . import test_compare
 from . import test_deferred
 from . import test_explore
 from . import test_tour
+from . import test_sharing
+from . import test_interact

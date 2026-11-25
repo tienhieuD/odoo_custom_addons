@@ -4,6 +4,11 @@
         <div class="dwo-card d-flex flex-column h-100" t-att-data-widget-id="props.widget.id">
             <div class="dwo-card-header d-flex align-items-center gap-2 px-2 pt-1">
                 <span class="dwo-card-title flex-grow-1 text-truncate fw-bold" t-out="title"/>
+                <span t-if="props.drill and props.drill.length" class="dwo-drill small text-muted text-truncate">
+                    <t t-foreach="props.drill" t-as="step" t-key="step_index"><t t-if="step_index"> › </t><t t-out="step"/></t>
+                    <button class="btn btn-sm btn-link p-0 ms-1 dwo-drill-up" t-on-click.stop="() => props.onDrillUp(props.widget)"
+                            title="Back up one level"><i class="fa fa-level-up"/></button>
+                </span>
                 <span t-if="truncatedNote" class="dwo-note small text-muted" title="Only the top results are shown" t-out="truncatedNote"/>
                 <span t-if="timezoneNote" class="badge text-bg-secondary" t-out="timezoneNote"/>
                 <t t-if="props.editing">
@@ -23,7 +28,7 @@
                 </div>
                 <div t-elif="isEmpty" class="dwo-empty-data d-flex h-100 align-items-center justify-content-center text-muted">No data</div>
                 <t t-elif="Renderer">
-                    <t t-component="Renderer" widget="props.widget" result="props.entry.result"/>
+                    <t t-component="Renderer" widget="props.widget" result="props.entry.result" onPick="pickHandler"/>
                 </t>
                 <div t-else="" class="d-flex h-100 align-items-center justify-content-center text-muted text-center">
                     This kind of widget is not installed on this database.

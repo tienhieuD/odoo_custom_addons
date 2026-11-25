@@ -7,7 +7,7 @@ import { formatNumber } from "../utils";
 
 export class TableRenderer extends Component {
     static template = "dwo_dashboard.TableRenderer";
-    static props = { widget: Object, result: Object };
+    static props = { widget: Object, result: Object, onPick: { type: Function, optional: true } };
 
     setup() {
         this.action = useService("action");

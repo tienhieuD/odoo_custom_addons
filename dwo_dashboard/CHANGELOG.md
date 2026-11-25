@@ -1,5 +1,20 @@
 # Changelog
 
+## Phase 2 (not released): sharing and interaction
+- **Sharing**: a page can be shared with users and groups (`dwo.dashboard.share`), level View or Edit. Recipients see it under
+  "Shared with me" and run every widget with their own access rights. Editors change the content only (spec); the owner alone
+  renames, deletes, orders and manages shares. Revoking, leaving a group or losing the share closes the page at once. "Save a
+  copy" puts a copy in the caller's own dashboard. A share log (readable by the person who shared) records grants, level
+  changes and revocations. Recipients are internal users only.
+- Not provided on purpose: "preview as another user". Running the engine as someone else shows the owner that person's data;
+  it needs the owner's decision (see issue #93).
+- **Cross-filter**: a click on a bar, a slice or a pivot row (menu: Filter the other widgets) narrows the other widgets of the
+  same data, and those of other data that have the same field; a chip in the toolbar clears it.
+- **Drill-down**: a time axis goes year, quarter, month, week, day; the card shows the path and a way back up.
+- **Drill-through**: "Show records" opens the records behind the click as a list.
+- The client sends only the group key it was given (`interactions`); the server writes the conditions from the saved page
+  (`engine/interact.py`), never from a client domain. Clicks are not saved in the page.
+
 ## Phase 1, second pass (not released): interface review
 - KPI cards: change since the previous period (`compare`), goal bar, prefix and suffix, `trend_good`.
 - New options: `show_values`, `target`, `percent` (100% stack), `show_percent`, `other`, `heatmap`, `open_records`; new

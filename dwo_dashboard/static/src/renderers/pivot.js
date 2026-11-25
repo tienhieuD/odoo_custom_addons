@@ -13,10 +13,12 @@ export function pivotMatrix(result) {
     const rowKey = (r) => r.keys.slice(0, nRows).map(String).join(SEP);
     const colKey = (r) => r.keys.slice(nRows).map(String).join(SEP);
     const rowHeads = new Map();
+    const rowRaw = new Map(); // row key -> the keys as the server wrote them (a click sends them back)
     const colHeads = new Map();
     const cells = new Map();
     for (const r of result.rows) {
         rowHeads.set(rowKey(r), r.labels.slice(0, nRows));
+        rowRaw.set(rowKey(r), r.keys.slice(0, nRows));
         colHeads.set(colKey(r), r.labels.slice(nRows));
         cells.set(rowKey(r) + SEP + SEP + colKey(r), r.values);
     }
@@ -28,12 +30,12 @@ export function pivotMatrix(result) {
               grand: result.totals.grand && result.totals.grand[0] ? result.totals.grand[0].values : null,
           }
         : null;
-    return { rowDims, colDims, rowHeads, colHeads, cells, totals, SEP };
+    return { rowDims, colDims, rowHeads, rowRaw, colHeads, cells, totals, SEP };
 }
 
 export class PivotRenderer extends Component {
     static template = "dwo_dashboard.PivotRenderer";
-    static props = { widget: Object, result: Object };
+    static props = { widget: Object, result: Object, onPick: { type: Function, optional: true } };
 
     setup() {
         this.matrix = pivotMatrix(this.props.result);
@@ -42,6 +44,14 @@ export class PivotRenderer extends Component {
             const values = [...this.matrix.cells.values()].map((v) => v[i]).filter((v) => v !== null && v !== undefined);
             return [Math.min(...values), Math.max(...values)];
         });
+    }
+
+    pickRow(rowKey, ev) {
+        const raw = this.matrix.rowRaw.get(rowKey);
+        if (this.props.onPick && raw && raw[0] !== "__other") {
+            ev.stopPropagation();
+            this.props.onPick({ key: raw[0], label: this.matrix.rowHeads.get(rowKey)[0], x: ev.clientX, y: ev.clientY });
+        }
     }
 
     /** Background of a cell: the larger the value in its column of measures, the stronger the blue. */

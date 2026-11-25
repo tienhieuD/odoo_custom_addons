@@ -8,7 +8,7 @@ import { formatNumber } from "../utils";
 /** A KPI card: the number, what it is, how it moved since the previous period, and how far it is from its goal. */
 export class KpiRenderer extends Component {
     static template = "dwo_dashboard.KpiRenderer";
-    static props = { widget: Object, result: Object };
+    static props = { widget: Object, result: Object, onPick: { type: Function, optional: true } };
 
     get options() {
         return this.props.widget.options || {};

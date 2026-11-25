@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.ShareDialog">
+        <Dialog title="'Share ' + props.pageName" size="'md'">
+            <p class="text-muted small mb-2">
+                People you share with see this page with <b>their own data</b>: each widget runs with their access rights, so they
+                never see more than they could see in Odoo. "Edit" lets them change the widgets, not rename or delete the page.
+            </p>
+            <div class="d-flex gap-2 mb-2">
+                <input class="form-control dwo-share-search" placeholder="Add a person or a group..." t-att-value="state.query"
+                       t-on-input="onQuery"/>
+                <select class="form-select w-auto dwo-share-newlevel" t-model="state.level">
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+            </div>
+            <div t-if="state.found" class="list-group mb-2 dwo-share-found">
+                <button t-foreach="state.found.users" t-as="u" t-key="'u' + u.id" class="list-group-item list-group-item-action"
+                        t-on-click="() => this.add('user', u.id)"><i class="fa fa-user"/> <t t-out="u.name"/></button>
+                <button t-foreach="state.found.groups" t-as="g" t-key="'g' + g.id" class="list-group-item list-group-item-action"
+                        t-on-click="() => this.add('group', g.id)"><i class="fa fa-users"/> <t t-out="g.name"/></button>
+                <div t-if="!state.found.users.length and !state.found.groups.length" class="list-group-item text-muted">No match.</div>
+            </div>
+            <div t-if="state.error" class="alert alert-danger py-1" t-out="state.error"/>
+            <div t-if="!state.shares.length" class="text-muted">Private: only you see this page.</div>
+            <table t-else="" class="table table-sm align-middle mb-0 dwo-share-list">
+                <tr t-foreach="state.shares" t-as="s" t-key="s.id">
+                    <td><i t-attf-class="fa #{s.kind === 'group' ? 'fa-users' : 'fa-user'}"/> <t t-out="s.name"/></td>
+                    <td class="text-end">
+                        <select class="form-select form-select-sm d-inline-block w-auto" t-on-change="(ev) => this.setLevel(s, ev)">
+                            <option value="view" t-att-selected="s.level === 'view'">View</option>
+                            <option value="edit" t-att-selected="s.level === 'edit'">Edit</option>
+                        </select>
+                        <button class="btn btn-sm btn-link text-danger dwo-share-revoke" t-on-click="() => this.revoke(s)">Revoke</button>
+                    </td>
+                </tr>
+            </table>
+            <a href="#" class="small d-block mt-2" t-on-click.prevent="toggleLog">History of my sharing</a>
+            <table t-if="state.log" class="table table-sm small mt-1">
+                <tr t-foreach="state.log" t-as="r" t-key="r.id">
+                    <td t-out="r.create_date"/><td t-out="r.action"/><td t-out="r.page_name"/><td t-out="r.target"/><td t-out="r.level"/>
+                </tr>
+            </table>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="props.close">Done</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

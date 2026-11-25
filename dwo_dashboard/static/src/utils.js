@@ -86,3 +86,24 @@ export const PRESET_LABELS = {
     this_year: _t("This year"),
     last_year: _t("Last year"),
 };
+
+export const INTERVALS = ["year", "quarter", "month", "week", "day"];
+export const INTERVAL_LABELS = { year: _t("year"), quarter: _t("quarter"), month: _t("month"), week: _t("week"), day: _t("day") };
+
+/** The first dimension of a widget (what a click on a bar, a slice or a pivot row stands for). Same rule as the server's. */
+export function primaryItem(widget) {
+    const wells = widget.wells || {};
+    for (const name of ["axis", "category", "rows"]) {
+        const item = Array.isArray(wells[name]) ? wells[name][0] : wells[name];
+        if (item && item.field) {
+            return item;
+        }
+    }
+    return null;
+}
+
+/** The intervals a time axis goes through when drilled, from its own interval down to the day. */
+export function drillChain(widget) {
+    const item = primaryItem(widget);
+    return item && INTERVALS.includes(item.interval) ? INTERVALS.slice(INTERVALS.indexOf(item.interval)) : [];
+}

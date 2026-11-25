@@ -6,10 +6,11 @@ import psycopg2.errors
 from odoo import _, api, models
 from odoo.exceptions import AccessError
 
-from ..engine import dates, domain as dom, grouped, guard, records
+from ..engine import dates, interact, domain as dom, grouped, guard, records
 from ..spec import validate_semantics, validate_structure
 
 _logger = logging.getLogger(__name__)
+MAX_IDS = 1000
 _TZ_KNOWN = {}  # time zone name -> does this PostgreSQL know it (aliases such as "Asia/Saigon" may be missing)
 
 
@@ -24,8 +25,9 @@ class DwoDashboardEngine(models.AbstractModel):
     _description = "Dashboard query engine"
 
     @api.model
-    def run_widget(self, page_id, widget_id, filter_values=None):
-        """Run a widget of a stored page. ``filter_values``: {filter id: value} chosen in the page's filter bar."""
+    def run_widget(self, page_id, widget_id, filter_values=None, interactions=None):
+        """Run a widget of a stored page. ``filter_values``: {filter id: value} chosen in the page's filter bar.
+        ``interactions``: what was clicked, {"select": {"widget", "key"}, "drills": {widget id: [keys]}} (see engine/interact.py)."""
         try:
             page = self.env["dwo.dashboard.page"].browse(page_id)
             page.check_access("read")
@@ -35,7 +37,60 @@ class DwoDashboardEngine(models.AbstractModel):
         widget = next((w for w in spec.get("widgets", []) if w.get("id") == widget_id), None)
         if widget is None:
             return self._error("not_found")
-        return self._run(spec, widget, filter_values)
+        return self._run(spec, widget, filter_values, interactions)
+
+    @api.model
+    def drill_records(self, page_id, widget_id, key, filter_values=None, interactions=None):
+        """The records behind one bar, slice or row (drill-through): ``{"model", "ids", "total"}`` for the client to open
+        as a list. The same filters and clicks as the widget, as the viewer, and the ids are capped (``MAX_IDS``)."""
+        try:
+            page = self.env["dwo.dashboard.page"].browse(page_id)
+            page.check_access("read")
+            spec = page.spec or {}
+        except AccessError:
+            return self._error("access")
+        widget = next((w for w in spec.get("widgets", []) if w.get("id") == widget_id), None)
+        if widget is None or not self._well_formed(spec, widget) or not widget["dataset"].startswith("orm:"):
+            return self._error("not_found")
+        item = interact.primary(widget)
+        if item is None:
+            return self._error("unsupported")
+        env = self._viewer().env
+        try:
+            chain = interact.drill_chain(item)
+            interval = chain[interact.depth(interactions or {}, widget_id, item)] if chain else None
+            applied = interact.apply(env, spec, widget, interactions) if interactions else widget
+            applied = dict(applied, where=list(applied.get("where", [])) + interact.key_leaves(
+                env, env[widget["dataset"][4:]], item, interval, key))
+            error = self._check_widget(spec, applied)
+            if error:
+                return error
+            model = env[widget["dataset"][4:]]
+            with guard.guarded(env):
+                domain = dom.widget_domain(env, model, self._mini_page(spec, applied), applied, filter_values)
+                ids = model.search(domain, limit=MAX_IDS, order="id desc").ids
+                total = model.search_count(domain, limit=MAX_IDS * 50)
+        except (ValueError, KeyError, TypeError):
+            return self._error("invalid")
+        except AccessError:
+            return self._error("access")
+        except Exception:
+            _logger.exception("drill-through of widget %s failed", widget_id)
+            return self._error("failed")
+        return {"ok": True, "result": {"model": model._name, "ids": ids, "total": total}}
+
+    def _check_widget(self, spec, widget):
+        """The error to answer for a widget that is not valid for the caller, else None."""
+        Spec = self.env["dwo.dashboard.spec"]
+        mini = self._mini_page(spec, widget)
+        errors = validate_structure(mini, Spec._dwo_registry())
+        if not errors:
+            errors = validate_semantics(self.env, mini, Spec._dwo_registry(), Spec._dwo_resolve_dataset, True,
+                                        Spec._dwo_dataset_checkers())
+        if errors:
+            code = "access" if any(e["code"] == "access" for e in errors) else "invalid"
+            return self._error(code, errors[0]["message"] if code == "invalid" else None)
+        return None
 
     @api.model
     def run_preview(self, widget, filters=None, filter_values=None):
@@ -60,11 +115,11 @@ class DwoDashboardEngine(models.AbstractModel):
             _TZ_KNOWN[tz] = bool(self.env.cr.fetchone())
         return self.with_context(tz=tz if _TZ_KNOWN[tz] else "UTC", dwo_tz_fallback=not _TZ_KNOWN[tz])
 
-    def _run(self, spec, widget, filter_values):
+    def _run(self, spec, widget, filter_values, interactions=None):
         try:
             if not self._well_formed(spec, widget):
                 return self._error("invalid")
-            return self._viewer()._run_checked(spec, widget, filter_values)
+            return self._viewer()._run_checked(spec, widget, filter_values, interactions)
         except Exception:  # whatever the payload was, the client never gets a traceback
             _logger.exception("dashboard widget %s failed", widget.get("id") if isinstance(widget, dict) else "?")
             return self._error("failed")
@@ -84,7 +139,9 @@ class DwoDashboardEngine(models.AbstractModel):
                 return False
         return True
 
-    def _run_checked(self, spec, widget, filter_values):
+    def _run_checked(self, spec, widget, filter_values, interactions=None):
+        if interactions:
+            widget = interact.apply(self.env, spec, widget, interactions)
         Spec = self.env["dwo.dashboard.spec"]
         registry = Spec._dwo_registry()
         # validate this widget, as the caller, with the filters that apply to its dataset only

@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_dwo_dashboard_user,dwo.dashboard user,model_dwo_dashboard,base.group_user,1,1,1,1
 access_dwo_dashboard_page_user,dwo.dashboard.page user,model_dwo_dashboard_page,base.group_user,1,1,1,1
+access_dwo_dashboard_share_user,dwo.dashboard.share user,model_dwo_dashboard_share,base.group_user,1,1,1,1
+access_dwo_dashboard_share_log_user,dwo.dashboard.share.log user,model_dwo_dashboard_share_log,base.group_user,1,0,0,0

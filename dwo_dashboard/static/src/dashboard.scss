@@ -108,3 +108,11 @@
     .dwo-spark-line { fill: none; stroke: var(--bs-primary, #2997ff); stroke-width: 2; stroke-linejoin: round; }
     .dwo-spark-area { fill: var(--bs-primary, #2997ff); opacity: 0.12; stroke: none; }
 }
+
+.dwo-pick-menu {
+    position: fixed;
+    z-index: 1060;
+    min-width: 13rem;
+    transform: translate(8px, 8px);
+}
+.dwo-pick { cursor: pointer; text-decoration: underline dotted; }

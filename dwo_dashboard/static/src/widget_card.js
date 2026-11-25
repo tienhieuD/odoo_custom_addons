@@ -14,10 +14,17 @@ export class WidgetCard extends Component {
         editing: { type: Boolean, optional: true },
         onEdit: { type: Function, optional: true },
         onRemove: { type: Function, optional: true },
+        onPick: { type: Function, optional: true },
+        onDrillUp: { type: Function, optional: true },
+        drill: { type: Array, optional: true }, // labels of the groups the user drilled into
     };
 
     get Renderer() {
         return registry.category("dwo_dashboard.visuals").get(this.props.widget.type, null);
+    }
+
+    get pickHandler() {
+        return this.props.onPick ? (pick) => this.props.onPick(this.props.widget, pick) : undefined;
     }
 
     get title() {

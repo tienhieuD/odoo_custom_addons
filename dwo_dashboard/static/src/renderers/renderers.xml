@@ -78,7 +78,8 @@
                 </thead>
                 <tbody>
                     <tr t-foreach="rowEntries" t-as="row" t-key="row[0]">
-                        <th t-foreach="row[1]" t-as="label" t-key="label_index" class="fw-normal" t-out="label"/>
+                        <th t-foreach="row[1]" t-as="label" t-key="label_index" t-att-class="'fw-normal' + (props.onPick and label_index === 0 ? ' dwo-pick' : '')"
+                            t-on-click="(ev) => label_index === 0 and this.pickRow(row[0], ev)" t-out="label"/>
                         <th t-if="!row[1].length"/>
                         <t t-foreach="colEntries" t-as="col" t-key="col[0]">
                             <td t-foreach="measures" t-as="m" t-key="m.key" class="text-end" t-att-style="heat(row[0], col[0], m_index)"

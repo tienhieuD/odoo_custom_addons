@@ -1,15 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Phase 1: a dashboard is private. Global rules (no group): nobody, administrators included, reads the dashboard
-         of somebody else. Sharing (Phase 2) widens them on purpose. -->
+    <!-- All rules are global (no group), so they are ANDed with each other: each operation has exactly one rule per model.
+         A dashboard is private to its owner. A page can be shared with users and groups (model dwo.dashboard.share):
+         the people it is shared with read it (level view) and also change its spec (level edit); only the owner
+         renames, deletes, reorders, and manages the shares. Administrators get no special access. -->
     <record id="rule_dwo_dashboard_owner" model="ir.rule">
         <field name="name">Dashboard: owner only</field>
         <field name="model_id" ref="model_dwo_dashboard"/>
         <field name="domain_force">[('user_id', '=', user.id)]</field>
     </record>
+
     <record id="rule_dwo_dashboard_page_owner" model="ir.rule">
-        <field name="name">Dashboard page: owner only</field>
+        <field name="name">Dashboard page: read (owner or shared)</field>
         <field name="model_id" ref="model_dwo_dashboard_page"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">['|', ('dashboard_id.user_id', '=', user.id),
+            ('share_ids', 'any', ['|', ('user_id', '=', user.id), ('group_id', 'in', user.all_group_ids.ids)])]</field>
+    </record>
+    <record id="rule_dwo_dashboard_page_write" model="ir.rule">
+        <field name="name">Dashboard page: write (owner or editor)</field>
+        <field name="model_id" ref="model_dwo_dashboard_page"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">['|', ('dashboard_id.user_id', '=', user.id),
+            ('share_ids', 'any', [('level', '=', 'edit'), '|', ('user_id', '=', user.id), ('group_id', 'in', user.all_group_ids.ids)])]</field>
+    </record>
+    <record id="rule_dwo_dashboard_page_owner_only" model="ir.rule">
+        <field name="name">Dashboard page: create and delete (owner only)</field>
+        <field name="model_id" ref="model_dwo_dashboard_page"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
         <field name="domain_force">[('dashboard_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_dwo_dashboard_share_read" model="ir.rule">
+        <field name="name">Dashboard share: read (owner or recipient)</field>
+        <field name="model_id" ref="model_dwo_dashboard_share"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">['|', '|', ('page_id.dashboard_id.user_id', '=', user.id), ('user_id', '=', user.id),
+            ('group_id', 'in', user.all_group_ids.ids)]</field>
+    </record>
+    <record id="rule_dwo_dashboard_share_owner" model="ir.rule">
+        <field name="name">Dashboard share: manage (page owner only)</field>
+        <field name="model_id" ref="model_dwo_dashboard_share"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="domain_force">[('page_id.dashboard_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_dwo_dashboard_share_log" model="ir.rule">
+        <field name="name">Dashboard share log: the person who shared</field>
+        <field name="model_id" ref="model_dwo_dashboard_share_log"/>
+        <field name="domain_force">[('actor_id', '=', user.id)]</field>
     </record>
 </odoo>

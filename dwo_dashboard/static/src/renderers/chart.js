@@ -160,9 +160,23 @@ const targetPlugin = {
     },
 };
 
+/** The group key of each label of the chart (the first dimension), in the order of ``chartData().labels``. */
+export function axisKeys(result, widget) {
+    if (SLICE_TYPES.includes(widget.type) || result.dims.length === 1) {
+        return result.rows.map((r) => r.keys[0]);
+    }
+    const seen = new Map();
+    for (const r of result.rows) {
+        if (!seen.has(r.labels[0])) {
+            seen.set(r.labels[0], r.keys[0]);
+        }
+    }
+    return [...seen.values()];
+}
+
 export class ChartRenderer extends Component {
     static template = "dwo_dashboard.ChartRenderer";
-    static props = { widget: Object, result: Object };
+    static props = { widget: Object, result: Object, onPick: { type: Function, optional: true } };
 
     setup() {
         this.canvas = useRef("canvas");
@@ -175,6 +189,20 @@ export class ChartRenderer extends Component {
             },
             () => [JSON.stringify(this.props.result), JSON.stringify(this.props.widget)]
         );
+    }
+
+    click(event, elements) {
+        const { onPick, result, widget } = this.props;
+        if (!onPick || !elements.length) {
+            return;
+        }
+        const index = elements[0].index;
+        const key = axisKeys(result, widget)[index];
+        if (key === undefined || key === "__other") {
+            return;
+        }
+        event.native.stopPropagation(); // the popover opens under the pointer: the click must not close it again
+        onPick({ key, label: this.chart.data.labels[index], x: event.native.clientX, y: event.native.clientY });
     }
 
     destroy() {
@@ -221,6 +249,10 @@ export class ChartRenderer extends Component {
             type: widget.type === "area" ? "line" : widget.type,
             data,
             options: {
+                onClick: (event, elements) => this.click(event, elements),
+                onHover: (event, elements) => {
+                    event.native.target.style.cursor = this.props.onPick && elements.length ? "pointer" : "default";
+                },
                 animation: false,
                 responsive: true,
                 maintainAspectRatio: false,

@@ -33,12 +33,27 @@
                             </div>
                         </t>
                     </div>
+                    <t t-if="state.shared.length">
+                        <div class="fw-bold mt-3 mb-1">Shared with me</div>
+                        <div t-foreach="state.shared" t-as="page" t-key="page.id"
+                             t-attf-class="dwo-page-item dwo-shared-item d-flex align-items-center gap-1 rounded px-2 py-1 #{page.id === state.pageId ? 'active' : ''}"
+                             t-att-data-page-id="page.id">
+                            <a href="#" class="flex-grow-1 text-truncate dwo-page-name" t-on-click.prevent="() => this.openPage(page.id)">
+                                <span t-out="page.name"/> <small class="text-muted d-block" t-out="page.owner"/>
+                            </a>
+                            <span t-attf-class="badge #{page.level === 'edit' ? 'text-bg-primary' : 'text-bg-secondary'}"
+                                  t-out="page.level === 'edit' ? 'Edit' : 'View'"/>
+                        </div>
+                    </t>
                 </nav>
 
                 <!-- the grid -->
                 <main class="dwo-main flex-grow-1 d-flex flex-column overflow-hidden">
                     <div class="dwo-toolbar d-flex align-items-center flex-wrap gap-3 p-2 border-bottom">
                         <h4 class="mb-0 dwo-title" t-out="state.name"/>
+                        <span t-if="!isOwner" class="badge text-bg-light border dwo-shared-badge">
+                            Shared by <t t-out="state.owner"/> · <t t-out="canEdit ? 'you can edit' : 'view only'"/>
+                        </span>
                         <FilterBar t-if="filters.length" filters="filters" values="state.filterValues" onChange.bind="onFilter"
                                    editing="state.editing" onRemove.bind="removeFilter"/>
                         <div t-if="state.editing" class="position-relative">
@@ -50,20 +65,30 @@
                                               onClose="() => state.filterEditor = false"/>
                             </div>
                         </div>
+                        <span t-if="state.select" class="badge text-bg-primary d-inline-flex align-items-center gap-1 dwo-selection">
+                            <t t-out="state.select.title or state.select.widget"/>: <t t-out="state.select.label"/>
+                            <button class="btn-close btn-close-white ms-1 dwo-selection-clear" t-on-click="clearSelect" aria-label="Clear"/>
+                        </span>
                         <span class="flex-grow-1"/>
-                        <button class="btn btn-outline-primary dwo-add-widget" t-on-click="addWidget">+ Add widget</button>
+                        <button t-if="isOwner and !state.editing" class="btn btn-outline-secondary dwo-share" t-on-click="openShare">
+                            <i class="fa fa-share-alt"/> Share
+                        </button>
+                        <button t-if="!isOwner" class="btn btn-outline-secondary dwo-copy" t-on-click="() => this.duplicatePage({id: state.pageId})">
+                            <i class="fa fa-copy"/> Save a copy
+                        </button>
+                        <button t-if="canEdit" class="btn btn-outline-primary dwo-add-widget" t-on-click="addWidget">+ Add widget</button>
                         <t t-if="state.editing">
                             <button class="btn btn-secondary dwo-cancel" t-on-click="cancelEdit">Cancel</button>
                             <button class="btn btn-primary dwo-done" t-att-disabled="state.saving" t-on-click="done">Save</button>
                         </t>
-                        <button t-else="" class="btn btn-outline-secondary dwo-edit" t-on-click="startEdit">
+                        <button t-elif="canEdit" class="btn btn-outline-secondary dwo-edit" t-on-click="startEdit">
                             <i class="fa fa-arrows"/> Arrange
                         </button>
                     </div>
                     <div class="dwo-canvas flex-grow-1 overflow-auto p-2">
                         <div t-if="!widgets.length" class="dwo-empty text-center text-muted p-5">
                             <p>This page is empty.</p>
-                            <p t-if="!state.editing">Press <b>+ Add widget</b> to start.</p>
+                            <p t-if="!state.editing and canEdit">Press <b>+ Add widget</b> to start.</p>
                         </div>
                         <t t-if="state.editing">
                             <div class="grid-stack dwo-grid-edit" t-ref="grid">
@@ -79,12 +104,23 @@
                         <t t-else="">
                             <div class="dwo-grid" t-attf-style="--dwo-cols: #{cols}; --dwo-row: #{rowHeight}px">
                                 <div t-foreach="orderedWidgets" t-as="w" t-key="w.id" class="dwo-grid-item" t-att-style="itemStyle(w)">
-                                    <WidgetCard widget="w" entry="state.data[w.id]"/>
+                                    <WidgetCard widget="w" entry="state.data[w.id]" onPick.bind="onPick" onDrillUp.bind="drillUp" drill="drillLabels(w)"/>
                                 </div>
                             </div>
                         </t>
                     </div>
                 </main>
+
+                <div t-if="state.pick" class="dwo-pick-menu card shadow py-1" t-attf-style="left: #{state.pick.x}px; top: #{state.pick.y}px">
+                    <div class="px-3 py-1 fw-bold small text-truncate" t-out="state.pick.label"/>
+                    <a href="#" class="dropdown-item dwo-pick-filter" t-on-click.prevent="pickFilter">
+                        <i class="fa fa-filter"/> <t t-out="state.pick.selected ? 'Clear the filter' : 'Filter the other widgets'"/>
+                    </a>
+                    <a t-if="state.pick.drillTo" href="#" class="dropdown-item dwo-pick-drill" t-on-click.prevent="pickDrill">
+                        <i class="fa fa-level-down"/> Drill down to <t t-out="state.pick.drillTo"/>
+                    </a>
+                    <a href="#" class="dropdown-item dwo-pick-records" t-on-click.prevent="pickRecords"><i class="fa fa-list"/> Show records</a>
+                </div>
 
                 <aside t-if="state.explore" class="dwo-explore-drawer border-start">
                     <ExplorePanel t-key="state.explore.widget ? state.explore.widget.id : 'new'" widget="state.explore.widget"
