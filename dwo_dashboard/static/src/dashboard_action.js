@@ -149,12 +149,22 @@ export class DashboardAction extends Component {
         return Math.min(COLS_MAX, Math.max(own, this.rightmost));
     }
 
+    /** The width of the edit grid follows its number of columns. Written on the element itself and not in the template: gridstack
+     * keeps its own variables in the same ``style`` attribute, and Owl rewriting the attribute wipes them (every widget collapsed
+     * to a width of 0 the first time the page grew). */
+    setGridCols(cols) {
+        if (this.gridRef.el) {
+            this.gridRef.el.style.setProperty("--dwo-cols", String(cols));
+        }
+    }
+
     /** Like a sheet: while editing there are always COLS_SPARE empty columns to the right of the last widget. */
     growGrid() {
         const wanted = Math.min(COLS_MAX, this.rightmost + COLS_SPARE);
         if (wanted > this.state.editCols) {
             this.state.editCols = wanted;
             if (this.grid) {
+                this.setGridCols(wanted);
                 this.grid.column(wanted, "none"); // more columns, every widget stays where it is
             }
         }
@@ -544,6 +554,7 @@ export class DashboardAction extends Component {
             return;
         }
         this.destroyGrid();
+        this.setGridCols(this.state.editCols);
         this.grid = window.GridStack.init(
             { column: this.state.editCols, cellHeight: ROW_HEIGHT + GAP, margin: GAP / 2, float: true, animate: false,
               handle: ".dwo-card-header", disableOneColumnMode: true },

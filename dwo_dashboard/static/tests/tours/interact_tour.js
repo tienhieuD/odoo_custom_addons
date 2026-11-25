@@ -34,6 +34,16 @@ registry.category("web_tour.tours").add("dwo_wide", {
         // twelve spare columns follow the widget: 21 + 3 + 12
         { trigger: ".grid-stack[style*='--dwo-cols: 36']" },
         {
+            // growing the grid must not collapse the widgets (they had a width of 0 once)
+            trigger: ".grid-stack-item[gs-id=total]",
+            run: () => {
+                const width = document.querySelector(".grid-stack-item[gs-id=total]").getBoundingClientRect().width;
+                if (width < 100) {
+                    throw new Error("the widget collapsed after the grid grew: width " + width);
+                }
+            },
+        },
+        {
             trigger: ".grid-stack",
             run: () => {
                 const grid = document.querySelector(".grid-stack");
