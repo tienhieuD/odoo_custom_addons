@@ -12,3 +12,4 @@ from . import test_metrics
 from . import test_ai
 from . import test_blend
 from . import test_sql
+from . import test_ai_dataset

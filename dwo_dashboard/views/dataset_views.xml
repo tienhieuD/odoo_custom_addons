@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="view_dwo_ai_dataset_wizard" model="ir.ui.view">
+        <field name="name">dwo.ai.dataset.wizard.form</field>
+        <field name="model">dwo.ai.dataset.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Ask the assistant for a dataset">
+                <p class="text-muted">
+                    What is sent to the AI service: the format of a dataset, the names and kinds of the fields of the models you choose (or the
+                    columns of the tables, never those that look like credentials), your request, the current definition only if you tick the box,
+                    and the identifier of this database. No record is ever sent. The answer is only a proposal: it is written to the dataset when
+                    you press <b>Use it</b>, and you can then check it and test it as usual.
+                </p>
+                <group>
+                    <field name="kind" readonly="dataset_id"/>
+                    <field name="dataset_id" options="{'no_create': True}" domain="[('kind', '=', kind)]"/>
+                    <field name="model_ids" widget="many2many_tags" options="{'no_create': True}" invisible="kind == 'sql'"
+                           required="kind == 'blend'" readonly="dataset_id and kind == 'orm'"/>
+                    <field name="tables" invisible="kind != 'sql'" placeholder="sale_order, res_partner"/>
+                    <field name="send_current" invisible="not dataset_id or kind == 'orm'"/>
+                </group>
+                <field name="request" placeholder="For example: revenue of the confirmed sales and the amount of the purchases, by month"/>
+                <div class="alert alert-danger" invisible="not message"><field name="message" nolabel="1"/></div>
+                <group invisible="not result_text">
+                    <field name="result_text" widget="text" nolabel="1" colspan="2"/>
+                </group>
+                <field name="result_json" invisible="1"/>
+                <footer>
+                    <button string="Ask" type="object" name="action_ask" class="btn-primary" data-hotkey="q"/>
+                    <button string="Use it" type="object" name="action_apply" class="btn-primary" invisible="not result_json"/>
+                    <button string="Close" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_dwo_ai_dataset" model="ir.actions.act_window">
+        <field name="name">Ask the assistant for a dataset</field>
+        <field name="res_model">dwo.ai.dataset.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
     <record id="view_dwo_dataset_list" model="ir.ui.view">
         <field name="name">dwo.dataset.list</field>
         <field name="model">dwo.dataset</field>
@@ -23,6 +62,9 @@
                             help="Runs the query (20 rows) with every protection and shows what it returns."/>
                     <button name="action_fill_columns" type="object" string="Fill the columns from the query" invisible="kind != 'sql'"
                             help="Lists the columns the query returns; you only choose which are dimensions and which are measures."/>
+                    <button name="%(action_dwo_ai_dataset)d" type="action" string="Ask AI" invisible="not id"
+                            context="{'default_dataset_id': id, 'default_kind': kind}"
+                            help="Describe what you want; the assistant proposes a definition that you review before using it."/>
                 </header>
                 <sheet>
                     <group>
@@ -118,5 +160,6 @@ FROM sale_order WHERE state IN ('sale', 'done')</pre>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
+    <menuitem id="menu_dwo_ai_dataset" name="Create a dataset with AI" parent="menu_dwo_config" action="action_dwo_ai_dataset" sequence="15"/>
     <menuitem id="menu_dwo_ai_settings" name="AI assistant" parent="menu_dwo_config" action="action_dwo_ai_settings" sequence="20"/>
 </odoo>

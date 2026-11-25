@@ -5,5 +5,6 @@ from . import dwo_dashboard_share
 from . import dwo_dataset
 from . import dwo_dashboard_ai
 from . import dwo_dashboard_ai_settings
+from . import dwo_ai_dataset_wizard
 from . import dwo_dashboard_engine
 from . import dwo_dashboard_explore

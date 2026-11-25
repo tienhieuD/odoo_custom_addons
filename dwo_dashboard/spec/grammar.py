@@ -46,3 +46,33 @@ def format_help(registry):
         'KPI extras: "compare":{"field":date,"period":"this_month","against":"previous_period"} and "trend":{"field":date,"interval":"month","points":12}.\n'
         'Domains are lists of [field, operator, value] with plain values only.\n'
         'Visual types:\n%(visuals)s' % {"schema": C.SCHEMA_ID, "max": C.GRID_COLS_MAX, "visuals": visual_lines(registry)})
+
+
+def dataset_help(kind):
+    """The rules of a dataset (blend or Odoo-model metrics), for the assistant that helps write one."""
+    if kind == "blend":
+        return (
+            'A blend is {"schema":"%(schema)s","type":"blend","code":"lower_case_id","label":str,'
+            '"sources":[{"name":"sales","dataset":"orm:sale.order","where":[domain]?}],'
+            '"dimensions":[{"name":"month","label":str,"kind":"%(kinds)s","map":{"<source>":"<field of that model>"},"comodel":"res.partner"}],'
+            '"metrics":[{"name":"revenue","source":"<source>","agg":"sum|avg|min|max|count_distinct|count","field":F,"where":[domain]?,'
+            '"label":str,"format":"number|currency|percent"}]}.\n'
+            '%(min)s to %(max)s sources, each an Odoo model "orm:<model>". Up to %(dims)s dimensions: the groupings the sources share '
+            '(the month of a date, a customer, a state). Every dimension maps EVERY source to one field of that source; the fields mapped '
+            'must be of the same kind (dates with dates, a many2one with a many2one to the same comodel; "comodel" only for kind many2one). '
+            'A metric reads ONE source; "field" is required unless agg is "count" (count of records). '
+            'Use only the models and fields listed under the data. Domains are lists of [field, operator, value] with plain values only.'
+            % {"schema": C.DATASET_SCHEMA_ID, "kinds": "|".join(C.BLEND_DIM_KINDS), "min": 2, "max": C.MAX_BLEND_SOURCES,
+               "dims": C.MAX_BLEND_DIMS})
+    if kind == "orm":
+        return (
+            'Reply with {"metrics":[{"name":"won_revenue","label":str,"agg":"sum|avg|min|max|count_distinct|count","field":F,'
+            '"where":[domain]?,"format":"number|currency|percent"}]}. A metric is a named measure of the model: name is lower case letters, '
+            'digits and _, starting with a letter; "field" is a stored field of the model listed under the data, required unless agg is '
+            '"count" (count of records); "where" is a domain of plain values that keeps only some records. Use only the listed fields.')
+    return (
+        'Reply with {"code":"lower_case_id","label":str,"query":"SELECT ..."}. The query is ONE PostgreSQL SELECT (no semicolon, no comment '
+        'that hides code), reading only the tables and columns listed under the data. Give every output column a lower case name with AS '
+        '(letters, digits, _). Odoo tables are named after the model with dots as underscores (sale.order is sale_order); a many2one is '
+        'a column "<field>_id" holding the id of the other table. Parameters you may use: %(uid)s %(company_id)s %(company_ids)s %(lang)s '
+        '%(today)s %(now)s; write a literal percent sign as %%. Dates and measures should be real columns (date, numeric), not text.')

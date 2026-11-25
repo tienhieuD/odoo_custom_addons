@@ -10,3 +10,4 @@ access_dwo_dataset_metric_manager,dwo.dataset.metric manager,model_dwo_dataset_m
 access_dwo_ai_config_manager,dwo.ai.config manager,model_dwo_ai_config,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1
 access_ir_model_dwo_manager,ir.model read for dashboard managers,base.model_ir_model,dwo_dashboard.group_dwo_dashboard_manager,1,0,0,0
 access_ir_model_fields_dwo_manager,ir.model.fields read for dashboard managers,base.model_ir_model_fields,dwo_dashboard.group_dwo_dashboard_manager,1,0,0,0
+access_dwo_ai_dataset_wizard_manager,dwo.ai.dataset.wizard manager,model_dwo_ai_dataset_wizard,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1

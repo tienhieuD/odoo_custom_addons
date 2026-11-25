@@ -10,13 +10,15 @@ import json
 import logging
 import re
 
+import psycopg2
 import requests
 
 from odoo import _, api, models
 from odoo.exceptions import AccessError, UserError
 
 from ..spec import constants as C
-from ..spec.grammar import format_help
+from ..spec.grammar import dataset_help, format_help
+from ..spec.sqlscan import scan
 
 _logger = logging.getLogger(__name__)
 
@@ -27,6 +29,10 @@ MAX_REQUEST = 1500        # characters of what the person writes
 MAX_FIELDS = 70           # fields described per dataset
 MAX_PAGE_JSON = 24000     # the current page, as sent
 MAX_ANSWER = 200000
+MAX_TABLES = 8            # tables described to the service for a SQL dataset
+MAX_TABLE_COLUMNS = 60
+MANAGER = "dwo_dashboard.group_dwo_dashboard_manager"
+TABLE_NAME = re.compile(r"^[a-z_][a-z0-9_]{0,62}$")
 FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.I)
 
 
@@ -230,4 +236,142 @@ class DwoDashboardAI(models.AbstractModel):
                 history = [{"role": "user", "content": prompt}, {"role": "assistant", "content": (text or "")[:6000]}]
                 prompt = ("Your page cannot be used. Problems:\n%s\nReply again with the complete corrected page as ONE JSON "
                           "object and nothing else." % "\n".join("%(path)s: %(message)s" % e for e in errors[:8]))
+        return {"ok": False, "message": problem, "errors": errors[:8], "retried": retried}
+
+    # ---------------------------------------------------------------------------------------------------- datasets
+    @api.model
+    def _describe_tables(self, names, request=""):
+        """Tables of the database as ``table(column type, ...)`` lines: names and types, nothing else. A table of the denylist of the
+        SQL engine and a column that looks like a credential are never described. ``names`` are what the manager chose; without them
+        the tables whose name appears in the request are used. Returns ``(text, [table names])``."""
+        from ..engine import sql as sql_engine
+        denied = sql_engine.denied_tables(self.env)
+        wanted = [n.strip().lower().replace(".", "_") for n in names or [] if isinstance(n, str)]
+        if not wanted:
+            words = [w for w in re.findall(r"[a-z0-9_]+", (request or "").lower()) if len(w) >= 3]
+            words += [w[:-1] for w in words if w.endswith("s")]
+            wanted = list(words) + [a + "_" + b for a, b in zip(words, words[1:])]
+        wanted = [w for w in dict.fromkeys(wanted) if TABLE_NAME.match(w) and w not in denied]
+        if not wanted:
+            return "", []
+        self.env.cr.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' "
+                            "AND table_name = ANY(%s) ORDER BY table_name", [wanted])
+        tables = [r[0] for r in self.env.cr.fetchall()][:MAX_TABLES]
+        if not tables:
+            return "", []
+        self.env.cr.execute("SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' "
+                            "AND table_name = ANY(%s) ORDER BY table_name, ordinal_position", [tables])
+        columns = {}
+        for table, column, kind in self.env.cr.fetchall():
+            if re.search(sql_engine.SECRET_COLUMN, column, re.I):
+                continue
+            columns.setdefault(table, []).append("%s %s" % (column, kind.replace("character varying", "varchar").replace(
+                "timestamp without time zone", "timestamp")))
+        return "\n".join("%s(%s)" % (t, ", ".join(columns.get(t, [])[:MAX_TABLE_COLUMNS])) for t in tables), tables
+
+    @api.model
+    def _dataset_prompt(self, kind, request, data, current):
+        parts = ["You help a manager write a dataset for the dashboards of Odoo. Reply with ONE JSON object and nothing else: no markdown, "
+                 "no comments, no explanation. Use only the data listed below.", "FORMAT\n" + dataset_help(kind), "DATA\n" + (data or "(none)")]
+        if current:
+            parts.append("CURRENT DEFINITION (change it as the request says, keep the rest)\n" + current)
+        parts.append("REQUEST\n" + request)
+        return "\n\n".join(parts)
+
+    @api.model
+    def _dataset_answer(self, kind, reply, model):
+        """Checks one reply of the service as the caller. Returns ``(result, errors)``: ``result`` is what the manager gets."""
+        Spec = self.env["dwo.dashboard.spec"]
+        if kind == "blend":
+            reply.setdefault("schema", C.DATASET_SCHEMA_ID)
+            reply["type"] = "blend"
+            reply.setdefault("code", "blend")
+            reply.setdefault("label", reply["code"])
+            check = Spec._validate_dataset(reply, True)
+            return ({"definition": reply} if check["valid"] else None), check["errors"]
+        if kind == "orm":
+            metrics = reply.get("metrics")
+            defn = {"schema": C.DATASET_SCHEMA_ID, "type": "orm", "model": model, "label": model, "metrics": metrics}
+            check = Spec._validate_dataset(defn, True)
+            return ({"metrics": metrics} if check["valid"] else None), check["errors"]
+        query = reply.get("query")
+        if not isinstance(query, str) or not query.strip():
+            return None, [{"path": "/query", "code": "required", "message": "the answer has no query"}]
+        query = query.strip().rstrip(";").strip()
+        problems, names = scan(query)
+        if problems:
+            return None, [{"path": "/query", "code": "sql", "message": p} for p in problems[:5]]
+        code = reply.get("code") if isinstance(reply.get("code"), str) and re.match(C.ID_PATTERN, reply["code"]) else "ai_query"
+        result = {"code": code, "label": reply.get("label") if isinstance(reply.get("label"), str) else code,
+                  "query": query, "params": [n for n in dict.fromkeys(names) if n in C.SQL_PARAMS], "tested": False}
+        if Spec._sql_enabled():
+            from ..engine import sql as sql_engine
+            try:
+                columns, _types, rows = sql_engine.sample(self.env, {"query": query, "params": result["params"]})
+            except sql_engine.SqlSetupError:
+                pass  # no safe login here: the manager gets the query untested
+            except sql_engine.SqlRefused as exc:
+                return None, [{"path": "/query", "code": "refused", "message": str(exc)}]
+            except psycopg2.Error as exc:  # the database says what is wrong with the query: the model can fix it
+                text = (exc.pgerror or str(exc)).strip().splitlines()
+                return None, [{"path": "/query", "code": "database", "message": (text[0] if text else "the query failed")[:300]}]
+            else:
+                result.update(tested=True, columns=columns, rows=len(rows))
+        return result, []
+
+    @api.model
+    def propose_dataset(self, kind, request, refs=None, current=None):
+        """A definition for a dataset, from words. Dashboard managers only; never saves. ``kind``: ``blend`` (``refs`` are the Odoo
+        models, ``orm:model``), ``orm`` (the metrics of the model in ``refs[0]``) or ``sql`` (``refs`` are table names, or the ones in the
+        request are used). ``current`` is the definition now (a blend as a JSON text, a query for SQL), sent only when given.
+        Returns ``{"ok": True, "kind", ...}`` or ``{"ok": False, "message", "errors"}``."""
+        if not self._enabled():
+            raise UserError(_("The assistant is switched off on this database."))
+        if not self.env.user.has_group(MANAGER):
+            raise AccessError(_("Only dashboard managers can ask the assistant for a dataset."))
+        if kind not in ("blend", "orm", "sql"):
+            raise UserError(_("Choose what to write: a blend, the metrics of a model or a SQL query."))
+        request = (request or "").strip()
+        if not request or len(request) > MAX_REQUEST:
+            raise UserError(_("Write what you want in 1 to %d characters.") % MAX_REQUEST)
+        refs = [r if r.startswith("orm:") else "orm:" + r for r in (refs or []) if isinstance(r, str) and r.strip()][:6] \
+            if kind != "sql" else [r for r in (refs or []) if isinstance(r, str) and r.strip()][:MAX_TABLES]
+        current = (current or "").strip()[:MAX_PAGE_JSON] if isinstance(current, str) else ""
+        model, tables = None, []
+        if kind == "sql":
+            data, tables = self._describe_tables(refs, request)
+            if not tables:
+                raise UserError(_("Name the tables the query reads (for example sale_order, res_partner): none was found."))
+        else:
+            if kind == "orm":
+                if len(refs) != 1:
+                    raise UserError(_("Choose the model the metrics are about."))
+                refs = refs[:1]
+            elif len(refs) < 2:
+                raise UserError(_("Choose two or three models to blend."))
+            data = self._describe_datasets(refs)
+            described = [r for r in refs if ('%s "' % r) in data]
+            if len(described) < len(refs):
+                raise UserError(_("You cannot read one of these models."))
+            model = refs[0][4:] if kind == "orm" else None
+        prompt = self._dataset_prompt(kind, request, data, current)
+        complete = self._dwo_ai_providers()[self._provider_name()][1]
+        history, retried, problem, errors = [], False, "", []
+        for attempt in (1, 2):
+            text = complete(prompt, history)
+            try:
+                reply = self._parse(text)
+            except (ValueError, json.JSONDecodeError) as exc:
+                problem = _("The answer was not a definition (%s).", exc)
+                errors = [{"path": "", "code": "json", "message": str(exc)}]
+            else:
+                result, errors = self._dataset_answer(kind, reply, model)
+                if result is not None:
+                    return dict(result, ok=True, kind=kind, retried=retried)
+                problem = _("The definition proposed is not valid.")
+            if attempt == 1:
+                retried = True
+                history = [{"role": "user", "content": prompt}, {"role": "assistant", "content": (text or "")[:6000]}]
+                prompt = ("Your answer cannot be used. Problems:\n%s\nReply again with the complete corrected answer as ONE JSON object "
+                          "and nothing else." % "\n".join("%(path)s: %(message)s" % e for e in errors[:8]))
         return {"ok": False, "message": problem, "errors": errors[:8], "retried": retried}
