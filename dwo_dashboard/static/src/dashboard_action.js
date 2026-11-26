@@ -13,6 +13,7 @@ import { ExplorePanel } from "./explore_panel";
 import { ShareDialog } from "./share_dialog";
 import { FilterBar } from "./filter_bar";
 import { FilterEditor } from "./filter_editor";
+import { placePopup } from "./select";
 import { COLS_DEFAULT, COLS_MAX, COLS_SPARE, GAP, INTERVAL_LABELS, ROW_HEIGHT, drillChain, newWidgetId, nextPosition } from "./utils";
 import { WidgetCard } from "./widget_card";
 import "./renderers/index";
@@ -43,13 +44,23 @@ export class DashboardAction extends Component {
         this.gridRef = useRef("grid");
         this.pagesRef = useRef("pages");
         // the pages are sorted by their handle only (it shows on hover); the other parts of an item stay clickable
+        this.pagesListRef = useRef("pagesList");
+        this.favListRef = useRef("favList");
         useSortable({
-            ref: this.pagesRef,
+            ref: this.pagesListRef,
             elements: ".dwo-page-own",
             handle: ".dwo-page-handle",
             cursor: "grabbing",
             delay: 0,
             onDrop: ({ element, previous }) => this.dropPage(element, previous),
+        });
+        useSortable({
+            ref: this.favListRef,
+            elements: ".dwo-fav-item",
+            handle: ".dwo-fav-handle",
+            cursor: "grabbing",
+            delay: 0,
+            onDrop: ({ element, previous }) => this.dropFavorite(element, previous),
         });
         this.grid = null;
         this.tokens = {};
@@ -57,14 +68,42 @@ export class DashboardAction extends Component {
         this.state = useState({
             ready: false, pages: [], shared: [], level: "owner", owner: "", pageId: null, name: "", revision: 0,
             spec: { schema: "dwo-dashboard/1", widgets: [] }, savedSpec: "", editing: false, snapshot: null,
-            data: {}, filterValues: {}, explore: null, saving: false, pageMenu: null, filterEditor: false,
+            data: {}, filterValues: {}, explore: null, saving: false, pageMenu: null, filterEditor: false, pagesList: false, tabsOverflow: false, addMenu: false,
             editCols: COLS_DEFAULT, ai: false, select: null, drills: {}, pick: null, // what was clicked (cross-filter, drill-down); never saved
         });
         useExternalListener(window, "click", () => {
             this.state.pageMenu = null;
             this.state.pick = null;
+            this.state.pagesList = false;
+            this.state.addMenu = false;
         });
+        // a fixed menu would stay where it was opened while the page moves under it
+        useExternalListener(window, "scroll", () => {
+            this.state.pageMenu = null;
+            this.state.pick = null;
+            this.state.addMenu = false;
+        }, { capture: true });
         onWillStart(() => this.boot());
+        // phone: the pages are tabs in a strip; when they do not all fit, a button opens the list of every page
+        useEffect(
+            () => {
+                const strip = this.pagesRef.el;
+                if (!strip || !window.ResizeObserver) {
+                    return;
+                }
+                const measure = () => {
+                    const wide = window.innerWidth < 768 && strip.scrollWidth > strip.clientWidth + 1;
+                    if (wide !== this.state.tabsOverflow) {
+                        this.state.tabsOverflow = wide;
+                    }
+                };
+                const observer = new ResizeObserver(measure);
+                observer.observe(strip);
+                measure();
+                return () => observer.disconnect();
+            },
+            () => [this.state.ready, this.state.pages.map((p) => p.name).join("|"), this.state.shared.length]
+        );
         useEffect(
             () => {
                 if (!this.state.editing) {
@@ -92,7 +131,7 @@ export class DashboardAction extends Component {
         this.state.pages = dashboard.pages;
         this.state.shared = dashboard.shared || [];
         this.orm.call("dwo.dashboard.ai", "get_status", []).then((status) => (this.state.ai = status.enabled)).catch(() => {});
-        await this.openPage(dashboard.pages[0].id, true);
+        await this.openPage(this.realPages[0].id, true);
         this.state.ready = true;
     }
 
@@ -108,6 +147,113 @@ export class DashboardAction extends Component {
 
     get isOwner() {
         return this.state.level === "owner";
+    }
+
+    // ------------------------------------------------------------------------------- the menu of pages
+    /** The pages (not the categories). */
+    get realPages() {
+        return this.state.pages.filter((p) => p.kind !== "divider");
+    }
+
+    get hasDividers() {
+        return this.state.pages.some((p) => p.kind === "divider");
+    }
+
+    get allCollapsed() {
+        const dividers = this.state.pages.filter((p) => p.kind === "divider");
+        return dividers.length > 0 && dividers.every((d) => d.collapsed);
+    }
+
+    get favorites() {
+        return this.realPages.filter((p) => p.favorite).sort((a, b) => a.fav_sequence - b.fav_sequence || a.id - b.id);
+    }
+
+    /** Every item in order; ``hidden``: it is in a category that is folded (on a phone the strip ignores it). */
+    get menuRows() {
+        let folded = false;
+        return this.state.pages.map((page) => {
+            if (page.kind === "divider") {
+                folded = page.collapsed;
+                return { page, hidden: false };
+            }
+            return { page, hidden: folded };
+        });
+    }
+
+    /** The list of the "more" button: favorites, then the categories with their pages, then what is shared. */
+    get listRows() {
+        const rows = [];
+        const favorites = this.favorites;
+        if (favorites.length) {
+            rows.push({ heading: _t("Favorites") }, ...favorites.map((page) => ({ page })));
+        }
+        let first = true;
+        for (const page of this.state.pages) {
+            if (page.kind === "divider") {
+                rows.push({ heading: page.name });
+            } else {
+                if (first && favorites.length) {
+                    rows.push({ heading: _t("Pages") });
+                }
+                rows.push({ page });
+            }
+            first = false;
+        }
+        if (this.state.shared.length) {
+            rows.push({ heading: _t("Shared with me") }, ...this.state.shared.map((page) => ({ page })));
+        }
+        return rows;
+    }
+
+    toggleAddMenu(ev) {
+        ev.stopPropagation();
+        if (!this.state.addMenu) {
+            this.state.addMenuStyle = placePopup(ev.currentTarget.getBoundingClientRect(), { minWidth: 190, height: 110 });
+        }
+        this.state.addMenu = !this.state.addMenu;
+    }
+
+    async toggleFavorite(page) {
+        const favorite = !page.favorite;
+        const top = Math.max(0, ...this.realPages.filter((p) => p.favorite).map((p) => p.fav_sequence));
+        const vals = favorite ? { favorite, fav_sequence: top + 10 } : { favorite };
+        await this.orm.write("dwo.dashboard.page", [page.id], vals);
+        Object.assign(this.state.pages.find((p) => p.id === page.id), vals);
+    }
+
+    async toggleCollapsed(divider) {
+        const collapsed = !divider.collapsed;
+        await this.orm.write("dwo.dashboard.page", [divider.id], { collapsed });
+        this.state.pages.find((p) => p.id === divider.id).collapsed = collapsed;
+    }
+
+    /** Fold every category, or unfold them all when they are all folded. */
+    async toggleAll() {
+        const collapsed = !this.allCollapsed;
+        const dividers = this.state.pages.filter((p) => p.kind === "divider");
+        await this.orm.write("dwo.dashboard.page", dividers.map((d) => d.id), { collapsed });
+        dividers.forEach((d) => (d.collapsed = collapsed));
+    }
+
+    addDivider() {
+        this.state.addMenu = false;
+        this.dialog.add(PageNameDialog, {
+            title: _t("New category"),
+            confirmLabel: _t("Create"),
+            onConfirm: async (name) => {
+                await this.orm.create("dwo.dashboard.page", [{ name, kind: "divider", dashboard_id: this.dashboardId }]);
+                await this.refreshLists();
+            },
+        });
+    }
+
+    async dropFavorite(element, previous) {
+        const moved = Number(element.dataset.pageId);
+        const ids = this.favorites.map((p) => p.id).filter((id) => id !== moved);
+        const after = previous && previous.dataset.pageId ? ids.indexOf(Number(previous.dataset.pageId)) : -1;
+        ids.splice(after + 1, 0, moved);
+        ids.forEach((id, index) => (this.state.pages.find((p) => p.id === id).fav_sequence = (index + 1) * 10));
+        await this.orm.call("dwo.dashboard.page", "reorder_favorites", [ids]);
     }
 
     async refreshLists() {
@@ -233,6 +379,7 @@ export class DashboardAction extends Component {
 
     /** "+": ask for a name first; the page exists only after OK. */
     addPage() {
+        this.state.addMenu = false;
         this.dialog.add(PageNameDialog, {
             title: _t("New page"),
             confirmLabel: _t("Create"),
@@ -247,7 +394,7 @@ export class DashboardAction extends Component {
     startRename(page) {
         this.state.pageMenu = null;
         this.dialog.add(PageNameDialog, {
-            title: _t("Rename page"),
+            title: page.kind === "divider" ? _t("Rename category") : _t("Rename page"),
             initial: page.name,
             onConfirm: async (name) => {
                 await this.orm.write("dwo.dashboard.page", [page.id], { name });
@@ -266,16 +413,17 @@ export class DashboardAction extends Component {
     }
 
     deletePage(page) {
+        const divider = page.kind === "divider";
         this.dialog.add(ConfirmationDialog, {
-            title: _t("Delete page"),
-            body: _t("Delete the page “%s” and its widgets?", page.name),
+            title: divider ? _t("Delete category") : _t("Delete page"),
+            body: divider ? _t("Delete the category “%s”? Its pages are kept.", page.name) : _t("Delete the page “%s” and its widgets?", page.name),
             confirmLabel: _t("Delete"),
             confirm: async () => {
                 await this.orm.unlink("dwo.dashboard.page", [page.id]);
                 const dashboard = await this.orm.call("dwo.dashboard", "get_my_dashboard", []);
                 this.state.pages = dashboard.pages;
                 if (page.id === this.state.pageId) {
-                    await this.openPage(dashboard.pages[0].id, true);
+                    await this.openPage(this.realPages[0].id, true);
                 }
             },
             cancel: () => {},
@@ -285,7 +433,12 @@ export class DashboardAction extends Component {
     async dropPage(element, previous) {
         const moved = Number(element.dataset.pageId);
         const ids = this.state.pages.map((p) => p.id).filter((id) => id !== moved);
-        const after = previous && previous.dataset.pageId ? ids.indexOf(Number(previous.dataset.pageId)) : -1;
+        let after = previous && previous.dataset.pageId ? ids.indexOf(Number(previous.dataset.pageId)) : -1;
+        // dropped right under a folded category: it joins that category, which unfolds so that the page does not vanish
+        const above = after >= 0 ? this.state.pages.find((p) => p.id === ids[after]) : null;
+        if (above && above.kind === "divider" && above.collapsed) {
+            await this.toggleCollapsed(above);
+        }
         ids.splice(after + 1, 0, moved);
         await this.saveOrder(ids);
     }
@@ -338,7 +491,7 @@ export class DashboardAction extends Component {
         const next = chain[steps.length + 1];
         this.state.pick = {
             widget, key: pick.key, label: pick.label,
-            x: Math.max(8, Math.min(pick.x, window.innerWidth - 240)), y: Math.max(8, Math.min(pick.y, window.innerHeight - 190)),
+            style: placePopup({ left: pick.x, right: pick.x, top: pick.y, bottom: pick.y, width: 0 }, { minWidth: 220, height: 190 }),
             selected: !!this.state.select && this.state.select.widget === widget.id && this.state.select.key === pick.key,
             drillTo: next ? INTERVAL_LABELS[next] : null,
         };
@@ -467,7 +620,28 @@ export class DashboardAction extends Component {
 
     togglePageMenu(page, ev) {
         ev.stopPropagation();
-        this.state.pageMenu = this.state.pageMenu === page.id ? null : page.id;
+        if (this.state.pageMenu === page.id) {
+            this.state.pageMenu = null;
+            return;
+        }
+        this.state.pageMenuStyle = placePopup(ev.currentTarget.getBoundingClientRect(), { minWidth: 170, height: 220 });
+        this.state.pageMenu = page.id;
+    }
+
+    togglePagesList(ev) {
+        ev.stopPropagation();
+        if (!this.state.pagesList) {
+            this.state.pagesListStyle = placePopup(ev.currentTarget.getBoundingClientRect(), { minWidth: 220, height: 300 });
+        }
+        this.state.pagesList = !this.state.pagesList;
+    }
+
+    toggleFilterEditor(ev) {
+        ev.stopPropagation();
+        if (!this.state.filterEditor) {
+            this.state.filterEditorStyle = placePopup(ev.currentTarget.getBoundingClientRect(), { minWidth: 340, height: 360 });
+        }
+        this.state.filterEditor = !this.state.filterEditor;
     }
 
     closeExplore() {

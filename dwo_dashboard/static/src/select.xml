@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.Select">
+        <div t-ref="root" t-attf-class="dwo-select form-select form-select-sm #{props.class || ''} #{state.open ? 'open' : ''}"
+             tabindex="0" role="combobox" t-att-data-level="props.dataLevel" t-att-data-value="props.value"
+             t-on-click="open" t-on-keydown="onTriggerKey">
+            <span t-if="current" class="dwo-select-text text-truncate" t-out="current.label"/>
+            <span t-else="" class="dwo-select-text text-truncate text-muted" t-out="props.placeholder or ''"/>
+        </div>
+        <t t-if="state.open" t-portal="'body'">
+            <div class="dwo-select-popup card shadow" t-att-style="state.style">
+                <input t-ref="input" class="form-control form-control-sm dwo-select-search" type="text" placeholder="Search..."
+                       autocomplete="off" t-att-value="state.query" t-on-input="onQuery" t-on-keydown="onKey"/>
+                <div class="dwo-select-list">
+                    <t t-foreach="rows" t-as="row" t-key="row_index">
+                        <div t-if="row.heading" class="dwo-select-heading" t-out="row.heading"/>
+                        <div t-else="" t-attf-class="dwo-select-option #{row.index === state.index ? 'active' : ''} #{row.option.value === props.value ? 'selected' : ''}"
+                             t-att-data-value="row.option.value" t-on-click.stop="() => this.choose(row.option)"
+                             t-on-mouseenter="() => state.index = row.index" t-out="row.option.label"/>
+                    </t>
+                    <div t-if="!shown.length" class="dwo-select-empty text-muted">Nothing found</div>
+                </div>
+            </div>
+        </t>
+    </t>
+</templates>

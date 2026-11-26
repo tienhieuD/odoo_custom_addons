@@ -34,7 +34,8 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour", {
         { trigger: ".dwo-dataset-input", run: "edit Contact" },
         { trigger: ".dwo-dataset-option:contains(res.partner)", run: "click" },
         { trigger: ".dwo-visual-bar", run: "click" },
-        { trigger: ".dwo-well[data-well=axis] .dwo-well-item select", run: "select country_id" },
+        { trigger: ".dwo-well[data-well=axis] .dwo-well-item .dwo-select", run: "click" },
+        { trigger: ".dwo-select-popup .dwo-select-option[data-value=country_id]", run: "click" },
         { trigger: ".dwo-explore-preview canvas" },
         { trigger: ".dwo-explore-apply:not(:disabled)", run: "click" },
         { trigger: ".dwo-grid-edit .dwo-card[data-widget-id=w2] canvas" },
@@ -46,7 +47,8 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour", {
         // a second filter, "some records" on the country: its model must match what the field points to
         { trigger: ".dwo-add-filter", run: "click" },
         { trigger: ".dwo-filter-kind-relation", run: "click" },
-        { trigger: ".dwo-filter-field", run: "select relation|country_id|res.country" },
+        { trigger: ".dwo-filter-field", run: "click" },
+        { trigger: ".dwo-select-popup .dwo-select-option[data-value='relation|country_id|res.country']", run: "click" },
         { trigger: ".dwo-filter-add:not(:disabled)", run: "click" },
         { trigger: ".dwo-filter[data-filter-id=country_id]" },
         { trigger: ".dwo-done", run: "click" },
@@ -54,7 +56,7 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour", {
         // the date filter is on "All time": nothing to compare, and the card says what to do
         { trigger: ".dwo-grid .dwo-card[data-widget-id=w1] .dwo-kpi-hint" },
         { trigger: ".dwo-grid .dwo-card[data-widget-id=w2] canvas" },
-        { trigger: ".dwo-filter select" },
+        { trigger: ".dwo-filter .dwo-select" },
     ],
 });
 
@@ -77,11 +79,13 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour_reload", {
         // a second page, with the "+" of the page list
         // Cancel creates nothing
         { trigger: ".dwo-page-add", run: "click" },
+        { trigger: ".dwo-add-page", run: "click" },
         { trigger: ".dwo-page-name-input", run: "edit Ghost" },
         { trigger: ".dwo-page-name-cancel", run: "click" },
         { trigger: ".dwo-pages:not(:has(.dwo-page-name:contains(Ghost)))" },
         // an empty name cannot be confirmed; OK creates the page and opens it
         { trigger: ".dwo-page-add", run: "click" },
+        { trigger: ".dwo-add-page", run: "click" },
         { trigger: ".dwo-page-name-ok:disabled" },
         { trigger: ".dwo-page-name-input", run: "edit Sales" },
         { trigger: ".dwo-page-name-ok:not(:disabled)", run: "click" },
@@ -98,5 +102,31 @@ registry.category("web_tour.tours").add("dwo_dashboard_tour_persist", {
         { trigger: ".grid-stack-item[gs-id=w2]" },
         { trigger: ".dwo-done", run: "click" },
         { trigger: ".dwo-grid .dwo-card[data-widget-id=w2] canvas" },
+        // a category (divider), a page under it, then fold it: the page leaves the menu
+        { trigger: ".dwo-page-add", run: "click" },
+        { trigger: ".dwo-add-divider", run: "click" },
+        { trigger: ".dwo-page-name-input", run: "edit Team" },
+        { trigger: ".dwo-page-name-ok:not(:disabled)", run: "click" },
+        { trigger: ".dwo-divider-item .dwo-divider-name:contains(Team)" },
+        { trigger: ".dwo-page-add", run: "click" },
+        { trigger: ".dwo-add-page", run: "click" },
+        { trigger: ".dwo-page-name-input", run: "edit Docs" },
+        { trigger: ".dwo-page-name-ok:not(:disabled)", run: "click" },
+        { trigger: ".dwo-pages-body .dwo-page-own:not(.dwo-divider-item) .dwo-page-name:contains(Docs)" },
+        { trigger: ".dwo-divider-item .dwo-divider-toggle", run: "click" },
+        {
+            trigger: ".dwo-pages-body",
+            run: () => {
+                const row = document.querySelector(".dwo-pages-body .dwo-in-collapsed");
+                if (!row || getComputedStyle(row).display !== "none") {
+                    throw new Error("the page under a folded category must be hidden");
+                }
+            },
+        },
+        { trigger: ".dwo-toggle-all .fa-expand", run: "click" }, // all folded: the button unfolds them
+        { trigger: ".dwo-pages-body .dwo-page-own .dwo-page-name:contains(Docs)" },
+        // a favorite shows in its own section, above the menu
+        { trigger: ".dwo-pages-body .dwo-page-own:has(.dwo-page-name:contains(Docs)) .dwo-star", run: "click" },
+        { trigger: ".dwo-favorites .dwo-fav-item .dwo-page-name:contains(Docs)" },
     ],
 });

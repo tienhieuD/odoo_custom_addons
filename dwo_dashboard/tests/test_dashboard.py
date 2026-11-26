@@ -159,6 +159,42 @@ class TestPages(DashboardCase):
         with self.assertRaisesRegex(ValidationError, "at most 30"):
             self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "one too many"})
 
+    def test_a_category_is_a_heading_not_a_page(self):
+        divider = self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "Team", "kind": "divider"})
+        for call in (lambda: self.Mine.get_page(divider.id), lambda: divider.duplicate_page(),
+                     lambda: divider.save_spec(sample_page("attachments_usage"), 1),
+                     lambda: divider.share_with([self.bob.id], [], "view")):
+            with self.assertRaises(UserError):
+                call()
+        # it does not count as a page, nor does it appear for other people
+        for i in range(29):
+            self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "P%d" % i})
+        self.assertEqual(len(self.as_(self.alice).get_my_dashboard()["pages"]), 1 + 29 + 1)
+        self.assertEqual(self.as_(self.bob).get_my_dashboard()["shared"], [])
+
+    def test_at_most_thirty_categories(self):
+        for i in range(30):
+            self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "D%d" % i, "kind": "divider"})
+        with self.assertRaisesRegex(ValidationError, "at most 30 categories"):
+            self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "one too many", "kind": "divider"})
+
+    def test_favorites_and_folding_are_the_owners(self):
+        divider = self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "Team", "kind": "divider"})
+        second = self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "Second"})
+        (self.home | second).write({"favorite": True})
+        self.Mine.reorder_favorites([second.id, self.home.id])
+        self.assertEqual([second.fav_sequence, self.home.fav_sequence], [10, 20])
+        divider.write({"collapsed": True})
+        self.assertEqual(self.home.revision, 1)  # a fold or a star is not a new revision of the page
+        self.Mine.reorder_favorites([self.home.id])
+        # somebody else cannot star or fold what is not theirs, nor order it
+        self.home.share_with([self.bob.id], [], "edit")
+        as_bob = self.as_(self.bob, "dwo.dashboard.page").browse(self.home.id)
+        with self.assertRaises(AccessError):
+            as_bob.write({"favorite": False})
+        with self.assertRaises(AccessError):
+            self.as_(self.bob, "dwo.dashboard.page").reorder_favorites([self.home.id])
+
     def test_reorder_only_my_pages(self):
         second = self.Mine.create({"dashboard_id": self.dashboard["id"], "name": "Second"})
         self.Mine.reorder([second.id, self.home.id])

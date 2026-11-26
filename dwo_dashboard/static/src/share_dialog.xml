@@ -13,10 +13,7 @@
             <div class="d-flex gap-2 mb-2">
                 <input class="form-control dwo-share-search" placeholder="Add a person or a group..." t-att-value="state.query"
                        t-on-input="onQuery"/>
-                <select class="form-select w-auto dwo-share-level dwo-share-newlevel" t-model="state.level">
-                    <option value="view">View</option>
-                    <option value="edit">Edit</option>
-                </select>
+                <DwoSelect class="'w-auto dwo-share-level dwo-share-newlevel'" options="levels" value="state.level" onChange.bind="setNewLevel"/>
             </div>
             <div t-if="state.found" class="list-group mb-2 dwo-share-found">
                 <button t-foreach="state.found.users" t-as="u" t-key="'u' + u.id" class="list-group-item list-group-item-action"
@@ -31,10 +28,7 @@
                 <tr t-foreach="state.shares" t-as="s" t-key="s.id">
                     <td><i t-attf-class="fa #{s.kind === 'group' ? 'fa-users' : 'fa-user'}"/> <t t-out="s.name"/></td>
                     <td class="text-end">
-                        <select class="form-select form-select-sm d-inline-block w-auto dwo-share-level" t-on-change="(ev) => this.setLevel(s, ev)">
-                            <option value="view" t-att-selected="s.level === 'view'">View</option>
-                            <option value="edit" t-att-selected="s.level === 'edit'">Edit</option>
-                        </select>
+                        <DwoSelect class="'w-auto dwo-share-level'" options="levels" value="s.level" onChange.bind="setLevel" args="[s]"/>
                         <button class="btn btn-sm btn-link text-danger dwo-share-revoke" t-on-click="() => this.revoke(s)">Revoke</button>
                     </td>
                 </tr>

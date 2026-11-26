@@ -4,7 +4,7 @@
         <div class="dwo-card d-flex flex-column h-100" t-att-data-widget-id="props.widget.id" t-att-data-type="props.widget.type">
             <div class="dwo-card-header d-flex align-items-center gap-2">
                 <i t-attf-class="fa #{icon} dwo-card-icon"/>
-                <span class="dwo-card-title flex-grow-1 text-truncate" t-out="title"/>
+                <span class="dwo-card-title flex-grow-1 text-truncate" t-att-data-tooltip="title" data-tooltip-delay="2000" t-out="title"/>
                 <span t-if="props.drill and props.drill.length" class="dwo-drill small text-muted text-truncate">
                     <t t-foreach="props.drill" t-as="step" t-key="step_index"><t t-if="step_index"> › </t><t t-out="step"/></t>
                     <button class="btn btn-sm btn-link p-0 ms-1 dwo-drill-up" t-on-click.stop="() => props.onDrillUp(props.widget)"

@@ -3,6 +3,7 @@
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+import { DwoSelect } from "./select";
 import { PRESET_LABELS } from "./utils";
 
 const KINDS = [
@@ -19,10 +20,13 @@ export class FilterEditor extends Component {
     static template = "dwo_dashboard.FilterEditor";
     static props = { datasets: Array, existing: Array, onAdd: Function, onClose: Function };
 
+    static components = { DwoSelect };
+
     setup() {
         this.orm = useService("orm");
         this.kinds = KINDS;
         this.presets = Object.entries(PRESET_LABELS);
+        this.presetOptions = this.presets.map(([value, label]) => ({ value, label }));
         this.state = useState({ loading: true, candidates: [], type: "date", key: "", label: "", default: "all" });
         onWillStart(async () => {
             // every dataset of the page: an Odoo model, a blend (its dimensions) or a SQL dataset (its columns); one that cannot be
@@ -84,6 +88,14 @@ export class FilterEditor extends Component {
     pick(candidate) {
         this.state.key = candidate ? candidate.key : "";
         this.state.label = candidate ? candidate.label : "";
+    }
+
+    setDefault(ev) {
+        this.state.default = ev.target.value;
+    }
+
+    get candidateOptions() {
+        return this.visible.map((c) => ({ value: c.key, label: `${c.label} (${this.sources(c.datasets.length)})` }));
     }
 
     onField(ev) {

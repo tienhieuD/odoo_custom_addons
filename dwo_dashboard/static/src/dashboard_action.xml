@@ -5,31 +5,70 @@
             <t t-if="state.ready">
                 <!-- pages: the menu inside the dashboard -->
                 <nav class="dwo-pages border-end d-flex flex-column p-2 gap-1" t-ref="pages">
-                    <div class="d-flex align-items-center mb-1">
+                    <div class="dwo-pages-head d-flex align-items-center gap-1 mb-1">
                         <span class="fw-bold flex-grow-1">Pages</span>
-                        <button class="btn btn-sm btn-secondary dwo-page-add" t-on-click="addPage" title="New page">+</button>
+                        <button t-if="hasDividers" class="btn btn-sm btn-link p-0 px-1 dwo-toggle-all" t-on-click="toggleAll"
+                                t-att-title="allCollapsed ? 'Expand all' : 'Collapse all'">
+                            <i t-attf-class="fa #{allCollapsed ? 'fa-expand' : 'fa-compress'}"/>
+                        </button>
+                        <button class="btn btn-sm btn-secondary dwo-page-add" t-on-click="toggleAddMenu" title="Add a page or a category">+</button>
                     </div>
-                    <div t-foreach="state.pages" t-as="page" t-key="page.id"
-                         t-attf-class="dwo-page-item dwo-page-own d-flex align-items-center gap-1 rounded px-1 py-1 #{page.id === state.pageId ? 'active' : ''}"
-                         t-att-data-page-id="page.id">
-                        <span class="dwo-page-handle d-flex align-items-center justify-content-center" title="Drag to reorder"><i class="oi oi-draggable"/></span>
-                        <a href="#" class="flex-grow-1 text-truncate dwo-page-name" t-on-click.prevent="() => this.openPage(page.id)"
-                           t-on-dblclick="() => this.startRename(page)" t-out="page.name"/>
-                        <div class="dwo-page-menu position-relative">
-                            <button class="btn btn-sm btn-link p-0 dwo-page-more" t-on-click="(ev) => this.togglePageMenu(page, ev)"
-                                    title="Page options"><i class="fa fa-ellipsis-v"/></button>
-                            <div t-if="state.pageMenu === page.id" class="dwo-page-popover card position-absolute shadow py-1">
-                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.startRename(page)">Rename</a>
-                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.duplicatePage(page)">Duplicate</a>
-                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, -1)">Move up</a>
-                                <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, 1)">Move down</a>
-                                <a t-if="state.pages.length > 1" href="#" class="dropdown-item text-danger dwo-page-delete"
-                                   t-on-click.prevent="() => this.deletePage(page)">Delete</a>
+
+                    <!-- favorites: the same pages again, in their own order -->
+                    <div t-if="favorites.length" class="dwo-favorites">
+                        <div class="dwo-section-title fw-bold small text-muted text-uppercase mb-1"><i class="fa fa-star"/> Favorites</div>
+                        <div t-ref="favList" class="d-flex flex-column gap-1">
+                            <div t-foreach="favorites" t-as="page" t-key="page.id"
+                                 t-attf-class="dwo-page-item dwo-fav-item d-flex align-items-center gap-1 rounded px-1 py-1 #{page.id === state.pageId ? 'active' : ''}"
+                                 t-att-data-page-id="page.id">
+                                <span class="dwo-fav-handle d-flex align-items-center justify-content-center" title="Drag to reorder"><i class="oi oi-draggable"/></span>
+                                <a href="#" class="flex-grow-1 text-truncate dwo-page-name" t-att-data-tooltip="page.name" data-tooltip-delay="2000"
+                                   t-on-click.prevent="() => this.openPage(page.id)" t-out="page.name"/>
+                                <button class="btn btn-sm btn-link p-0 dwo-star on" title="Remove from favorites"
+                                        t-on-click.stop="() => this.toggleFavorite(page)"><i class="fa fa-star"/></button>
                             </div>
                         </div>
+                        <hr class="my-2"/>
+                    </div>
+
+                    <div t-ref="pagesList" class="dwo-pages-body d-flex flex-column gap-1">
+                        <t t-foreach="menuRows" t-as="row" t-key="row.page.id">
+                            <t t-set="page" t-value="row.page"/>
+                            <div t-attf-class="dwo-page-item dwo-page-own d-flex align-items-center gap-1 rounded px-1 py-1 #{page.kind === 'divider' ? 'dwo-divider-item' : ''} #{row.hidden ? 'dwo-in-collapsed' : ''} #{page.id === state.pageId ? 'active' : ''}"
+                                 t-att-data-page-id="page.id">
+                                <span class="dwo-page-handle d-flex align-items-center justify-content-center" title="Drag to reorder"><i class="oi oi-draggable"/></span>
+                                <t t-if="page.kind === 'divider'">
+                                    <button class="btn btn-sm btn-link p-0 dwo-divider-toggle" t-on-click.stop="() => this.toggleCollapsed(page)"
+                                            t-att-title="page.collapsed ? 'Expand' : 'Collapse'">
+                                        <i t-attf-class="fa #{page.collapsed ? 'fa-caret-right' : 'fa-caret-down'}"/>
+                                    </button>
+                                    <span class="flex-grow-1 text-truncate dwo-page-name dwo-divider-name" t-att-data-tooltip="page.name" data-tooltip-delay="2000"
+                                          t-on-click="() => this.toggleCollapsed(page)" t-on-dblclick="() => this.startRename(page)" t-out="page.name"/>
+                                </t>
+                                <t t-else="">
+                                    <a href="#" class="flex-grow-1 text-truncate dwo-page-name" t-att-data-tooltip="page.name" data-tooltip-delay="2000"
+                                       t-on-click.prevent="() => this.openPage(page.id)" t-on-dblclick="() => this.startRename(page)" t-out="page.name"/>
+                                    <button t-attf-class="btn btn-sm btn-link p-0 dwo-star #{page.favorite ? 'on' : ''}"
+                                            t-att-title="page.favorite ? 'Remove from favorites' : 'Add to favorites'"
+                                            t-on-click.stop="() => this.toggleFavorite(page)"><i t-attf-class="fa #{page.favorite ? 'fa-star' : 'fa-star-o'}"/></button>
+                                </t>
+                                <div class="dwo-page-menu position-relative">
+                                    <button class="btn btn-sm btn-link p-0 dwo-page-more" t-on-click="(ev) => this.togglePageMenu(page, ev)"
+                                            title="Options"><i class="fa fa-ellipsis-v"/></button>
+                                    <div t-if="state.pageMenu === page.id" class="dwo-page-popover dwo-fixed-menu card shadow py-1" t-att-style="state.pageMenuStyle">
+                                        <a href="#" class="dropdown-item" t-on-click.prevent="() => this.startRename(page)">Rename</a>
+                                        <a t-if="page.kind === 'page'" href="#" class="dropdown-item" t-on-click.prevent="() => this.duplicatePage(page)">Duplicate</a>
+                                        <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, -1)">Move up</a>
+                                        <a href="#" class="dropdown-item" t-on-click.prevent="() => this.movePage(page, 1)">Move down</a>
+                                        <a t-if="page.kind === 'divider' or realPages.length > 1" href="#" class="dropdown-item text-danger dwo-page-delete"
+                                           t-on-click.prevent="() => this.deletePage(page)">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
                     </div>
                     <t t-if="state.shared.length">
-                        <div class="fw-bold mt-3 mb-1">Shared with me</div>
+                        <div class="dwo-shared-title fw-bold mt-3 mb-1">Shared with me</div>
                         <div t-foreach="state.shared" t-as="page" t-key="page.id"
                              t-attf-class="dwo-page-item dwo-shared-item d-flex align-items-center gap-1 rounded px-2 py-1 #{page.id === state.pageId ? 'active' : ''}"
                              t-att-data-page-id="page.id">
@@ -40,7 +79,23 @@
                                   t-out="page.level === 'edit' ? 'Edit' : 'View'"/>
                         </div>
                     </t>
+                    <!-- phone: "+" is the last tab, and a list of every page when the tabs do not fit or there are categories -->
+                    <button class="dwo-page-add-tab" t-on-click="toggleAddMenu" title="Add a page or a category"><i class="fa fa-plus"/></button>
+                    <button t-if="state.tabsOverflow or hasDividers or favorites.length" class="dwo-pages-more" t-on-click="togglePagesList" title="All pages">
+                        <i class="fa fa-caret-down"/>
+                    </button>
                 </nav>
+                <div t-if="state.addMenu" class="dwo-add-menu dwo-fixed-menu card shadow py-1" t-att-style="state.addMenuStyle">
+                    <a href="#" class="dropdown-item dwo-add-page" t-on-click.prevent="addPage"><i class="fa fa-file-o"/> New page</a>
+                    <a href="#" class="dropdown-item dwo-add-divider" t-on-click.prevent="addDivider"><i class="fa fa-folder-o"/> New category</a>
+                </div>
+                <div t-if="state.pagesList" class="dwo-pages-list dwo-fixed-menu card shadow py-1" t-att-style="state.pagesListStyle">
+                    <t t-foreach="listRows" t-as="row" t-key="row_index">
+                        <div t-if="row.heading" class="dwo-list-heading px-3 pt-2 pb-1 small fw-bold text-muted text-uppercase text-truncate" t-out="row.heading"/>
+                        <a t-else="" href="#" t-attf-class="dropdown-item text-truncate #{row.page.id === state.pageId ? 'fw-bold' : ''}"
+                           t-on-click.prevent="() => this.openPage(row.page.id)" t-out="row.page.name"/>
+                    </t>
+                </div>
 
                 <!-- the grid -->
                 <main class="dwo-main flex-grow-1 d-flex flex-column overflow-hidden">
@@ -59,10 +114,10 @@
                         <div class="d-flex flex-wrap gap-1 dwo-actions">
                             <t t-if="state.editing">
                                 <div class="position-relative">
-                                    <button class="btn btn-secondary dwo-add-filter" t-on-click="() => state.filterEditor = !state.filterEditor">
+                                    <button class="btn btn-secondary dwo-add-filter" t-on-click="toggleFilterEditor">
                                         <i class="fa fa-filter"/> Add filter
                                     </button>
-                                    <div t-if="state.filterEditor" class="dwo-filter-editor-wrap position-absolute">
+                                    <div t-if="state.filterEditor" class="dwo-filter-editor-wrap dwo-fixed-menu" t-att-style="state.filterEditorStyle">
                                         <FilterEditor datasets="pageDatasets" existing="filters" onAdd.bind="addFilter"
                                                       onClose="() => state.filterEditor = false"/>
                                     </div>
@@ -116,7 +171,7 @@
                     </div>
                 </main>
 
-                <div t-if="state.pick" class="dwo-pick-menu card shadow py-1" t-attf-style="left: #{state.pick.x}px; top: #{state.pick.y}px">
+                <div t-if="state.pick" class="dwo-pick-menu dwo-fixed-menu card shadow py-1" t-att-style="state.pick.style">
                     <div class="px-3 py-1 fw-bold small text-truncate" t-out="state.pick.label"/>
                     <a href="#" class="dropdown-item dwo-pick-filter" t-on-click.prevent="pickFilter">
                         <i class="fa fa-filter"/> <t t-out="state.pick.selected ? 'Clear the filter' : 'Filter the other widgets'"/>

@@ -22,7 +22,7 @@
                     <input class="form-control dwo-dataset-input" placeholder="Search: Contact, Sales order, Invoice..."
                            t-att-value="state.datasetOpen ? state.search : datasetLabel"
                            t-on-focus="openDatasets" t-on-blur="closeDatasets" t-on-input="(ev) => state.search = ev.target.value"/>
-                    <div t-if="state.datasetOpen" class="dwo-dataset-list card position-absolute w-100 shadow">
+                    <div t-if="state.datasetOpen" class="dwo-dataset-list dwo-fixed-menu card shadow" t-att-style="state.datasetStyle">
                         <t t-foreach="datasetChoices" t-as="d" t-key="d.ref">
                             <div t-if="d_index === 0 or datasetChoices[d_index - 1].group !== d.group" class="dwo-dataset-group small text-muted px-2 pt-1"
                                  t-out="groupTitle(d.group)"/>
@@ -55,43 +55,12 @@
                         <label class="form-label fw-bold text-capitalize" t-out="well.name"/>
                         <div t-foreach="items(well)" t-as="item" t-key="item_index" class="d-flex gap-1 mb-1 dwo-well-item">
                             <t t-if="well.accepts === 'measure'">
-                                <select class="form-select form-select-sm w-auto" t-on-change="(ev) => this.setAgg(item, ev)">
-                                    <t t-if="state.metrics.length">
-                                        <optgroup label="Metrics of this data">
-                                            <option t-foreach="state.metrics" t-as="m" t-key="m.name" t-att-value="'metric:' + m.name"
-                                                    t-att-selected="item.metric === m.name" t-out="m.label"/>
-                                        </optgroup>
-                                        <optgroup t-if="state.kind === 'orm'" label="Aggregate of a field">
-                                            <option value="count" t-att-selected="!item.metric and item.agg === 'count'">Count</option>
-                                            <option t-foreach="aggChoices" t-as="a" t-key="a.value" t-att-value="a.value"
-                                                    t-att-selected="!item.metric and item.agg === a.value" t-out="a.label"/>
-                                        </optgroup>
-                                    </t>
-                                    <t t-else="">
-                                        <option value="count" t-att-selected="item.agg === 'count'">Count</option>
-                                        <option t-foreach="aggChoices" t-as="a" t-key="a.value" t-att-value="a.value"
-                                                t-att-selected="item.agg === a.value" t-out="a.label"/>
-                                    </t>
-                                </select>
-                                <select t-if="!item.metric and item.agg !== 'count'" class="form-select form-select-sm"
-                                        t-on-change="(ev) => this.setField(item, ev)">
-                                    <option value="">Field...</option>
-                                    <option t-foreach="fieldsFor(well, item.agg)" t-as="f" t-key="f.name" t-att-value="f.name"
-                                            t-att-selected="item.field === f.name" t-out="f.label"/>
-                                </select>
+                                <DwoSelect class="'w-auto dwo-agg-select'" options="aggOptions" value="aggValue(item)" onChange.bind="setAgg" args="[item]"/>
+                                <DwoSelect t-if="!item.metric and item.agg !== 'count'" options="fieldOptions(well, item)" value="item.field" placeholder="'Field...'" onChange.bind="setField" args="[item]"/>
                             </t>
                             <t t-else="">
-                                <select t-foreach="levels(well, item)" t-as="lv" t-key="lv.level" class="form-select form-select-sm dwo-field-select"
-                                        t-att-data-level="lv.level" t-on-change="(ev) => this.pick(item, lv.level, ev)">
-                                    <option value="">Choose a field...</option>
-                                    <option t-foreach="lv.options" t-as="o" t-key="o.value" t-att-value="o.value"
-                                            t-att-selected="lv.selected === o.value" t-out="o.label"/>
-                                </select>
-                                <select t-if="well.accepts === 'dimension' and isDate(item)" class="form-select form-select-sm w-auto"
-                                        t-on-change="(ev) => this.setInterval(item, ev)">
-                                    <option t-foreach="intervals" t-as="i" t-key="i" t-att-value="i"
-                                            t-att-selected="item.interval === i" t-out="i"/>
-                                </select>
+                                <DwoSelect t-foreach="levels(well, item)" t-as="lv" t-key="lv.level" class="'dwo-field-select'" dataLevel="lv.level" options="lv.options" value="lv.selected" placeholder="'Choose a field...'" onChange.bind="pick" args="[item, lv.level]"/>
+                                <DwoSelect t-if="well.accepts === 'dimension' and isDate(item)" class="'w-auto'" options="intervalOptions" value="item.interval" onChange.bind="setInterval" args="[item]"/>
                             </t>
                             <button t-if="canRemove(well)" type="button" class="btn btn-sm btn-link text-danger px-1"
                                     t-on-click="() => this.removeItem(well, item_index)" title="Remove">×</button>
@@ -109,24 +78,15 @@
                         <div t-if="state.compare.enabled" class="row g-2">
                             <div t-if="!compareOnAxis" class="col-6">
                                 <label class="form-label small">Date</label>
-                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setCompare('field', ev)">
-                                    <option t-foreach="dateFields" t-as="f" t-key="f.name" t-att-value="f.name"
-                                            t-att-selected="state.compare.field === f.name" t-out="f.label"/>
-                                </select>
+                                <DwoSelect options="dateFieldOptions" value="state.compare.field" onChange.bind="setCompare" args="['field']"/>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small">Compared with</label>
-                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setCompare('against', ev)">
-                                    <option value="previous_period" t-att-selected="state.compare.against === 'previous_period'">the previous period</option>
-                                    <option value="previous_year" t-att-selected="state.compare.against === 'previous_year'">the same period last year</option>
-                                </select>
+                                <DwoSelect options="againstOptions" value="state.compare.against" onChange.bind="setCompare" args="['against']"/>
                             </div>
                             <div class="col-12">
                                 <label class="form-label small">Period</label>
-                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setCompare('period', ev)">
-                                    <option t-foreach="presetLabels" t-as="p" t-key="p[0]" t-att-value="p[0]"
-                                            t-att-selected="state.compare.period === p[0]" t-out="p[1]"/>
-                                </select>
+                                <DwoSelect options="periodOptions" value="state.compare.period" onChange.bind="setCompare" args="['period']"/>
                                 <div class="form-text">If the page has a date filter on this date, its period is used instead.</div>
                             </div>
                         </div>
@@ -141,18 +101,11 @@
                         <div t-if="state.trend.enabled" class="row g-2">
                             <div class="col-6">
                                 <label class="form-label small">Date</label>
-                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setTrend('field', ev)">
-                                    <option t-foreach="dateFields" t-as="f" t-key="f.name" t-att-value="f.name"
-                                            t-att-selected="state.trend.field === f.name" t-out="f.label"/>
-                                </select>
+                                <DwoSelect options="dateFieldOptions" value="state.trend.field" onChange.bind="setTrend" args="['field']"/>
                             </div>
                             <div class="col-3">
                                 <label class="form-label small">Per</label>
-                                <select class="form-select form-select-sm" t-on-change="(ev) => this.setTrend('interval', ev)">
-                                    <option value="day" t-att-selected="state.trend.interval === 'day'">day</option>
-                                    <option value="week" t-att-selected="state.trend.interval === 'week'">week</option>
-                                    <option value="month" t-att-selected="state.trend.interval === 'month'">month</option>
-                                </select>
+                                <DwoSelect options="trendIntervalOptions" value="state.trend.interval" onChange.bind="setTrend" args="['interval']"/>
                             </div>
                             <div class="col-3">
                                 <label class="form-label small">Points</label>
@@ -179,17 +132,15 @@
                         </div>
                         <div class="col-6">
                             <label class="form-label small">Sort by</label>
-                            <select class="form-select form-select-sm" t-model="state.orderKey" t-on-change="schedulePreview">
-                                <option t-foreach="orderChoices" t-as="o" t-key="o.key" t-att-value="o.key" t-out="o.label"/>
-                            </select>
+                            <DwoSelect options="orderOptions" value="state.orderKey" onChange.bind="setOrderKey"/>
                         </div>
                         <div class="col-12">
                             <label class="form-label small">Icon and title</label>
                             <div class="input-group input-group-sm position-relative">
                                 <button type="button" class="btn btn-secondary dwo-icon-button" title="Choose the icon"
-                                        t-on-click="() => state.iconMenu = !state.iconMenu"><i t-attf-class="fa #{currentIcon}"/></button>
+                                        t-on-click="(ev) => this.toggleIconMenu(ev)"><i t-attf-class="fa #{currentIcon}"/></button>
                                 <input class="form-control dwo-title-input" t-att-placeholder="autoTitle" t-model="state.title"/>
-                                <div t-if="state.iconMenu" class="dwo-icon-menu card shadow p-2 position-absolute">
+                                <div t-if="state.iconMenu" class="dwo-icon-menu dwo-fixed-menu card shadow p-2" t-att-style="state.iconStyle">
                                     <div class="d-flex flex-wrap gap-1">
                                         <button t-foreach="iconChoices" t-as="ic" t-key="ic" type="button" t-att-title="ic"
                                                 t-attf-class="btn btn-sm dwo-icon-choice #{ic === currentIcon ? 'btn-primary' : 'btn-light'}"
@@ -207,12 +158,7 @@
                             </label>
                             <t t-else="">
                                 <label class="form-label small" t-out="optionLabel(opt.name)"/>
-                                <select t-if="opt.kind === 'enum'" class="form-select form-select-sm"
-                                        t-on-change="(ev) => this.setOption(opt.name, opt, ev)">
-                                    <option value="">Default</option>
-                                    <option t-foreach="opt.values" t-as="v" t-key="v" t-att-value="v"
-                                            t-att-selected="state.options[opt.name] === v" t-out="enumLabel(v)"/>
-                                </select>
+                                <DwoSelect t-if="opt.kind === 'enum'" options="enumOptions(opt)" value="state.options[opt.name] || ''" onChange.bind="setOption" args="[opt.name, opt]"/>
                                 <input t-elif="opt.kind === 'int' or opt.kind === 'number'" type="number" class="form-control form-control-sm"
                                        t-att-min="opt.min" t-att-max="opt.max" t-att-value="state.options[opt.name]"
                                        t-on-input="(ev) => this.setOption(opt.name, opt, ev)"/>

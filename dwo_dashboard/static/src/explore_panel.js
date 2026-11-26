@@ -7,6 +7,7 @@ import { DomainSelector } from "@web/core/domain_selector/domain_selector";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { ICON_CHOICES, PRESET_LABELS, suggestVisual, widgetIcon } from "./utils";
+import { DwoSelect, placePopup } from "./select";
 import { WidgetCard } from "./widget_card";
 
 const AGG_LABELS = {
@@ -56,7 +57,7 @@ function rememberDataset(ref) {
  * an existing widget. Everything shown (datasets, fields) is what the viewer may read: the server answers for the caller. */
 export class ExplorePanel extends Component {
     static template = "dwo_dashboard.ExplorePanel";
-    static components = { WidgetCard, DomainSelector };
+    static components = { WidgetCard, DomainSelector, DwoSelect };
     static props = {
         pageId: { type: Number, optional: true },
         widget: { type: [Object, { value: null }], optional: true },
@@ -180,7 +181,8 @@ export class ExplorePanel extends Component {
         return group === 0 ? _t("On this page") : group === 1 ? _t("Recent") : _t("All data");
     }
 
-    openDatasets() {
+    openDatasets(ev) {
+        this.state.datasetStyle = placePopup(ev.currentTarget.getBoundingClientRect(), { minWidth: 260, height: 280 });
         this.state.datasetOpen = true;
         this.state.search = "";
     }
@@ -190,6 +192,13 @@ export class ExplorePanel extends Component {
         this.state.search = "";
         rememberDataset(d.ref);
         this.chooseDataset(d.ref);
+    }
+
+    toggleIconMenu(ev) {
+        if (!this.state.iconMenu) {
+            this.state.iconStyle = placePopup(ev.currentTarget.getBoundingClientRect(), { minWidth: 280, height: 240 });
+        }
+        this.state.iconMenu = !this.state.iconMenu;
     }
 
     closeDatasets() {
@@ -426,6 +435,64 @@ export class ExplorePanel extends Component {
     setInterval(item, ev) {
         item.interval = ev.target.value;
         this.schedulePreview();
+    }
+
+    // ---------------------------------------------------------------------- choices of the autocomplete selectors
+    get aggOptions() {
+        const aggs = this.aggChoices.map((a) => ({ ...a, group: "" }));
+        const count = { value: "count", label: _t("Count") };
+        if (!this.state.metrics.length) {
+            return [count, ...aggs];
+        }
+        const metrics = this.state.metrics.map((m) => ({ value: "metric:" + m.name, label: m.label, group: _t("Metrics of this data") }));
+        const fieldGroup = _t("Aggregate of a field");
+        return this.state.kind === "orm"
+            ? [...metrics, ...[count, ...aggs].map((o) => ({ ...o, group: fieldGroup }))]
+            : metrics;
+    }
+
+    aggValue(item) {
+        return item.metric ? "metric:" + item.metric : item.agg;
+    }
+
+    fieldOptions(well, item) {
+        return this.fieldsFor(well, item.agg).map((f) => ({ value: f.name, label: f.label }));
+    }
+
+    get intervalOptions() {
+        return this.intervals.map((i) => ({ value: i, label: i }));
+    }
+
+    get trendIntervalOptions() {
+        return ["day", "week", "month"].map((i) => ({ value: i, label: i }));
+    }
+
+    get dateFieldOptions() {
+        return this.dateFields.map((f) => ({ value: f.name, label: f.label }));
+    }
+
+    get againstOptions() {
+        return [
+            { value: "previous_period", label: _t("the previous period") },
+            { value: "previous_year", label: _t("the same period last year") },
+        ];
+    }
+
+    get periodOptions() {
+        return this.presetLabels.map(([value, label]) => ({ value, label }));
+    }
+
+    get orderOptions() {
+        return this.orderChoices.map((o) => ({ value: o.key, label: o.label }));
+    }
+
+    setOrderKey(ev) {
+        this.state.orderKey = ev.target.value;
+        this.schedulePreview();
+    }
+
+    enumOptions(opt) {
+        return [{ value: "", label: _t("Default") }, ...opt.values.map((v) => ({ value: v, label: this.enumLabel(v) }))];
     }
 
     get aggChoices() {

@@ -5,14 +5,23 @@ import { Dialog } from "@web/core/dialog/dialog";
 import { deserializeDateTime } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+import { DwoSelect } from "./select";
 import { formatDateTimeShort } from "./utils";
 
 /** Who sees a page and who may change it. Everything is decided by the server (record rules): this dialog only lists
  * and asks. Recipients always see their own data in the widgets, never the owner's. */
 export class ShareDialog extends Component {
     static template = "dwo_dashboard.ShareDialog";
-    static components = { Dialog };
+    static components = { Dialog, DwoSelect };
     static props = { pageId: Number, pageName: String, hasSql: { type: Boolean, optional: true }, close: Function };
+
+    setNewLevel(ev) {
+        this.state.level = ev.target.value;
+    }
+
+    get levels() {
+        return [{ value: "view", label: _t("View") }, { value: "edit", label: _t("Edit") }];
+    }
 
     setup() {
         this.orm = useService("orm");

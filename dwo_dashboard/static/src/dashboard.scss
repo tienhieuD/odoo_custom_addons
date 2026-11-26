@@ -36,11 +36,22 @@
             .dwo-page-more { opacity: 0; transition: opacity 0.15s; }
             &:hover .dwo-page-more, &.active .dwo-page-more,
             &:hover .dwo-page-handle { opacity: 1; }
-            .dwo-page-popover { right: 0; top: 100%; z-index: 30; min-width: 140px; }
+            
         }
         .dwo-page-item.o_dragged, .dwo-page-item.dwo-dragging { box-shadow: var(--dwo-shadow); background: var(--dwo-card); z-index: 5; }
         .dwo-page-ghost { opacity: 0.4; }
     }
+    .dwo-page-add-tab, .dwo-pages-more { display: none; }
+    // favorites, categories (dividers) and the star of a page
+    .dwo-fav-item { a { color: inherit; text-decoration: none; } &:hover { background: var(--secondary-bg); } &.active { background: var(--primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
+        .dwo-fav-handle { cursor: grab; opacity: 0; width: 14px; flex: 0 0 14px; color: var(--secondary-color); touch-action: none; } &:hover .dwo-fav-handle { opacity: 1; } }
+    .dwo-star { color: var(--secondary-color); opacity: 0; &.on { opacity: 1; color: #f5a623; } }
+    .dwo-page-item:hover .dwo-star, .dwo-page-item.active .dwo-star { opacity: 1; }
+    .dwo-divider-item { margin-top: 6px; border-top: 1px solid var(--border-color); border-radius: 0 !important;
+        .dwo-divider-name { cursor: pointer; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--secondary-color); }
+        .dwo-divider-toggle { color: var(--secondary-color); width: 14px; } }
+    @media (min-width: 768px) { .dwo-in-collapsed { display: none !important; } }
+    @media (hover: none) { .dwo-star, .dwo-fav-item .dwo-fav-handle { opacity: 1; } }
     @media (hover: none) {
         .dwo-pages .dwo-page-item { .dwo-page-handle, .dwo-page-more { opacity: 1; } }
     }
@@ -101,10 +112,17 @@
 
     // ------------------------------------------------------------------------------------------ numbers
     .dwo-kpi-content { padding-top: 8px; padding-bottom: 8px; &.has-trend { padding-bottom: 12%; } position: relative; z-index: 1; }
-    .dwo-kpi-value { font-size: 2.2rem; font-weight: 600; line-height: 1.15; }
-    .dwo-kpi-affix { font-size: 1.3rem; font-weight: 400; margin: 0 2px; opacity: 0.7; }
-    .dwo-kpi-label { font-size: 0.85rem; }
-    .dwo-kpi-delta { font-size: 0.95rem; margin-top: 2px; }
+    // the text follows the size of the card (container units): a small card gets a small number, a big one a big number
+    .dwo-kpi { container-type: size; }
+    .dwo-kpi-value { font-size: clamp(0.9rem, #{"min(26cqh, 13cqw)"}, 2.8rem); font-weight: 600; line-height: 1.15; }
+    .dwo-kpi-affix { font-size: 0.6em; font-weight: 400; margin: 0 2px; opacity: 0.7; }
+    .dwo-kpi-label { font-size: clamp(0.65rem, #{"min(9cqh, 6cqw)"}, 0.95rem); }
+    .dwo-kpi-delta { font-size: clamp(0.65rem, #{"min(9cqh, 6cqw)"}, 1rem); margin-top: 2px; }
+    .dwo-kpi-period, .dwo-kpi-hint { font-size: clamp(0.6rem, #{"min(8cqh, 5cqw)"}, 0.8rem) !important; }
+    // a small card keeps the number first, then drops the details one by one
+    @container (max-height: 170px) { .dwo-kpi-period, .dwo-kpi-hint, .dwo-kpi-goal { display: none; } }
+    @container (max-height: 120px) { .dwo-kpi-delta { font-size: 0.7rem; } .dwo-kpi-label { display: none; } }
+    @container (max-height: 90px) { .dwo-kpi-delta { display: none; } .dwo-kpi-content { padding-top: 2px; padding-bottom: 2px; } }
     // the trend is a background: full width, stuck to the bottom edge, a quarter to a third of the card
     .dwo-kpi-trend { position: absolute; left: 0; right: 0; bottom: 0; height: 30%; min-height: 40px; z-index: 0; pointer-events: auto; }
     .dwo-kpi-trend svg { display: block; width: 100%; height: 100%; }
@@ -144,22 +162,15 @@
 
     // ------------------------------------------------------------------------------------------ menus and editors
     .dwo-filter-menu {
-        top: 100%;
-        left: 0;
-        z-index: 10;
-        min-width: 200px;
-        max-height: 260px;
-        overflow-y: auto;
         .dwo-filter-option { cursor: pointer; padding: 2px 4px; &:hover { background: var(--secondary-bg); } }
     }
-    .dwo-filter-editor-wrap { top: 100%; left: 0; z-index: 40; width: 340px; margin-top: 4px; }
     .dwo-explore-drawer { width: 480px; flex: 0 0 480px; background: var(--dwo-card); }
     .dwo-empty { background: var(--dwo-card); border: 1px dashed var(--dwo-line); border-radius: var(--dwo-radius); }
 }
 
 .dwo-explore {
     label.form-label { display: block; }
-    .dwo-icon-menu { top: 100%; left: 0; z-index: 30; width: 100%; margin-top: 4px; .btn { width: 32px; height: 32px; padding: 0; } }
+    .dwo-icon-menu { .btn { width: 32px; height: 32px; padding: 0; } }
     .dwo-explore-preview { height: 260px; flex: 0 0 260px; padding: 8px; background: var(--tertiary-bg); }
     .dwo-visual {
         display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
@@ -168,17 +179,20 @@
         &:hover { border-color: var(--primary); }
         &.active { border-color: var(--primary); background: var(--primary-bg-subtle, rgba(0, 102, 255, 0.1)); font-weight: 600; }
     }
-    .dwo-dataset-list { z-index: 20; max-height: 280px; overflow-y: auto; top: 100%; }
+    
     .dwo-dataset-option { cursor: pointer; &:hover { background: var(--secondary-bg); } }
 }
 
-.dwo-pick-menu {
-    position: fixed;
+// every menu opened from a button or a click: fixed, put inside the screen by JS (placePopup in select.js)
+.dwo-fixed-menu {
+    position: fixed !important;
     z-index: 1060;
-    min-width: 13rem;
-    transform: translate(8px, 8px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     border-radius: 10px;
 }
+.dwo-pick-menu { min-width: 13rem; }
+.dwo-fixed-menu .dropdown-item { display: block; padding: 8px 14px; color: inherit; text-decoration: none; &:hover { background: var(--secondary-bg, rgba(0, 0, 0, 0.06)); } }
 
 .dwo-share-level { min-width: 6.5rem; }
 
@@ -187,9 +201,19 @@
     .dwo-dashboard {
         flex-direction: column;
         overflow-y: auto !important;
-        .dwo-pages { width: 100%; flex: 0 0 auto; flex-direction: row !important; align-items: center; overflow-x: auto; overflow-y: hidden; padding: 4px; }
-        .dwo-pages > div:first-child { flex: 0 0 auto; }
-        .dwo-page-item { flex: 0 0 auto; white-space: nowrap; .dwo-page-handle { display: none !important; } }
+        // the pages are tabs: no title, "+" is the last tab, a caret lists every page when they do not fit
+        .dwo-pages { width: 100%; flex: 0 0 auto; flex-direction: row !important; align-items: flex-end; gap: 0 !important; overflow-x: auto; overflow-y: hidden; padding: 0 4px; border-bottom: 1px solid var(--border-color); scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+        .dwo-pages-head, .dwo-shared-title, .dwo-favorites, .dwo-divider-item, .dwo-star { display: none !important; }
+        .dwo-pages-body { display: contents !important; }
+        .dwo-page-item {
+            flex: 0 0 auto; white-space: nowrap; border-radius: 8px 8px 0 0 !important; padding: 10px 10px !important;
+            border-bottom: 3px solid transparent; background: transparent !important;
+            .dwo-page-handle { display: none !important; }
+            &.active { border-bottom-color: var(--primary); color: var(--primary); }
+            .dwo-page-name { max-width: 40vw; }
+        }
+        .dwo-page-add-tab { display: flex !important; flex: 0 0 auto; align-items: center; padding: 10px 14px; border: 0; background: transparent; color: var(--primary); }
+        .dwo-pages-more { display: flex; flex: 0 0 auto; position: sticky; right: 0; margin-left: auto; align-items: center; padding: 10px 14px; border: 0; background: var(--dwo-card); box-shadow: -8px 0 8px -4px rgba(0, 0, 0, 0.12); }
         .dwo-main { flex: 0 0 auto !important; overflow: visible !important; }
         .dwo-canvas { overflow: visible !important; }
         .dwo-grid { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; width: auto; }
@@ -203,4 +227,33 @@
         .dwo-explore-drawer { position: fixed; inset: 0; width: 100%; flex: none; z-index: 1050; }
         .dwo-explore-preview { height: 200px !important; flex-basis: 200px !important; }
     }
+}
+
+// the autocomplete selector (select.js): the popup is fixed, placed inside the screen by JS, above dialogs
+.dwo-select {
+    display: block;
+    cursor: pointer;
+    min-width: 6rem;
+    max-width: 100%;
+    &.open { border-color: var(--primary); }
+    &.w-auto { display: inline-block; }
+    .dwo-select-text { display: block; }
+}
+.dwo-select-popup {
+    position: fixed;
+    z-index: 1090;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 6px;
+    .dwo-select-search { flex: 0 0 auto; margin-bottom: 4px; }
+    .dwo-select-list { overflow-y: auto; overscroll-behavior: contain; flex: 1 1 auto; }
+    .dwo-select-heading { padding: 6px 8px 2px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted, #6c757d); }
+    .dwo-select-option {
+        padding: 6px 8px; border-radius: 6px; cursor: pointer; white-space: normal; word-break: break-word;
+        &.active { background: var(--secondary-bg, rgba(0, 0, 0, 0.06)); }
+        &.selected { font-weight: 600; color: var(--primary); }
+    }
+    .dwo-select-empty { padding: 8px; }
 }

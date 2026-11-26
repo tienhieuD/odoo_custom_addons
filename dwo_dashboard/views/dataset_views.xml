@@ -43,7 +43,7 @@
         <field name="name">dwo.dataset.list</field>
         <field name="model">dwo.dataset</field>
         <field name="arch" type="xml">
-            <list>
+            <list js_class="dwo_dataset_list">
                 <field name="label"/>
                 <field name="kind"/>
                 <field name="ref"/>
@@ -160,6 +160,5 @@ FROM sale_order WHERE state IN ('sale', 'done')</pre>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
-    <menuitem id="menu_dwo_ai_dataset" name="Create a dataset with AI" parent="menu_dwo_config" action="action_dwo_ai_dataset" sequence="15"/>
     <menuitem id="menu_dwo_ai_settings" name="AI assistant" parent="menu_dwo_config" action="action_dwo_ai_settings" sequence="20"/>
 </odoo>

@@ -2,6 +2,7 @@
 // Copyright 2026 DuoTEK. Licensed under the Odoo Proprietary License v1.0 (OPL-1).
 import { Component, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { DwoSelect, placePopup } from "./select";
 import { PRESET_LABELS } from "./utils";
 
 /** The filters of a page. ``values``: {filter id: value}; relation filters hold [{id, name}] so chips can be drawn. */
@@ -15,10 +16,13 @@ export class FilterBar extends Component {
         onRemove: { type: Function, optional: true },
     };
 
+    static components = { DwoSelect };
+
     setup() {
         this.orm = useService("orm");
         this.state = useState({ openId: null, query: "", options: [] });
         this.presets = PRESET_LABELS;
+        this.presetOptions = Object.entries(PRESET_LABELS).map(([value, label]) => ({ value, label }));
     }
 
     presetOf(flt) {
@@ -48,7 +52,8 @@ export class FilterBar extends Component {
         this.props.onChange(flt.id, next);
     }
 
-    async open(flt) {
+    async open(flt, ev) {
+        this.state.style = placePopup(ev.currentTarget.getBoundingClientRect(), { minWidth: 240, height: 260 });
         this.state.openId = flt.id;
         this.state.query = "";
         await this.search(flt, "");

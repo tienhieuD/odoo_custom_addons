@@ -12,15 +12,9 @@
                 </div>
                 <div t-if="!visible.length" class="text-muted small mb-2">The widgets of this page have no field of this kind.</div>
                 <t t-else="">
-                    <select class="form-select form-select-sm mb-2 dwo-filter-field" t-on-change="onField">
-                        <option t-foreach="visible" t-as="c" t-key="c.key" t-att-value="c.key" t-att-selected="c.key === state.key">
-                            <t t-out="c.label"/> (<t t-out="sources(c.datasets.length)"/>)
-                        </option>
-                    </select>
+                    <DwoSelect class="'mb-2 dwo-filter-field'" options="candidateOptions" value="state.key" onChange.bind="onField"/>
                     <input class="form-control form-control-sm mb-2" placeholder="Name" t-model="state.label"/>
-                    <select t-if="state.type === 'date'" class="form-select form-select-sm mb-2" t-model="state.default">
-                        <option t-foreach="presets" t-as="p" t-key="p[0]" t-att-value="p[0]" t-out="p[1]"/>
-                    </select>
+                    <DwoSelect t-if="state.type === 'date'" class="'mb-2 dwo-filter-default'" options="presetOptions" value="state.default" onChange.bind="setDefault"/>
                 </t>
                 <div class="d-flex justify-content-end gap-2">
                     <button class="btn btn-sm btn-secondary" t-on-click="props.onClose">Cancel</button>

@@ -4,6 +4,7 @@ import { Component, onWillStart, useState } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+import { DwoSelect } from "./select";
 
 const EXAMPLES = [
     _t("Add a KPI with the number of orders this month, compared with last month"),
@@ -15,7 +16,7 @@ const EXAMPLES = [
  * editor, where Save and Discard decide (so does the revision check of the page). */
 export class AiDialog extends Component {
     static template = "dwo_dashboard.AiDialog";
-    static components = { Dialog };
+    static components = { Dialog, DwoSelect };
     static props = { pageId: Number, spec: Object, datasets: Array, onApply: Function, close: Function };
 
     setup() {
@@ -32,6 +33,14 @@ export class AiDialog extends Component {
             this.state.status = status;
             this.state.options = options;
         });
+    }
+
+    setExtra(ev) {
+        this.state.extra = ev.target.value;
+    }
+
+    get extraOptions() {
+        return this.state.options.map((o) => ({ value: o.ref, label: o.label }));
     }
 
     get chosen() {

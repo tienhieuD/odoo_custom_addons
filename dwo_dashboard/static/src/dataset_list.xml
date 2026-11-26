@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="dwo_dashboard.DatasetListButtons">
+        <button type="button" class="btn btn-secondary dwo-dataset-ai" t-on-click="createWithAi">
+            <i class="fa fa-magic"/> Create with AI
+        </button>
+    </t>
+</templates>

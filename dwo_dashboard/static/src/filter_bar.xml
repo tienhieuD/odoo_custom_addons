@@ -7,11 +7,7 @@
                 <span class="text-muted" t-out="label(flt)"/>
                 <a t-if="props.editing" href="#" class="text-danger small dwo-filter-remove" title="Remove this filter"
                    t-on-click.prevent="() => props.onRemove(flt)">×</a>
-                <select t-if="flt.type === 'date'" class="form-select form-select-sm w-auto"
-                        t-on-change="(ev) => this.setPreset(flt, ev)">
-                    <option t-foreach="Object.keys(presets)" t-as="key" t-key="key" t-att-value="key"
-                            t-att-selected="presetOf(flt) === key" t-out="presets[key]"/>
-                </select>
+                <DwoSelect t-if="flt.type === 'date'" class="'w-auto'" options="presetOptions" value="presetOf(flt)" onChange.bind="setPreset" args="[flt]"/>
                 <div t-elif="flt.type === 'selection'" class="d-flex flex-wrap gap-1">
                     <button t-foreach="flt.values" t-as="value" t-key="value" type="button"
                             t-attf-class="btn btn-sm #{selectionValue(flt).includes(value) ? 'btn-primary' : 'btn-secondary'}"
@@ -22,10 +18,10 @@
                         <t t-out="chip.name"/>
                         <a href="#" class="text-reset ms-1" t-on-click.prevent="() => this.unpick(flt, chip)">×</a>
                     </span>
-                    <button type="button" class="btn btn-sm btn-secondary dwo-filter-open" t-on-click="() => this.open(flt)">
+                    <button type="button" class="btn btn-sm btn-secondary dwo-filter-open" t-on-click="(ev) => this.open(flt, ev)">
                         <t t-if="chips(flt).length">+</t><t t-else="">All <i class="fa fa-caret-down"/></t>
                     </button>
-                    <div t-if="state.openId === flt.id" class="dwo-filter-menu card p-2 position-absolute">
+                    <div t-if="state.openId === flt.id" class="dwo-filter-menu dwo-fixed-menu card p-2" t-att-style="state.style">
                         <input class="form-control form-control-sm mb-1" placeholder="Search..." t-att-value="state.query"
                                t-on-input="(ev) => this.search(flt, ev.target.value)"/>
                         <div t-foreach="state.options" t-as="option" t-key="option.id" class="dwo-filter-option"

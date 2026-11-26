@@ -8,6 +8,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
 MAX_PAGES = 30
+MAX_DIVIDERS = 30
 MAX_SPEC_BYTES = 512 * 1024
 EMPTY_SPEC = {"schema": "dwo-dashboard/1", "widgets": []}
 
@@ -42,7 +43,7 @@ class DwoDashboard(models.Model):
             except psycopg2.errors.UniqueViolation:
                 dashboard = self.search([("user_id", "=", self.env.uid)], limit=1)
         pages = self.env["dwo.dashboard.page"].search([("dashboard_id", "=", dashboard.id)])
-        shared = self.env["dwo.dashboard.page"].search([("dashboard_id", "!=", dashboard.id)])
+        shared = self.env["dwo.dashboard.page"].search([("dashboard_id", "!=", dashboard.id), ("kind", "=", "page")])
         return {"id": dashboard.id, "name": dashboard.name, "pages": [page._summary() for page in pages],
                 "shared": [page._summary() for page in shared]}
 
@@ -60,6 +61,11 @@ class DwoDashboardPage(models.Model):
     dashboard_id = fields.Many2one("dwo.dashboard", required=True, index=True, ondelete="cascade")
     user_id = fields.Many2one(related="dashboard_id.user_id", store=True, index=True)
     share_ids = fields.One2many("dwo.dashboard.share", "page_id", string="Shared with")
+    kind = fields.Selection([("page", "Page"), ("divider", "Category")], default="page", required=True,
+                            help="A category is a named divider of the menu: the pages below it, up to the next one, belong to it.")
+    collapsed = fields.Boolean(help="Category only: its pages are folded in the menu.")
+    favorite = fields.Boolean(help="Shown in the Favorites of the menu (own pages only: a shared page belongs to its owner).")
+    fav_sequence = fields.Integer(default=10)
     spec = fields.Json(default=lambda self: copy.deepcopy(EMPTY_SPEC))
     revision = fields.Integer(default=1, readonly=True, copy=False,
                               help="Raised at every change of the spec; a save that does not know the latest "
@@ -67,7 +73,8 @@ class DwoDashboardPage(models.Model):
 
     def _summary(self):
         self.ensure_one()
-        return {"id": self.id, "name": self.name, "sequence": self.sequence, "revision": self.revision,
+        return {"id": self.id, "name": self.name, "sequence": self.sequence, "revision": self.revision, "kind": self.kind,
+                "collapsed": self.collapsed, "favorite": self.favorite, "fav_sequence": self.fav_sequence,
                 "level": self._level(), "owner": self.sudo().user_id.name}
 
     def _level(self):
@@ -117,8 +124,10 @@ class DwoDashboardPage(models.Model):
     @api.constrains("dashboard_id")
     def _check_page_count(self):
         for dashboard in self.dashboard_id:
-            if len(dashboard.page_ids) > MAX_PAGES:
+            if len(dashboard.page_ids.filtered(lambda p: p.kind == "page")) > MAX_PAGES:
                 raise ValidationError(_("A dashboard has at most %d pages.") % MAX_PAGES)
+            if len(dashboard.page_ids.filtered(lambda p: p.kind == "divider")) > MAX_DIVIDERS:
+                raise ValidationError(_("A dashboard has at most %d categories.") % MAX_DIVIDERS)
 
     def write(self, vals):
         if not self.env.su and set(vals) - {"spec", "revision"} and any(page._level() != "owner" for page in self):
@@ -139,6 +148,7 @@ class DwoDashboardPage(models.Model):
         """The page with its spec, for the client. Access is the one of the caller (record rules)."""
         page = self.browse(page_id)
         page.check_access("read")
+        page._must_be_page()
         return {"id": page.id, "name": page.name, "spec": page.spec or copy.deepcopy(EMPTY_SPEC),
                 "revision": page.revision, "level": page._level(), "owner": page.sudo().user_id.name}
 
@@ -146,6 +156,7 @@ class DwoDashboardPage(models.Model):
         """Save the grid. ``revision`` is the one the client loaded: a newer one on the server means somebody else
         changed the page, and nothing is overwritten."""
         self.ensure_one()
+        self._must_be_page()
         if revision != self.revision:
             raise UserError(_("This page was changed somewhere else (revision %(server)s, yours is %(yours)s). "
                               "Reload it before saving.", server=self.revision, yours=revision))
@@ -155,6 +166,7 @@ class DwoDashboardPage(models.Model):
     def duplicate_page(self):
         """A copy in the dashboard of the caller (also for a page shared with them: nothing else is copied than the grid)."""
         self.ensure_one()
+        self._must_be_page()
         mine = self.env["dwo.dashboard"].get_my_dashboard()["id"]
         copy_ = self.create({"dashboard_id": mine, "name": (_("%s (copy)") % self.name)[:60], "sequence": self.sequence + 1,
                              "spec": copy.deepcopy(self.spec or EMPTY_SPEC)})
@@ -183,6 +195,7 @@ class DwoDashboardPage(models.Model):
     def share_with(self, user_ids, group_ids, level):
         self.ensure_one()
         self._must_own()
+        self._must_be_page()
         if level not in ("view", "edit"):
             raise UserError(_("Unknown level."))
         Share = self.env["dwo.dashboard.share"]
@@ -215,6 +228,21 @@ class DwoDashboardPage(models.Model):
         """The log of the person who shared (of one page when ``page_id`` is given), newest first."""
         domain = [("page_id", "=", page_id)] if page_id else []
         return self.env["dwo.dashboard.share.log"].search_read(domain, ["page_name", "action", "target", "level", "create_date"], limit=limit)
+
+    @api.model
+    def reorder_favorites(self, page_ids):
+        """Give the favorite pages the order of the list (owner only)."""
+        pages = self.browse(page_ids)
+        pages.check_access("write")
+        if any(page._level() != "owner" or not page.favorite for page in pages):
+            raise AccessError(_("Only the owner orders the favorites."))
+        for index, page in enumerate(pages):
+            page.fav_sequence = (index + 1) * 10
+        return True
+
+    def _must_be_page(self):
+        if any(page.kind != "page" for page in self):
+            raise UserError(_("A category is a heading of the menu, it has no content."))
 
     def _must_own(self):
         if self.sudo().user_id.id != self.env.uid:
