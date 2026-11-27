@@ -1,6 +1,10 @@
 # Changelog
 
 ## Joins (not released)
+- A blend is now called a **model of several tables**, edited with Odoo's own lists (Tables, Dimensions with the field of each table,
+  Measures) instead of JSON, and a "Suggest dimensions" button. Every line maps 1-1 to a key of the definition document (`type: blend`,
+  `blend:code`), which is still what is stored and what the engine reads: the lines write it, and a document written by the assistant
+  or an import writes the lines. A blend can be saved as a draft (tables only).
 - Explore: a field of a related record (`partner_id.country_id`) for dimensions and table columns, picked in a second selector.
 - **Blend** datasets (`blend:code`): several Odoo models merged by shared dimensions, as the viewer. `engine/blend.py`,
   `dwo.dataset` kind Blend, semantic checks, SPEC "Joining models".

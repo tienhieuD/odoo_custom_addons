@@ -65,6 +65,20 @@ Screenshot helpers used before are throw-away Playwright scripts (`uv run script
 **B. Other open items:** (1) "Preview as another user" was left undone on purpose (it would show the owner another person's data; if done, administrators only; owner said "để lại"). (2) Editing on a phone (currently view only; owner undecided: one-column editor or keep). (3) A structured form for blend (today: JSON with a Check button). (4) Formula metrics for blend (`a - b`, `a / b`): ask the owner first. (5) Ports to Odoo 12-18/20 (none done). (6) Enabling SQL on a real server: run `tools/sql_role_setup.sql`, set the env vars, restart. (7) Possible later phases in issue #93: alerts, e-mail digests, change history, more chart types. (8) Dark mode of Odoo is untested (Enterprise only).
 **C. Not verified:** OpenAI-compatible provider against a real service (only mocked); the AI settings form's OpenAI fields in a browser; WebKit/Safari on a real iPhone; SQL on a real production database; the owner's report that "admin cannot use the dashboard / add a page" could not be reproduced (they are investigating).
 
+## 6b. Datasets "like Power BI" (owner's request, issue #93, 2026-11-27)
+Decisions: (1) Explore already groups/filters through many2one paths (the "relationships"). (2) The blend keeps its engine and its JSON
+(`kind` value `blend`, ref `blend:<code>`) but is presented as a **model of several tables** and edited with Odoo one2many lists
+(owner: "dùng kiểu của Odoo, vẫn lưu JSON, JSON và record map 1-1"). Models `dwo.dataset.table`, `.dimension`, `.dimension.map`
+(file `models/dwo_dataset_blend.py`) and `dwo.dataset.metric.table_id`. Two pure functions: records -> document
+(`_blend_document`) and document -> records (`_sync_from_document`); the stored JSON is the canonical rebuilt one.
+(3) Rules: rebuild the JSON only when a write carries child commands (never on a plain write: an old blend has JSON but no lines
+until the post-migrate creates them); a write with both `definition_text` and child commands is refused; a blend with no
+dimension or no measure is a **draft** (saved, hidden from Explore, `_definition()` is `{}`), because lines can only point to saved
+tables; dimension and measure lists are read-only until the record is saved. A map line keeps the field PATH (`field_path`, may be
+dotted); `field_id` is its picker. Tables may repeat a model (the demo reads `sale.order` twice). (4) A widget on a multi-table
+model groups only by the shared dimensions; one table's own fields are used through its Odoo model dataset + Metrics.
+(5) Not done: row-level joins such as `mail.message` (`model` + `res_id`), `dwo-dataset/2`, converting one-model blends to metrics.
+
 ## 7. State of the repos at handoff
 - `odoo_custom_addons` branch `19.0`: the demo server runs commit `e760997`. The commit that adds this file (related paths, blend, SQL, review fixes)
   is pushed but **NOT deployed**; deploying needs the owner's OK and `--rebuild` (demo data changed: new blend dataset and widgets).

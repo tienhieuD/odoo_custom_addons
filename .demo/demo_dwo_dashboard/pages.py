@@ -58,7 +58,7 @@ def sales_page():
              "dataset": "orm:sale.order", "wells": {"axis": {"field": "partner_id.country_id"}, "values": [{"metric": "revenue"}]},
              "order": [{"measure": "revenue", "dir": "desc"}], "limit": 8, "options": {"horizontal": True, "legend": "none"},
              "ignore_filters": ["period"]},
-            {"id": "blended", "type": "bar", "title": "Won and still open, per month (a blend)", "x": 6, "y": 11, "w": 6, "h": 4,
+            {"id": "blended", "type": "bar", "title": "Won and still open, per month (two tables)", "x": 6, "y": 11, "w": 6, "h": 4,
              "dataset": "blend:won_open", "icon": "fa-random",
              "wells": {"axis": {"field": "month", "interval": "month"}, "values": [{"metric": "won"}, {"metric": "open"}]},
              "order": [{"field": "month", "dir": "asc"}], "limit": 12, "options": {"legend": "bottom"}},

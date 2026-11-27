@@ -37,7 +37,7 @@ class DwoDashboardExplore(models.AbstractModel):
             rows.append({"ref": "orm:" + name, "model": name, "label": rec.name or name})
         for dataset in self.env["dwo.dataset"].sudo().search([("kind", "=", "blend")]):
             if self._blend_readable(dataset._definition()):
-                rows.append({"ref": dataset.ref, "model": dataset.code, "label": "%s (blend)" % dataset.label})
+                rows.append({"ref": dataset.ref, "model": dataset.code, "label": "%s (model)" % dataset.label})
         if self.env["dwo.dashboard.spec"]._sql_enabled():
             for dataset in self.env["dwo.dataset"].sudo().search([("kind", "=", "sql")]):
                 if self._sql_allowed(dataset._definition()):

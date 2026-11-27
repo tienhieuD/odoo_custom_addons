@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Dynamic Dashboard",
-    "version": "19.0.0.1.0",
+    "version": "19.0.0.1.1",
     "summary": "Personal dashboards with drag-and-drop pages, charts, pivots and tables, shared with permissions kept. "
                "Keywords: dashboard, dashboards, drag and drop dashboard, pivot, chart, kpi.",
     "description": "A private dashboard for each user: pages, a drag-and-drop grid of KPIs, tables, charts and pivots, filters, "

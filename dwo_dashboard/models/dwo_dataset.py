@@ -26,6 +26,37 @@ def _plain(value):
     raise ValueError("not a plain value")
 
 
+class DwoDatasetLines(models.AbstractModel):
+    _name = "dwo.dataset.lines"
+    _description = "Lines of a dataset: they rebuild the document of their dataset"
+
+    def _blend_datasets(self):
+        raise NotImplementedError
+
+    def _rebuild(self, datasets):
+        if self.env.context.get("dwo_skip_rebuild"):
+            return
+        datasets.filtered(lambda d: d.exists() and d.kind == "blend")._rebuild_blend_document()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        recs = super().create(vals_list)
+        self._rebuild(recs._blend_datasets())
+        return recs
+
+    def write(self, vals):
+        datasets = self._blend_datasets()
+        res = super().write(vals)
+        self._rebuild(datasets | self._blend_datasets())
+        return res
+
+    def unlink(self):
+        datasets = self._blend_datasets()
+        res = super().unlink()
+        self._rebuild(datasets)
+        return res
+
+
 class DwoDataset(models.Model):
     """What the dashboards know about a data source beyond its fields. Three kinds:
     * ``orm``: an Odoo model with named, reusable measures (*metrics*);
@@ -40,7 +71,7 @@ class DwoDataset(models.Model):
     _rec_name = "label"
     _order = "label, id"
 
-    kind = fields.Selection([("orm", "Odoo model"), ("blend", "Blend of models"), ("sql", "SQL query")], required=True,
+    kind = fields.Selection([("orm", "Odoo model"), ("blend", "Model of several tables"), ("sql", "SQL query")], required=True,
                             default="orm", index=True)
     model_id = fields.Many2one("ir.model", string="Model", ondelete="cascade", index=True,
                                domain=[("transient", "=", False)])
@@ -78,7 +109,14 @@ class DwoDataset(models.Model):
             self.label = self.model_id.name
 
     def _definition(self):
-        """The ``dwo-dataset/1`` document of this record."""
+        """The ``dwo-dataset/1`` document of this record, as dashboards use it: nothing for a draft."""
+        self.ensure_one()
+        if self.kind == "blend" and self.draft:
+            return {}
+        return self._document()
+
+    def _document(self):
+        """The ``dwo-dataset/1`` document of this record, a draft included."""
         self.ensure_one()
         if self.kind != "orm":
             try:
@@ -106,7 +144,7 @@ class DwoDataset(models.Model):
             defn["metrics"] = metrics
         return defn
 
-    @api.constrains("kind", "model_id", "code", "label", "metric_ids", "definition_text")
+    @api.constrains("kind", "model_id", "code", "label", "metric_ids", "definition_text", "draft")
     def _check_definition(self):
         Spec = self.env["dwo.dashboard.spec"]
         for rec in self:
@@ -115,7 +153,9 @@ class DwoDataset(models.Model):
                     raise ValidationError(_("An Odoo model dataset needs its model."))
             elif not re.match(C.ID_PATTERN, rec.code or ""):
                 raise ValidationError(_("The code of a blend or SQL dataset is lower case letters, digits and _ (e.g. sales_vs_costs)."))
-            defn = rec._definition()
+            if rec.kind == "blend" and rec.draft:
+                continue  # tables only so far: it is checked when it is complete
+            defn = rec._document()
             if rec.kind == "sql" and not (defn.get("sql") or {}).get("columns"):
                 # a draft: the query and the groups are checked, the columns come from the button "Fill the columns from the query"
                 problems, _names = scan((defn.get("sql") or {}).get("query") or "SELECT 1")
@@ -204,7 +244,21 @@ class DwoDataset(models.Model):
                 if isinstance(defn, dict) and isinstance(defn.get("sql"), dict) and not defn["sql"].get("groups"):
                     defn["sql"]["groups"] = ["dwo_dashboard.group_dwo_dashboard_user"]
                     vals["definition_text"] = json.dumps(defn)
-        recs = super().create(vals_list)
+        lines = ("table_ids", "dimension_ids", "metric_ids")
+        for vals in vals_list:  # a blend written with lines: a draft until the document the lines write is complete
+            if vals.get("kind") == "blend":
+                if any(vals.get(k) for k in lines) and vals.get("definition_text"):
+                    raise UserError(_("Write a model of several tables with its lines or with its definition, not both."))
+                if not vals.get("definition_text"):
+                    vals["draft"] = True  # lines, or nothing yet: it is complete when the lines say so
+        recs = super(DwoDataset, self.with_context(dwo_skip_rebuild=True)).create(vals_list)
+        recs = recs.with_context(dwo_skip_rebuild=self.env.context.get("dwo_skip_rebuild", False))
+        for rec, vals in zip(recs, vals_list):
+            if rec.kind == "blend" and not self.env.context.get("dwo_sync"):
+                if rec.draft:
+                    rec._rebuild_blend_document()
+                elif vals.get("definition_text"):
+                    rec._sync_from_document()
         user_group = "dwo_dashboard.group_dwo_dashboard_user"
         for rec in recs.filtered(lambda r: r.kind == "sql"):
             defn = rec._sql_doc()
@@ -212,6 +266,23 @@ class DwoDataset(models.Model):
                 defn["sql"]["groups"] = [user_group]  # by default every dashboard user: the form shows it, and a manager can narrow it
                 rec._write_sql_doc(defn)
         return recs
+
+    def write(self, vals):
+        lines = ("table_ids", "dimension_ids", "metric_ids")
+        blends = self.filtered(lambda r: r.kind == "blend") if not self.env.context.get("dwo_sync") else self.browse()
+        by_lines = blends and any(k in vals for k in lines)
+        if by_lines and vals.get("definition_text"):
+            raise UserError(_("Edit a model of several tables with its lines or with its definition, not both."))
+        if by_lines:
+            res = super(DwoDataset, self.with_context(dwo_skip_rebuild=True)).write(dict(vals, draft=True) if len(blends) == len(self) else vals)
+            blends._rebuild_blend_document()
+            return res
+        if blends and vals.get("definition_text"):
+            vals = dict(vals, draft=False)  # a whole document is checked as one, and writes the lines
+        res = super().write(vals)
+        if blends and vals.get("definition_text"):
+            blends._sync_from_document()
+        return res
 
     def _sql_block(self):
         self.ensure_one()
@@ -287,7 +358,9 @@ class DwoDataset(models.Model):
     def action_check(self):
         """Check the definition as the person who presses the button (their own access: a field they cannot read is an error)."""
         self.ensure_one()
-        result = self.env["dwo.dashboard.spec"]._validate_dataset(self._definition(), True)
+        if self.kind == "blend" and self.draft:
+            raise UserError(_("This model is still a draft: it needs at least two tables, a dimension and a measure."))
+        result = self.env["dwo.dashboard.spec"]._validate_dataset(self._document(), True)
         if not result["valid"]:
             raise UserError(_("The definition has problems:\n%s") % "\n".join(
                 "%(path)s: %(message)s" % e for e in result["errors"][:12]))
@@ -298,22 +371,46 @@ class DwoDataset(models.Model):
 
 class DwoDatasetMetric(models.Model):
     _name = "dwo.dataset.metric"
+    _inherit = "dwo.dataset.lines"
     _description = "Dashboard metric"
     _order = "dataset_id, sequence, id"
 
+    def _blend_datasets(self):
+        return self.dataset_id
+
     dataset_id = fields.Many2one("dwo.dataset", required=True, ondelete="cascade", index=True)
-    model_name = fields.Char(related="dataset_id.model_name")
+    table_id = fields.Many2one("dwo.dataset.table", string="Table", ondelete="cascade", domain="[('dataset_id', '=', dataset_id)]",
+                               help="The table of a model of several tables that this measure reads.")
+    model_id = fields.Many2one("ir.model", compute="_compute_model_id", string="Model")
+    model_name = fields.Char(compute="_compute_model_id")
     sequence = fields.Integer(default=10)
-    name = fields.Char(required=True, help="Technical name, used in dashboards: lower case letters, digits and _ (e.g. won_revenue).")
+    name = fields.Char(required=False, help="Technical name, used in dashboards: lower case letters, digits and _ (e.g. won_revenue).")
     label = fields.Char(translate=True, help="What the widgets show; the name if empty.")
     agg = fields.Selection(AGGS, string="Aggregate", required=True, default="sum")
     field_id = fields.Many2one("ir.model.fields", string="Field", ondelete="cascade",
-                               domain="[('model_id', '=', parent.model_id), ('store', '=', True)]",
+                               domain="[('model_id', '=', model_id), ('store', '=', True)]",
                                help="Empty to count the records.")
     where = fields.Char(string="Only records", help="A domain: the metric counts only the records that match it, whatever the filters of the page.")
     format = fields.Selection(FORMATS)
 
     _name_unique = models.Constraint("UNIQUE(dataset_id, name)", "A metric name is used once per dataset.")
+
+    @api.depends("table_id.model_id", "dataset_id.model_id")
+    def _compute_model_id(self):
+        for rec in self:
+            rec.model_id = rec.table_id.model_id or rec.dataset_id.model_id
+            rec.model_name = rec.model_id.model
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        recs = self.browse()
+        for vals in vals_list:  # a measure of a model of several tables is named after its label when nobody named it
+            if not vals.get("name") and vals.get("dataset_id") and vals.get("label"):
+                from .dwo_dataset_blend import slug
+                taken = self.search([("dataset_id", "=", vals["dataset_id"])]).mapped("name")
+                vals = dict(vals, name=slug(vals["label"], taken, "measure"))
+            recs |= super().create([vals])
+        return recs
 
     @api.constrains("name")
     def _check_name(self):
@@ -336,7 +433,9 @@ class DwoDatasetMetric(models.Model):
     @api.constrains("name", "agg", "field_id", "where", "format")
     def _check_in_dataset(self):
         """The metric is checked as part of the whole definition (a field that does not exist, an average of a text...)."""
-        self.dataset_id._check_definition()
+        if self.env.context.get("dwo_skip_rebuild"):
+            return
+        self.dataset_id.filtered(lambda d: d.kind != "blend")._check_definition()
 
     def _where_list(self):
         self.ensure_one()

@@ -78,7 +78,7 @@ def _dashboards(env):
 
 
 def _blend(env):
-    """A blend: two readings of the sales orders (the won ones, the open quotations) side by side on the same months."""
+    """A model of two tables: two readings of the sales orders (the won ones, the open quotations) side by side on the same months."""
     import json
     env["dwo.dataset"].create({"kind": "blend", "code": "won_open", "label": "Won and open sales", "definition_text": json.dumps({
         "schema": "dwo-dataset/1", "type": "blend", "code": "won_open", "label": "Won and open sales",

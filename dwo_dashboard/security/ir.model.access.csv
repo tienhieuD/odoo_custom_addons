@@ -11,3 +11,9 @@ access_dwo_ai_config_manager,dwo.ai.config manager,model_dwo_ai_config,dwo_dashb
 access_ir_model_dwo_manager,ir.model read for dashboard managers,base.model_ir_model,dwo_dashboard.group_dwo_dashboard_manager,1,0,0,0
 access_ir_model_fields_dwo_manager,ir.model.fields read for dashboard managers,base.model_ir_model_fields,dwo_dashboard.group_dwo_dashboard_manager,1,0,0,0
 access_dwo_ai_dataset_wizard_manager,dwo.ai.dataset.wizard manager,model_dwo_ai_dataset_wizard,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1
+access_dwo_dataset_table_user,dwo.dataset.table user,model_dwo_dataset_table,dwo_dashboard.group_dwo_dashboard_user,1,0,0,0
+access_dwo_dataset_table_manager,dwo.dataset.table manager,model_dwo_dataset_table,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1
+access_dwo_dataset_dimension_user,dwo.dataset.dimension user,model_dwo_dataset_dimension,dwo_dashboard.group_dwo_dashboard_user,1,0,0,0
+access_dwo_dataset_dimension_manager,dwo.dataset.dimension manager,model_dwo_dataset_dimension,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1
+access_dwo_dataset_dimension_map_user,dwo.dataset.dimension.map user,model_dwo_dataset_dimension_map,dwo_dashboard.group_dwo_dashboard_user,1,0,0,0
+access_dwo_dataset_dimension_map_manager,dwo.dataset.dimension.map manager,model_dwo_dataset_dimension_map,dwo_dashboard.group_dwo_dashboard_manager,1,1,1,1
